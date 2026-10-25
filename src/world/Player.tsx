@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
-import { useMuseumStore } from '../state/useMuseumStore'
+import { useMuseumStore, canUse } from '../state/useMuseumStore'
 import { moveWithCollision, type Box } from './collision'
 import { getCanvas } from './pointer-lock'
 import { regionAt, spawnOf } from './layout'
@@ -40,6 +40,10 @@ const WALK_KEYS = [...FORWARD, ...BACKWARD, ...STEP_LEFT, ...STEP_RIGHT]
 
 // A released key must stay released this long before walking stops (see onKeyUp).
 const KEY_RELEASE_GRACE_MS = 60
+
+// Tutorial: the "look" step is done after turning this far, the "move" step after walking this far.
+const TUTORIAL_TURN = 1.2 // radians, about 70 degrees
+const TUTORIAL_WALK = 3 // metres
 
 // After this many normal W/A/S/D presses in a row, we trust the typing tool is off.
 const NORMAL_PRESSES_TO_CLEAR_WARNING = 4
@@ -87,6 +91,7 @@ export default function Player({ walls }: PlayerProps) {
   const pitch = useRef(0)
   const velocity = useRef({ x: 0, z: 0 }) // metres per second
   const normalPresses = useRef(0)
+  const tutorialProgress = useRef(0) // turned (radians) or walked (metres) in the current step
   // -1 = nothing handled yet, so the very first frame "teleports" us to the store's
   // starting room (the hall). Map teleports later reuse the same code.
   const handledTeleports = useRef(-1)
@@ -126,13 +131,17 @@ export default function Player({ walls }: PlayerProps) {
         velocity.current = { x: 0, z: 0 }
         store().setTypingToolWarning(false)
         // Released on purpose for a panel or the map: those modes are already set.
-        if (store().mode === 'exploring') store().setMode('paused')
+        if (store().mode === 'exploring') {
+          store().setMode('paused')
+          store().advanceTutorial('pause') // last tutorial step: open the pause menu
+        }
       }
     }
 
     function onMouseMove(event: MouseEvent) {
       debugStats.mouseMoves += 1
       if (store().mode !== 'exploring' || isFakeMouseJump(event)) return
+      if (!canUse(store().tutorial, 'look')) return // tutorial: camera still frozen
       const sensitivity = BASE_MOUSE_SENSITIVITY * store().mouseSensitivity
       targetYaw.current -= event.movementX * sensitivity
       targetPitch.current -= event.movementY * sensitivity
@@ -224,19 +233,34 @@ export default function Player({ walls }: PlayerProps) {
     const dt = Math.min(delta, 0.1)
     const isDown = (codes: string[]) => codes.some((code) => pressed.current.has(code))
 
+    // In the tutorial, controls unlock one at a time.
+    const canLook = canUse(store.tutorial, 'look')
+    const canMove = canUse(store.tutorial, 'move')
+
     // Camera: arrow keys change the target, then the camera glides towards it.
-    const turn = (isDown(TURN_RIGHT) ? 1 : 0) - (isDown(TURN_LEFT) ? 1 : 0)
-    const tilt = (isDown(LOOK_UP) ? 1 : 0) - (isDown(LOOK_DOWN) ? 1 : 0)
+    const turn = canLook ? (isDown(TURN_RIGHT) ? 1 : 0) - (isDown(TURN_LEFT) ? 1 : 0) : 0
+    const tilt = canLook ? (isDown(LOOK_UP) ? 1 : 0) - (isDown(LOOK_DOWN) ? 1 : 0) : 0
     targetYaw.current -= turn * TURN_SPEED * dt
     targetPitch.current += tilt * TILT_SPEED * dt
     targetPitch.current = Math.max(-MAX_PITCH, Math.min(MAX_PITCH, targetPitch.current))
+    const oldYaw = yaw.current
+    const oldPitch = pitch.current
     yaw.current = approach(yaw.current, targetYaw.current, LOOK_SMOOTHING, dt)
     pitch.current = approach(pitch.current, targetPitch.current, LOOK_SMOOTHING, dt)
     camera.rotation.set(pitch.current, yaw.current, 0)
 
+    // Tutorial "look" step: done after turning about 70 degrees in total.
+    if (store.tutorial === 'look') {
+      tutorialProgress.current += Math.abs(yaw.current - oldYaw) + Math.abs(pitch.current - oldPitch)
+      if (tutorialProgress.current > TUTORIAL_TURN) {
+        tutorialProgress.current = 0
+        store.advanceTutorial('look')
+      }
+    }
+
     // Walking: work out the wanted direction on the floor, based on where we face.
-    const forward = (isDown(FORWARD) ? 1 : 0) - (isDown(BACKWARD) ? 1 : 0)
-    const strafe = (isDown(STEP_RIGHT) ? 1 : 0) - (isDown(STEP_LEFT) ? 1 : 0)
+    const forward = canMove ? (isDown(FORWARD) ? 1 : 0) - (isDown(BACKWARD) ? 1 : 0) : 0
+    const strafe = canMove ? (isDown(STEP_RIGHT) ? 1 : 0) - (isDown(STEP_LEFT) ? 1 : 0) : 0
     const sin = Math.sin(yaw.current)
     const cos = Math.cos(yaw.current)
     let wantX = -sin * forward + cos * strafe
@@ -259,6 +283,14 @@ export default function Player({ walls }: PlayerProps) {
     // If a wall stopped us in one direction, drop that part of the speed too.
     if (next.x === camera.position.x) v.x = 0
     if (next.z === camera.position.z) v.z = 0
+    // Tutorial "move" step: done after walking about 3 metres.
+    if (store.tutorial === 'move') {
+      tutorialProgress.current += Math.hypot(next.x - camera.position.x, next.z - camera.position.z)
+      if (tutorialProgress.current > TUTORIAL_WALK) {
+        tutorialProgress.current = 0
+        store.advanceTutorial('move')
+      }
+    }
     camera.position.x = next.x
     camera.position.z = next.z
   })

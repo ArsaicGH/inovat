@@ -19,3 +19,11 @@ export function closedDoorBlockers(): Box[] {
   }
   return blockers
 }
+
+// Is a part of the museum worth drawing, seen from room `here`? Rooms hide behind closed
+// doors: a room is drawn while you are in it (or its passage) or while its door is open;
+// the rotunda while you are in it or the door of the room you are in is open.
+export function isPartVisible(part: RoomId, here: RoomId): boolean {
+  const isOpen = (room: RoomId) => (doorOpen.get(room) ?? 0) > 0
+  return part === 'rotunda' ? here === 'rotunda' || isOpen(here) : here === part || isOpen(part)
+}

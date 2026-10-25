@@ -1,32 +1,52 @@
-# React + TypeScript + Vite
+# INNOVA – Bảo tàng Cách mạng Công nghiệp
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A browser-based 3D virtual museum about the four Industrial Revolutions, made by a school group.
+Live site: https://innova-museum.vercel.app — full plan and status: [PLAN.md](PLAN.md).
 
-Currently, two official plugins are available:
+## Run it locally
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```
+npm install
+npm run dev      # opens at http://localhost:5173
+npm run build    # check for errors before every commit
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## Style guide (M6)
+
+**Mood.** A grand, luxurious museum. The central rotunda is a Victorian dome hall that sets the
+scene; each era room has its own atmosphere, from historical (CMCN 1) to futuristic (CMCN 4).
+Impressive but light: glow comes from emissive (self-lit) materials and a bloom effect, not from
+many real lights.
+
+**Font.** Be Vietnam Pro (full Vietnamese support), bundled in `public/fonts`, used for the
+interface and for all text painted onto 3D signs and boards (`src/world/fonts.ts`).
+Weights: 700 titles, 600 summaries and buttons, 400 body text.
+
+**Colours** (`src/world/style.ts`):
+
+| Use | Colour |
+|---|---|
+| Gold trim, sign borders | `#c9a25a` |
+| Dark wood (frames, wainscot, plinths) | `#4a3423` |
+| Panel paper / ink | `#f2ece0` / `#2b2620` |
+| Interface accent (buttons, crosshair) | `#c98a3c` |
+| Room accents | Rotunda gold `#c9a25a`, Sảnh giới thiệu amber `#c98a3c`, CMCN 1 copper `#b5763a`, CMCN 2 steel `#8f9aa6`, CMCN 3 beige `#d9c7a0`, CMCN 4 cyan `#3fd0e0`, Phòng trò chơi pink `#e05a8a` |
+
+**Signs.** Dark board, thin gold border, cream text. Grand era portals: title "CMCN n" plus the
+full name. Plain start/end doors: the room name only.
+
+**Text boards.** Cream paper in a dark wooden frame, readable while walking past (title, summary,
+text, source). Pressing E (or clicking) zooms the board into a large on-screen card with a short
+scale-and-fade animation; closing plays it in reverse.
+
+**Exhibits.** Each era room has four corner exhibits: a round plinth with a glowing ring, the
+prototype on top, and a text board beside it. Placeholders use the room's accent colour.
+
+**Performance rules.** Pixel ratio at most 1.5; one shadow-casting light, shadows drawn once;
+a fixed number of lights (only their brightness changes); rooms behind closed doors are not drawn;
+textures 1024 px or smaller.
+
+## Credits
+
+Every font, texture, image and model is listed with its author and licence in
+[src/content/credits.ts](src/content/credits.ts).

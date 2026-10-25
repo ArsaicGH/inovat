@@ -208,11 +208,11 @@ Create the Vite React + TypeScript project, push to GitHub, connect Vercel.
 ### Phase C: The complete game with placeholders (the "skeleton")
 
 **M6. Visual identity and themed rooms**: a shared style guide (colours, fonts, panels, signs) and one distinct, impressive atmosphere per room, balanced with performance. Direction: the hall is a welcoming museum lobby; CMCN 1 historical (brick, wood, warm lamplight); CMCN 2 steel and early electric light; CMCN 3 beige computers and fluorescent light; CMCN 4 futuristic (white glass, screens, glow); the quiz room playful. Tools: textured materials, emissive (glowing) lights, an environment map for reflections, fog, bloom, 3D signs with a bundled Vietnamese font, decoration props. Placeholder prototypes on every pedestal and placeholder text on every panel. (New packages or downloads are asked for first.)
-- [ ] All rooms use the same UI components and fonts (full Vietnamese support, e.g. Be Vietnam Pro).
+- [ ] All rooms use the same UI components and fonts (full Vietnamese support, e.g. Be Vietnam Pro). (Be Vietnam Pro bundled and used everywhere; rooms still to be themed.)
 - [ ] Each room is recognisable at a glance from lighting, materials and decoration.
 - [ ] Doorways and signs make the route Sảnh -> CMCN 1 -> ... -> Phòng trò chơi obvious.
 - [ ] Still 30 fps or more at 1080p on the leader's laptop, with at most one shadow-casting light.
-- [ ] The style guide is written in README.md.
+- [x] The style guide is written in README.md.
 
 **M7. Quiz room engine (Phòng trò chơi)**: questions from `quiz.ts`, multiple choice, immediate feedback with a short explanation, scoring, results screen, retry. Uses clearly fake placeholder questions until Phase D.
 - [ ] An answer locks once chosen; feedback is immediate.
@@ -385,4 +385,12 @@ Plan: aim for A, keep B as a cheap fallback (only `Player.tsx` changes). Decide 
   - Tested by script: all routes, closed doors block, 72 wall blocks with 0 overlaps, rooms never overlap, all 22 exhibits aimable (2.8 m yes, 3.5 m no), quiz lock and unlock, map teleports.
   - Movement stutter: caused by Windows dynamic refresh rate (see M9); frame-cap attempt removed (made it worse); hint decision open. Rotunda enlarged to 24 m across (leader's choice).
 - [x] Decision point after M5: keep free walking (leader's decision). Stutter on Windows dynamic-refresh laptops accepted as a known limitation, no hint (leader's decision).
-- [ ] M6: Visual identity and themed rooms  <- next step (asking for packages/downloads first)
+- [x] M4 + M5 committed and pushed (def3b51).
+- [x] M6: Visual identity and themed rooms (reviewed by the leader)
+  - Leader's notes (before M6): text boards are readable in 3D (`PanelBoard.tsx`, canvas texture) and E/click zooms them into the on-screen card with a smooth animation; prototypes much larger (plinth about 2.3 m wide, placeholder machines about 1.7 m tall in the room's accent colour, boards 1.4 x 1.9 m).
+  - Approved additions: Be Vietnam Pro font (public/fonts, OFL), 7 CC0 texture sets from ambientCG (public/textures, colour + normal maps, about 12 MB), @react-three/postprocessing + postprocessing (bloom). All listed in `src/content/credits.ts`.
+  - Step 1: style guide (README.md, `src/world/style.ts`) and the Victorian rotunda (`Rotunda.tsx`: marble floor with medallion and gold rings, plaster walls with wainscot and cornice, 12 columns, damask panels with wall lamps, coffered dome with oculus, chandelier), bloom + tone mapping, reflection map from Lightformers, chandelier light dimmed (not removed) when unseen. Dev switch `?fx=0` turns bloom off.
+  - Leader's UI changes: boards show only "…" when text overflows; start screen = decorated INNOVA title + subtitle + start button, then "Bạn có muốn xem hướng dẫn điều khiển không?"; optional guided tutorial (`TutorialCard.tsx`, store `tutorial` + `canUse`): intro (all frozen, Space) -> look -> move (Unikey tip) -> interact -> map -> pause (settings live in the pause menu; "Hoàn tất" shown there). Tested step by step.
+  - Step 2 done (approved by the leader): era-room themes in `room-themes.ts`, `SurfaceMaterial.tsx`, `RoomDecor.tsx`, two roaming room lights + room-tinted sky light (light count never changes).
+  - Small fixes: black screen, then the title, then the starting room fades in (`worldReady` + `.world-cover`); full-screen (F11) tip on the first tutorial step; the map places the rooms on a circle around the rotunda.
+  - Step 3 done: intro hall (wainscot with gold rail, crown moulding, red carpet, two small chandeliers, corner plants with collision, INNOVA sign on the back wall, "Sảnh trung tâm" sign above the door) and quiz room (quiz-show set: A/B/C/D answer tiles, question marks, show bulbs drawn as one instanced mesh, stage lights, name sign and floor medallion).

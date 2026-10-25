@@ -30,9 +30,23 @@ function saveSensitivity(value: number) {
   }
 }
 
+// GUIDED TUTORIAL (optional, chosen on the start screen). Each step unlocks one more control:
+// intro (everything frozen) -> look -> move -> interact -> map -> pause -> done.
+export type TutorialStep = 'intro' | 'look' | 'move' | 'interact' | 'map' | 'pause' | 'done'
+export const TUTORIAL_STEPS: TutorialStep[] = ['intro', 'look', 'move', 'interact', 'map', 'pause', 'done']
+export type Control = 'look' | 'move' | 'interact' | 'map'
+
+// May this control be used now? Always, unless the tutorial has not reached it yet.
+export function canUse(tutorial: TutorialStep | null, control: Control): boolean {
+  return tutorial === null || TUTORIAL_STEPS.indexOf(tutorial) >= TUTORIAL_STEPS.indexOf(control)
+}
+
 interface MuseumState {
   mode: Mode
   setMode: (mode: Mode) => void
+  // True once the museum has loaded and drawn its first frames (the black cover then fades).
+  worldReady: boolean
+  setWorldReady: () => void
   // Called when the mouse is captured: back to walking, any open panel is closed.
   startExploring: () => void
 
@@ -60,6 +74,12 @@ interface MuseumState {
   nearLockedDoor: boolean
   setNearLockedDoor: (near: boolean) => void
 
+  // Current tutorial step, or null when there is no tutorial (declined or finished).
+  tutorial: TutorialStep | null
+  setTutorial: (step: TutorialStep | null) => void
+  // Go to the next step, but only if we are still on `from` (so repeated events are harmless).
+  advanceTutorial: (from: TutorialStep) => void
+
   // Map teleport: `count` goes up on every request, so the player knows a new one arrived.
   teleport: { roomId: RoomId; count: number }
   requestTeleport: (roomId: RoomId) => void
@@ -68,7 +88,11 @@ interface MuseumState {
 export const useMuseumStore = create<MuseumState>((set) => ({
   mode: 'start',
   setMode: (mode) => set({ mode }),
-  startExploring: () => set({ mode: 'exploring', openExhibitId: null }),
+  worldReady: false,
+  setWorldReady: () => set({ worldReady: true }),
+  // A finished tutorial ends when the visitor resumes from the pause menu.
+  startExploring: () =>
+    set((state) => ({ mode: 'exploring', openExhibitId: null, tutorial: state.tutorial === 'done' ? null : state.tutorial })),
 
   mouseSensitivity: loadSensitivity(),
   setMouseSensitivity: (value) => {
@@ -92,6 +116,14 @@ export const useMuseumStore = create<MuseumState>((set) => ({
     set((state) => (state.visitedRooms.includes(room) ? state : { visitedRooms: [...state.visitedRooms, room] })),
   nearLockedDoor: false,
   setNearLockedDoor: (near) => set({ nearLockedDoor: near }),
+
+  tutorial: null,
+  setTutorial: (step) => set({ tutorial: step }),
+  advanceTutorial: (from) =>
+    set((state) => {
+      if (state.tutorial !== from) return state
+      return { tutorial: TUTORIAL_STEPS[TUTORIAL_STEPS.indexOf(from) + 1] ?? null }
+    }),
 
   teleport: { roomId: 'hall', count: 0 },
   requestTeleport: (roomId) => set((state) => ({ teleport: { roomId, count: state.teleport.count + 1 } })),

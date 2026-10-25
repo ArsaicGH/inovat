@@ -3,6 +3,7 @@ import { ui } from '../content/ui'
 import { roomNames } from '../content/rooms'
 import { getExhibitText } from '../content/exhibits'
 import { useMuseumStore, eraRoomsVisited } from '../state/useMuseumStore'
+import TutorialCard from './TutorialCard'
 
 // On-screen layer while walking: crosshair, exhibit prompt, room name, warnings.
 // Text comes from src/content/.
@@ -16,6 +17,7 @@ export default function Hud() {
 
   return (
     <>
+      <TutorialCard />
       {showWarning && <p className="hud-warning">{ui.typingToolWarning}</p>}
       {nearLockedDoor && (
         <p className="hud-notice">{ui.quizLocked.replace('{count}', String(visitedCount))}</p>

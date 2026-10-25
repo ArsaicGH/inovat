@@ -1,17 +1,42 @@
 // Interface text (buttons, screens). All visible text lives in src/content/.
 export const ui = {
   start: {
-    button: 'Bắt đầu tham quan',
-    controlsTitle: 'Cách điều khiển',
-    controls: [
-      'W A S D: di chuyển',
-      'Chuột / touchpad / phím mũi tên: nhìn xung quanh',
-      'E / nhấp chuột: xem hiện vật',
-      'M: bản đồ',
-      'Esc: tạm dừng',
-    ],
-    keyboardTip:
-      'Nếu đang bật bộ gõ tiếng Việt (Unikey, EVKey,...), hãy chuyển sang chế độ gõ tiếng Anh khi tham quan.',
+    button: 'Bắt đầu',
+    tutorialQuestion: 'Bạn có muốn xem hướng dẫn điều khiển không?',
+    tutorialYes: 'Có, hướng dẫn tôi',
+    tutorialNo: 'Không, vào tham quan',
+  },
+  // Guided tutorial (chosen on the start screen). {n} = step number, {total} = number of steps.
+  tutorial: {
+    progress: 'Hướng dẫn {n}/{total}',
+    steps: {
+      intro: {
+        title: 'Chào mừng đến INNOVA',
+        text: 'Hướng dẫn sẽ giới thiệu từng thao tác. Nhấn phím cách (Space) để bắt đầu.',
+        tip: 'Mẹo: nhấn F11 để chơi toàn màn hình, cho trải nghiệm tốt nhất.',
+      },
+      look: {
+        title: 'Nhìn xung quanh',
+        text: 'Di chuyển chuột hoặc touchpad, hoặc dùng các phím mũi tên, để xoay góc nhìn.',
+      },
+      move: {
+        title: 'Di chuyển',
+        text: 'Dùng W A S D để đi lại. Nếu đang bật bộ gõ tiếng Việt (Unikey, EVKey,...), hãy chuyển sang chế độ gõ tiếng Anh.',
+      },
+      interact: {
+        title: 'Xem hiện vật',
+        text: 'Đến gần một bảng thông tin trên tường, nhắm vào nó rồi nhấn E hoặc nhấp chuột để phóng to. Nhấn E hoặc Esc để đóng.',
+      },
+      map: {
+        title: 'Bản đồ',
+        text: 'Nhấn M để mở bản đồ bảo tàng. Chọn một phòng để đi thẳng đến đó.',
+      },
+      pause: {
+        title: 'Tạm dừng',
+        text: 'Nhấn Esc để tạm dừng. Menu tạm dừng chứa các cài đặt, ví dụ độ nhạy camera.',
+      },
+    },
+    done: 'Hoàn tất hướng dẫn! Đây là menu tạm dừng với các cài đặt. Nhấn Tiếp tục để bắt đầu tham quan.',
   },
   pause: {
     title: 'Tạm dừng',
@@ -21,6 +46,14 @@ export const ui = {
   sensitivity: {
     label: 'Độ nhạy camera',
   },
+  // Text painted on decorations in the 3D world.
+  decor: {
+    // Quiz room: answer tiles like a TV quiz show, and question marks on the side walls.
+    quizAnswers: ['A', 'B', 'C', 'D'],
+    quizMark: '?',
+  },
+  // Shown at the bottom of a 3D text board when the full text does not fit on it.
+  panelMore: '…',
   // Shown under the crosshair when an exhibit is within reach.
   prompt: 'Nhấn E để xem',
   infoPanel: {

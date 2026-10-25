@@ -1,3 +1,32 @@
+/* Museum font: Be Vietnam Pro (full Vietnamese support), bundled in /public/fonts. */
+@font-face {
+  font-family: 'Be Vietnam Pro';
+  src: url('/fonts/be-vietnam-pro-regular.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Be Vietnam Pro';
+  src: url('/fonts/be-vietnam-pro-medium.ttf') format('truetype');
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Be Vietnam Pro';
+  src: url('/fonts/be-vietnam-pro-semibold.ttf') format('truetype');
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Be Vietnam Pro';
+  src: url('/fonts/be-vietnam-pro-bold.ttf') format('truetype');
+  font-weight: 700;
+  font-display: swap;
+}
+
 /* The 3D canvas must fill the whole window, so remove the browser's default margins
    and let the page be exactly one screen tall (no scrollbars). */
 html,
@@ -7,11 +36,25 @@ body,
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: #111;
+  background: #000;
+}
+
+/* Black layer between the 3D world and the interface (App.tsx). It fades out once the
+   museum is ready, a moment after the title has appeared: black, title, then the room. */
+.world-cover {
+  position: fixed;
+  inset: 0;
+  z-index: 15;
+  background: #000;
+  pointer-events: none;
+  transition: opacity 450ms ease-out 250ms;
+}
+.world-cover-gone {
+  opacity: 0;
 }
 
 body {
-  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Be Vietnam Pro', system-ui, 'Segoe UI', Roboto, sans-serif;
   color: #f3f4f6;
 }
 
@@ -145,9 +188,10 @@ body {
   justify-content: center;
 }
 
-/* A refusal message from LockButton takes its own full line under the buttons. */
+/* A refusal message from LockButton takes its own full line under all the buttons. */
 .button-row .overlay-error {
   flex-basis: 100%;
+  order: 99;
 }
 
 .overlay-card .secondary-button {
@@ -202,83 +246,142 @@ body {
 }
 
 /* Exhibit information panel. */
-.overlay-card.info-panel {
-  max-width: 620px;
-  max-height: calc(100% - 64px);
+/* Enlarged text board: a copy of the 3D board (PanelBoard.tsx) with the same proportions,
+   wooden frame, cream paper and text layout. 1cqw = 1% of the board's width, so it all
+   scales together like a picture; text sizes are capped so big screens stay comfortable. */
+.info-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.board-zoom {
+  container-type: inline-size;
+  /* As large as fits: 92% of the window width or 80% of its height. */
+  width: min(92vw, calc(80vh * var(--ratio)), 1000px);
+}
+.board-frame {
+  box-sizing: border-box;
+  aspect-ratio: var(--ratio);
+  padding: var(--frame);
+  background: linear-gradient(135deg, #5a4030, #4a3423 45%, #3b2a1c);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+.board-paper {
+  --unit: clamp(13px, 5.2cqw, 24px);
+  box-sizing: border-box;
+  height: 100%;
   overflow-y: auto;
+  padding: 7.4cqw;
+  background: #f2ece0;
+  color: #3a332b;
+  font-size: var(--unit);
+  line-height: 1.5;
   text-align: left;
 }
-
-.info-panel h2 {
-  font-size: 24px;
+.board-paper h2 {
+  margin: 0;
+  color: #2b2620;
+  font-size: calc(var(--unit) * 1.5);
+  font-weight: 700;
+  line-height: 1.2;
+}
+.board-rule {
+  width: 30%;
+  height: calc(var(--unit) * 0.12);
+  margin: calc(var(--unit) * 0.4) 0 calc(var(--unit) * 0.8);
+  background: #b08a4a;
+}
+.board-paper p {
+  margin: 0 0 calc(var(--unit) * 0.6);
+}
+.board-summary {
   font-weight: 600;
 }
-
-.info-image {
+.board-body {
+  font-size: calc(var(--unit) * 0.9);
+}
+.board-sources {
+  color: #6b6152;
+  font-size: calc(var(--unit) * 0.75);
+}
+.board-actions {
   display: flex;
   align-items: center;
-  justify-content: center;
-  height: 180px;
-  margin: 0 0 16px;
-  border: 1px dashed #4a4f5d;
+  gap: 14px;
+}
+.board-close {
+  padding: 8px 20px;
+  border: 1px solid #c9a25a;
   border-radius: 8px;
-  font-size: 13px;
-  opacity: 0.7;
-}
-
-.info-summary {
-  margin: 0 0 12px;
+  background: #2b2620;
+  color: #f3e7cf;
+  font: inherit;
   font-weight: 600;
-  line-height: 1.5;
+  cursor: pointer;
 }
-
-.info-body {
-  margin: 0 0 16px;
-  line-height: 1.6;
-}
-
-.info-sources {
-  margin: 0 0 20px;
-  font-size: 13px;
-  opacity: 0.8;
-}
-
-.info-panel .overlay-tip {
-  margin: 12px 0 0;
+.board-close:hover {
+  background: #3b3226;
 }
 
 /* Map: the six rooms in visiting order. */
 .overlay-card.map-card {
-  max-width: 760px;
+  /* A set width: the circle of rooms takes its size from the card. */
+  box-sizing: border-box;
+  width: min(600px, calc(100% - 32px));
+  max-width: none;
   max-height: calc(100% - 64px);
   overflow-y: auto;
 }
 
-/* The map is laid out like the museum: rotunda in the middle, rooms around it. */
+/* The map is laid out like the museum: the rotunda in the middle and the six rooms on a
+   circle around it, each at the angle of its door (north at the top). */
 .map-plan {
-  display: grid;
-  /* Up to 150 px per column, narrower on small windows. */
-  grid-template-columns: repeat(3, minmax(0, 150px));
-  grid-template-areas:
-    "ir2 quiz ir3"
-    ". rotunda ."
-    "ir1 hall ir4";
-  gap: 10px;
-  justify-content: center;
-  margin: 0 0 20px;
+  position: relative;
+  /* Fits the window both ways; everything inside scales with it (cqw = 1% of its width). */
+  container-type: inline-size;
+  width: min(500px, 100%, 56vh);
+  aspect-ratio: 1;
+  margin: 0 auto 16px;
 }
+
+/* Thin gold ring through the rooms, like the rotunda wall they open from. */
+.map-plan::before {
+  content: '';
+  position: absolute;
+  inset: 12%;
+  border: 1px dashed rgba(201, 162, 90, 0.35);
+  border-radius: 50%;
+}
+
+/* Every room is centred on its point of the circle (--x, --y set per room below). */
+.overlay-card .map-plan > .map-room {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: 30%;
+  transform: translate(-50%, -50%);
+}
+/* Points on a circle of radius 38% around the centre, 60 degrees apart. */
+.map-quiz { --x: 50%; --y: 12%; }
+.map-ir3 { --x: 82.9%; --y: 31%; }
+.map-ir4 { --x: 82.9%; --y: 69%; }
+.map-hall { --x: 50%; --y: 88%; }
+.map-ir1 { --x: 17.1%; --y: 69%; }
+.map-ir2 { --x: 17.1%; --y: 31%; }
+.map-rotunda { --x: 50%; --y: 50%; }
 
 .overlay-card .map-room {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  min-height: 100px;
-  padding: 12px 8px;
+  gap: 0.8cqw;
+  min-height: 19cqw;
+  padding: 2cqw 1.6cqw;
   border: 2px solid transparent;
   background: #2b2e38;
   color: #f3f4f6;
-  font-size: 13px;
+  font-size: 2.6cqw;
   font-weight: 400;
 }
 
@@ -292,24 +395,25 @@ body {
 }
 
 .map-room-short {
-  font-size: 16px;
+  font-size: 3.2cqw;
   font-weight: 700;
 }
 
 .map-room-name {
-  font-size: 12px;
+  font-size: 2.4cqw;
   line-height: 1.3;
   opacity: 0.85;
 }
 
 .map-here {
   margin-top: auto;
-  font-size: 11px;
+  font-size: 2.2cqw;
   color: #f2c27b;
 }
 
-.overlay-card .map-rotunda {
+.overlay-card .map-plan > .map-rotunda {
   justify-content: center;
+  width: 28%;
   border-radius: 50%;
   aspect-ratio: 1;
 }
@@ -321,7 +425,7 @@ body {
 
 .map-visited {
   margin-top: auto;
-  font-size: 11px;
+  font-size: 2.2cqw;
   opacity: 0.7;
 }
 
@@ -339,4 +443,193 @@ body {
   font-size: 14px;
   text-align: center;
   pointer-events: none;
+}
+
+/* Exhibit panel: zooms out of the board in the middle of the screen, and back in when
+   closed (220 ms, matching CLOSE_ANIMATION_MS in InfoPanel.tsx). */
+@keyframes info-backdrop-in {
+  from { background: rgba(10, 11, 15, 0); }
+  to { background: rgba(10, 11, 15, 0.75); }
+}
+@keyframes info-card-in {
+  from { opacity: 0; transform: scale(0.35); }
+  to { opacity: 1; transform: scale(1); }
+}
+.info-overlay {
+  animation: info-backdrop-in 260ms ease-out both;
+}
+.info-overlay .info-panel {
+  animation: info-card-in 260ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.info-overlay.info-closing {
+  animation: info-backdrop-in 220ms ease-in reverse both;
+  pointer-events: none;
+}
+.info-overlay.info-closing .info-panel {
+  animation: info-card-in 220ms ease-in reverse both;
+}
+/* Visitors who asked their system for less motion get a simple fade instead. */
+@media (prefers-reduced-motion: reduce) {
+  .info-overlay .info-panel,
+  .info-overlay.info-closing .info-panel {
+    animation-name: info-backdrop-in;
+    transform: none;
+  }
+}
+
+/* ---------- Title screen ---------- */
+.title-overlay {
+  background: radial-gradient(ellipse at center, rgba(20, 16, 12, 0.55) 0%, rgba(8, 7, 6, 0.9) 75%);
+}
+
+.title-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 24px;
+  text-align: center;
+  animation: title-in 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes title-in {
+  from { opacity: 0; transform: translateY(16px) scale(0.98); letter-spacing: 0.1em; }
+  to { opacity: 1; transform: none; }
+}
+
+/* INNOVA in polished gold: a gradient painted inside the letters, with a soft glow. */
+.game-title {
+  margin: 0;
+  font-size: clamp(64px, 11vw, 148px);
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  /* Letter spacing also adds space after the last letter; this keeps the word centred. */
+  margin-right: -0.18em;
+  line-height: 1;
+  background: linear-gradient(180deg, #fff3cf 0%, #e8c77e 38%, #b8893d 62%, #f1d898 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 18px rgba(201, 162, 90, 0.35)) drop-shadow(0 4px 2px rgba(0, 0, 0, 0.5));
+}
+
+.game-subtitle {
+  margin: 0;
+  font-size: clamp(16px, 2.2vw, 24px);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  color: #e9dcc0;
+}
+
+/* Gold line - diamond - gold line, above and below the title. */
+.title-ornament {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(520px, 80vw);
+}
+.title-ornament span {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #c9a25a, transparent);
+}
+.title-ornament i {
+  width: 10px;
+  height: 10px;
+  transform: rotate(45deg);
+  border: 1px solid #c9a25a;
+  background: rgba(201, 162, 90, 0.25);
+}
+
+/* Stylised start button: dark with a gold border that glows on hover. */
+.start-button {
+  margin-top: 18px;
+  padding: 14px 44px;
+  border: 1px solid #c9a25a;
+  border-radius: 999px;
+  background: rgba(30, 24, 16, 0.75);
+  color: #f3e7cf;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+.start-button:hover {
+  background: rgba(201, 162, 90, 0.22);
+  box-shadow: 0 0 24px rgba(201, 162, 90, 0.45);
+  transform: translateY(-1px);
+}
+.start-button-quiet {
+  border-color: rgba(201, 162, 90, 0.45);
+  color: #d9ccb2;
+}
+
+.tutorial-question {
+  animation: title-in 0.5s ease-out both;
+  color: #efe4cf;
+}
+.tutorial-question p {
+  margin: 8px 0 4px;
+  font-size: 17px;
+}
+.tutorial-question .start-button {
+  margin-top: 10px;
+  padding: 12px 28px;
+  font-size: 15px;
+  letter-spacing: 0.06em;
+}
+
+/* ---------- Tutorial card (top of the screen while walking) ---------- */
+.tutorial-card {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(560px, calc(100% - 32px));
+  padding: 16px 22px;
+  border: 1px solid rgba(201, 162, 90, 0.6);
+  border-radius: 12px;
+  background: rgba(20, 17, 13, 0.85);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+  animation: tutorial-in 0.4s ease-out both;
+}
+@keyframes tutorial-in {
+  from { opacity: 0; transform: translate(-50%, -10px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+.tutorial-progress {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: #c9a25a;
+  text-transform: uppercase;
+}
+.tutorial-card h3 {
+  margin: 4px 0 6px;
+  font-size: 18px;
+  color: #f3e7cf;
+}
+.tutorial-card p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: #ddd2bc;
+}
+.tutorial-card .tutorial-tip {
+  margin-top: 10px;
+  padding: 8px 12px;
+  border-left: 3px solid #c9a25a;
+  border-radius: 4px;
+  background: rgba(201, 162, 90, 0.14);
+  color: #f3e7cf;
+}
+.tutorial-done {
+  margin: 0 0 18px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(201, 162, 90, 0.15);
+  font-size: 14px;
+  line-height: 1.5;
 }

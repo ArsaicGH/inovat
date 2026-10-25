@@ -5,8 +5,8 @@ import { useMuseumStore, isQuizUnlocked } from '../state/useMuseumStore'
 import { resumeWalking } from '../world/pointer-lock'
 import type { RoomId } from '../types'
 
-// The map follows the museum's shape: the rotunda in the middle, the rooms around it
-// (north at the top). Each name is the CSS grid area it sits in.
+// The map follows the museum's shape: the rotunda in the middle, the rooms on a circle
+// around it (north at the top). Each room's place is set in index.css (.map-<room>).
 const MAP_ROOMS: RoomId[] = ['ir2', 'quiz', 'ir3', 'rotunda', 'ir1', 'hall', 'ir4']
 
 // Map of the museum. The current room is highlighted; clicking a room teleports there.
@@ -46,7 +46,6 @@ export default function MapMenu() {
                 key={room}
                 type="button"
                 className={classes.join(' ')}
-                style={{ gridArea: room }}
                 disabled={locked}
                 onClick={() => goTo(room)}
               >

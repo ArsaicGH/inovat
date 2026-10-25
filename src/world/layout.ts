@@ -18,14 +18,15 @@ const T = WALL_THICKNESS
 export const ROTUNDA_SIDES = 12
 export const ROTUNDA_APOTHEM = 12 // centre to the middle of each side: 24 m across (leader's choice)
 export const ROTUNDA_RADIUS = ROTUNDA_APOTHEM / Math.cos(Math.PI / ROTUNDA_SIDES) // centre to each corner
-const SIDE_LENGTH = 2 * ROTUNDA_APOTHEM * Math.tan(Math.PI / ROTUNDA_SIDES) // about 6.4 m
+export const SIDE_LENGTH = 2 * ROTUNDA_APOTHEM * Math.tan(Math.PI / ROTUNDA_SIDES) // about 6.4 m
 export const ROTUNDA_HEIGHT = 8
+export const CHANDELIER_Y = 9.4 // height of the chandelier in the rotunda
 
-const DOOR_WIDTH = 2.4
+export const DOOR_WIDTH = 2.4
 // Rooms start this far from the centre. Closer, and neighbouring rooms would overlap.
 const ROOM_START = 15
-const CORNER_INSET = 2.4 // how far corner exhibits stand from the walls
-const PANEL_OFFSET = 1.3 // text panel distance from the centre of its pedestal
+const CORNER_INSET = 3.4 // how far corner exhibits stand from the walls
+const PANEL_OFFSET = 2.3 // text panel distance from the centre of its plinth
 
 export type DoorStyle = 'grand' | 'plain'
 const DOOR_HEIGHT: Record<DoorStyle, number> = { grand: 3.6, plain: 3 }
@@ -59,7 +60,7 @@ export interface Frame {
   angle: number // mesh rotation.y that lines up a mesh's x axis with t
 }
 
-function frameOfSide(side: number): Frame {
+export function frameOfSide(side: number): Frame {
   const phi = (side * 2 * Math.PI) / ROTUNDA_SIDES
   return { nx: Math.sin(phi), nz: -Math.cos(phi), tx: Math.cos(phi), tz: Math.sin(phi), angle: -phi }
 }
@@ -102,11 +103,9 @@ export const ROOMS: RoomLayout[] = ROOM_SPECS.map((spec) => {
   const frame = frameOfSide(spec.side)
   const vFront = ROOM_START + T
   const vBack = vFront + spec.depth
-  // Start the visit at the back of the hall looking towards the rotunda;
-  // everywhere else arrive just inside the entrance, looking into the room.
-  const isStart = spec.id === 'hall'
-  const spawnV = isStart ? vBack - 2 : vFront + 1.5
-  const look = isStart ? -1 : 1
+  // Arrive just inside the entrance, looking into the room. The visit starts a little
+  // further in, facing the INNOVA sign on the hall's back wall.
+  const spawnV = spec.id === 'hall' ? vFront + 3 : vFront + 1.5
   return {
     ...spec,
     frame,
@@ -115,7 +114,7 @@ export const ROOMS: RoomLayout[] = ROOM_SPECS.map((spec) => {
     vBack,
     doorHeight: DOOR_HEIGHT[spec.doorStyle],
     spawn: toWorld(frame, 0, spawnV),
-    spawnYaw: lookTowards(look * frame.nx, look * frame.nz),
+    spawnYaw: lookTowards(frame.nx, frame.nz),
   }
 })
 
@@ -334,15 +333,38 @@ export function panelPosition(spot: ExhibitSpot): [number, number] {
   return [spot.x + Math.cos(spot.yaw) * d, spot.z - Math.sin(spot.yaw) * d]
 }
 
+// ---------- Room decorations that stand on the floor ----------
+
+// Potted plants in the four corners of the intro hall (drawn in RoomDecor.tsx). Local
+// coordinates as in RoomDecor: x across the room, z towards the entrance.
+export const HALL_PLANTS: [number, number][] = [
+  [-5.3, -4.3],
+  [5.3, -4.3],
+  [-5.3, 4.3],
+  [5.3, 4.3],
+]
+
+function hallPlantBoxes(): Box[] {
+  const hall = roomById('hall')
+  if (!hall) return []
+  const centreV = (hall.vFront + hall.vBack) / 2
+  return HALL_PLANTS.map(([x, z]) => {
+    const [wx, wz] = toWorld(hall.frame, x, centreV - z)
+    return makeBox(wx, wz, 0.4, 0.4, hall.frame.angle)
+  })
+}
+
 // ---------- Collision ----------
 
 // Everything fixed that the player bumps into: solid walls, pillars, pedestals and
 // panel stands. (Closed doors are added separately, because they open and close.)
 export const COLLISION_BOXES: Box[] = [
   ...WALL_PIECES.filter((p) => p.solid),
-  ...PILLARS.map(([x, z]) => makeBox(x, z, PILLAR_RADIUS, PILLAR_RADIUS)),
+  // Column bases are about 1 m wide (Rotunda.tsx).
+  ...PILLARS.map(([x, z]) => makeBox(x, z, 0.55, 0.55)),
   ...EXHIBIT_SPOTS.filter((spot) => spot.kind !== 'wall').flatMap((spot) => {
     const [px, pz] = panelPosition(spot)
-    return [makeBox(spot.x, spot.z, 0.6, 0.6, spot.yaw), makeBox(px, pz, 0.35, 0.35, spot.yaw)]
+    return [makeBox(spot.x, spot.z, 1.2, 1.2, spot.yaw), makeBox(px, pz, 0.75, 0.25, spot.yaw)]
   }),
+  ...hallPlantBoxes(),
 ]
