@@ -5,6 +5,7 @@ import type { Group, Mesh } from 'three'
 import { useMuseumStore, isQuizUnlocked } from '../state/useMuseumStore'
 import { DOORS, type DoorLayout } from './layout'
 import { doorOpen } from './door-state'
+import { playEffect } from '../audio/sound'
 import { addAimTarget, removeAimTarget } from './aim-targets'
 import Sign from './Sign'
 
@@ -19,6 +20,7 @@ function Door({ door }: { door: DoorLayout }) {
   const group = useRef<Group>(null)
   const left = useRef<Mesh>(null)
   const right = useRef<Mesh>(null)
+  const lastTarget = useRef(-1) // last open (1) / closed (0) decision, -1 = none yet
   const visited = useMuseumStore((state) => state.visitedRooms)
   const locked = door.room === 'quiz' && !isQuizUnlocked(visited)
   const leafWidth = door.width / 2
@@ -34,6 +36,11 @@ function Door({ door }: { door: DoorLayout }) {
   useFrame(({ camera }, delta) => {
     const dist = Math.hypot(camera.position.x - door.centre[0], camera.position.z - door.centre[1])
     const target = !locked && dist < OPEN_DISTANCE ? 1 : 0
+    // Sliding sound when the door starts to open or to close (quieter further away).
+    if (target !== lastTarget.current) {
+      if (lastTarget.current !== -1) playEffect(target ? 'doorOpen' : 'doorClose', Math.max(0.1, 0.5 - dist * 0.04))
+      lastTarget.current = target
+    }
     const current = doorOpen.get(door.room) ?? 0
     let next = current + (target - current) * Math.min(1, delta * OPEN_SPEED)
     if (Math.abs(target - next) < 0.001) next = target

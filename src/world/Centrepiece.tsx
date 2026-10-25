@@ -75,19 +75,19 @@ export default function Centrepiece() {
       })}
 
       {/* Gold column holding the armillary. */}
-      <mesh position={[0, 1.75, 0]}>
+      <mesh position={[0, 1.75, 0]} castShadow>
         <cylinderGeometry args={[0.05, 0.07, 1.3, 16]} />
         <meshStandardMaterial color={GOLD} metalness={0.9} roughness={0.42} />
       </mesh>
 
       <group position={[0, 2.75, 0]}>
-        <mesh>
+        <mesh castShadow>
           <sphereGeometry args={[0.24, 32, 20]} />
           <meshStandardMaterial color={GOLD} metalness={0.9} roughness={0.38} />
         </mesh>
         {RINGS.map((ring, i) => (
           <group key={ring.room} ref={(g) => { rings.current[i] = g }}>
-            <mesh rotation={[ring.tilt[0], 0, ring.tilt[1]]}>
+            <mesh rotation={[ring.tilt[0], 0, ring.tilt[1]]} castShadow>
               <torusGeometry args={[ring.radius, 0.035, 10, 72]} />
               {ring.glows ? (
                 <meshStandardMaterial color={ring.colour} emissive={ring.colour} emissiveIntensity={3} toneMapped={false} />

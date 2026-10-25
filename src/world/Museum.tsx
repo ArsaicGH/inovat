@@ -1,9 +1,9 @@
 import { Suspense, useEffect, useMemo, useRef, type ReactNode, type RefObject } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Environment, Lightformer, Stats } from '@react-three/drei'
-import { Bloom, EffectComposer, ToneMapping, Vignette } from '@react-three/postprocessing'
+import { Bloom, EffectComposer, N8AO, ToneMapping, Vignette } from '@react-three/postprocessing'
 import { ToneMappingMode } from 'postprocessing'
-import { HalfFloatType, Object3D, Texture, WebGLRenderTarget, type Camera, type Group, type HemisphereLight, type Mesh, type PointLight, type SpotLight, type Scene, type WebGLRenderer } from 'three'
+import { Color, HalfFloatType, Object3D, Texture, WebGLRenderTarget, type Camera, type Group, type HemisphereLight, type Mesh, type PointLight, type SpotLight, type Scene, type WebGLRenderer } from 'three'
 import type { RoomId } from '../types'
 import { useMuseumStore } from '../state/useMuseumStore'
 import Room from './Room'
@@ -14,49 +14,53 @@ import Exhibit from './Exhibit'
 import Player from './Player'
 import Interaction from './Interaction'
 import FrameTimingProbe from './FrameTimingProbe'
-import { CHANDELIER_Y, COLLISION_BOXES, EXHIBIT_SPOTS, PART_COUNT, ROOMS, toWorld } from './layout'
-import { doorOpen, isPartVisible } from './door-state'
+import { CHANDELIER_Y, COLLISION_BOXES, DOORS, EXHIBIT_SPOTS, PART_COUNT, ROOMS, roomById, toWorld } from './layout'
+import { isPartVisible } from './door-state'
 import { ROOM_THEMES } from './room-themes'
 import { CANVAS_WRAPPER_ID } from './pointer-lock'
-import { SPOT_COUNT, SPOT_PLANS } from './spot-plan'
+import { KEY_PLANS, SPOT_COUNT, SPOT_PLANS } from './spot-plan'
 import SpotFixtures from './SpotFixtures'
 import { useFontsReady } from './fonts'
 
 // DEVELOPMENT-ONLY test switches in the address bar, to find what slows frames down:
 // ?dpr=1 (normal resolution), ?aa=0 (no edge smoothing), ?shadows=0 (no shadows),
-// ?fx=0 (no bloom glow). They can be combined: ?dpr=1&fx=0. Ignored on the live site.
+// ?fx=0 (no bloom glow), ?ao=0 (no ambient occlusion). They can be combined: ?dpr=1&fx=0.
+// Ignored on the live site.
 const testSwitches = new URLSearchParams(import.meta.env.DEV ? window.location.search : '')
 const MAX_PIXEL_RATIO = testSwitches.get('dpr') === '1' ? 1 : 1.5
 const ANTIALIAS = testSwitches.get('aa') !== '0'
 const SHADOWS = testSwitches.get('shadows') !== '0'
 const EFFECTS = testSwitches.get('fx') !== '0'
+const AO = testSwitches.get('ao') !== '0'
 
 const GROUPS: RoomId[] = ['rotunda', ...ROOMS.map((room) => room.id)]
 
-// Where each room's roaming light hangs: room centre, 1.8 m below the ceiling. (Close to
-// a light-coloured ceiling it made a blinding bright spot.)
-const ROOM_LIGHT_SPOTS = new Map(
-  ROOMS.map((room) => {
-    const [x, z] = toWorld(room.frame, 0, (room.vFront + room.vBack) / 2)
-    return [room.id, [x, room.height - 1.8, z] as const]
-  }),
-)
-
-// Put a roaming light in a room (with its theme colour), or switch it off (room = null).
-function placeRoomLight(light: PointLight, room: RoomId | null) {
-  const spot = room ? ROOM_LIGHT_SPOTS.get(room) : undefined
-  if (!room || room === 'rotunda' || !spot) {
-    light.intensity = 0
-    return
+// Which room's lights are on: the room you are in, or, in the rotunda, the room whose door
+// is nearest. So a room is already lit before its door opens, and the room you just left
+// stays lit while its door closes behind you.
+function litRoom(here: RoomId, x: number, z: number): RoomId {
+  if (here !== 'rotunda') return here
+  let best: RoomId = 'hall'
+  let bestDistance = Infinity
+  for (const door of DOORS) {
+    const distance = Math.hypot(door.centre[0] - x, door.centre[1] - z)
+    if (distance < bestDistance) {
+      bestDistance = distance
+      best = door.room
+    }
   }
-  const theme = ROOM_THEMES[room].light
-  light.position.set(spot[0], spot[1], spot[2])
-  light.color.set(theme.colour)
-  light.intensity = theme.intensity
+  return best
 }
 
+// How long a change of lit room takes: the old room's lights fade out, then the new
+// room's fade in (seconds each), instead of popping.
+const LIGHT_FADE = 0.3
+
+// The rotunda's soft fill light: generous, the hall is meant to feel grand and welcoming.
+const ROTUNDA_FILL = 0.3
+
 // Brightness of one museum spotlight (spot-plan.ts).
-const SPOT_INTENSITY = 45
+const SPOT_INTENSITY = 120
 
 // LIGHTING, in the style of a real museum: the rooms themselves are fairly dim (low soft
 // light, a gentle room light) and warm spotlights pick out the exhibits, which gives the
@@ -64,52 +68,96 @@ const SPOT_INTENSITY = 45
 // The NUMBER of lights never changes (switching lights on/off would make the browser
 // re-prepare its drawing code, causing hitches); only their brightness and place do.
 function Lighting() {
-  // A directional light shines towards its "target"; it must be in the scene to be used.
-  const target = useMemo(() => new Object3D(), [])
-  const chandelier = useRef<PointLight>(null)
-  const roomLight = useRef<PointLight>(null) // the room you are in
-  const peekLight = useRef<PointLight>(null) // a room whose door is open in front of you
+  const accent = useRef<PointLight>(null) // the lit room's coloured lamp light
+  const keyLight = useRef<SpotLight>(null)
+  const keyTarget = useMemo(() => new Object3D(), [])
+  const keyArea = useRef<RoomId | null>(null)
+  const keyLevel = useRef(0)
   const sky = useRef<HemisphereLight>(null)
   // Five spotlights that move to the room you are in (spot-plan.ts), each with the point
   // it shines at (a spotlight's target must be in the scene too).
   const spots = useRef<(SpotLight | null)[]>([])
   const spotTargets = useMemo(() => Array.from({ length: SPOT_COUNT }, () => new Object3D()), [])
-  const spotRoom = useRef<RoomId | null>(null)
+  const lit = useRef<RoomId | null>(null) // the room the lights are in now
+  const level = useRef(0) // 0-1: the lights fade between rooms
+  const skyColour = useMemo(() => new Color(), [])
 
-  useFrame(() => {
+  useFrame(({ camera, gl }, delta) => {
     const here = useMuseumStore.getState().currentRoom
-    // The chandelier's warm light only matters while the rotunda can be seen.
-    if (chandelier.current) chandelier.current.intensity = isPartVisible('rotunda', here) ? 110 : 0
-    if (roomLight.current) placeRoomLight(roomLight.current, here)
-    if (peekLight.current) {
-      // From the rotunda you can look into a room through its open door.
-      const peek = here === 'rotunda' ? ROOMS.find((room) => (doorOpen.get(room.id) ?? 0) > 0)?.id ?? null : null
-      placeRoomLight(peekLight.current, peek)
-    }
-    if (sky.current) sky.current.color.set(here === 'rotunda' ? '#fff1dc' : ROOM_THEMES[here].sky)
+    const want = litRoom(here, camera.position.x, camera.position.z)
 
-    // Move the spotlights only when the room changes.
-    if (spotRoom.current !== here) {
-      spotRoom.current = here
-      const plan = SPOT_PLANS.get(here) ?? []
-      spots.current.forEach((spot, i) => {
-        if (!spot) return
-        const aim = plan[i]
-        spot.intensity = aim ? SPOT_INTENSITY * (aim.strength ?? 1) : 0
-        if (!aim) return
-        spot.position.set(...aim.from)
-        spotTargets[i].position.set(...aim.to)
-        spotTargets[i].updateMatrixWorld()
-      })
+    // Fade out, move the lights to the new room, fade back in.
+    const dt = Math.min(delta, 0.1)
+    if (lit.current !== want) {
+      level.current = Math.max(0, level.current - dt / LIGHT_FADE)
+      if (level.current === 0 || lit.current === null) {
+        lit.current = want
+        const plan = SPOT_PLANS.get(want) ?? []
+        spots.current.forEach((spot, i) => {
+          const aim = plan[i]
+          if (!spot || !aim) return
+          spot.position.set(...aim.from)
+          // Exhibits: a tight beam that just covers the object and its plinth, fading out
+          // very softly (a wide beam left a hard bright ring on the floor around the plinth).
+          spot.angle = aim.narrow ? 0.3 : 0.42
+          spot.penumbra = aim.narrow ? 0.9 : 0.5
+          spotTargets[i].position.set(...aim.to)
+          spotTargets[i].updateMatrixWorld()
+        })
+      }
+    } else {
+      level.current = Math.min(1, level.current + dt / LIGHT_FADE)
+    }
+    const room = lit.current ?? want
+    const plan = SPOT_PLANS.get(room) ?? []
+    // The room's coloured lamp light (lanterns, bulbs, panels...), following the lit room.
+    const roomLayout = roomById(room)
+    if (accent.current && roomLayout && room !== 'rotunda') {
+      const { colour, intensity, at } = ROOM_THEMES[room].accent
+      const [ax, az] = toWorld(roomLayout.frame, at[0], (roomLayout.vFront + roomLayout.vBack) / 2 - at[2])
+      accent.current.position.set(ax, at[1], az)
+      accent.current.color.set(colour)
+      accent.current.intensity = intensity * level.current
+    }
+    spots.current.forEach((spot, i) => {
+      if (spot) spot.intensity = plan[i] ? SPOT_INTENSITY * (plan[i].strength ?? 1) * level.current : 0
+    })
+
+    // The key light follows the area you are in, fading out, moving and fading back in.
+    const key = keyLight.current
+    if (key) {
+      if (keyArea.current !== here) {
+        keyLevel.current = Math.max(0, keyLevel.current - dt / LIGHT_FADE)
+        const plan = KEY_PLANS.get(here)
+        if ((keyLevel.current === 0 || keyArea.current === null) && plan) {
+          keyArea.current = here
+          key.position.set(...plan.from)
+          gl.shadowMap.needsUpdate = true // the key light moved: redraw its shadows
+          key.angle = plan.angle
+          keyTarget.position.set(...plan.to)
+          keyTarget.updateMatrixWorld()
+        }
+      } else {
+        keyLevel.current = Math.min(1, keyLevel.current + dt / LIGHT_FADE)
+      }
+      key.intensity = (KEY_PLANS.get(keyArea.current ?? here)?.intensity ?? 0) * keyLevel.current
+    }
+
+    // The soft "sky" light takes the colour of where you are, gradually.
+    skyColour.set(here === 'rotunda' ? '#fff1dc' : ROOM_THEMES[here].sky)
+    const fill = here === 'rotunda' ? ROTUNDA_FILL : ROOM_THEMES[here].fill
+    if (sky.current) {
+      sky.current.color.lerp(skyColour, Math.min(1, dt * 3))
+      sky.current.intensity += (fill - sky.current.intensity) * Math.min(1, dt * 3)
     }
   })
 
   return (
     <>
-      <primitive object={target} position={[0, 0, 0]} />
       {/* A little soft light from every direction, so nothing is pitch black. */}
-      <ambientLight intensity={0.08} />
-      <hemisphereLight ref={sky} args={['#fff1dc', '#2a2219', 0.2]} />
+      <ambientLight intensity={0.04} />
+      {/* Even fill in the room's colour (a ceiling lamp here made a fake bright spot). */}
+      <hemisphereLight ref={sky} args={['#fff1dc', '#2a2219', 0.13]} />
       {/* The museum spotlights (no shadows: CLAUDE.md allows only one shadow light). */}
       {spotTargets.map((spotTarget, i) => (
         <group key={i}>
@@ -121,40 +169,40 @@ function Lighting() {
             target={spotTarget}
             color="#ffe6c4"
             intensity={0}
-            angle={0.5}
-            penumbra={0.7}
+            // Beam width and softness are set per target (see the frame code above).
+            angle={0.42}
+            penumbra={0.5}
             decay={2}
           />
         </group>
       ))}
-      {/* Two roaming room lights (always present; only moved, recoloured and dimmed). */}
-      <pointLight ref={roomLight} intensity={0} decay={2} />
-      <pointLight ref={peekLight} intensity={0} decay={2} />
-      <pointLight ref={chandelier} color="#ffd9a0" intensity={110} decay={2} position={[0, CHANDELIER_Y - 0.3, 0]} />
-      {/* The only shadow-casting light (CLAUDE.md allows at most one): "sunlight". */}
-      <directionalLight
-        target={target}
-        position={[8, 25, 6]}
-        intensity={0.55}
-        color="#fff1dc"
+      {/* The lit room's coloured lamp light (no shadows). */}
+      <pointLight ref={accent} intensity={0} decay={2} />
+      {/* Always on (switching it on only when the rotunda came into view made it pop). */}
+      <pointLight color="#ffd9a0" intensity={110} decay={2} position={[0, CHANDELIER_Y - 0.3, 0]} />
+      {/* The key light: the only shadow-casting light (CLAUDE.md allows one). A big soft
+          spotlight from high above the area you are in (spot-plan.ts, KEY_PLANS). */}
+      <primitive object={keyTarget} />
+      <spotLight
+        ref={keyLight}
+        target={keyTarget}
+        color="#ffe9cf"
+        intensity={0}
+        penumbra={0.9}
+        decay={2}
         castShadow
-        shadow-mapSize={[2048, 2048]}
-        shadow-bias={-0.0005}
-        shadow-normalBias={0.02}
-        // Make the shadow area cover the whole museum (about 70 m across).
-        shadow-camera-left={-40}
-        shadow-camera-right={40}
-        shadow-camera-top={40}
-        shadow-camera-bottom={-40}
-        shadow-camera-near={1}
-        shadow-camera-far={80}
+        shadow-mapSize={[1024, 1024]}
+        shadow-bias={-0.0004}
+        shadow-normalBias={0.03}
+        shadow-camera-near={0.5}
+        shadow-camera-far={30}
       />
       {/* Reflections: a small "light map" of glowing shapes, made once at start (no
           download). Shiny surfaces such as marble and gold reflect it. */}
       <Environment resolution={128} frames={1}>
-        <Lightformer form="ring" intensity={1.3} color="#ffe4b8" scale={10} position={[0, 12, 0]} rotation={[Math.PI / 2, 0, 0]} />
-        <Lightformer form="rect" intensity={0.45} color="#fff3e0" scale={[20, 4, 1]} position={[0, 4, -12]} />
-        <Lightformer form="rect" intensity={0.35} color="#ffe9cc" scale={[20, 4, 1]} position={[0, 4, 12]} rotation={[0, Math.PI, 0]} />
+        <Lightformer form="ring" intensity={1.2} color="#ffe4b8" scale={10} position={[0, 12, 0]} rotation={[Math.PI / 2, 0, 0]} />
+        <Lightformer form="rect" intensity={0.2} color="#fff3e0" scale={[20, 4, 1]} position={[0, 4, -12]} />
+        <Lightformer form="rect" intensity={0.15} color="#ffe9cc" scale={[20, 4, 1]} position={[0, 4, 12]} rotation={[0, Math.PI, 0]} />
       </Environment>
     </>
   )
@@ -204,7 +252,7 @@ function MuseumPart({ id }: { id: RoomId }) {
   const prepared = usePrepareForDrawing(group)
 
   useFrame(() => {
-    // Keep everything visible until it has been prepared (and for the once-only shadows).
+    // Keep everything visible until it has been prepared.
     if (prepared.current < 5) return
     if (group.current) group.current.visible = isPartVisible(id, useMuseumStore.getState().currentRoom)
   })
@@ -256,8 +304,74 @@ function PreparedDoors({ children }: { children: ReactNode }) {
   return <group ref={group}>{children}</group>
 }
 
-// Shadows are drawn only once (see onCreated). Textures load in the background, so the
-// museum appears a moment after start; redraw the shadows once it has.
+// Redraw the shadows once a part has loaded (harmless now that they are redrawn every
+// frame, but keeps the shadows right if that is ever switched off again).
+// AUTOMATIC QUALITY: the expensive work (ambient occlusion, edge smoothing, lights,
+// shadows) costs per pixel, and visitors' computers differ a lot. Every 2 seconds the
+// game checks its frame rate. When frames are slow it steps down, one step at a time:
+// resolution to 1x, then ambient occlusion off, then resolution to 0.75x, then shadows
+// only redrawn when the key light moves. When there is time to spare it raises the
+// resolution again (never above 1.5, CLAUDE.md); effects that were switched off stay off
+// for the visit, because switching them back and forth would be noticed.
+const MIN_PIXEL_RATIO = 0.75
+const SLOW_FPS = 50
+const FAST_FPS = 80
+function AdaptiveQuality() {
+  const setDpr = useThree((state) => state.setDpr)
+  const ratio = useRef(Math.min(window.devicePixelRatio, MAX_PIXEL_RATIO))
+  const frames = useRef(0)
+  const time = useRef(0)
+  const calmPeriods = useRef(0)
+  useFrame((_, delta) => {
+    const store = useMuseumStore.getState()
+    // Only typical walking frames count (not loading, menus or the very first seconds).
+    if (!store.worldReady || store.mode !== 'exploring') {
+      frames.current = 0
+      time.current = 0
+      return
+    }
+    frames.current += 1
+    time.current += delta
+    if (time.current < 2) return
+    const fps = frames.current / time.current
+    frames.current = 0
+    time.current = 0
+
+    let next = ratio.current
+    if (fps < SLOW_FPS) {
+      calmPeriods.current = 0
+      if (ratio.current > 1) next = Math.max(1, ratio.current - 0.25)
+      else if (store.graphicsLevel === 2) store.lowerGraphics() // ambient occlusion off
+      else if (ratio.current > MIN_PIXEL_RATIO) next = MIN_PIXEL_RATIO
+      else if (store.graphicsLevel === 1) store.lowerGraphics() // fewer shadow redraws
+    } else if (fps > FAST_FPS) {
+      calmPeriods.current += 1
+      if (calmPeriods.current >= 3) {
+        next = Math.min(MAX_PIXEL_RATIO, ratio.current + 0.25)
+        calmPeriods.current = 0
+      }
+    } else {
+      calmPeriods.current = 0
+    }
+    if (next !== ratio.current) {
+      ratio.current = next
+      setDpr(next)
+    }
+  })
+  return null
+}
+
+// Shadows: redrawn every third frame (the key light moves rarely and the prototypes turn
+// slowly). At the lowest graphics level only when the key light has moved.
+function ShadowThrottle() {
+  const frame = useRef(0)
+  useFrame(({ gl }) => {
+    frame.current += 1
+    if (useMuseumStore.getState().graphicsLevel > 0 && frame.current % 3 === 0) gl.shadowMap.needsUpdate = true
+  })
+  return null
+}
+
 function ShadowRefresh() {
   const get = useThree((state) => state.get)
   useEffect(() => {
@@ -267,6 +381,7 @@ function ShadowRefresh() {
 }
 
 export default function Museum() {
+  const graphicsLevel = useMuseumStore((state) => state.graphicsLevel)
   return (
     // The Canvas resizes itself with the window, so the scene never stretches.
     <Canvas
@@ -279,9 +394,7 @@ export default function Museum() {
       // Laptops with two graphics chips: ask for the faster one.
       gl={{ powerPreference: 'high-performance', antialias: ANTIALIAS }}
       onCreated={({ gl }) => {
-        // Nothing big moves (doors and small placeholder models cast no shadows), so draw
-        // the shadows once instead of 100+ times a second. If moving shadow casters are
-        // added later, set gl.shadowMap.needsUpdate = true.
+        // Shadows are redrawn by ShadowThrottle (every third frame), not every frame.
         gl.shadowMap.autoUpdate = false
         gl.shadowMap.needsUpdate = true
       }}
@@ -299,6 +412,8 @@ export default function Museum() {
       ))}
       {/* Doors are always drawn: you see them from both the rotunda and the rooms. */}
       <WarmUp />
+      <AdaptiveQuality />
+      <ShadowThrottle />
       <PreparedDoors>
         <Doors />
       </PreparedDoors>
@@ -309,9 +424,13 @@ export default function Museum() {
       {/* Bloom: things brighter than white (bulbs, oculus, gold rings) glow softly.
           ToneMapping turns the bright picture into screen colours (needed with effects). */}
       {EFFECTS && (
-        <EffectComposer multisampling={ANTIALIAS ? 4 : 0}>
-          <Bloom mipmapBlur luminanceThreshold={1} luminanceSmoothing={0.2} intensity={0.8} />
-          <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />
+        <EffectComposer multisampling={ANTIALIAS ? 2 : 0}>
+          {/* Ambient occlusion: the soft darkening where objects meet the floor and in
+              corners, which real rooms always have. Half resolution keeps it cheap. */}
+          {AO && graphicsLevel === 2 ? <N8AO halfRes quality="performance" aoSamples={8} denoiseSamples={4} aoRadius={1.2} distanceFalloff={1} intensity={2.2} /> : <></>}
+          <Bloom mipmapBlur luminanceThreshold={1} luminanceSmoothing={0.2} intensity={0.45} />
+          {/* AgX: a natural, film-like way of turning light into screen colours. */}
+          <ToneMapping mode={ToneMappingMode.AGX} />
           {/* Slightly darker corners, like a camera lens: a cinematic frame. */}
           <Vignette offset={0.3} darkness={0.55} />
         </EffectComposer>

@@ -6,6 +6,7 @@ import InfoPanel from './ui/InfoPanel'
 import MapMenu from './ui/MapMenu'
 import DeviceMessage from './ui/DeviceMessage'
 import LoadingScreen from './ui/LoadingScreen'
+import SoundDirector from './audio/SoundDirector'
 import { useEffect } from 'react'
 import { useMuseumStore } from './state/useMuseumStore'
 import { useContent } from './content/use-content'
@@ -42,6 +43,7 @@ function App() {
       <InfoPanel />
       {mode === 'map' && <MapMenu />}
       <LoadingScreen />
+      <SoundDirector />
     </>
   )
 }

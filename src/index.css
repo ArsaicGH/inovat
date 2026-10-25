@@ -970,3 +970,15 @@ body {
   width: auto;
   margin: 10px 0 16px;
 }
+
+/* ---------- Volume slider on the start screen (above the language pill) ---------- */
+.language-bottom .sensitivity {
+  width: min(280px, 70vw);
+  margin: 0;
+  color: #d9ccb2;
+  font-size: 13px;
+  text-align: center;
+}
+.language-bottom .sensitivity input {
+  accent-color: #c9a25a;
+}

@@ -146,7 +146,7 @@ function ElectricAge({ size }: { size: RoomSize }) {
             </mesh>
             <mesh position={[0, size.h - 1.55, 0]}>
               <sphereGeometry args={[0.1, 14, 10]} />
-              <Glow colour="#ffcf85" intensity={6} />
+              <Glow colour="#ffcf85" intensity={3} />
             </mesh>
           </group>
         )),
@@ -164,7 +164,7 @@ function ComputerAge({ size }: { size: RoomSize }) {
         [-3.5, 0, 3.5].map((z) => (
           <mesh key={`${x}${z}`} position={[x, size.h - 0.01, z]} rotation={[Math.PI / 2, 0, 0]}>
             <planeGeometry args={[1.8, 0.5]} />
-            <Glow colour="#eef6ff" intensity={1.3} />
+            <Glow colour="#eef6ff" intensity={0.35} />
           </mesh>
         )),
       )}
@@ -216,13 +216,13 @@ function DigitalAge({ size }: { size: RoomSize }) {
         strips.map(([x, z, r, len], i) => (
           <mesh key={`${y}-${i}`} position={[x, y, z]} rotation={[0, r, 0]}>
             <boxGeometry args={[len - 0.1, 0.04, 0.02]} />
-            <Glow colour="#3fd0e0" intensity={4} />
+            <Glow colour="#3fd0e0" intensity={2} />
           </mesh>
         )),
       )}
       <mesh position={[0, size.h - 0.05, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[3, 0.05, 8, 80]} />
-        <Glow colour="#7fe9ff" intensity={2} />
+        <Glow colour="#7fe9ff" intensity={1} />
       </mesh>
       <group ref={hologram} position={[0, 2.2, 0]}>
         <mesh>
@@ -311,7 +311,7 @@ function Plant({ x, z }: { x: number; z: number }) {
   ]
   return (
     <group position={[x, 0, z]}>
-      <mesh position={[0, 0.3, 0]}>
+      <mesh position={[0, 0.3, 0]} castShadow>
         <cylinderGeometry args={[0.3, 0.22, 0.6, 20]} />
         <meshStandardMaterial color="#2f2a26" roughness={0.6} />
       </mesh>
@@ -320,7 +320,7 @@ function Plant({ x, z }: { x: number; z: number }) {
         <meshStandardMaterial color={GOLD} metalness={0.9} roughness={0.3} />
       </mesh>
       {leaves.map(([lx, ly, lz, r], i) => (
-        <mesh key={i} position={[lx, ly, lz]}>
+        <mesh key={i} position={[lx, ly, lz]} castShadow>
           <icosahedronGeometry args={[r, 1]} />
           <meshStandardMaterial color="#3f6b3a" roughness={0.8} flatShading />
         </mesh>

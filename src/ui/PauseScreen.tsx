@@ -4,6 +4,7 @@ import { requestPointerLock } from '../world/pointer-lock'
 import LockButton from './LockButton'
 import SensitivitySlider from './SensitivitySlider'
 import LanguageSwitch from './LanguageSwitch'
+import VolumeSlider from './VolumeSlider'
 
 // Shown after Esc (or whenever the mouse is released while walking).
 export default function PauseScreen() {
@@ -32,6 +33,7 @@ export default function PauseScreen() {
         {tutorialHere && <p className="tutorial-done">{ui.tutorial.pauseIntro}</p>}
         {/* Settings live here (more can be added as the game grows). */}
         <SensitivitySlider />
+        <VolumeSlider />
         <LanguageSwitch label={ui.language.label} />
         <div className="button-row">
           <LockButton label={ui.pause.resume} className="start-button" />

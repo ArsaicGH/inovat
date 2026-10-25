@@ -96,6 +96,36 @@ function saveLanguage(value: Language) {
 
 export type QuizStage = 'idle' | 'question' | 'results'
 
+// SOUND SETTINGS (M8b): volumes (0-1), remembered in this browser. Only the main volume
+// has a slider (0 = silent); effects and ambience keep their default balance.
+export interface Volumes {
+  master: number
+  effects: number
+  ambience: number
+}
+const SOUND_STORAGE_KEY = 'innova-sound'
+const DEFAULT_SOUND = { on: true, volumes: { master: 0.8, effects: 0.8, ambience: 0.7 } }
+
+function loadSound(): { on: boolean; volumes: Volumes } {
+  try {
+    const saved = JSON.parse(localStorage.getItem(SOUND_STORAGE_KEY) ?? 'null') as { on: boolean; volumes: Volumes } | null
+    if (saved && typeof saved.on === 'boolean' && typeof saved.volumes?.master === 'number') return saved
+  } catch {
+    // ignore
+  }
+  return DEFAULT_SOUND
+}
+
+function saveSound(on: boolean, volumes: Volumes) {
+  try {
+    localStorage.setItem(SOUND_STORAGE_KEY, JSON.stringify({ on, volumes }))
+  } catch {
+    // ignore
+  }
+}
+
+const savedSound = loadSound()
+
 // GUIDED TUTORIAL (optional, chosen on the start screen). Each step unlocks one more control:
 // intro (everything frozen) -> look -> move -> sprint -> interact -> map -> pause -> keys -> done.
 export type TutorialStep = 'intro' | 'look' | 'move' | 'sprint' | 'interact' | 'map' | 'pause' | 'keys' | 'done'
@@ -116,6 +146,10 @@ interface MuseumState {
   partsPrepared: number
   markPartPrepared: () => void
   warmedUp: boolean // the whole museum has been drawn once off-screen (Museum.tsx WarmUp)
+  // Automatic graphics level (Museum.tsx AdaptiveResolution): 2 = everything, 1 = no
+  // ambient occlusion, 0 = also shadows only redrawn when the key light moves.
+  graphicsLevel: 0 | 1 | 2
+  lowerGraphics: () => void
   setWarmedUp: () => void
   worldReady: boolean
   setWorldReady: () => void
@@ -125,6 +159,8 @@ interface MuseumState {
   mouseSensitivity: number
   language: Language
   setLanguage: (value: Language) => void
+  volumes: Volumes
+  setVolume: (which: keyof Volumes, value: number) => void
   setMouseSensitivity: (value: number) => void
 
   // True when a Vietnamese typing tool (Unikey/EVKey) seems to be eating our keys.
@@ -187,6 +223,8 @@ export const useMuseumStore = create<MuseumState>((set) => ({
   partsPrepared: 0,
   markPartPrepared: () => set((state) => ({ partsPrepared: state.partsPrepared + 1 })),
   warmedUp: false,
+  graphicsLevel: 2,
+  lowerGraphics: () => set((state) => ({ graphicsLevel: Math.max(0, state.graphicsLevel - 1) as 0 | 1 | 2 })),
   setWarmedUp: () => set({ warmedUp: true }),
   worldReady: false,
   setWorldReady: () => set({ worldReady: true }),
@@ -195,6 +233,13 @@ export const useMuseumStore = create<MuseumState>((set) => ({
     set((state) => ({ mode: 'exploring', openExhibitId: null, tutorial: state.tutorial === 'done' ? null : state.tutorial })),
 
   mouseSensitivity: loadSensitivity(),
+  volumes: savedSound.volumes,
+  setVolume: (which, value) =>
+    set((state) => {
+      const volumes = { ...state.volumes, [which]: value }
+      saveSound(true, volumes)
+      return { volumes }
+    }),
   language: loadLanguage(),
   setLanguage: (value) => {
     saveLanguage(value)

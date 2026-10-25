@@ -81,6 +81,9 @@ const vi = {
   language: {
     label: 'Ngôn ngữ',
   },
+  sound: {
+    volume: 'Âm lượng',
+  },
   // Text painted on decorations in the 3D world (the same in both languages).
   decor: {
     // Quiz room: question marks on the side walls.
@@ -216,6 +219,9 @@ const en: UiText = {
   },
   language: {
     label: 'Language',
+  },
+  sound: {
+    volume: 'Volume',
   },
   decor: {
     quizMark: '?',

@@ -210,7 +210,8 @@ export default function PanelBoard({ exhibitId, width, height, aimed, theme }: P
           roughness={look === 'screen' ? 0.3 : 0.9}
           emissive="#ffffff"
           emissiveMap={texture}
-          emissiveIntensity={look === 'screen' ? 0.9 : 0.18}
+          // Slightly self-lit so text stays readable in the dim rooms without a strong spotlight.
+          emissiveIntensity={look === 'screen' ? 0.9 : 0.28}
         />
       </mesh>
     </group>

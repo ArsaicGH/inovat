@@ -1,5 +1,6 @@
 import type { Language } from './language'
 import { credits } from './credits'
+import { AUDIO_ENABLED } from '../features'
 
 // Exhibit texts, in both languages. PLACEHOLDERS ONLY until the group's content document
 // is ready (PLAN.md Phase D). Real texts will replace these, in BOTH languages at once,
@@ -45,7 +46,10 @@ function buildTexts(lang: Language): Record<string, ExhibitText> {
       summary: vi
         ? 'Phông chữ, vật liệu và mô hình dùng trong bảo tàng, cùng tác giả và giấy phép.'
         : 'The font, textures and models used in the museum, with their authors and licences.',
-      body: credits.map((c) => `${c.item[lang]} – ${c.author} (${c.licence[lang]})`).join('; ') + '.',
+      body: credits
+        // (Sound credits only while sound is switched on, see src/features.ts.)
+        .filter((c) => AUDIO_ENABLED || !c.files.every((file) => file.startsWith('sounds/')))
+        .map((c) => `${c.item[lang]} – ${c.author} (${c.licence[lang]})`).join('; ') + '.',
       placeholder: false,
     },
     'hall-sources': vi ? p('Nguồn tham khảo', 'Danh sách tài liệu tham khảo.') : p('References', 'The list of references.'),

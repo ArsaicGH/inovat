@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import type { Group } from 'three'
 import { useMuseumStore } from '../state/useMuseumStore'
@@ -15,6 +15,12 @@ const PLINTH_TOP = 0.6 // height of the plinth's top surface (metres)
 // them in Phase D (M11).
 function PlaceholderMachine({ number, colour }: { number: number; colour: string }) {
   const ref = useRef<Group>(null)
+  // Every part of the prototype casts a shadow from the key light.
+  useLayoutEffect(() => {
+    ref.current?.traverse((object) => {
+      object.castShadow = true
+    })
+  }, [number])
   useFrame((_, delta) => {
     if (ref.current) ref.current.rotation.y += delta * 0.25
   })
@@ -99,7 +105,8 @@ function Plinth({ colour }: { colour: string }) {
       </mesh>
       <mesh position={[0, 0.5, 0]} castShadow receiveShadow>
         <cylinderGeometry args={[1.0, 1.05, 0.2, 32]} />
-        <meshStandardMaterial color="#e9e3d6" roughness={0.3} />
+        {/* Matt stone, so the spotlight straight above does not blow it out to white. */}
+        <meshStandardMaterial color="#b8ae9c" roughness={0.75} />
       </mesh>
       <mesh position={[0, PLINTH_TOP + 0.005, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <ringGeometry args={[0.92, 0.98, 48]} />

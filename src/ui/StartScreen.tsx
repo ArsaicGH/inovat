@@ -3,6 +3,7 @@ import { useContent } from '../content/use-content'
 import { useMuseumStore, hasSavedProgress } from '../state/useMuseumStore'
 import LockButton from './LockButton'
 import LanguageSwitch from './LanguageSwitch'
+import VolumeSlider from './VolumeSlider'
 
 // First screen: the decorated INNOVA title and a start button. After "Bắt đầu" the visitor
 // chooses whether to take the guided tutorial; either choice captures the mouse and the
@@ -51,6 +52,7 @@ export default function StartScreen() {
       </div>
       {/* Near the bottom of the screen, out of the way of the title. */}
       <div className="language-bottom">
+        <VolumeSlider />
         <LanguageSwitch />
       </div>
     </div>

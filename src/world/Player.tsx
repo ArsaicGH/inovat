@@ -7,6 +7,7 @@ import { regionAt, spawnOf } from './layout'
 import { closedDoorBlockers } from './door-state'
 import { ERA_ROOMS, type RoomId } from '../types'
 import { debugStats } from './debug-stats'
+import { playStep } from '../audio/sound'
 
 const WALK_SPEED = 3 // metres per second
 const SPRINT_SPEED = 5.5 // while Shift is held (crossing the rotunda faster)
@@ -47,6 +48,11 @@ const KEY_RELEASE_GRACE_MS = 60
 // not angle, so it feels the same at any sensitivity), the "move" step after walking this far.
 const TUTORIAL_LOOK_TIME = 1 // seconds
 const TUTORIAL_WALK = 3 // metres
+
+// FOOTSTEPS: one step sound every STEP_LENGTH metres. At walking speed (3 m/s) that is
+// 2 steps a second, a calm walk; sprinting (5.5 m/s) gives about 2.6, a brisk run.
+const STEP_LENGTH = 1.5
+const SPRINT_STEP_LENGTH = 2.1
 const TUTORIAL_SPRINT = 4 // metres run with Shift to finish the "sprint" step
 
 // After this many normal W/A/S/D presses in a row, we trust the typing tool is off.
@@ -101,6 +107,7 @@ export default function Player({ walls }: PlayerProps) {
   const handledTeleports = useRef(-1)
 
   const lastSave = useRef(0)
+  const stepDistance = useRef(0) // metres since the last footstep sound
 
   // Stand at a room's spawn point (start of the visit, map teleport), or at a saved spot.
   function placeAt(room: RoomId, saved: { x: number; z: number; yaw: number } | null = null) {
@@ -340,6 +347,11 @@ export default function Player({ walls }: PlayerProps) {
         tutorialProgress.current = 0
         store.advanceTutorial('sprint')
       }
+    }
+    stepDistance.current += Math.hypot(next.x - camera.position.x, next.z - camera.position.z)
+    if (stepDistance.current > (sprinting ? SPRINT_STEP_LENGTH : STEP_LENGTH)) {
+      stepDistance.current = 0
+      playStep(sprinting ? 0.34 : 0.28)
     }
     camera.position.x = next.x
     camera.position.z = next.z
