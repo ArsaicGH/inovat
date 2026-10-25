@@ -16,24 +16,30 @@ export default function PauseScreen() {
     // A click on the dark area around the card also continues (a click is the only way
     // the browser lets the game capture the mouse again).
     <div
-      className="overlay pause-overlay"
+      className="overlay title-overlay pause-overlay"
       onClick={(event) => {
         if (event.target === event.currentTarget) void requestPointerLock()
       }}
     >
-      <div className="overlay-card">
-        <h2>{ui.pause.title}</h2>
+      {/* Gold and glass, like the title screen and the map. */}
+      <div className="pause-card">
+        <h2 className="map-title">{ui.pause.title}</h2>
+        <div className="title-ornament map-ornament" aria-hidden="true">
+          <span />
+          <i />
+          <span />
+        </div>
         {tutorialHere && <p className="tutorial-done">{ui.tutorial.pauseIntro}</p>}
         {/* Settings live here (more can be added as the game grows). */}
         <SensitivitySlider />
-        <LanguageSwitch label={ui.language.label} variant="menu" />
+        <LanguageSwitch label={ui.language.label} />
         <div className="button-row">
-          <LockButton label={ui.pause.resume} />
-          <button type="button" className="secondary-button" onClick={() => setMode('map')}>
+          <LockButton label={ui.pause.resume} className="start-button" />
+          <button type="button" className="start-button start-button-quiet" onClick={() => setMode('map')}>
             {ui.pause.map}
           </button>
         </div>
-        <p className="overlay-tip">{ui.pause.clickHint}</p>
+        <p className="map-hint pause-hint">{ui.pause.clickHint}</p>
       </div>
     </div>
   )

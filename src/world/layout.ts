@@ -118,6 +118,10 @@ export const ROOMS: RoomLayout[] = ROOM_SPECS.map((spec) => {
   }
 })
 
+// The museum is drawn in parts: the rotunda, each room, and the doors (Museum.tsx). The
+// loading screen waits for all of them to be prepared for the graphics card.
+export const PART_COUNT = ROOMS.length + 2
+
 export function roomById(id: RoomId): RoomLayout | undefined {
   return ROOMS.find((room) => room.id === id)
 }
@@ -302,8 +306,15 @@ function buildSpots(): ExhibitSpot[] {
         spots.push({ id, room: room.id, kind: 'wall', number: 0, x, z, yaw: faceTowards(-sideU * f.tx, -sideU * f.tz), panelSide: 1 })
       }
     } else if (room.id === 'quiz') {
-      const [x, z] = at(0, (room.vFront + room.vBack) / 2)
-      spots.push({ id: 'quiz-info', room: room.id, kind: 'centre', number: 0, x, z, yaw: faceTowards(-f.nx, -f.nz), panelSide: 1 })
+      // The pedestal and its board stand aside, by the left wall near the entrance: the
+      // back wall is the quiz screen (QuizWall.tsx), so the middle stays free to play.
+      const [x, z] = at(-(room.width / 2 - 1.7), room.vFront + 2.8)
+      const yaw = faceTowards(f.tx, f.tz) // facing across the room
+      // Board on the side further from the door (so it stays clear of the entrance).
+      const spot: ExhibitSpot = { id: 'quiz-info', room: room.id, kind: 'centre', number: 0, x, z, yaw, panelSide: 1 }
+      const [, vPlus] = toLocal(f, ...panelPosition(spot))
+      const [, vMinus] = toLocal(f, ...panelPosition({ ...spot, panelSide: -1 }))
+      spots.push({ ...spot, panelSide: vPlus >= vMinus ? 1 : -1 })
     } else {
       // Overview board on the back wall (1 cm off it), facing the entrance.
       const [ox, oz] = at(0, room.vBack - 0.01)

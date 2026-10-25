@@ -1,9 +1,11 @@
 import { create } from 'zustand'
 import { ERA_ROOMS, type RoomId } from '../types'
 import { LANGUAGES, type Language } from '../content/language'
+import { QUIZ_QUESTIONS } from '../content/quiz'
 
 // The app is always in exactly one mode (PLAN.md section 3). Only in "exploring"
-// is the mouse captured and walking allowed. "quiz" and "results" come with M7.
+// is the mouse captured and walking allowed. (The quiz is played while exploring: it is
+// shown on the Game Room's back wall, see QuizWall.tsx.)
 export type Mode = 'start' | 'exploring' | 'paused' | 'reading' | 'map'
 
 // Mouse/touchpad sensitivity is a multiplier: 1 = default speed.
@@ -92,6 +94,8 @@ function saveLanguage(value: Language) {
   }
 }
 
+export type QuizStage = 'idle' | 'question' | 'results'
+
 // GUIDED TUTORIAL (optional, chosen on the start screen). Each step unlocks one more control:
 // intro (everything frozen) -> look -> move -> sprint -> interact -> map -> pause -> keys -> done.
 export type TutorialStep = 'intro' | 'look' | 'move' | 'sprint' | 'interact' | 'map' | 'pause' | 'keys' | 'done'
@@ -106,7 +110,13 @@ export function canUse(tutorial: TutorialStep | null, control: Control): boolean
 interface MuseumState {
   mode: Mode
   setMode: (mode: Mode) => void
-  // True once the museum has loaded and drawn its first frames (the black cover then fades).
+  // LOADING. Each part of the museum (rotunda + 6 rooms) counts itself once its pictures
+  // are loaded and sent to the graphics card and its drawing code is built. worldReady =
+  // everything is done (the loading screen then gives way to the title screen).
+  partsPrepared: number
+  markPartPrepared: () => void
+  warmedUp: boolean // the whole museum has been drawn once off-screen (Museum.tsx WarmUp)
+  setWarmedUp: () => void
   worldReady: boolean
   setWorldReady: () => void
   // Called when the mouse is captured: back to walking, any open panel is closed.
@@ -160,11 +170,24 @@ interface MuseumState {
   // The key list (Space) is showing.
   showKeyList: boolean
   toggleKeyList: () => void
+
+  // QUIZ on the Game Room's back wall. Stage: idle (start button), question, results.
+  // quizAnswers[i] = option chosen for question i (0-3), or null. An answer locks once chosen.
+  quizStage: QuizStage
+  quizIndex: number
+  quizAnswers: (number | null)[]
+  startQuiz: () => void
+  answerQuiz: (choice: number) => void
+  nextQuizQuestion: () => void // to the next question, or to the results after the last
 }
 
 export const useMuseumStore = create<MuseumState>((set) => ({
   mode: 'start',
   setMode: (mode) => set({ mode }),
+  partsPrepared: 0,
+  markPartPrepared: () => set((state) => ({ partsPrepared: state.partsPrepared + 1 })),
+  warmedUp: false,
+  setWarmedUp: () => set({ warmedUp: true }),
   worldReady: false,
   setWorldReady: () => set({ worldReady: true }),
   // A finished tutorial ends when the visitor resumes from the pause menu.
@@ -215,6 +238,24 @@ export const useMuseumStore = create<MuseumState>((set) => ({
 
   showKeyList: false,
   toggleKeyList: () => set((state) => ({ showKeyList: !state.showKeyList })),
+
+  quizStage: 'idle',
+  quizIndex: 0,
+  quizAnswers: [],
+  startQuiz: () => set({ quizStage: 'question', quizIndex: 0, quizAnswers: QUIZ_QUESTIONS.map(() => null) }),
+  answerQuiz: (choice) =>
+    set((state) => {
+      if (state.quizStage !== 'question' || state.quizAnswers[state.quizIndex] !== null) return state // locked
+      const quizAnswers = [...state.quizAnswers]
+      quizAnswers[state.quizIndex] = choice
+      return { quizAnswers }
+    }),
+  nextQuizQuestion: () =>
+    set((state) => {
+      if (state.quizStage !== 'question' || state.quizAnswers[state.quizIndex] === null) return state // answer first
+      const next = state.quizIndex + 1
+      return next < QUIZ_QUESTIONS.length ? { quizIndex: next } : { quizStage: 'results' }
+    }),
 
   continueSavedVisit: () =>
     set((state) => {

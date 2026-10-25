@@ -4,10 +4,11 @@ import { useFrame } from '@react-three/fiber'
 import { CanvasTexture, Color, MeshBasicMaterial, Object3D, SRGBColorSpace, type Group, type InstancedMesh, type MeshStandardMaterial } from 'three'
 import type { RoomId } from '../types'
 import { DOOR_WIDTH, HALL_PLANTS, roomById, toWorld } from './layout'
-import { ROOM_ACCENT, DARK_WOOD, GOLD } from './style'
+import { ROOM_ACCENT, DARK_WOOD, GOLD, QUIZ_COLOURS } from './style'
 import { paintFont, useFontsReady } from './fonts'
 import Sign from './Sign'
 import EraNumeral from './EraNumeral'
+import QuizWall from './QuizWall'
 import { useMuseumStore } from '../state/useMuseumStore'
 
 // DECORATION OF EACH ROOM (M6), built from simple shapes. Inside each room the local axes
@@ -37,15 +38,18 @@ function RoomIdentity({ room, size }: { room: ThemedRoom; size: RoomSize }) {
   return (
     <>
       {/* Era rooms: a huge decorated number above the overview board (which ends at
-          2.78 m). The quiz room keeps a name sign. */}
+          2.78 m). */}
       {room === 'ir1' || room === 'ir2' || room === 'ir3' || room === 'ir4' ? (
         <group position={[0, 3.6, -size.d / 2 + 0.03]}>
           <EraNumeral era={room} />
         </group>
       ) : (
-        <group position={[0, size.h - 1.1, -size.d / 2 + 0.03]}>
-          <Sign title={name.short} subtitle={name.short !== name.name ? name.name : undefined} width={5.2} height={1.2} />
-        </group>
+        // (The Game Room's back wall is the quiz screen, so it has no name sign.)
+        room !== 'quiz' && (
+          <group position={[0, size.h - 1.1, -size.d / 2 + 0.03]}>
+            <Sign title={name.short} subtitle={name.short !== name.name ? name.name : undefined} width={5.2} height={1.2} />
+          </group>
+        )
       )}
       <group rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.004, 0]}>
         <mesh>
@@ -458,8 +462,6 @@ function LetterTile({ letter, colour, width, height }: { letter: string; colour:
   )
 }
 
-// The four quiz-show colours: answer tiles, bulbs and stage lights.
-const QUIZ_COLOURS = ['#e05a8a', '#3f8ff5', '#f5b13f', '#3fc47f']
 
 // Show bulbs along the top of the back and side walls, in the quiz colours. One
 // "instanced" mesh draws all of them in a single step, much cheaper than one mesh each.
@@ -509,7 +511,6 @@ function MarqueeBulbs({ size }: { size: RoomSize }) {
 // at the pedestal in the middle (where the quiz will start, M7).
 function QuizRoom({ size }: { size: RoomSize }) {
   const { ui } = useContent()
-  const answers = ui.decor.quizAnswers
   const stageLights: [number, number][] = [
     [-2.6, -2.2],
     [2.6, -2.2],
@@ -519,13 +520,14 @@ function QuizRoom({ size }: { size: RoomSize }) {
   return (
     <>
       <MarqueeBulbs size={size} />
-      {answers.map((letter, i) => (
-        <group key={letter} position={[(i - (answers.length - 1) / 2) * 1.6, 1.75, -size.d / 2 + 0.03]}>
-          <LetterTile letter={letter} colour={QUIZ_COLOURS[i % QUIZ_COLOURS.length]} width={1.3} height={0.9} />
-        </group>
-      ))}
+      {/* The back wall is the quiz itself. */}
+      <group position={[0, 0, -size.d / 2 + 0.01]}>
+        <QuizWall />
+      </group>
+      {/* Question marks on the side walls, towards the back (the quiz pedestal and its
+          board stand by the left wall nearer the entrance). */}
       {[-1, 1].map((s, i) => (
-        <group key={s} position={[s * (size.w / 2 - 0.03), 2.2, 0]} rotation={[0, -s * Math.PI / 2, 0]}>
+        <group key={s} position={[s * (size.w / 2 - 0.03), 2.2, -3]} rotation={[0, -s * Math.PI / 2, 0]}>
           <LetterTile letter={ui.decor.quizMark} colour={QUIZ_COLOURS[i + 1]} width={1.6} height={1.6} />
         </group>
       ))}

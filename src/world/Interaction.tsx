@@ -2,11 +2,13 @@ import { useEffect, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Raycaster, Vector2 } from 'three'
 import { useMuseumStore, canUse } from '../state/useMuseumStore'
-import { aimTargets, exhibitIdOf } from './aim-targets'
+import { aimTargets, exhibitIdOf, isQuizTarget } from './aim-targets'
 import { releasePointer, requestPointerLock } from './pointer-lock'
 
-// How close you must be to open an exhibit (metres from your eyes).
+// How close you must be to open an exhibit (metres from your eyes). The quiz wall is big
+// and read from the middle of the room, so its tiles can be chosen from further away.
 const AIM_DISTANCE = 3
+const QUIZ_AIM_DISTANCE = 6
 
 // Keys by PHYSICAL position (event.code), like the movement keys.
 const OPEN_KEY = 'KeyE'
@@ -19,7 +21,7 @@ const SPACE = 'Space' // starts the tutorial; later shows / hides the key list
 export default function Interaction() {
   const raycaster = useMemo(() => {
     const ray = new Raycaster()
-    ray.far = AIM_DISTANCE
+    ray.far = QUIZ_AIM_DISTANCE
     return ray
   }, [])
   const screenCentre = useMemo(() => new Vector2(0, 0), [])
@@ -33,6 +35,7 @@ export default function Interaction() {
       // The nearest hit wins, so a wall in front of an exhibit blocks it.
       const nearest = raycaster.intersectObjects(aimTargets, true)[0]
       aimed = nearest ? exhibitIdOf(nearest.object) : null
+      if (aimed && !isQuizTarget(aimed) && nearest.distance > AIM_DISTANCE) aimed = null
     }
     // Only tell the store when the answer changes (avoids re-drawing the interface 100x/s).
     if (aimed !== store.aimedExhibitId) store.setAimedExhibit(aimed)
@@ -42,6 +45,14 @@ export default function Interaction() {
     function openAimedExhibit() {
       const store = useMuseumStore.getState()
       if (store.mode !== 'exploring' || !store.aimedExhibitId) return
+      // Quiz wall tiles: answer, next, start, play again (the visitor keeps walking).
+      const id = store.aimedExhibitId
+      if (isQuizTarget(id)) {
+        if (id === 'quiz-start' || id === 'quiz-retry') store.startQuiz()
+        else if (id === 'quiz-next') store.nextQuizQuestion()
+        else store.answerQuiz(Number(id.slice('quiz-answer-'.length)))
+        return
+      }
       store.openExhibit(store.aimedExhibitId) // sets mode "reading" first...
       releasePointer() // ...so releasing the mouse is not taken as a pause
       store.advanceTutorial('interact')
@@ -50,7 +61,13 @@ export default function Interaction() {
     function onKeyDown(event: KeyboardEvent) {
       if (event.repeat) return // holding a key must not open/close things repeatedly
       const store = useMuseumStore.getState()
-      if (event.code === OPEN_KEY) openAimedExhibit()
+      if (event.code === OPEN_KEY) {
+        // In the Game Room, after answering, E simply goes to the next question (no need
+        // to aim at the button).
+        const answered = store.quizStage === 'question' && store.quizAnswers[store.quizIndex] !== null
+        if (answered && store.mode === 'exploring' && store.currentRoom === 'quiz') store.nextQuizQuestion()
+        else openAimedExhibit()
+      }
       if (event.code === MAP_KEY && store.mode === 'exploring' && canUse(store.tutorial, 'map')) {
         store.setMode('map')
         releasePointer()

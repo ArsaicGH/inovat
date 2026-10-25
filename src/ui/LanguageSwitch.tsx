@@ -3,14 +3,12 @@ import { useMuseumStore } from '../state/useMuseumStore'
 
 // Pill-shaped switch between Tiếng Việt and English (start screen and pause menu).
 // Changing it switches every text in the game at once, including the 3D signs and boards.
-// variant "title": gold, for the start screen and phone message; "menu": matches the pause
-// menu's card, laid out like the sensitivity setting above it.
-export default function LanguageSwitch({ label, variant = 'title' }: { label?: string; variant?: 'title' | 'menu' }) {
+export default function LanguageSwitch({ label }: { label?: string }) {
   const language = useMuseumStore((state) => state.language)
   const setLanguage = useMuseumStore((state) => state.setLanguage)
 
   return (
-    <div className={`language-setting language-${variant}`}>
+    <div className="language-setting language-title">
       {label && <span>{label}</span>}
       <div className="language-switch" role="radiogroup" aria-label={label ?? 'Language'}>
         {LANGUAGES.map((option) => (

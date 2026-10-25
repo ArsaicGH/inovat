@@ -1,4 +1,5 @@
 import Centrepiece from './Centrepiece'
+import MergeStatic from './MergeStatic'
 import { useEffect, useMemo } from 'react'
 import { BackSide, CanvasTexture, RepeatWrapping, SRGBColorSpace } from 'three'
 import {
@@ -303,12 +304,16 @@ function Chandelier() {
 export default function Rotunda() {
   return (
     <>
-      <Floor />
-      <WallDecor />
-      <Columns />
-      <Cornice />
-      <Dome />
-      <Chandelier />
+      {/* Everything that never moves is joined into a few big meshes (much cheaper to
+          draw); the centrepiece's rings turn, so it stays separate. */}
+      <MergeStatic>
+        <Floor />
+        <WallDecor />
+        <Columns />
+        <Cornice />
+        <Dome />
+        <Chandelier />
+      </MergeStatic>
       <Centrepiece />
     </>
   )

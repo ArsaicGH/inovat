@@ -215,16 +215,26 @@ Create the Vite React + TypeScript project, push to GitHub, connect Vercel.
 - [x] The style guide is written in README.md.
 
 **M7. Quiz room engine (Phòng trò chơi)**: questions from `quiz.ts`, multiple choice, immediate feedback with a short explanation, scoring, results screen, retry. Uses clearly fake placeholder questions until Phase D.
-- [ ] An answer locks once chosen; feedback is immediate.
-- [ ] Score is correct in three tests: all right, all wrong, mixed.
-- [ ] Results screen offers "Làm lại" and "Quay lại bảo tàng".
+- [x] An answer locks once chosen; feedback is immediate. (Tested: a second click does not change the answer.)
+- [x] Score is correct in three tests: all right, all wrong, mixed. (Test script: 8/8, 0/8, 4/8; scoring lives in `src/state/quiz-score.ts`.)
+- [x] Results screen offers "Làm lại" and "Quay lại bảo tàng".
 
 **M8. Game shell**: loading screen with progress, credits screen (reads `credits.ts`), the intro hall's placeholder panels (introduction, overview of the four revolutions, our team, credits, sources, controls), the "Vui lòng dùng máy tính" message for phones/tablets, final start/pause/map screens styled to match M6.
-- [ ] Loading screen shows progress and disappears when the museum is ready.
-- [ ] The credits screen lists every placeholder asset with author and licence.
+- [x] Loading screen shows progress and disappears when the museum is ready. (One gold bar on black; waits for the textures, the font and every part being prepared for the graphics card, so the start no longer stutters; then the title screen fades in. `LoadingScreen.tsx`.)
+- [x] The credits screen lists every placeholder asset with author and licence. (The intro hall's "Ghi công" board is built from `credits.ts`, so it always lists every asset with its author and licence. A separate start-screen credits button was tried and removed by the leader: the hall board is the credits screen.)
 - [x] Phone/tablet visitors see "Vui lòng dùng máy tính". (Done early: `device.ts` + `DeviceMessage.tsx`; the 3D museum is not loaded on phones and tablets.)
-- [ ] The intro hall has a readable placeholder panel for each section: introduction, overview, our team, credits, sources.
-- [ ] Every screen and sign uses text from `src/content/`.
+- [x] The intro hall has a readable placeholder panel for each section: introduction, overview, our team, credits, sources. (The controls are covered by the Space key list and the tutorial.)
+- [x] Every screen and sign uses text from `src/content/`. (Checked: no visible text in components, both languages.)
+
+**M8b. Sound effects and ambience** (added by the leader: the game has no audio yet). Short, light sound files (compressed `.ogg`/`.mp3`, a few hundred KB in total for effects; looping ambience about 1 MB or less per room), each listed in `credits.ts` with author and licence (prefer CC0, e.g. freesound.org or Kenney). Plain browser audio (Web Audio / `HTMLAudioElement`); a new library only if asked first.
+- Interface: click/hover on buttons, panel open and close, map open/close and teleport, language switch, tutorial step completed.
+- World: footsteps while walking (faster when sprinting, matching the floor where cheap: marble, wood, concrete, tiles), sliding doors opening/closing, a short "locked" sound at the quiz door, a soft chime when a new era room is visited.
+- Ambience, quiet and looping, one per area: rotunda (large hall reverb, distant murmur), CMCN 1 (steam hiss, ticking clockwork), CMCN 2 (electric hum, factory rhythm), CMCN 3 (computer fans, keyboard clicks), CMCN 4 (soft synth drone), quiz room (light, playful); cross-fades when moving between areas.
+- Quiz (with M7): correct / wrong answer, results fanfare.
+- [ ] A single sound on/off toggle right beside the language pill, both on the start screen and in the pause menu (matching each pill's style); remembered in the browser.
+- [ ] Settings in the pause menu: master volume, effects volume, ambience volume; remembered in the browser.
+- [ ] No sound plays before the visitor's first click (browsers block it), and nothing is loud or sudden; everything pauses with the game.
+- [ ] Every sound file is in `credits.ts`; the total audio download stays small enough for the loading budget (CLAUDE.md asset limits).
 
 **M9. Performance and compatibility pass (skeleton)**
 - [ ] Automatic quality: resolution/effects drop on slow computers so frames stay smooth.
@@ -240,12 +250,13 @@ Create the Vite React + TypeScript project, push to GitHub, connect Vercel.
 - [ ] The panel shows the text and its source.
 - [ ] A second member verified the text against that source.
 - [ ] The credits screen lists every image and model with its licence.
+- [ ] **Reminder (leader's request): the credits live on the intro hall's "Ghi công" board.** Every new image, model, sound and font goes into `src/content/credits.ts` (author, licence, source, item name in both languages); the board fills itself from that file. Also write the team's own credits (who did what) for the "Nhóm thực hiện" board, and the reference list for "Nguồn tham khảo".
 
 **M11. All real content**: the 16 inventions (4 per era room) with their prototype models and texts, the intro hall sections (introduction, overview, our team, credits, sources), and the real quiz questions, replacing every placeholder.
 - [ ] No placeholder or `[CẦN KIỂM TRA]` left anywhere.
 - [ ] Every question can be answered from an exhibit in the museum.
 - [ ] Total download about 30 MB or less; no single model above about 2 MB; textures 1024 px or smaller unless justified.
-- [ ] Every asset is in the credits; every text reviewed by two people.
+- [ ] Every asset is in the credits (shown on the intro hall's "Ghi công" board); every text reviewed by two people.
 
 ### Phase E: Release
 
@@ -400,3 +411,12 @@ Plan: aim for A, keep B as a cheap fallback (only `Player.tsx` changes). Decide 
   - Shift to sprint (5.5 m/s instead of 3 m/s), taught in a new tutorial step right after W A S D (7 steps now). Fixed the flickering gold edges of the hall's red carpet (they shared the carpet's plane).
   - Before M7 (leader's list): huge decorated era numbers 1-4 above each overview board instead of the name signs (`EraNumeral.tsx`); English added (`src/content/*` hold `vi` and `en`, read with `useContent()`; Tiếng Việt / English pill on the start screen and in the pause menu, remembered in the browser); key list in tutorial order; phones and tablets get a "please use a computer" message (`device.ts`). E closes boards, the map key closes the map, Esc pauses; Space shows the key list (tutorial step 8).
   - Keys: the map moved from M to Q (easier to reach beside W A S D). Esc only pauses; a click continues (Continue, or anywhere around the pause menu), the same in a window and in full screen (leader's decision; Esc-to-continue via full screen "keyboard lock" was tried and dropped). Full screen (F11) is only recommended, in the tutorial's first tip. Map restyled in the title screen's gold-and-glass look; language pill at the bottom of the start screen and styled like the pause menu's settings.
+- [x] M7: Quiz room engine (reviewed by the leader)
+  - 8 clearly fake placeholder questions, 2 per revolution, in both languages with one shared answer key (`src/content/quiz.ts`); scoring in `src/state/quiz-score.ts`.
+  - Leader's change: the quiz is played ON the Game Room's back wall (`QuizWall.tsx`), not in a pop-up. A big gold-framed screen shows the intro, the question or the results; four A-D answer tiles in the room's colours are aimed at with the crosshair and chosen with E or a click (up to 6 m away); after answering, the right tile glows green, a wrong choice red, a feedback line explains, and a gold button goes on ("Câu tiếp theo" / "Xem kết quả" / "Bắt đầu" / "Chơi lại"). The questions, tiles and buttons are shown on a giant wall-mounted screen (dark metal case, gold trim, purple backlight glow, power light) spanning almost the whole wall. The visitor keeps walking the whole time. The pedestal and its info board moved beside the left wall near the entrance; the "?" tiles moved towards the back. Multiple choice for now; more creative mini-games may come with the real content.
+  - Quiz wall: after answering, E anywhere in the Game Room goes to the next question; the button reads "Câu tiếp theo  [E]".
+- [x] M8: Game shell (reviewed by the leader)
+  - Loading screen (one gold bar on black) that waits for everything before the title screen: textures, the font, then every part (rotunda, rooms, doors) prepared for the graphics card AFTER the font has arrived (signs and boards are repainted with it, so preparing earlier missed them and caused hitches on entering rooms), then one hidden drawing of the whole museum with every room shown (`WarmUp` in `Museum.tsx`), because the graphics card does some work only the first time each thing is really drawn (leader saw a strong hitch on first entering the rotunda from the hall); credits on the intro hall's board (from `credits.ts`); pause menu restyled in the gold-and-glass look (gold language pill, gold buttons); phone/tablet message done earlier.
+  - Camera stutter in the rotunda: its ~300 separate decoration meshes (columns, rails, bulbs, cornice...) are now joined into one mesh per look (`MergeStatic.tsx`); same picture, far fewer drawing steps each frame. The centrepiece's turning rings stay separate.
+  - Museum lighting (leader's request: dramatic, studio-like, not office light): much lower soft light, softer room lights, and five warm spotlights (no shadows; hall: one per board, era rooms: 4 inventions + overview board, rotunda: 4 portals + centrepiece) that move to the room you are in and light its exhibits (era rooms: the 4 inventions; hall: 4 boards; Game Room: the screen, the pedestal and its board; rotunda: the 4 grand era portals), with small black ceiling/wall lamps drawn where they hang (`spot-plan.ts`, `SpotFixtures.tsx`); a light vignette for a cinematic frame. Light count stays fixed (no hitches).
+  - Camera jerks (leader: random up/down flicks at high fps): besides the huge fake jumps, Chrome/Edge sometimes send a single mouse event far bigger than the ones around it; such lone spikes are now ignored (`isMouseSpike` in `Player.tsx`), while real fast flicks still pass. Wall spotlights toned down (overview boards 40 %, hall boards 55 %).

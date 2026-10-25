@@ -835,27 +835,6 @@ body {
   transform: translateX(-50%);
 }
 
-/* Pause-menu version: same colours and layout as the card's other settings. */
-.language-menu {
-  margin: 0 0 20px;
-}
-.language-menu .language-switch {
-  display: flex;
-  background: #2b2e38;
-}
-.overlay-card .language-menu .language-option {
-  padding: 7px 12px;
-  color: #c9ccd4;
-}
-.overlay-card .language-menu .language-option:hover {
-  background: #363a46;
-}
-.overlay-card .language-menu .language-option-on,
-.overlay-card .language-menu .language-option-on:hover {
-  background: #c98a3c;
-  color: #111;
-  font-weight: 600;
-}
 .device-message .language-setting {
   margin-top: 8px;
 }
@@ -885,10 +864,6 @@ body {
   cursor: default;
 }
 
-/* Hint under the pause menu's buttons: a little space above, none below. */
-.pause-overlay .overlay-tip {
-  margin: 16px 0 0;
-}
 /* "Press E to close" beside the Close button, centred on it. */
 .board-actions .overlay-tip {
   margin: 0;
@@ -909,4 +884,89 @@ body {
 .map-overlay .map-room:not(:disabled),
 .info-overlay .board-close {
   cursor: pointer;
+}
+
+
+/* ---------- Loading screen: one gold bar on black ---------- */
+.loading-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  background: #000;
+  transition: opacity 500ms ease-out;
+}
+.loading-done {
+  opacity: 0;
+  pointer-events: none;
+}
+.loading-bar {
+  width: min(420px, 70vw);
+  height: 4px;
+  border-radius: 4px;
+  background: rgba(201, 162, 90, 0.15);
+  overflow: hidden;
+}
+.loading-bar span {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #8a6424, #e8c77e 45%, #fff3cf 60%, #c9a25a);
+  box-shadow: 0 0 12px rgba(232, 199, 126, 0.7);
+  transition: width 300ms ease-out;
+}
+
+/* Start screen: the language pill near the bottom. */
+.language-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ---------- Pause menu: gold and glass ---------- */
+.pause-card {
+  box-sizing: border-box;
+  width: min(460px, calc(100% - 32px));
+  padding: 26px 32px 22px;
+  border: 1px solid rgba(201, 162, 90, 0.45);
+  border-radius: 16px;
+  background: rgba(24, 19, 13, 0.7);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  color: #f3e7cf;
+  text-align: center;
+  cursor: default;
+  animation: title-in 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.pause-card .sensitivity,
+.pause-card .language-setting {
+  margin: 0 0 18px;
+  color: #e9dcc0;
+}
+.pause-card .sensitivity input {
+  accent-color: #c9a25a;
+}
+.pause-card .button-row .start-button {
+  margin-top: 4px;
+  padding: 11px 30px;
+  font-size: 15px;
+  letter-spacing: 0.08em;
+}
+.pause-card .pause-hint {
+  margin: 14px 0 0;
+}
+.pause-card .tutorial-done {
+  text-align: left;
+}
+
+/* Pause menu: the title's letter spacing also adds space after the last letter, which
+   pushed it off centre; the ornament spans the card instead of a fixed width. */
+.pause-card .map-title {
+  margin-right: -0.12em;
+}
+.pause-card .title-ornament {
+  width: auto;
+  margin: 10px 0 16px;
 }

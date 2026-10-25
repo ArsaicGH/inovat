@@ -83,8 +83,7 @@ const vi = {
   },
   // Text painted on decorations in the 3D world (the same in both languages).
   decor: {
-    // Quiz room: answer tiles like a TV quiz show, and question marks on the side walls.
-    quizAnswers: ['A', 'B', 'C', 'D'],
+    // Quiz room: question marks on the side walls.
     quizMark: '?',
   },
   // Shown at the bottom of a 3D text board when the full text does not fit on it.
@@ -114,6 +113,28 @@ const vi = {
   // Shown when the browser refuses to capture the mouse.
   lockRefused:
     'Trình duyệt chưa cho phép điều khiển chuột. Hãy đợi một giây rồi nhấp lại. Nếu vẫn không được, hãy mở trang trực tiếp trong một thẻ Chrome hoặc Edge.',
+  // QUIZ on the Game Room's back wall. {n} = question number, {total} = number of questions,
+  // {score} = right answers, {letter} = A-D.
+  quiz: {
+    prompt: 'Nhấn E để chọn',
+    title: 'Trò chơi câu hỏi',
+    intro: 'Câu hỏi và bốn đáp án sẽ hiện trên bức tường này. Nhắm vào đáp án bạn chọn rồi nhấn E hoặc nhấp chuột.',
+    progress: 'Câu {n}/{total}',
+    answerLabel: 'Đáp án {letter}',
+    correct: 'Chính xác!',
+    wrong: 'Chưa đúng.',
+    start: 'Bắt đầu',
+    next: 'Câu tiếp theo',
+    finish: 'Xem kết quả',
+    retry: 'Chơi lại',
+    resultsTitle: 'Kết quả',
+    score: 'Bạn trả lời đúng {score}/{total} câu',
+    levels: {
+      great: 'Xuất sắc! Bạn đã nắm rất vững bốn cuộc Cách mạng Công nghiệp.',
+      good: 'Khá lắm! Hãy xem lại vài phòng trưng bày để đạt điểm tuyệt đối.',
+      retry: 'Đừng nản lòng! Hãy tham quan lại các phòng trưng bày rồi thử lần nữa.',
+    },
+  },
   // Shown instead of the museum on phones and tablets.
   device: {
     title: 'Vui lòng dùng máy tính',
@@ -197,7 +218,6 @@ const en: UiText = {
     label: 'Language',
   },
   decor: {
-    quizAnswers: ['A', 'B', 'C', 'D'],
     quizMark: '?',
   },
   panelMore: '…',
@@ -222,6 +242,26 @@ const en: UiText = {
     'A Vietnamese typing tool (Unikey/EVKey) seems to be on, so some keys do not work. Please switch it to English mode.',
   lockRefused:
     'The browser has not allowed mouse control yet. Wait a second and click again. If it still does not work, open the page directly in a Chrome or Edge tab.',
+  quiz: {
+    prompt: 'Press E to choose',
+    title: 'The Quiz',
+    intro: 'The questions and their four answers appear on this wall. Aim at the answer you choose, then press E or click.',
+    progress: 'Question {n}/{total}',
+    answerLabel: 'Answer {letter}',
+    correct: 'Correct!',
+    wrong: 'Not quite.',
+    start: 'Start',
+    next: 'Next question',
+    finish: 'See results',
+    retry: 'Play again',
+    resultsTitle: 'Results',
+    score: 'You got {score} out of {total} right',
+    levels: {
+      great: 'Excellent! You really know the four Industrial Revolutions.',
+      good: 'Well done! Revisit a few exhibition rooms to get a perfect score.',
+      retry: "Don't give up! Walk through the exhibition rooms again and have another go.",
+    },
+  },
   device: {
     title: 'Please use a computer',
     text: 'INNOVA is a 3D museum controlled with a keyboard and a mouse or touchpad, so for now it can only be played on a computer. Please open this page on a desktop or laptop.',

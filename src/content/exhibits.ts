@@ -1,4 +1,5 @@
 import type { Language } from './language'
+import { credits } from './credits'
 
 // Exhibit texts, in both languages. PLACEHOLDERS ONLY until the group's content document
 // is ready (PLAN.md Phase D). Real texts will replace these, in BOTH languages at once,
@@ -38,15 +39,21 @@ function buildTexts(lang: Language): Record<string, ExhibitText> {
       ? p('Tổng quan', 'Tổng quan về bốn cuộc Cách mạng Công nghiệp và lộ trình tham quan.')
       : p('Overview', 'An overview of the four Industrial Revolutions and the route through the museum.'),
     'hall-team': vi ? p('Nhóm thực hiện', 'Các thành viên và vai trò.') : p('Our Team', 'The team members and their roles.'),
-    'hall-credits': vi
-      ? p('Ghi công', 'Hình ảnh, mô hình và công cụ đã sử dụng.')
-      : p('Credits', 'The images, models and tools we used.'),
+    // Real, not a placeholder: listed from credits.ts, so it is always complete.
+    'hall-credits': {
+      title: vi ? 'Ghi công' : 'Credits',
+      summary: vi
+        ? 'Phông chữ, vật liệu và mô hình dùng trong bảo tàng, cùng tác giả và giấy phép.'
+        : 'The font, textures and models used in the museum, with their authors and licences.',
+      body: credits.map((c) => `${c.item[lang]} – ${c.author} (${c.licence[lang]})`).join('; ') + '.',
+      placeholder: false,
+    },
     'hall-sources': vi ? p('Nguồn tham khảo', 'Danh sách tài liệu tham khảo.') : p('References', 'The list of references.'),
 
-    // Quiz room: the quiz itself arrives in M7.
+    // Game Room: the board beside the quiz.
     'quiz-info': vi
-      ? p('Phòng trò chơi', 'Trò chơi câu hỏi sẽ được đặt tại đây.')
-      : p('Game Room', 'The quiz game will take place here.'),
+      ? p('Trò chơi câu hỏi', 'Câu hỏi về bốn cuộc Cách mạng Công nghiệp hiện trên bức tường cuối phòng. Nhắm vào đáp án bạn chọn rồi nhấn E.')
+      : p('The Quiz', 'Questions about the four Industrial Revolutions appear on the back wall. Aim at the answer you choose and press E.'),
   }
 
   // Era rooms: an overview board on the back wall ("ir1-overview" ...) and 4 inventions,

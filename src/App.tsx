@@ -5,6 +5,7 @@ import PauseScreen from './ui/PauseScreen'
 import InfoPanel from './ui/InfoPanel'
 import MapMenu from './ui/MapMenu'
 import DeviceMessage from './ui/DeviceMessage'
+import LoadingScreen from './ui/LoadingScreen'
 import { useEffect } from 'react'
 import { useMuseumStore } from './state/useMuseumStore'
 import { useContent } from './content/use-content'
@@ -31,14 +32,16 @@ function App() {
   return (
     <>
       <Museum />
-      {/* Black cover over the 3D world until it has loaded, then a quick fade into view. */}
+      {/* Black cover over the 3D world until it has loaded, then a fade into view. */}
       <div className={worldReady ? 'world-cover world-cover-gone' : 'world-cover'} aria-hidden="true" />
       {mode === 'exploring' && <Hud />}
-      {mode === 'start' && <StartScreen />}
+      {/* The title screen waits until everything has loaded (LoadingScreen). */}
+      {mode === 'start' && worldReady && <StartScreen />}
       {mode === 'paused' && <PauseScreen />}
       {/* Always mounted: it animates in when an exhibit opens and out when it closes. */}
       <InfoPanel />
       {mode === 'map' && <MapMenu />}
+      <LoadingScreen />
     </>
   )
 }

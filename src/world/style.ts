@@ -61,6 +61,10 @@ export const BOARD_THEMES: Record<RoomId, BoardTheme> = {
 }
 export const BOARD_FRAME = 0.06
 
+// The four quiz-show colours (A, B, C, D): the Game Room's tiles, bulbs and stage lights,
+// and the answer buttons of the quiz screen.
+export const QUIZ_COLOURS = ['#e05a8a', '#3f8ff5', '#f5b13f', '#3fc47f']
+
 export const GOLD = '#c9a25a'
 export const DARK_WOOD = '#4a3423'
 export const PAPER = '#f2ece0'

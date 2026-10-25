@@ -32,7 +32,7 @@ Project: browser-based 3D virtual museum about the four Industrial Revolutions (
 - Both languages must read naturally (written for a native reader, not word-for-word translation). Names that stay the same in both (INNOVA, key names) are fine.
 - Placeholders are marked `[CẦN KIỂM TRA]` in Vietnamese and `[NEEDS CHECKING]` in English.
 - **Never invent historical facts, dates, names or sources.** Every exhibit and quiz question needs a real source that I provided or that you looked up and cited. If unsure, write `[CẦN KIỂM TRA]` and tell me.
-- Every image and 3D model must be listed in `src/content/credits.ts` with author and licence.
+- Every image, 3D model, sound and font must be listed in `src/content/credits.ts` with author, licence, source and item name (in both languages). There is no separate credits screen: the intro hall's "Ghi công" board is filled from that file, so adding the entry is what credits the asset. Remind the leader of this when content development starts.
 
 ## Git rules
 - Do not commit or push unless I ask. When I do, use a short descriptive message.

@@ -20,3 +20,8 @@ export function exhibitIdOf(object: Object3D | null): string | null {
   }
   return null
 }
+
+// Tiles of the quiz wall (QuizWall.tsx) are aimed at like exhibits but do not open a panel.
+export function isQuizTarget(id: string | null): id is string {
+  return !!id && id.startsWith('quiz-') && id !== 'quiz-info'
+}

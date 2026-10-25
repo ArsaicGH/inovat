@@ -146,9 +146,22 @@ export default function Player({ walls }: PlayerProps) {
       }
     }
 
+    // Chrome/Edge also send smaller fake jumps now and then (a single event much bigger
+    // than the ones around it), which jerk the camera up or down. A real hand speeds up
+    // gradually, so an event far bigger than the recent average is ignored.
+    let recentMove = 0 // average size of recent mouse events (pixels)
+    function isMouseSpike(event: MouseEvent): boolean {
+      const size = Math.hypot(event.movementX, event.movementY)
+      const spike = size > 60 && size > recentMove * 6 + 20
+      // A spike still raises the average a lot, so a real fast flick (many big events in
+      // a row) gets through from its second event on; only a lone jump is dropped.
+      recentMove = spike ? recentMove * 0.5 + size * 0.5 : recentMove * 0.8 + size * 0.2
+      return spike
+    }
+
     function onMouseMove(event: MouseEvent) {
       debugStats.mouseMoves += 1
-      if (store().mode !== 'exploring' || isFakeMouseJump(event)) return
+      if (store().mode !== 'exploring' || isFakeMouseJump(event) || isMouseSpike(event)) return
       if (!store().mouseCaptured) return // free mouse: only a click captures it again
       if (!canUse(store().tutorial, 'look')) return // tutorial: camera still frozen
       const sensitivity = BASE_MOUSE_SENSITIVITY * store().mouseSensitivity
