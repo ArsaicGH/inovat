@@ -153,9 +153,9 @@ Install Node.js (LTS), Git, VS Code. Create GitHub accounts for everyone and one
 
 **M1. "Hello, museum" live on the internet**
 Create the Vite React + TypeScript project, push to GitHub, connect Vercel.
-- [ ] A page titled "Bảo tàng Cách mạng Công nghiệp" with correct diacritics opens at the public `.vercel.app` URL, on another computer and on the school network.
-- [ ] Editing the text and pushing updates the live site within minutes.
-- [ ] Every member can download the project and run it locally.
+- [x] A page titled "Bảo tàng Cách mạng Công nghiệp" with correct diacritics opens at the public `.vercel.app` URL, on another computer and on the school network. (Page title is now "INNOVA – Bảo tàng Cách mạng Công nghiệp". Checked from the leader's computer only; another computer and the school network are NOT tested yet, by decision. Retest before M11.)
+- [x] Editing the text and pushing updates the live site within minutes. (Tested: live in about 20 seconds.)
+- [x] Every member can download the project and run it locally. (Leader only, by decision: `git clone https://github.com/ArsaicGH/innova.git`, then `npm install`, then `npm run dev`.)
 
 ### Phase B: Core 3D (riskiest part first)
 
@@ -331,5 +331,7 @@ Plan: aim for A, keep B as a cheap fallback (only `Player.tsx` changes). Decide 
 - [x] Plan reviewed
 - [x] M0: Tools and accounts (leader's computer only, by decision)
   - Windows 11: Node.js v24.22.1, npm 11.19.1, Git 2.55.0 installed with winget. Leader has GitHub, VS Code and Vercel.
-- [ ] M1: "Hello, museum" live on the internet  <- next step
-  - Needs: the GitHub repository name, Git identity (name + email) set on this device, GitHub sign-in from this device.
+- [x] M1: "Hello, museum" live on the internet
+  - Repository (public): https://github.com/ArsaicGH/innova
+  - Live site: https://innova-museum.vercel.app (every push to `main` redeploys)
+- [ ] M2: First 3D scene  <- next step, wait for the leader's review of M1 first
