@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
+import { debugStats } from './debug-stats'
 
 // DEVELOPMENT-ONLY diagnostic (never shown on the live site, so English is fine).
 // The FPS counter only shows an average; jitter comes from frames that take UNEVEN
@@ -53,8 +54,16 @@ export default function FrameTimingProbe() {
       `avg ${avg.toFixed(1)} ms (${(1000 / avg).toFixed(0)} fps)\n` +
       `p95 ${p95.toFixed(1)} ms   max ${max.toFixed(1)} ms\n` +
       `uneven ${(uneven * 100).toFixed(1)}% of frames\n` +
+      `keys held: ${[...debugStats.held].join(' ') || '-'}\n` +
+      `key events (2 s): ${debugStats.keyDowns} pressed, ${debugStats.keyUps} released\n` +
+      `mouse signals: ${Math.round(debugStats.mouseMoves / elapsed.current)} per second\n` +
+      `key chatter ${debugStats.keyChatter} (fake key releases so far)\n` +
       `pixels ${canvas.width}x${canvas.height} (ratio ${renderer.getPixelRatio()})\n` +
-      `gpu ${gpuName(renderer.getContext())}`
+      // Shortened: the full name is very long and would cover the view on small windows.
+      `gpu ${gpuName(renderer.getContext()).slice(0, 40)}`
+    debugStats.keyDowns = 0
+    debugStats.keyUps = 0
+    debugStats.mouseMoves = 0
     times.current = []
     elapsed.current = 0
   })

@@ -1,8 +1,12 @@
 import { useEffect, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useMuseumStore } from '../state/useMuseumStore'
-import { moveWithCollision, type WallBox } from './collision'
+import { moveWithCollision, type Box } from './collision'
 import { getCanvas } from './pointer-lock'
+import { regionAt, spawnOf } from './layout'
+import { closedDoorBlockers } from './door-state'
+import { ERA_ROOMS, type RoomId } from '../types'
+import { debugStats } from './debug-stats'
 
 const WALK_SPEED = 3 // metres per second
 const TURN_SPEED = 2 // radians per second when turning with ← / → (~115°/s)
@@ -20,9 +24,6 @@ const MAX_PITCH = Math.PI / 2 - 0.05
 const LOOK_SMOOTHING = 25
 // Walking reaches full speed (and stops) in about a tenth of a second.
 const WALK_ACCELERATION = 12
-// The measured time between frames wobbles a little even on a steady screen, which makes
-// each step a slightly different size. Averaging it over a few frames evens the steps out.
-const FRAME_TIME_SMOOTHING = 0.15
 
 // Keys are matched by PHYSICAL position (event.code), not by the typed letter.
 // W A S D walk. The arrow keys move the camera, like the mouse, so touchpad users can
@@ -36,6 +37,9 @@ const TURN_RIGHT = ['ArrowRight']
 const LOOK_UP = ['ArrowUp']
 const LOOK_DOWN = ['ArrowDown']
 const WALK_KEYS = [...FORWARD, ...BACKWARD, ...STEP_LEFT, ...STEP_RIGHT]
+
+// A released key must stay released this long before walking stops (see onKeyUp).
+const KEY_RELEASE_GRACE_MS = 60
 
 // After this many normal W/A/S/D presses in a row, we trust the typing tool is off.
 const NORMAL_PRESSES_TO_CLEAR_WARNING = 4
@@ -67,51 +71,67 @@ function approach(current: number, target: number, rate: number, dt: number): nu
 }
 
 interface PlayerProps {
-  walls: WallBox[]
-  spawn: [number, number] // x, z on the floor
-  spawnYaw: number // which way to face at the start, in radians
+  walls: Box[] // fixed walls; closed doors are added every frame
 }
 
-export default function Player({ walls, spawn, spawnYaw }: PlayerProps) {
+export default function Player({ walls }: PlayerProps) {
   // `get()` returns the current 3D state; we read the camera from it at the moment we
   // move it (moving the camera is exactly what this component is for).
   const get = useThree((state) => state.get)
-  const pressed = useRef(new Set<string>())
+  // The same Set is shown live in the development readout.
+  const pressed = useRef(debugStats.held)
   // Where the visitor wants to look (set by mouse/arrows) and where the camera looks now.
-  const targetYaw = useRef(spawnYaw) // turning left/right
+  const targetYaw = useRef(0) // turning left/right
   const targetPitch = useRef(0) // looking up/down
-  const yaw = useRef(spawnYaw)
+  const yaw = useRef(0)
   const pitch = useRef(0)
   const velocity = useRef({ x: 0, z: 0 }) // metres per second
-  const smoothDt = useRef(1 / 60)
   const normalPresses = useRef(0)
+  // -1 = nothing handled yet, so the very first frame "teleports" us to the store's
+  // starting room (the hall). Map teleports later reuse the same code.
+  const handledTeleports = useRef(-1)
 
-  // Place the camera at the spawn point once.
-  useEffect(() => {
+  // Stand at a room's spawn point (start of the visit, map teleport).
+  function placeAt(room: RoomId) {
     const camera = get().camera
-    camera.position.set(spawn[0], EYE_HEIGHT, spawn[1])
+    const spawn = spawnOf(room)
+    camera.position.set(spawn.x, EYE_HEIGHT, spawn.z)
+    yaw.current = targetYaw.current = spawn.yaw
+    pitch.current = targetPitch.current = 0
+    velocity.current = { x: 0, z: 0 }
     // "YXZ" = turn left/right first, then tilt up/down, like a person's head.
     camera.rotation.order = 'YXZ'
-    camera.rotation.set(pitch.current, yaw.current, 0)
-  }, [get, spawn])
+    camera.rotation.set(0, spawn.yaw, 0)
+  }
 
   useEffect(() => {
     const store = useMuseumStore.getState
+    // Keys waiting to be counted as released (see onKeyUp).
+    const releaseTimers = new Map<string, number>()
+
+    // Forget all held keys at once (pause, panel, window loses focus...).
+    function releaseAllKeys() {
+      releaseTimers.forEach((timer) => clearTimeout(timer))
+      releaseTimers.clear()
+      pressed.current.clear()
+    }
 
     // The browser tells us whenever the mouse is captured or released.
     // Captured = exploring. Released (Esc, Alt+Tab...) while exploring = paused.
     function onLockChange() {
       if (document.pointerLockElement === getCanvas()) {
-        store().setMode('exploring')
+        store().startExploring()
       } else {
-        pressed.current.clear() // forget held keys, so we do not keep walking
+        releaseAllKeys() // forget held keys, so we do not keep walking
         velocity.current = { x: 0, z: 0 }
         store().setTypingToolWarning(false)
+        // Released on purpose for a panel or the map: those modes are already set.
         if (store().mode === 'exploring') store().setMode('paused')
       }
     }
 
     function onMouseMove(event: MouseEvent) {
+      debugStats.mouseMoves += 1
       if (store().mode !== 'exploring' || isFakeMouseJump(event)) return
       const sensitivity = BASE_MOUSE_SENSITIVITY * store().mouseSensitivity
       targetYaw.current -= event.movementX * sensitivity
@@ -120,6 +140,14 @@ export default function Player({ walls, spawn, spawnYaw }: PlayerProps) {
     }
 
     function onKeyDown(event: KeyboardEvent) {
+      debugStats.keyDowns += 1
+      // Pressed again before its release was confirmed: it was a fake release.
+      const pendingRelease = releaseTimers.get(event.code)
+      if (pendingRelease !== undefined) {
+        clearTimeout(pendingRelease)
+        releaseTimers.delete(event.code)
+        debugStats.keyChatter += 1
+      }
       pressed.current.add(event.code)
       if (store().mode !== 'exploring') return
 
@@ -135,11 +163,23 @@ export default function Player({ walls, spawn, spawnYaw }: PlayerProps) {
         }
       }
     }
+    // Keyboard hooks such as Unikey can send a fake "released" between the repeats of a
+    // held key, which made walking go move-stop-move-stop. So a key only counts as
+    // released if it STAYS released for a moment; a quick re-press cancels the release.
     function onKeyUp(event: KeyboardEvent) {
-      pressed.current.delete(event.code)
+      debugStats.keyUps += 1
+      const code = event.code
+      clearTimeout(releaseTimers.get(code))
+      releaseTimers.set(
+        code,
+        window.setTimeout(() => {
+          releaseTimers.delete(code)
+          pressed.current.delete(code)
+        }, KEY_RELEASE_GRACE_MS),
+      )
     }
     function onBlur() {
-      pressed.current.clear()
+      releaseAllKeys()
     }
 
     document.addEventListener('pointerlockchange', onLockChange)
@@ -148,6 +188,7 @@ export default function Player({ walls, spawn, spawnYaw }: PlayerProps) {
     window.addEventListener('keyup', onKeyUp)
     window.addEventListener('blur', onBlur)
     return () => {
+      releaseAllKeys()
       document.removeEventListener('pointerlockchange', onLockChange)
       document.removeEventListener('mousemove', onMouseMove)
       window.removeEventListener('keydown', onKeyDown)
@@ -157,13 +198,30 @@ export default function Player({ walls, spawn, spawnYaw }: PlayerProps) {
   }, [get])
 
   useFrame(({ camera }, delta) => {
-    if (useMuseumStore.getState().mode !== 'exploring') return
+    const store = useMuseumStore.getState()
 
-    // Cap the frame time so a stutter cannot teleport us through a wall, then smooth it:
-    // each frame keeps 85% of the running average and adds 15% of the new measurement.
-    const frameTime = Math.min(delta, 0.1)
-    smoothDt.current += (frameTime - smoothDt.current) * FRAME_TIME_SMOOTHING
-    const dt = smoothDt.current
+    // A new map teleport request? (Checked in every mode: the map is open when it is made.)
+    if (store.teleport.count !== handledTeleports.current) {
+      handledTeleports.current = store.teleport.count
+      placeAt(store.teleport.roomId)
+    }
+
+    // Keep "which room am I in" up to date (on-screen name, map, hiding unseen rooms).
+    // Stepping inside an era room counts as visiting it (all four unlock the quiz room).
+    const region = regionAt(camera.position.x, camera.position.z)
+    if (region) {
+      if (region.room !== store.currentRoom) store.setCurrentRoom(region.room)
+      if (region.inside && ERA_ROOMS.includes(region.room) && !store.visitedRooms.includes(region.room)) {
+        store.markVisited(region.room)
+      }
+    }
+
+    if (store.mode !== 'exploring') return
+
+    // Use the REAL time since the last frame, so each step matches what is on screen even
+    // when frames arrive unevenly. (An averaged time made such moments look worse.)
+    // Capped, so a long hitch cannot carry us through a wall.
+    const dt = Math.min(delta, 0.1)
     const isDown = (codes: string[]) => codes.some((code) => pressed.current.has(code))
 
     // Camera: arrow keys change the target, then the camera glides towards it.
@@ -197,7 +255,7 @@ export default function Player({ walls, spawn, spawnYaw }: PlayerProps) {
     if (Math.abs(v.x) < 0.001 && Math.abs(v.z) < 0.001) return
 
     // Distance = speed x time, so the speed is the same on fast and slow computers.
-    const next = moveWithCollision(camera.position.x, camera.position.z, v.x * dt, v.z * dt, walls)
+    const next = moveWithCollision(camera.position.x, camera.position.z, v.x * dt, v.z * dt, [walls, closedDoorBlockers()])
     // If a wall stopped us in one direction, drop that part of the speed too.
     if (next.x === camera.position.x) v.x = 0
     if (next.z === camera.position.z) v.z = 0

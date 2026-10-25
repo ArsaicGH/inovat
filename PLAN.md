@@ -25,11 +25,11 @@ Content draft: a private Google Doc kept by the project leader. The link is deli
 
 A browser-based 3D museum, playable by anyone with the URL, no installation.
 
-Six areas, in a straight chronological line:
+Six rooms around a central rotunda (layout chosen by the leader, see section 3):
 
 | # | Area | Vietnamese name |
 |---|------|-----------------|
-| 1 | Introduction hall (title, short intro, navigation, controls) | Sảnh giới thiệu |
+| 1 | Introduction hall (introduction, overview, our team, credits, sources, controls) | Sảnh giới thiệu |
 | 2 | First Industrial Revolution | Phòng Cách mạng Công nghiệp lần thứ nhất (CMCN 1) |
 | 3 | Second Industrial Revolution | Phòng CMCN 2 |
 | 4 | Third Industrial Revolution | Phòng CMCN 3 |
@@ -37,6 +37,14 @@ Six areas, in a straight chronological line:
 | 6 | Educational minigame (quiz) | Phòng trò chơi |
 
 Core features: first-person walking (WASD + mouse), collision with walls, clickable exhibits with info panels, a map menu to jump between rooms, a distinct atmosphere per era, a multiple-choice quiz with feedback, scoring and results, desktop-browser support, smooth performance on ordinary student computers, and a public URL.
+
+**Exhibits (leader's decision).** Each of the four era rooms shows exactly **4 inventions**, the most valuable of that revolution, one in each **corner**. Each corner has an observable prototype/demonstration (3D model on a pedestal) with a descriptive, informative text panel beside it. 4 rooms x 4 = 16 inventions.
+
+**Introduction hall (leader's decision).** Sảnh giới thiệu is the first room and holds: a basic introduction to the museum, an overview of the four Industrial Revolutions and the route through the rooms, our team (members and roles), credits (images, models, tools) and sources (the reference list). Exact sections and wording come from the group's content document once it is polished; until then each section is a placeholder panel marked `[CẦN KIỂM TRA]`.
+
+**Look and feel (leader's decision).** Each era room is designed and decorated after its revolution, from historical (CMCN 1) to futuristic (CMCN 4). The whole museum should feel like a real, impressive *museum*, not simple graphics, while staying smooth on ordinary laptops. Realistic target: a polished, stylised museum (rich lighting, materials and atmosphere), not photorealism.
+
+**Order of work (leader's decision).** The complete game is built first with placeholder prototypes and texts (Phase C), then real content replaces the placeholders (Phase D). See section 4.
 
 ---
 
@@ -76,12 +84,23 @@ Two layers stacked in one web page, connected by a shared store:
 
 **Modes.** The app is always in exactly one mode: `start`, `exploring`, `paused`, `reading`, `map`, `quiz`, `results`. Only in `exploring` is the mouse captured and movement allowed. Every action checks the mode first.
 
-**Museum layout.**
+**Museum layout (leader's decision): a 12-sided rotunda hub.**
 
 ```
-Sảnh giới thiệu -> CMCN 1 -> CMCN 2 -> CMCN 3 -> CMCN 4 -> Phòng trò chơi
-      M key / map button: jump straight to any room
+                 [Phòng trò chơi]          <- top flat side (end room, locked until CMCN 1-4 visited)
+      [CMCN 2]                    [CMCN 3]
+                 (  Sảnh trung tâm  )      <- 12-sided rotunda, 24 m across (leader's choice)
+      [CMCN 1]                    [CMCN 4]
+                 [Sảnh giới thiệu]         <- bottom flat side (start room)
 ```
+
+- The central rotunda (Sảnh trung tâm) is a regular 12-sided polygon with flat sides facing the start and end rooms. Doors alternate with blank walls: 6 doors, 6 blank (decorated) walls, symmetrical.
+- Doors: Sảnh giới thiệu (bottom), CMCN 1 (lower left), CMCN 2 (upper left), CMCN 3 (upper right), CMCN 4 (lower right), Phòng trò chơi (top). Visiting order: clockwise.
+- Every room is behind a closed sliding door with its name on a sign above; doors open when you approach. Each room has a short entry passage, so no room is visible from the rotunda.
+- The 4 era doors are grand portals (taller, framed, large sign); the start and end doors are plain (lower, small sign).
+- The quiz room door stays locked until all four era rooms have been visited.
+- Look (M6): a grand, luxurious Victorian dome hall (coffered dome with an oculus, 12 pillars, marble floor, chandelier, decorative blank walls) that sets the scene for the four rooms.
+- M key / map button: jump to any room (the quiz room only once unlocked).
 
 Every room is built from one reusable `<Room>` component with different size, colours and lights.
 
@@ -142,7 +161,9 @@ The `Exhibit` type requires at least one source, so the build fails if one is mi
 
 ## 4. Milestones and acceptance criteria
 
-Ordered by dependency and risk: foundations, then the riskiest 3D mechanics, then content, then quality and release.
+Ordered by dependency and risk: foundations, then the riskiest 3D mechanics, then **the complete game with placeholders**, then real content, then release.
+
+**Skeleton first (leader's decision).** The whole game, including all visual polish, the quiz, menus and performance work, is finished with **placeholder** prototypes and **placeholder** texts (marked `[CẦN KIỂM TRA]`) before any real content is added. Real content in Phase D only *replaces* placeholders; it should not require new features or redesign.
 
 ### Phase A: Foundations
 
@@ -153,11 +174,11 @@ Install Node.js (LTS), Git, VS Code. Create GitHub accounts for everyone and one
 
 **M1. "Hello, museum" live on the internet**
 Create the Vite React + TypeScript project, push to GitHub, connect Vercel.
-- [x] A page titled "Bảo tàng Cách mạng Công nghiệp" with correct diacritics opens at the public `.vercel.app` URL, on another computer and on the school network. (Page title is now "INNOVA – Bảo tàng Cách mạng Công nghiệp". Checked from the leader's computer only; another computer and the school network are NOT tested yet, by decision. Retest before M11.)
+- [x] A page titled "Bảo tàng Cách mạng Công nghiệp" with correct diacritics opens at the public `.vercel.app` URL, on another computer and on the school network. (Page title is now "INNOVA – Bảo tàng Cách mạng Công nghiệp". Checked from the leader's computer only; another computer and the school network are NOT tested yet, by decision. Retest before M12.)
 - [x] Editing the text and pushing updates the live site within minutes. (Tested: live in about 20 seconds.)
 - [x] Every member can download the project and run it locally. (Leader only, by decision: `git clone https://github.com/ArsaicGH/innova.git`, then `npm install`, then `npm run dev`.)
 
-### Phase B: Core 3D (riskiest part first)
+### Phase B: Core mechanics (riskiest part first)
 
 **M2. First 3D scene**: a floor, one box, lights, a camera.
 - [x] Scene fills the window; resizing does not stretch it. (Measured: canvas = window size at 600x900 and 1366x768.)
@@ -171,51 +192,65 @@ Create the Vite React + TypeScript project, push to GitHub, connect Vercel.
 - [x] Esc shows a pause screen; "Tiếp tục" resumes. (Leader tested in Edge; mouse capture needs a normal browser tab, not an in-app preview.)
 - [x] Movement works while Unikey or EVKey is running (read physical key positions). (Works in English mode. In Vietnamese mode Unikey swallows Telex keys before the browser sees them; the page detects this and shows a warning until 4 normal key presses arrive.)
 
-**M4. Interacting with one exhibit**: crosshair, "Nhấn E để xem" prompt, info panel, back to walking.
-- [ ] Prompt appears only when aiming at the exhibit within about 3 m.
-- [ ] While the panel is open: cursor visible, WASD does nothing.
-- [ ] Opening and closing the panel 20 times never leaves the app stuck.
+**M4. Interacting with one exhibit**: crosshair, "Nhấn E để xem" prompt (left click as a backup), info panel, back to walking.
+- [x] Prompt appears only when aiming at the exhibit within about 3 m. (Tested: all 22 spots reachable from 2.8 m, none from 3.5 m; walls block aiming.)
+- [x] While the panel is open: cursor visible, WASD does nothing. (Tested: holding W for 1 s with the panel open moved the camera 0 m.)
+- [x] Opening and closing the panel 20 times never leaves the app stuck. (Scripted 20/20 rounds pass, alternating E and Esc, with the "mouse capture refused" fallback; leader reviewed in Edge.)
 
-**M5. Grey-box museum and map navigation**: all six rooms as plain grey boxes with doorways, a spawn point per room, the map menu.
-- [ ] Can walk from Sảnh giới thiệu to Phòng trò chơi with no gaps, stuck spots or flickering walls (z-fighting).
-- [ ] Teleporting places you inside the chosen room, facing the exhibits.
-- [ ] The map highlights the current room.
+**M5. Grey-box museum and map navigation**: the 12-sided rotunda and the six rooms as plain grey boxes, each behind a closed sliding door with a sign (grand era doors, plain start/end doors), the quiz door locked until CMCN 1-4 are visited; each era room has 4 exhibit slots (one per corner: pedestal + placeholder prototype + text panel beside it); the intro hall has wall-panel slots for its sections (introduction, overview, our team, credits, sources); a spawn point per room; current room name on screen; the map menu (M key).
+- [x] Can walk from Sảnh giới thiệu to Phòng trò chơi with no gaps, stuck spots or flickering walls (z-fighting). (Rotunda layout: script walks every route, closed doors block, 72 wall blocks with 0 overlaps; leader walked it in Edge.)
+- [x] Teleporting places you inside the chosen room, facing the exhibits. (Tested: CMCN 4 -> lands at its entrance, facing into the room; the two far corners are in view, the near two a head-turn away.)
+- [x] The map highlights the current room. (Tested: "Sảnh ... Bạn đang ở đây" highlighted; room name on screen updates after teleport.)
+- [x] Every corner slot of the four era rooms can be aimed at and opened (placeholder text). (Tested: all 22 spots, including the 5 hall panels and the quiz sign.)
 
 **Decision point after M5:** if M3-M5 proved too hard or unstable, switch to the click-to-move version (Section 8). Content, panels, map and quiz are reused unchanged; only `Player.tsx` differs.
 
-### Phase C: Content and features (parallelisable)
+### Phase C: The complete game with placeholders (the "skeleton")
 
-**M6. Content pipeline and one real exhibit**
+**M6. Visual identity and themed rooms**: a shared style guide (colours, fonts, panels, signs) and one distinct, impressive atmosphere per room, balanced with performance. Direction: the hall is a welcoming museum lobby; CMCN 1 historical (brick, wood, warm lamplight); CMCN 2 steel and early electric light; CMCN 3 beige computers and fluorescent light; CMCN 4 futuristic (white glass, screens, glow); the quiz room playful. Tools: textured materials, emissive (glowing) lights, an environment map for reflections, fog, bloom, 3D signs with a bundled Vietnamese font, decoration props. Placeholder prototypes on every pedestal and placeholder text on every panel. (New packages or downloads are asked for first.)
+- [ ] All rooms use the same UI components and fonts (full Vietnamese support, e.g. Be Vietnam Pro).
+- [ ] Each room is recognisable at a glance from lighting, materials and decoration.
+- [ ] Doorways and signs make the route Sảnh -> CMCN 1 -> ... -> Phòng trò chơi obvious.
+- [ ] Still 30 fps or more at 1080p on the leader's laptop, with at most one shadow-casting light.
+- [ ] The style guide is written in README.md.
+
+**M7. Quiz room engine (Phòng trò chơi)**: questions from `quiz.ts`, multiple choice, immediate feedback with a short explanation, scoring, results screen, retry. Uses clearly fake placeholder questions until Phase D.
+- [ ] An answer locks once chosen; feedback is immediate.
+- [ ] Score is correct in three tests: all right, all wrong, mixed.
+- [ ] Results screen offers "Làm lại" and "Quay lại bảo tàng".
+
+**M8. Game shell**: loading screen with progress, credits screen (reads `credits.ts`), the intro hall's placeholder panels (introduction, overview of the four revolutions, our team, credits, sources, controls), the "Vui lòng dùng máy tính" message for phones/tablets, final start/pause/map screens styled to match M6.
+- [ ] Loading screen shows progress and disappears when the museum is ready.
+- [ ] The credits screen lists every placeholder asset with author and licence.
+- [ ] Phone/tablet visitors see "Vui lòng dùng máy tính".
+- [ ] The intro hall has a readable placeholder panel for each section: introduction, overview, our team, credits, sources.
+- [ ] Every screen and sign uses text from `src/content/`.
+
+**M9. Performance and compatibility pass (skeleton)**
+- [ ] Automatic quality: resolution/effects drop on slow computers so frames stay smooth.
+- [ ] At 1080p: 30 fps or more (target 60) on the weakest computer available.
+- [ ] Tested in Chrome, Edge, Firefox (and Safari if available).
+- [ ] Movement jitter (from M3): CAUSE FOUND. Windows "dynamic refresh rate" laptops switch the screen between 60 and 120 Hz after mouse movement, so the browser delivers frames in a jumpy rhythm for a few seconds (leader confirmed: with Dynamic off, a flawless 120 fps). A web page cannot control the screen's refresh rate. Tried and REMOVED: a 60 fps frame cap with an auto mode and a "Khung hình" setting (on a switching screen it ran at a jerky 40-50 fps, and visitors would mistake the setting for a quality option). Kept: movement uses the real frame time. Still open: whether to show affected visitors a short hint (leader to decide). Dev-only tools: timing readout (`FrameTimingProbe.tsx`) and address-bar switches `?dpr=1`, `?aa=0`, `?shadows=0`.
+- [ ] **Skeleton complete:** a classmate can start the game, visit every room, open every placeholder exhibit and finish the placeholder quiz unaided.
+
+### Phase D: Real content (needs the group's content document)
+
+**M10. Content pipeline and one real exhibit**
 - [ ] Build fails if an exhibit has no source.
 - [ ] The panel shows the text and its source.
 - [ ] A second member verified the text against that source.
 - [ ] The credits screen lists every image and model with its licence.
 
-**M7. Quiz room (Phòng trò chơi)**: questions from `quiz.ts`, multiple choice, immediate feedback with a short explanation, scoring, results screen, retry.
-- [ ] An answer locks once chosen; feedback is immediate.
-- [ ] Score is correct in three tests: all right, all wrong, mixed.
-- [ ] Results screen offers "Làm lại" and "Quay lại bảo tàng".
+**M11. All real content**: the 16 inventions (4 per era room) with their prototype models and texts, the intro hall sections (introduction, overview, our team, credits, sources), and the real quiz questions, replacing every placeholder.
+- [ ] No placeholder or `[CẦN KIỂM TRA]` left anywhere.
 - [ ] Every question can be answered from an exhibit in the museum.
-
-**M8. Visual identity**: a shared style guide (colours, fonts, panels, signs) and one distinct atmosphere per era (the group decides the details; example directions: brick and warm lamplight, steel and early electric light, beige computers and fluorescent light, white glass and screens).
-- [ ] All rooms use the same UI components and fonts.
-- [ ] Each room is recognisable at a glance from lighting and materials.
-- [ ] The style guide is written in README.md.
-
-### Phase D: Quality and release
-
-**M9. Real assets and full content** (suggested: 4-6 exhibits per room)
 - [ ] Total download about 30 MB or less; no single model above about 2 MB; textures 1024 px or smaller unless justified.
 - [ ] Every asset is in the credits; every text reviewed by two people.
 
-**M10. Performance and compatibility pass**
-- [ ] At 1080p: 30 fps or more (target 60) on the weakest computer available.
-- [ ] Loading screen with progress.
-- [ ] Tested in Chrome, Edge, Firefox (and Safari if available).
-- [ ] Phone/tablet visitors see "Vui lòng dùng máy tính".
-- [ ] Movement jitter investigated (from M3). Leader's laptop (AMD Radeon 780M, ~120 Hz): 3-10% of frames take exactly two refreshes (~16.7 ms), even with `?dpr=1&aa=0&shadows=0` and Edge energy saver off, so graphics load is not the cause. Next: measure main-thread blocking (long tasks) and our own per-frame work time; test other browsers/computers and Windows power modes. Dev-only tools: frame timing readout (`src/world/FrameTimingProbe.tsx`) and address-bar switches `?dpr=1`, `?aa=0`, `?shadows=0`.
+### Phase E: Release
 
-**M11. Final polish and launch**
+**M12. Final check and launch**
+- [ ] Performance re-checked with the real assets (same targets as M9).
 - [ ] A classmate who has never seen the project can start it, visit every room, read exhibits and finish the quiz unaided.
 - [ ] No console errors; README finished; final URL shared.
 
@@ -337,9 +372,17 @@ Plan: aim for A, keep B as a cheap fallback (only `Player.tsx` changes). Decide 
   - Live site: https://innova-museum.vercel.app (every push to `main` redeploys)
 - [x] M2: First 3D scene (reviewed and pushed)
   - Added three, @react-three/fiber, @react-three/drei, @types/three. Scene in `src/world/Museum.tsx`, title overlay in `src/ui/Hud.tsx`.
-- [x] M3: Walking in one test room (reviewed by the leader; jitter investigation moved to M10)
+- [x] M3: Walking in one test room (reviewed by the leader; jitter investigation moved to M9, the performance pass)
   - Added zustand. Mode store `src/state/useMuseumStore.ts`; `Player.tsx`, `Room.tsx`, `collision.ts`, `pointer-lock.ts`; `StartScreen.tsx`, `PauseScreen.tsx`; text in `src/content/ui.ts`.
   - Controls (leader's decision): W A S D move; arrow keys / mouse / touchpad move the camera (arrow keys help touchpad users, whose touchpad is often disabled while typing). Sensitivity slider on start and pause screens, saved in the browser. Normal (not raw) mouse input, so each visitor's OS mouse/touchpad settings apply; fake mouse jumps (> 1/4 window) are ignored.
   - Unikey/EVKey in Vietnamese mode swallows Telex keys (a, s, d, w); no code can recover them. The page detects it and shows a warning asking to switch to English mode.
   - Smoothing: camera glides to the mouse target, walking accelerates/decelerates, frame time averaged. Shadows drawn once (static room); `powerPreference: 'high-performance'`.
-- [ ] M4: Interacting with one exhibit  <- next step
+- Plan restructured (leader's decision): skeleton first. Phase C (M6-M9) builds the complete, polished game with placeholders; Phase D (M10-M11) adds real content; M12 is launch. Old M6 (content pipeline) is now M10, old M8 (visual identity) is now M6, old M9/M10/M11 are now M11/M9/M12.
+- [x] M4 + M5: exhibits and grey-box museum (rotunda layout; reviewed by the leader)
+  - Floor plan `src/world/layout.ts`: 12-sided rotunda (24 m across, 8 m high, 12 pillars) with 6 doors alternating with 6 blank walls; each room behind a short passage (rooms 15 m from the centre so neighbours never overlap). Rotated rooms use rotated collision boxes (`collision.ts`).
+  - Doors `Doors.tsx` + `door-state.ts`: sliding double doors open within 3 m; grand era portals (3.6 m, columns, big sign) vs plain start/end doors (3 m, small sign); signs painted with the system font (`Sign.tsx`). Quiz door locked until CMCN 1-4 are entered, with a "x/4" message nearby.
+  - Only what can be seen is drawn (`MuseumPart` in `Museum.tsx`): about 20-30 draw calls instead of about 140.
+  - Tested by script: all routes, closed doors block, 72 wall blocks with 0 overlaps, rooms never overlap, all 22 exhibits aimable (2.8 m yes, 3.5 m no), quiz lock and unlock, map teleports.
+  - Movement stutter: caused by Windows dynamic refresh rate (see M9); frame-cap attempt removed (made it worse); hint decision open. Rotunda enlarged to 24 m across (leader's choice).
+- [x] Decision point after M5: keep free walking (leader's decision). Stutter on Windows dynamic-refresh laptops accepted as a known limitation, no hint (leader's decision).
+- [ ] M6: Visual identity and themed rooms  <- next step (asking for packages/downloads first)

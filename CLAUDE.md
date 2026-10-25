@@ -8,7 +8,9 @@ Project: browser-based 3D virtual museum about the four Industrial Revolutions (
 
 ## How to work with us
 - Explain every unfamiliar term and every command **before** running it, in plain language.
-- Work on **one milestone at a time** (see `PLAN.md`). Do not build ahead. Stop at the end of each milestone, say how to test it, and wait for my review.
+- Work on **one milestone at a time** (see `PLAN.md`), unless I ask to group several. Do not build ahead. Stop at the end of each milestone (or group), say how to test it, and wait for my review.
+- **Skeleton first:** finish the complete game, including all visual polish, the quiz, menus and performance, with placeholder prototypes and placeholder texts before any real content is added. Real content later only replaces placeholders.
+- Visual goal: an impressive, stylised museum that still runs smoothly on ordinary laptops. When a visual idea costs too much performance, say so and offer a cheaper way to get the look.
 - When the milestone's acceptance criteria are met, tick them in `PLAN.md` and update the status line at the end of that file.
 - Keep code simple and readable. Prefer plain, reliable solutions over clever ones. Add short comments that explain *why*.
 - If something fails, explain what the error message means before fixing it.

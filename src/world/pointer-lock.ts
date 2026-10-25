@@ -1,5 +1,7 @@
+import { useMuseumStore } from '../state/useMuseumStore'
+
 // Pointer lock = the browser hides the cursor and sends mouse movement to the 3D view.
-// Browsers only allow it right after a click, and Esc always releases it.
+// Browsers only allow it right after a click or key press, and Esc always releases it.
 
 // The 3D canvas lives inside this wrapper (see Museum.tsx).
 export const CANVAS_WRAPPER_ID = 'museum-canvas'
@@ -24,4 +26,18 @@ export async function requestPointerLock(): Promise<boolean> {
     console.warn('Pointer lock refused by the browser:', error)
     return false
   }
+}
+
+// Release the mouse (to show a panel or the map). The mode must already be set,
+// so the Player does not mistake this for a pause.
+export function releasePointer() {
+  if (document.pointerLockElement) document.exitPointerLock()
+}
+
+// Go back to walking from a panel or the map. If the browser refuses to capture the
+// mouse, show the pause screen (its "Tiếp tục" button tries again) instead of getting stuck.
+export async function resumeWalking() {
+  const ok = await requestPointerLock()
+  // Also forget the open panel, so nothing is left half-open behind the pause screen.
+  if (!ok) useMuseumStore.setState({ mode: 'paused', openExhibitId: null })
 }
