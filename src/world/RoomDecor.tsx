@@ -80,9 +80,10 @@ function SteamAge({ size }: { size: RoomSize }) {
           </mesh>
         </group>
       ))}
+      {/* Gears on the back wall, either side of the overview board. */}
       {[
-        [-1.4, 1.2],
-        [0.9, 0.8],
+        [-4.4, 1.2],
+        [4.4, 0.85],
       ].map(([x, r], i) => (
         <group key={i} position={[x, 1.9, -size.d / 2 + 0.12]}>
           <mesh>
@@ -150,7 +151,7 @@ function ComputerAge({ size }: { size: RoomSize }) {
         [-3.5, 0, 3.5].map((z) => (
           <mesh key={`${x}${z}`} position={[x, size.h - 0.01, z]} rotation={[Math.PI / 2, 0, 0]}>
             <planeGeometry args={[1.8, 0.5]} />
-            <Glow colour="#eef6ff" intensity={2.5} />
+            <Glow colour="#eef6ff" intensity={1.3} />
           </mesh>
         )),
       )}
@@ -208,7 +209,7 @@ function DigitalAge({ size }: { size: RoomSize }) {
       )}
       <mesh position={[0, size.h - 0.05, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[3, 0.05, 8, 80]} />
-        <Glow colour="#7fe9ff" intensity={4} />
+        <Glow colour="#7fe9ff" intensity={2} />
       </mesh>
       <group ref={hologram} position={[0, 2.2, 0]}>
         <mesh>
@@ -365,7 +366,8 @@ function IntroHall({ size }: { size: RoomSize }) {
           <meshStandardMaterial color="#7a1f2b" roughness={0.95} {...inlay} />
         </mesh>
         {[-0.92, 0.92].map((x) => (
-          <mesh key={x} position={[x, 0, 0]}>
+          // 3 mm above the carpet: in the same plane they flickered against each other.
+          <mesh key={x} position={[x, 0, 0.003]}>
             <planeGeometry args={[0.06, carpetLength]} />
             <meshStandardMaterial color={GOLD} metalness={0.7} roughness={0.4} {...inlay} />
           </mesh>

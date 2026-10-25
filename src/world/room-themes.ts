@@ -49,16 +49,16 @@ export const ROOM_THEMES: Record<Exclude<RoomId, 'rotunda'>, RoomTheme> = {
   ir3: {
     floor: { texture: 'tiles', colour: '#ffffff', tile: 1.6, roughness: 0.45 },
     walls: { colour: '#d8ccb0', tile: 1, roughness: 0.75 },
-    ceiling: '#ebe6d8',
-    light: { colour: '#eef6ff', intensity: 34 },
+    ceiling: '#c9c4b6',
+    light: { colour: '#eef6ff', intensity: 26 },
     sky: '#f2f6ff',
   },
   // CMCN 4: digital and smart technology. White gloss, glass, cyan light.
   ir4: {
     floor: { colour: '#e6ecf0', tile: 1, roughness: 0.12, metalness: 0.2 },
     walls: { colour: '#f3f6f9', tile: 1, roughness: 0.3 },
-    ceiling: '#f0f3f6',
-    light: { colour: '#bff3ff', intensity: 34 },
+    ceiling: '#cfd6dc',
+    light: { colour: '#bff3ff', intensity: 26 },
     sky: '#d8f6ff',
   },
   // Quiz room (finished in M6 step 3).

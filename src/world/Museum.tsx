@@ -3,7 +3,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Environment, Lightformer, Stats } from '@react-three/drei'
 import { Bloom, EffectComposer, ToneMapping } from '@react-three/postprocessing'
 import { ToneMappingMode } from 'postprocessing'
-import { Object3D, type Group, type HemisphereLight, type PointLight } from 'three'
+import { Object3D, Texture, type Camera, type Group, type HemisphereLight, type Mesh, type PointLight, type Scene, type WebGLRenderer } from 'three'
 import type { RoomId } from '../types'
 import { useMuseumStore } from '../state/useMuseumStore'
 import Room from './Room'
@@ -30,11 +30,12 @@ const EFFECTS = testSwitches.get('fx') !== '0'
 
 const GROUPS: RoomId[] = ['rotunda', ...ROOMS.map((room) => room.id)]
 
-// Where each room's roaming light hangs: room centre, 0.8 m below the ceiling.
+// Where each room's roaming light hangs: room centre, 1.8 m below the ceiling. (Close to
+// a light-coloured ceiling it made a blinding bright spot.)
 const ROOM_LIGHT_SPOTS = new Map(
   ROOMS.map((room) => {
     const [x, z] = toWorld(room.frame, 0, (room.vFront + room.vBack) / 2)
-    return [room.id, [x, room.height - 0.8, z] as const]
+    return [room.id, [x, room.height - 1.8, z] as const]
   }),
 )
 
@@ -113,15 +114,38 @@ function Lighting() {
   )
 }
 
+// Upload every picture of a part to the graphics card and build its drawing code
+// ("shaders"). compileAsync lets the browser build them in the background where it can.
+function prepareForDrawing(part: Object3D, { gl, camera, scene }: { gl: WebGLRenderer; camera: Camera; scene: Scene }) {
+  part.traverse((object) => {
+    const material = (object as Mesh).material
+    if (!material) return
+    for (const m of Array.isArray(material) ? material : [material]) {
+      for (const value of Object.values(m)) {
+        if (value instanceof Texture) gl.initTexture(value)
+      }
+    }
+  })
+  gl.compileAsync(part, camera, scene).catch(() => {
+    // Not fatal: it will simply be prepared when first seen.
+  })
+}
+
 // One part of the museum (the rotunda or one room with its passage and exhibits),
 // drawn only while it can be seen (see isPartVisible in door-state.ts).
 function MuseumPart({ id }: { id: RoomId }) {
   const group = useRef<Group>(null)
   const frames = useRef(0)
+  const get = useThree((state) => state.get)
 
   useFrame(() => {
     // Keep everything visible for the first frames, so the once-only shadows include it all.
     if (frames.current < 3) {
+      // On the first frame, get the whole part ready for the graphics card now, behind
+      // the title screen, instead of the moment its door first opens (that caused a
+      // hitch). Only things in front of the camera are drawn, so without this each
+      // room's pictures were uploaded and its drawing code built when first seen.
+      if (frames.current === 0 && group.current) prepareForDrawing(group.current, get())
       frames.current += 1
       return
     }

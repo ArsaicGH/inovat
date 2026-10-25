@@ -4,9 +4,9 @@ import type { Group } from 'three'
 import { useMuseumStore } from '../state/useMuseumStore'
 import type { ExhibitSpot } from './layout'
 import { addAimTarget, removeAimTarget } from './aim-targets'
-import { ROOM_ACCENT, GOLD, DARK_WOOD } from './style'
+import { ROOM_ACCENT, GOLD, DARK_WOOD, BOARD_SIZE, BOARD_THEMES } from './style'
 import PanelBoard from './PanelBoard'
-import { BOARD_SIZE } from './style'
+import BoardStand from './BoardStand'
 
 const PLINTH_TOP = 0.6 // height of the plinth's top surface (metres)
 
@@ -115,6 +115,7 @@ export default function Exhibit({ spot }: { spot: ExhibitSpot }) {
   const group = useRef<Group>(null)
   const aimed = useMuseumStore((state) => state.aimedExhibitId === spot.id)
   const colour = ROOM_ACCENT[spot.room]
+  const theme = BOARD_THEMES[spot.room]
 
   useEffect(() => {
     const exhibit = group.current
@@ -125,27 +126,34 @@ export default function Exhibit({ spot }: { spot: ExhibitSpot }) {
 
   return (
     <group ref={group} position={[spot.x, 0, spot.z]} rotation={[0, spot.yaw, 0]} userData={{ exhibitId: spot.id }}>
-      {spot.kind === 'wall' ? (
+      {spot.kind === 'wall' && (
         // Intro-hall wall panel, just off the wall surface.
         <group position={[0, 1.65, 0.04]}>
-          <PanelBoard exhibitId={spot.id} width={BOARD_SIZE.wall[0]} height={BOARD_SIZE.wall[1]} aimed={aimed} />
+          <PanelBoard exhibitId={spot.id} width={BOARD_SIZE.wall[0]} height={BOARD_SIZE.wall[1]} aimed={aimed} theme={theme} />
         </group>
-      ) : (
+      )}
+      {spot.kind === 'overview' && (
+        // The era's overview board on the back wall, under the room's name sign (which
+        // starts at 2.8 m); in CMCN 3 it hangs just above the desk of old computers.
+        <group position={[0, 2.08, 0.08]}>
+          <PanelBoard exhibitId={spot.id} width={BOARD_SIZE.overview[0]} height={BOARD_SIZE.overview[1]} aimed={aimed} theme={theme} />
+        </group>
+      )}
+      {(spot.kind === 'corner' || spot.kind === 'centre') && (
         <>
           <Plinth colour={colour} />
           <PlaceholderMachine number={spot.number || 1} colour={colour} />
 
-          {/* Readable text board beside the plinth, on two posts. */}
+          {/* Readable text board beside the plinth, on a stand in the room's style. */}
           <group position={[spot.panelSide * 2.3, 0, 0]}>
-            {[-0.5, 0.5].map((x) => (
-              <mesh key={x} position={[x, 0.45, -0.05]} castShadow>
-                <boxGeometry args={[0.06, 0.9, 0.06]} />
-                <meshStandardMaterial color={DARK_WOOD} />
-              </mesh>
-            ))}
-            <group position={[0, 1.55, 0]}>
-              <PanelBoard exhibitId={spot.id} width={BOARD_SIZE.stand[0]} height={BOARD_SIZE.stand[1]} aimed={aimed} />
-            </group>
+            <BoardStand
+              exhibitId={spot.id}
+              width={BOARD_SIZE.stand[0]}
+              height={BOARD_SIZE.stand[1]}
+              centreY={1.55}
+              aimed={aimed}
+              theme={theme}
+            />
           </group>
         </>
       )}

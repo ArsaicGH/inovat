@@ -1,3 +1,4 @@
+import Centrepiece from './Centrepiece'
 import { useEffect, useMemo } from 'react'
 import { BackSide, CanvasTexture, RepeatWrapping, SRGBColorSpace } from 'three'
 import {
@@ -308,6 +309,7 @@ export default function Rotunda() {
       <Cornice />
       <Dome />
       <Chandelier />
+      <Centrepiece />
     </>
   )
 }

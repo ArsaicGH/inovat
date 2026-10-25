@@ -4,7 +4,7 @@ import { getExhibitText } from '../content/exhibits'
 import { useMuseumStore } from '../state/useMuseumStore'
 import { resumeWalking } from '../world/pointer-lock'
 import { EXHIBIT_SPOTS } from '../world/layout'
-import { BOARD_FRAME, BOARD_SIZE } from '../world/style'
+import { BOARD_FRAME, BOARD_SIZE, BOARD_THEMES } from '../world/style'
 
 // How long the shrink-away animation plays after closing (must match index.css).
 const CLOSE_ANIMATION_MS = 220
@@ -28,13 +28,13 @@ export default function InfoPanel() {
     return () => clearTimeout(timer)
   }, [closing])
 
-  // E or Esc closes the panel. (A key press counts as a user action, which the browser
+  // E closes the panel (Esc is kept for the pause menu). (A key press counts as a user action, which the browser
   // requires before it lets the page capture the mouse again.)
   useEffect(() => {
     if (!openId) return
     function onKeyDown(event: KeyboardEvent) {
       if (event.repeat) return
-      if (event.code === 'KeyE' || event.code === 'Escape') resumeWalking()
+      if (event.code === 'KeyE') resumeWalking()
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
@@ -42,15 +42,27 @@ export default function InfoPanel() {
 
   if (!shownId) return null
   const text = getExhibitText(shownId)
-  const kind = EXHIBIT_SPOTS.find((spot) => spot.id === shownId)?.kind
-  const [width, height] = kind === 'wall' ? BOARD_SIZE.wall : BOARD_SIZE.stand
-  // Passed to index.css: the board's shape, and its frame width as a share of its width.
-  const shape = { '--ratio': width / height, '--frame': `${(BOARD_FRAME / width) * 100}cqw` } as CSSProperties
+  const spot = EXHIBIT_SPOTS.find((s) => s.id === shownId)
+  const [width, height] =
+    spot?.kind === 'wall' ? BOARD_SIZE.wall : spot?.kind === 'overview' ? BOARD_SIZE.overview : BOARD_SIZE.stand
+  // The same look as the board in the room (style.ts board themes).
+  const theme = BOARD_THEMES[spot?.room ?? 'hall']
+  // Passed to index.css: the board's shape, frame width (as a share of its width) and colours.
+  const look = {
+    '--ratio': width / height,
+    '--frame': `${(BOARD_FRAME / width) * 100}cqw`,
+    '--paper': theme.paper,
+    '--title': theme.title,
+    '--ink': theme.ink,
+    '--muted': theme.muted,
+    '--rule': theme.rule,
+    '--frame-colour': theme.frame,
+  } as CSSProperties
 
   return (
     <div className={closing ? 'overlay info-overlay info-closing' : 'overlay info-overlay'}>
       <div className="info-panel">
-        <article className="board-zoom" style={shape}>
+        <article className={`board-zoom board-look-${theme.look}`} style={look}>
           <div className="board-frame">
             <div className="board-paper">
               <h2>{text.title}</h2>

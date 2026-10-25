@@ -3,7 +3,7 @@ import { useFrame } from '@react-three/fiber'
 import { Raycaster, Vector2 } from 'three'
 import { useMuseumStore, canUse } from '../state/useMuseumStore'
 import { aimTargets, exhibitIdOf } from './aim-targets'
-import { releasePointer } from './pointer-lock'
+import { releasePointer, requestPointerLock } from './pointer-lock'
 
 // How close you must be to open an exhibit (metres from your eyes).
 const AIM_DISTANCE = 3
@@ -11,7 +11,7 @@ const AIM_DISTANCE = 3
 // Keys by PHYSICAL position (event.code), like the movement keys.
 const OPEN_KEY = 'KeyE'
 const MAP_KEY = 'KeyM'
-const TUTORIAL_START_KEY = 'Space'
+const SPACE = 'Space' // starts the tutorial; later shows / hides the key list
 
 // Aiming and opening: shoots an invisible line ("ray") from the centre of the screen
 // every frame. If it hits an exhibit within reach (and no wall is in front of it), that
@@ -56,13 +56,26 @@ export default function Interaction() {
         releasePointer()
         store.advanceTutorial('map')
       }
-      // Tutorial intro card: Space starts the tutorial.
-      if (event.code === TUTORIAL_START_KEY && store.mode === 'exploring') store.advanceTutorial('intro')
+      if (event.code === SPACE && store.mode === 'exploring') {
+        // Tutorial intro card: Space starts the tutorial. Afterwards it shows the key list.
+        if (store.tutorial === 'intro') store.advanceTutorial('intro')
+        else if (canUse(store.tutorial, 'keys')) {
+          store.toggleKeyList()
+          store.advanceTutorial('keys')
+        }
+      }
     }
 
     // Left click is a backup for E (in case a typing tool interferes with the key).
     function onMouseDown(event: MouseEvent) {
-      if (event.button === 0) openAimedExhibit()
+      if (event.button !== 0) return
+      const store = useMuseumStore.getState()
+      // Walking with a free mouse: the click captures it (instead of opening anything).
+      if (store.mode === 'exploring' && !store.mouseCaptured) {
+        void requestPointerLock()
+        return
+      }
+      openAimedExhibit()
     }
 
     window.addEventListener('keydown', onKeyDown)

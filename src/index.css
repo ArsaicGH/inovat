@@ -264,7 +264,7 @@ body {
   box-sizing: border-box;
   aspect-ratio: var(--ratio);
   padding: var(--frame);
-  background: linear-gradient(135deg, #5a4030, #4a3423 45%, #3b2a1c);
+  background: var(--frame-colour);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
 }
 .board-paper {
@@ -273,15 +273,15 @@ body {
   height: 100%;
   overflow-y: auto;
   padding: 7.4cqw;
-  background: #f2ece0;
-  color: #3a332b;
+  background: var(--paper);
+  color: var(--ink);
   font-size: var(--unit);
   line-height: 1.5;
   text-align: left;
 }
 .board-paper h2 {
   margin: 0;
-  color: #2b2620;
+  color: var(--title);
   font-size: calc(var(--unit) * 1.5);
   font-weight: 700;
   line-height: 1.2;
@@ -290,7 +290,7 @@ body {
   width: 30%;
   height: calc(var(--unit) * 0.12);
   margin: calc(var(--unit) * 0.4) 0 calc(var(--unit) * 0.8);
-  background: #b08a4a;
+  background: var(--rule);
 }
 .board-paper p {
   margin: 0 0 calc(var(--unit) * 0.6);
@@ -302,9 +302,58 @@ body {
   font-size: calc(var(--unit) * 0.9);
 }
 .board-sources {
-  color: #6b6152;
+  color: var(--muted);
   font-size: calc(var(--unit) * 0.75);
 }
+
+/* Per-era looks (same as the 3D boards, PanelBoard.tsx). */
+.board-look-classic .board-frame {
+  background: linear-gradient(135deg, #5a4030, #4a3423 45%, #3b2a1c);
+}
+/* CMCN 1: riveted brass frame, aged parchment with a thin double border. */
+.board-look-brass .board-frame {
+  background: linear-gradient(135deg, #d2a462, #8a5f2a 50%, #b5843f);
+}
+.board-look-brass .board-paper {
+  background: radial-gradient(ellipse at center, rgba(110, 70, 30, 0) 45%, rgba(110, 70, 30, 0.38)), var(--paper);
+  box-shadow: inset 0 0 0 1.4cqw var(--paper), inset 0 0 0 1.75cqw var(--rule), inset 0 0 0 2.2cqw var(--paper),
+    inset 0 0 0 2.55cqw var(--rule);
+}
+/* CMCN 2: steel frame, white enamel sign with a wide navy border. */
+.board-look-enamel .board-frame {
+  background: linear-gradient(135deg, #8a929b, #4f565e 50%, #6d757e);
+}
+.board-look-enamel .board-paper {
+  box-shadow: inset 0 0 0 1.7cqw var(--paper), inset 0 0 0 4.2cqw var(--title);
+  padding: 9cqw;
+}
+/* CMCN 3: beige computer case around a glowing green screen with scan lines. */
+.board-look-screen .board-frame {
+  padding: calc(var(--frame) * 1.6);
+  border-radius: 2cqw;
+  background: linear-gradient(180deg, #e6dcc2, #c9bc9c);
+}
+.board-look-screen .board-paper {
+  border-radius: 1.5cqw;
+  background:
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.22) 0 1.5px, transparent 1.5px 4px),
+    radial-gradient(ellipse at center, rgba(60, 140, 80, 0.2), transparent 70%),
+    var(--paper);
+  text-shadow: 0 0 6px rgba(107, 224, 139, 0.55);
+}
+/* CMCN 4: see-through glass with glowing cyan edges and text. */
+.board-look-hologram .board-frame {
+  padding: 0;
+  background: transparent;
+  border: 1px solid var(--rule);
+  box-shadow: 0 0 30px rgba(63, 208, 224, 0.45), inset 0 0 40px rgba(63, 208, 224, 0.18);
+}
+.board-look-hologram .board-paper {
+  padding: calc(7.4cqw + var(--frame));
+  backdrop-filter: blur(6px);
+  text-shadow: 0 0 8px rgba(120, 230, 255, 0.8);
+}
+
 .board-actions {
   display: flex;
   align-items: center;
@@ -478,6 +527,12 @@ body {
 }
 
 /* ---------- Title screen ---------- */
+.start-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
 .title-overlay {
   background: radial-gradient(ellipse at center, rgba(20, 16, 12, 0.55) 0%, rgba(8, 7, 6, 0.9) 75%);
 }
@@ -632,4 +687,52 @@ body {
   background: rgba(201, 162, 90, 0.15);
   font-size: 14px;
   line-height: 1.5;
+}
+
+/* ---------- Key list (Space) ---------- */
+.key-list {
+  position: fixed;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: min(360px, calc(100% - 40px));
+  padding: 16px 20px;
+  border: 1px solid rgba(201, 162, 90, 0.6);
+  border-radius: 12px;
+  background: rgba(20, 17, 13, 0.88);
+  color: #f3e7cf;
+  pointer-events: none;
+  animation: tutorial-in 0.25s ease-out both;
+}
+.key-list h3 {
+  margin: 0 0 10px;
+  font-size: 17px;
+}
+.key-list dl {
+  margin: 0;
+}
+.key-list dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+  border-top: 1px solid rgba(201, 162, 90, 0.18);
+  font-size: 14px;
+}
+.key-list dt {
+  font-weight: 600;
+  color: #e8c77e;
+}
+.key-list dd {
+  margin: 0;
+  text-align: right;
+  color: #ddd2bc;
+}
+.key-list .overlay-tip {
+  margin: 10px 0 0;
+}
+/* Lower on the screen than the other notices (e.g. "click to use the mouse"). */
+.hud-notice.hud-notice-low {
+  top: auto;
+  bottom: 90px;
 }

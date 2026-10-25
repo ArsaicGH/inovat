@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { site } from '../content/site'
 import { ui } from '../content/ui'
-import { useMuseumStore } from '../state/useMuseumStore'
+import { useMuseumStore, hasSavedProgress } from '../state/useMuseumStore'
 import LockButton from './LockButton'
 
 // First screen: the decorated INNOVA title and a start button. After "Bắt đầu" the visitor
@@ -10,6 +10,7 @@ import LockButton from './LockButton'
 export default function StartScreen() {
   const [asking, setAsking] = useState(false)
   const setTutorial = useMuseumStore((state) => state.setTutorial)
+  const continueSavedVisit = useMuseumStore((state) => state.continueSavedVisit)
 
   return (
     <div className="overlay title-overlay">
@@ -28,9 +29,15 @@ export default function StartScreen() {
         </div>
 
         {!asking ? (
-          <button type="button" className="start-button" onClick={() => setAsking(true)}>
-            {ui.start.button}
-          </button>
+          <div className="start-buttons">
+            <button type="button" className="start-button" onClick={() => setAsking(true)}>
+              {ui.start.button}
+            </button>
+            {/* Only when this tab holds an earlier visit (e.g. after a reload). */}
+            {hasSavedProgress && (
+              <LockButton label={ui.start.continue} className="start-button start-button-quiet" onBeforeLock={continueSavedVisit} />
+            )}
+          </div>
         ) : (
           <div className="tutorial-question">
             <p>{ui.start.tutorialQuestion}</p>

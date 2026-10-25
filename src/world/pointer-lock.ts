@@ -34,6 +34,13 @@ export function releasePointer() {
   if (document.pointerLockElement) document.exitPointerLock()
 }
 
+// Esc on the pause menu: try to capture the mouse again. Browsers usually refuse after a
+// key press like Esc, so then walk on with the keyboard; a click captures the mouse.
+export async function resumeFromKeyboard() {
+  const ok = await requestPointerLock()
+  if (!ok) useMuseumStore.getState().startExploring()
+}
+
 // Go back to walking from a panel or the map. If the browser refuses to capture the
 // mouse, show the pause screen (its "Tiếp tục" button tries again) instead of getting stuck.
 export async function resumeWalking() {

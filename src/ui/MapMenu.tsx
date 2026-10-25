@@ -16,11 +16,11 @@ export default function MapMenu() {
   const requestTeleport = useMuseumStore((state) => state.requestTeleport)
   const quizOpen = isQuizUnlocked(visited)
 
-  // M or Esc closes the map and returns to walking.
+  // M closes the map and returns to walking (Esc is kept for the pause menu).
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
       if (event.repeat) return
-      if (event.code === 'KeyM' || event.code === 'Escape') resumeWalking()
+      if (event.code === 'KeyM') resumeWalking()
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)

@@ -1,28 +1,85 @@
 import { useEffect, useMemo } from 'react'
 import { useThree } from '@react-three/fiber'
-import { CanvasTexture, SRGBColorSpace } from 'three'
+import { CanvasTexture, DoubleSide, MeshBasicMaterial, SRGBColorSpace } from 'three'
 import { getExhibitText } from '../content/exhibits'
 import { ui } from '../content/ui'
-import { BOARD_FRAME } from './style'
+import { BOARD_FRAME, type BoardTheme } from './style'
 import { drawWrappedText, paintFont, useFontsReady } from './fonts'
 
 // A text board in the 3D world that is readable as you walk past: title, summary, full
 // text and source, painted onto a picture (canvas texture). Pressing E enlarges it on screen.
+// Its look (frame, paper, colours) follows the room's board theme (style.ts).
 
 const PIXELS_PER_METRE = 512 // sharp enough to read from a couple of metres away
-const FRAME = BOARD_FRAME // wooden frame width (metres)
-const DEPTH = 0.06
+const FRAME = BOARD_FRAME // frame width (metres)
 
 interface PanelBoardProps {
   exhibitId: string
   width: number // metres, including the frame
   height: number
   aimed: boolean
+  theme: BoardTheme
 }
 
-export default function PanelBoard({ exhibitId, width, height, aimed }: PanelBoardProps) {
+// The background of the paper, before the text.
+function paintPaper(ctx: CanvasRenderingContext2D, theme: BoardTheme, w: number, h: number) {
+  const { look } = theme
+  if (look === 'hologram') {
+    // See-through glass: faint tint, a thin glowing border and corner brackets.
+    ctx.clearRect(0, 0, w, h)
+    ctx.fillStyle = theme.paper
+    ctx.fillRect(0, 0, w, h)
+    ctx.strokeStyle = theme.rule
+    ctx.lineWidth = w * 0.006
+    ctx.strokeRect(w * 0.02, w * 0.02, w - w * 0.04, h - w * 0.04)
+    const c = w * 0.09
+    ctx.lineWidth = w * 0.014
+    for (const [x, y, dx, dy] of [
+      [w * 0.035, w * 0.035, 1, 1],
+      [w - w * 0.035, w * 0.035, -1, 1],
+      [w * 0.035, h - w * 0.035, 1, -1],
+      [w - w * 0.035, h - w * 0.035, -1, -1],
+    ]) {
+      ctx.beginPath()
+      ctx.moveTo(x, y + dy * c)
+      ctx.lineTo(x, y)
+      ctx.lineTo(x + dx * c, y)
+      ctx.stroke()
+    }
+    return
+  }
+  ctx.fillStyle = theme.paper
+  ctx.fillRect(0, 0, w, h)
+  if (look === 'brass') {
+    // Aged parchment: darker towards the edges, with a thin double border.
+    const age = ctx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.3, w / 2, h / 2, Math.max(w, h) * 0.75)
+    age.addColorStop(0, 'rgba(110, 70, 30, 0)')
+    age.addColorStop(1, 'rgba(110, 70, 30, 0.38)')
+    ctx.fillStyle = age
+    ctx.fillRect(0, 0, w, h)
+    ctx.strokeStyle = theme.rule
+    ctx.lineWidth = w * 0.006
+    ctx.strokeRect(w * 0.03, w * 0.03, w - w * 0.06, h - w * 0.06)
+    ctx.strokeRect(w * 0.045, w * 0.045, w - w * 0.09, h - w * 0.09)
+  } else if (look === 'enamel') {
+    // Enamel factory sign: a wide navy border band.
+    ctx.strokeStyle = theme.title
+    ctx.lineWidth = w * 0.025
+    ctx.strokeRect(w * 0.03, w * 0.03, w - w * 0.06, h - w * 0.06)
+  } else if (look === 'screen') {
+    // Old monitor: a faint glow in the middle.
+    const glow = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, Math.max(w, h) * 0.7)
+    glow.addColorStop(0, 'rgba(60, 140, 80, 0.18)')
+    glow.addColorStop(1, 'rgba(0, 0, 0, 0)')
+    ctx.fillStyle = glow
+    ctx.fillRect(0, 0, w, h)
+  }
+}
+
+export default function PanelBoard({ exhibitId, width, height, aimed, theme }: PanelBoardProps) {
   const fontsReady = useFontsReady()
   const maxAnisotropy = useThree((state) => state.gl.capabilities.getMaxAnisotropy())
+  const { look } = theme
   const faceWidth = width - 2 * FRAME
   const faceHeight = height - 2 * FRAME
 
@@ -41,25 +98,24 @@ export default function PanelBoard({ exhibitId, width, height, aimed }: PanelBoa
       const bottom = h - pad
       const unit = w / 18 // base text size, scales with the board
 
-      ctx.fillStyle = '#f2ece0' // cream "paper"
-      ctx.fillRect(0, 0, w, h)
+      paintPaper(ctx, theme, w, h)
       ctx.textBaseline = 'top'
       ctx.textAlign = 'left'
 
       let y = pad
-      ctx.fillStyle = '#2b2620'
+      ctx.fillStyle = theme.title
       ctx.font = `700 ${unit * 1.5}px ${font}`
       y = drawWrappedText(ctx, text.title, pad, y, maxWidth, unit * 1.8, bottom)
 
-      ctx.fillStyle = '#b08a4a'
+      ctx.fillStyle = theme.rule
       ctx.fillRect(pad, y + unit * 0.3, maxWidth * 0.3, unit * 0.12)
       y += unit * 1.1
 
-      // Summary, then body, then source. If something does not fit, end with a hint.
+      // Summary, then body, then source. If something does not fit, end with "…".
       const parts: [string, string, string][] = [
-        [text.summary, `600 ${unit}px ${font}`, '#3a332b'],
-        [text.body, `400 ${unit * 0.9}px ${font}`, '#3a332b'],
-        [`${ui.infoPanel.sourcesLabel}: ${ui.infoPanel.sourcesPlaceholder}`, `400 ${unit * 0.75}px ${font}`, '#6b6152'],
+        [text.summary, `600 ${unit}px ${font}`, theme.ink],
+        [text.body, `400 ${unit * 0.9}px ${font}`, theme.ink],
+        [`${ui.infoPanel.sourcesLabel}: ${ui.infoPanel.sourcesPlaceholder}`, `400 ${unit * 0.75}px ${font}`, theme.muted],
       ]
       for (const [content, partFont, colour] of parts) {
         if (y < 0) break
@@ -68,33 +124,94 @@ export default function PanelBoard({ exhibitId, width, height, aimed }: PanelBoa
         const next = drawWrappedText(ctx, content, pad, y, maxWidth, unit * 1.35, bottom - unit * 1.4)
         if (next < 0) {
           ctx.font = `600 ${unit * 0.8}px ${font}`
-          ctx.fillStyle = '#8a6a2e'
+          ctx.fillStyle = theme.rule
           ctx.fillText(ui.panelMore, pad, bottom - unit * 1.1)
           y = -1
           break
         }
         y = next + unit * 0.6
       }
+
+      if (look === 'screen') {
+        // Scan lines over everything, like an old monitor.
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.22)'
+        for (let line = 0; line < h; line += 4) ctx.fillRect(0, line, w, 1.5)
+      }
     }
     const tex = new CanvasTexture(canvas)
     tex.colorSpace = SRGBColorSpace
     tex.anisotropy = maxAnisotropy // stays sharp when seen at an angle
     return tex
-  }, [exhibitId, faceWidth, faceHeight, maxAnisotropy, fontsReady])
+  }, [exhibitId, faceWidth, faceHeight, maxAnisotropy, fontsReady, theme, look])
 
   useEffect(() => () => texture.dispose(), [texture])
 
+  // Hologram glass: unlit and brighter than white where the text is, so the bloom makes
+  // the letters glow; the faint tint stays below the glow threshold.
+  const glass = useMemo(() => {
+    if (look !== 'hologram') return null
+    return new MeshBasicMaterial({ map: texture, transparent: true, depthWrite: false, side: DoubleSide, toneMapped: false })
+  }, [look, texture])
+  useEffect(() => {
+    if (glass) glass.color.setScalar(aimed ? 2.3 : 1.7)
+  }, [glass, aimed])
+  useEffect(() => () => glass?.dispose(), [glass])
+
+  if (glass) {
+    const edge = <meshStandardMaterial color={theme.rule} emissive={theme.rule} emissiveIntensity={aimed ? 5 : 3} toneMapped={false} />
+    return (
+      <group>
+        <mesh material={glass}>
+          <planeGeometry args={[width, height]} />
+        </mesh>
+        {/* Thin glowing edges along the top and bottom. */}
+        {[-1, 1].map((s) => (
+          <mesh key={s} position={[0, (s * height) / 2, 0]}>
+            <boxGeometry args={[width, 0.015, 0.015]} />
+            {edge}
+          </mesh>
+        ))}
+      </group>
+    )
+  }
+
+  const depth = look === 'screen' ? 0.14 : 0.06 // the computer case is deeper
+  const frameMaterial = {
+    classic: { roughness: 0.6, metalness: 0 },
+    brass: { roughness: 0.35, metalness: 0.85 },
+    enamel: { roughness: 0.4, metalness: 0.75 },
+    screen: { roughness: 0.6, metalness: 0 },
+    hologram: { roughness: 0.2, metalness: 0 }, // not used: the hologram has no frame
+  }[look]
+  // Rivets (brass) or bolts (enamel) in the frame's corners.
+  const rivets = look === 'brass' || look === 'enamel'
   return (
     <group>
-      {/* Wooden frame; glows faintly while aimed at. */}
+      {/* Frame; glows faintly while aimed at. */}
       <mesh castShadow receiveShadow>
-        <boxGeometry args={[width, height, DEPTH]} />
-        <meshStandardMaterial color="#4a3423" roughness={0.6} emissive="#c98a3c" emissiveIntensity={aimed ? 0.5 : 0} />
+        <boxGeometry args={[width, height, depth]} />
+        <meshStandardMaterial color={theme.frame} {...frameMaterial} emissive={theme.rule} emissiveIntensity={aimed ? 0.5 : 0} />
       </mesh>
-      {/* Paper face, 3 mm in front of the frame (no shared surface, so no flicker). */}
-      <mesh position={[0, 0, DEPTH / 2 + 0.003]}>
+      {rivets &&
+        [-1, 1].flatMap((sx) =>
+          [-1, 1].map((sy) => (
+            <mesh key={`${sx}${sy}`} position={[(sx * (width - FRAME)) / 2, (sy * (height - FRAME)) / 2, depth / 2]}>
+              <sphereGeometry args={[0.018, 10, 8]} />
+              <meshStandardMaterial color={look === 'brass' ? '#e0b56a' : '#c9ced4'} metalness={0.9} roughness={0.3} />
+            </mesh>
+          )),
+        )}
+      {/* Paper face, 3 mm in front of the frame (no shared surface, so no flicker). The
+          screen is lit from inside, so it glows more. */}
+      <mesh position={[0, 0, depth / 2 + 0.003]}>
         <planeGeometry args={[faceWidth, faceHeight]} />
-        <meshStandardMaterial map={texture} roughness={0.9} emissive="#ffffff" emissiveMap={texture} emissiveIntensity={0.18} />
+        <meshStandardMaterial
+          map={texture}
+          roughness={look === 'screen' ? 0.3 : 0.9}
+          emissive="#ffffff"
+          emissiveMap={texture}
+          emissiveIntensity={look === 'screen' ? 0.9 : 0.18}
+        />
       </mesh>
     </group>
   )

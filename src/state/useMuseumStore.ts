@@ -30,11 +30,51 @@ function saveSensitivity(value: number) {
   }
 }
 
+// PROGRESS SAVING. If the page reloads (the browser put the tab to sleep, the connection
+// to the development server dropped, F5...), the title screen offers to continue the
+// earlier visit: rooms visited, tutorial step, position. Kept in sessionStorage, which
+// belongs to this tab only, so a new visit in a new tab starts fresh.
+const PROGRESS_STORAGE_KEY = 'innova-progress'
+
+export interface Pose {
+  x: number
+  z: number
+  yaw: number
+}
+
+interface SavedProgress {
+  visitedRooms: RoomId[]
+  tutorial: TutorialStep | null
+  pose: Pose
+}
+
+function loadProgress(): SavedProgress | null {
+  try {
+    const saved = JSON.parse(sessionStorage.getItem(PROGRESS_STORAGE_KEY) ?? 'null') as SavedProgress | null
+    if (saved && Array.isArray(saved.visitedRooms) && typeof saved.pose?.x === 'number') return saved
+  } catch {
+    // ignore: start a new visit
+  }
+  return null
+}
+
+export function saveProgress(pose: Pose) {
+  const { visitedRooms, tutorial } = useMuseumStore.getState()
+  try {
+    sessionStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify({ visitedRooms, tutorial, pose }))
+  } catch {
+    // ignore: storage blocked, progress is simply not kept
+  }
+}
+
+const savedProgress = loadProgress()
+export const hasSavedProgress = savedProgress !== null
+
 // GUIDED TUTORIAL (optional, chosen on the start screen). Each step unlocks one more control:
-// intro (everything frozen) -> look -> move -> interact -> map -> pause -> done.
-export type TutorialStep = 'intro' | 'look' | 'move' | 'interact' | 'map' | 'pause' | 'done'
-export const TUTORIAL_STEPS: TutorialStep[] = ['intro', 'look', 'move', 'interact', 'map', 'pause', 'done']
-export type Control = 'look' | 'move' | 'interact' | 'map'
+// intro (everything frozen) -> look -> move -> sprint -> interact -> map -> pause -> keys -> done.
+export type TutorialStep = 'intro' | 'look' | 'move' | 'sprint' | 'interact' | 'map' | 'pause' | 'keys' | 'done'
+export const TUTORIAL_STEPS: TutorialStep[] = ['intro', 'look', 'move', 'sprint', 'interact', 'map', 'pause', 'keys', 'done']
+export type Control = 'look' | 'move' | 'sprint' | 'interact' | 'map' | 'keys'
 
 // May this control be used now? Always, unless the tutorial has not reached it yet.
 export function canUse(tutorial: TutorialStep | null, control: Control): boolean {
@@ -81,8 +121,21 @@ interface MuseumState {
   advanceTutorial: (from: TutorialStep) => void
 
   // Map teleport: `count` goes up on every request, so the player knows a new one arrived.
-  teleport: { roomId: RoomId; count: number }
-  requestTeleport: (roomId: RoomId) => void
+  // pose: stand exactly there instead of at the room's arrival point.
+  teleport: { roomId: RoomId; count: number; pose?: Pose }
+  requestTeleport: (roomId: RoomId, pose?: Pose) => void
+
+  // Title screen "continue": bring back the visit saved before the reload.
+  continueSavedVisit: () => void
+
+  // Is the mouse captured? (Walking also works without it, keyboard only, e.g. after
+  // resuming with Esc, which browsers do not accept for capturing the mouse.)
+  mouseCaptured: boolean
+  setMouseCaptured: (captured: boolean) => void
+
+  // The key list (Space) is showing.
+  showKeyList: boolean
+  toggleKeyList: () => void
 }
 
 export const useMuseumStore = create<MuseumState>((set) => ({
@@ -126,7 +179,23 @@ export const useMuseumStore = create<MuseumState>((set) => ({
     }),
 
   teleport: { roomId: 'hall', count: 0 },
-  requestTeleport: (roomId) => set((state) => ({ teleport: { roomId, count: state.teleport.count + 1 } })),
+  requestTeleport: (roomId, pose) => set((state) => ({ teleport: { roomId, pose, count: state.teleport.count + 1 } })),
+
+  mouseCaptured: false,
+  setMouseCaptured: (captured) => set({ mouseCaptured: captured }),
+
+  showKeyList: false,
+  toggleKeyList: () => set((state) => ({ showKeyList: !state.showKeyList })),
+
+  continueSavedVisit: () =>
+    set((state) => {
+      if (!savedProgress) return state
+      return {
+        visitedRooms: savedProgress.visitedRooms,
+        tutorial: savedProgress.tutorial,
+        teleport: { roomId: state.teleport.roomId, pose: savedProgress.pose, count: state.teleport.count + 1 },
+      }
+    }),
 }))
 
 // How many era rooms have been visited, and whether the quiz room is open.

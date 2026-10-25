@@ -23,6 +23,7 @@ Project: browser-based 3D virtual museum about the four Industrial Revolutions (
 - Folder layout is in `PLAN.md` section 3. Keep the 3D layer (`src/world/`), the interface (`src/ui/`) and the text (`src/content/`) separate.
 - File names: lowercase, hyphens, no spaces, no Vietnamese diacritics.
 - Read movement keys by physical key position (`event.code`), so Unikey and EVKey do not break controls.
+- Every key the game uses is listed in the key list shown with Space (`ui.keyList` in `src/content/ui.ts`). When a key is added or changed, update that list (and the tutorial, if the key is important).
 - Run `npm run build` before every commit.
 
 ## Content rules

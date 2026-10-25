@@ -34,8 +34,13 @@ const texts: Record<string, ExhibitText> = {
   'quiz-info': placeholder('Phòng trò chơi', `Trò chơi câu hỏi sẽ được đặt tại đây. ${PLACEHOLDER_NOTE}`),
 }
 
-// Era rooms: 4 inventions each, one per corner (ids "ir1-1" ... "ir4-4").
+// Era rooms: an overview board in the middle ("ir1-overview" ...) and 4 inventions, one
+// per corner ("ir1-1" ... "ir4-4").
 for (let era = 1; era <= 4; era++) {
+  texts[`ir${era}-overview`] = placeholder(
+    `Tổng quan CMCN ${era}`,
+    `Tổng quan về cuộc Cách mạng Công nghiệp lần thứ ${era}: thời gian, bối cảnh và ý nghĩa. ${PLACEHOLDER_NOTE}`,
+  )
   for (let slot = 1; slot <= 4; slot++) {
     texts[`ir${era}-${slot}`] = placeholder(
       `Phát minh ${slot} – CMCN ${era}`,

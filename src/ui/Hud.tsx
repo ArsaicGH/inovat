@@ -14,11 +14,30 @@ export default function Hud() {
   const room = useMuseumStore((state) => state.currentRoom)
   const nearLockedDoor = useMuseumStore((state) => state.nearLockedDoor)
   const visitedCount = useMuseumStore((state) => eraRoomsVisited(state.visitedRooms))
+  const mouseCaptured = useMuseumStore((state) => state.mouseCaptured)
+  const showKeyList = useMuseumStore((state) => state.showKeyList)
 
   return (
     <>
       <TutorialCard />
       {showWarning && <p className="hud-warning">{ui.typingToolWarning}</p>}
+      {!mouseCaptured && <p className="hud-notice hud-notice-low">{ui.clickToLook}</p>}
+
+      {/* Space: every key at a glance. Walking goes on underneath. */}
+      {showKeyList && (
+        <aside className="key-list">
+          <h3>{ui.keyList.title}</h3>
+          <dl>
+            {ui.keyList.keys.map(({ keys, action }) => (
+              <div key={keys}>
+                <dt>{keys}</dt>
+                <dd>{action}</dd>
+              </div>
+            ))}
+          </dl>
+          <p className="overlay-tip">{ui.keyList.hint}</p>
+        </aside>
+      )}
       {nearLockedDoor && (
         <p className="hud-notice">{ui.quizLocked.replace('{count}', String(visitedCount))}</p>
       )}

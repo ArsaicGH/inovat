@@ -265,7 +265,8 @@ export const DOORS: DoorLayout[] = ROOMS.map((room) => ({
 // corner = era-room invention (pedestal + prototype + text panel beside it)
 // wall   = intro-hall information panel on a wall
 // centre = a pedestal in the middle of a room (quiz room sign for now)
-export type SpotKind = 'corner' | 'wall' | 'centre'
+// overview = an era's overview board on its room's back wall, under the room's name sign
+export type SpotKind = 'corner' | 'wall' | 'centre' | 'overview'
 
 export interface ExhibitSpot {
   id: string // matches the text id in src/content/exhibits.ts
@@ -304,6 +305,10 @@ function buildSpots(): ExhibitSpot[] {
       const [x, z] = at(0, (room.vFront + room.vBack) / 2)
       spots.push({ id: 'quiz-info', room: room.id, kind: 'centre', number: 0, x, z, yaw: faceTowards(-f.nx, -f.nz), panelSide: 1 })
     } else {
+      // Overview board on the back wall (1 cm off it), facing the entrance.
+      const [ox, oz] = at(0, room.vBack - 0.01)
+      spots.push({ id: `${room.id}-overview`, room: room.id, kind: 'overview', number: 0, x: ox, z: oz, yaw: faceTowards(-f.nx, -f.nz), panelSide: 1 })
+
       // Four corners, numbered in walking order: front-left, back-left, back-right, front-right
       // (as seen when entering the room).
       const centreV = (room.vFront + room.vBack) / 2
@@ -329,6 +334,7 @@ export const EXHIBIT_SPOTS = buildSpots()
 
 // Where a spot's text panel stands (beside the pedestal, along the exhibit's local x axis).
 export function panelPosition(spot: ExhibitSpot): [number, number] {
+  if (spot.kind === 'overview') return [spot.x, spot.z] // the board is the whole exhibit
   const d = spot.panelSide * PANEL_OFFSET
   return [spot.x + Math.cos(spot.yaw) * d, spot.z - Math.sin(spot.yaw) * d]
 }
@@ -354,6 +360,15 @@ function hallPlantBoxes(): Box[] {
   })
 }
 
+// The desk of old computers along CMCN 3's back wall (RoomDecor.tsx), local x 0,
+// z = 0.7 m in front of the back wall, 4.4 x 0.9 m.
+function ir3DeskBox(): Box[] {
+  const room = roomById('ir3')
+  if (!room) return []
+  const [x, z] = toWorld(room.frame, 0, room.vBack - 0.7)
+  return [makeBox(x, z, 2.2, 0.45, room.frame.angle)]
+}
+
 // ---------- Collision ----------
 
 // Everything fixed that the player bumps into: solid walls, pillars, pedestals and
@@ -362,7 +377,10 @@ export const COLLISION_BOXES: Box[] = [
   ...WALL_PIECES.filter((p) => p.solid),
   // Column bases are about 1 m wide (Rotunda.tsx).
   ...PILLARS.map(([x, z]) => makeBox(x, z, 0.55, 0.55)),
-  ...EXHIBIT_SPOTS.filter((spot) => spot.kind !== 'wall').flatMap((spot) => {
+  ...ir3DeskBox(),
+  // The centrepiece in the middle of the rotunda (Centrepiece.tsx), about 3.4 m across.
+  makeBox(0, 0, 1.75, 1.75, Math.PI / 4),
+  ...EXHIBIT_SPOTS.filter((spot) => spot.kind === 'corner' || spot.kind === 'centre').flatMap((spot) => {
     const [px, pz] = panelPosition(spot)
     return [makeBox(spot.x, spot.z, 1.2, 1.2, spot.yaw), makeBox(px, pz, 0.75, 0.25, spot.yaw)]
   }),

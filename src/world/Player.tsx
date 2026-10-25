@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
-import { useMuseumStore, canUse } from '../state/useMuseumStore'
+import { useMuseumStore, canUse, saveProgress } from '../state/useMuseumStore'
 import { moveWithCollision, type Box } from './collision'
 import { getCanvas } from './pointer-lock'
 import { regionAt, spawnOf } from './layout'
@@ -9,6 +9,7 @@ import { ERA_ROOMS, type RoomId } from '../types'
 import { debugStats } from './debug-stats'
 
 const WALK_SPEED = 3 // metres per second
+const SPRINT_SPEED = 5.5 // while Shift is held (crossing the rotunda faster)
 const TURN_SPEED = 2 // radians per second when turning with ← / → (~115°/s)
 const TILT_SPEED = 1.5 // radians per second when looking up/down with ↑ / ↓
 const EYE_HEIGHT = 1.6 // metres, roughly a standing visitor
@@ -37,6 +38,7 @@ const TURN_RIGHT = ['ArrowRight']
 const LOOK_UP = ['ArrowUp']
 const LOOK_DOWN = ['ArrowDown']
 const WALK_KEYS = [...FORWARD, ...BACKWARD, ...STEP_LEFT, ...STEP_RIGHT]
+const SPRINT = ['ShiftLeft', 'ShiftRight']
 
 // A released key must stay released this long before walking stops (see onKeyUp).
 const KEY_RELEASE_GRACE_MS = 60
@@ -44,6 +46,7 @@ const KEY_RELEASE_GRACE_MS = 60
 // Tutorial: the "look" step is done after turning this far, the "move" step after walking this far.
 const TUTORIAL_TURN = 1.2 // radians, about 70 degrees
 const TUTORIAL_WALK = 3 // metres
+const TUTORIAL_SPRINT = 4 // metres run with Shift to finish the "sprint" step
 
 // After this many normal W/A/S/D presses in a row, we trust the typing tool is off.
 const NORMAL_PRESSES_TO_CLEAR_WARNING = 4
@@ -96,10 +99,12 @@ export default function Player({ walls }: PlayerProps) {
   // starting room (the hall). Map teleports later reuse the same code.
   const handledTeleports = useRef(-1)
 
-  // Stand at a room's spawn point (start of the visit, map teleport).
-  function placeAt(room: RoomId) {
+  const lastSave = useRef(0)
+
+  // Stand at a room's spawn point (start of the visit, map teleport), or at a saved spot.
+  function placeAt(room: RoomId, saved: { x: number; z: number; yaw: number } | null = null) {
     const camera = get().camera
-    const spawn = spawnOf(room)
+    const spawn = saved ?? spawnOf(room)
     camera.position.set(spawn.x, EYE_HEIGHT, spawn.z)
     yaw.current = targetYaw.current = spawn.yaw
     pitch.current = targetPitch.current = 0
@@ -124,7 +129,9 @@ export default function Player({ walls }: PlayerProps) {
     // The browser tells us whenever the mouse is captured or released.
     // Captured = exploring. Released (Esc, Alt+Tab...) while exploring = paused.
     function onLockChange() {
-      if (document.pointerLockElement === getCanvas()) {
+      const captured = document.pointerLockElement === getCanvas()
+      store().setMouseCaptured(captured)
+      if (captured) {
         store().startExploring()
       } else {
         releaseAllKeys() // forget held keys, so we do not keep walking
@@ -141,6 +148,7 @@ export default function Player({ walls }: PlayerProps) {
     function onMouseMove(event: MouseEvent) {
       debugStats.mouseMoves += 1
       if (store().mode !== 'exploring' || isFakeMouseJump(event)) return
+      if (!store().mouseCaptured) return // free mouse: only a click captures it again
       if (!canUse(store().tutorial, 'look')) return // tutorial: camera still frozen
       const sensitivity = BASE_MOUSE_SENSITIVITY * store().mouseSensitivity
       targetYaw.current -= event.movementX * sensitivity
@@ -159,6 +167,16 @@ export default function Player({ walls }: PlayerProps) {
       }
       pressed.current.add(event.code)
       if (store().mode !== 'exploring') return
+
+      // Esc while walking without the mouse captured: the browser has nothing to release,
+      // so pause here ourselves.
+      if (event.code === 'Escape' && !store().mouseCaptured) {
+        releaseAllKeys()
+        velocity.current = { x: 0, z: 0 }
+        store().setMode('paused')
+        store().advanceTutorial('pause')
+        return
+      }
 
       // Show the typing-tool warning as soon as it interferes, and hide it as soon as
       // a few normal presses in a row show the visitor has switched to English mode.
@@ -212,7 +230,14 @@ export default function Player({ walls }: PlayerProps) {
     // A new map teleport request? (Checked in every mode: the map is open when it is made.)
     if (store.teleport.count !== handledTeleports.current) {
       handledTeleports.current = store.teleport.count
-      placeAt(store.teleport.roomId)
+      placeAt(store.teleport.roomId, store.teleport.pose ?? null)
+    }
+
+    // Save progress about once a second once the visit has started.
+    const now = performance.now()
+    if (store.mode !== 'start' && now - lastSave.current > 1000) {
+      lastSave.current = now
+      saveProgress({ x: camera.position.x, z: camera.position.z, yaw: yaw.current })
     }
 
     // Keep "which room am I in" up to date (on-screen name, map, hiding unseen rooms).
@@ -236,6 +261,7 @@ export default function Player({ walls }: PlayerProps) {
     // In the tutorial, controls unlock one at a time.
     const canLook = canUse(store.tutorial, 'look')
     const canMove = canUse(store.tutorial, 'move')
+    const sprinting = canUse(store.tutorial, 'sprint') && isDown(SPRINT)
 
     // Camera: arrow keys change the target, then the camera glides towards it.
     const turn = canLook ? (isDown(TURN_RIGHT) ? 1 : 0) - (isDown(TURN_LEFT) ? 1 : 0) : 0
@@ -268,8 +294,9 @@ export default function Player({ walls }: PlayerProps) {
     // Diagonal keys should not be faster than straight ones.
     const length = Math.hypot(wantX, wantZ)
     if (length > 0) {
-      wantX = (wantX / length) * WALK_SPEED
-      wantZ = (wantZ / length) * WALK_SPEED
+      const speed = sprinting ? SPRINT_SPEED : WALK_SPEED
+      wantX = (wantX / length) * speed
+      wantZ = (wantZ / length) * speed
     }
 
     // Speed up / slow down smoothly instead of starting and stopping instantly.
@@ -289,6 +316,14 @@ export default function Player({ walls }: PlayerProps) {
       if (tutorialProgress.current > TUTORIAL_WALK) {
         tutorialProgress.current = 0
         store.advanceTutorial('move')
+      }
+    }
+    // Tutorial "sprint" step: done after running about 4 metres with Shift held.
+    if (store.tutorial === 'sprint' && sprinting) {
+      tutorialProgress.current += Math.hypot(next.x - camera.position.x, next.z - camera.position.z)
+      if (tutorialProgress.current > TUTORIAL_SPRINT) {
+        tutorialProgress.current = 0
+        store.advanceTutorial('sprint')
       }
     }
     camera.position.x = next.x
