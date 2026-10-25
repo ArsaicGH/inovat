@@ -1,13 +1,11 @@
-import { site } from '../content/site'
-import { ui } from '../content/ui'
-import { roomNames } from '../content/rooms'
-import { getExhibitText } from '../content/exhibits'
 import { useMuseumStore, eraRoomsVisited } from '../state/useMuseumStore'
+import { useContent } from '../content/use-content'
 import TutorialCard from './TutorialCard'
 
 // On-screen layer while walking: crosshair, exhibit prompt, room name, warnings.
 // Text comes from src/content/.
 export default function Hud() {
+  const { ui, site, roomNames, exhibit } = useContent()
   // Player.tsx turns this on when Unikey/EVKey interferes, and off once keys are normal again.
   const showWarning = useMuseumStore((state) => state.typingToolWarning)
   const aimedId = useMuseumStore((state) => state.aimedExhibitId)
@@ -46,7 +44,7 @@ export default function Hud() {
       <div className={aimedId ? 'crosshair crosshair-active' : 'crosshair'} />
       {aimedId && (
         <div className="hud-prompt">
-          <strong>{getExhibitText(aimedId).title}</strong>
+          <strong>{exhibit(aimedId).title}</strong>
           <span>{ui.prompt}</span>
         </div>
       )}

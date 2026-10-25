@@ -1,9 +1,8 @@
 import { useEffect, useRef } from 'react'
+import { useContent } from '../content/use-content'
 import { useFrame } from '@react-three/fiber'
 import type { Group, Mesh } from 'three'
 import { useMuseumStore, isQuizUnlocked } from '../state/useMuseumStore'
-import { roomNames } from '../content/rooms'
-import { ui } from '../content/ui'
 import { DOORS, type DoorLayout } from './layout'
 import { doorOpen } from './door-state'
 import { addAimTarget, removeAimTarget } from './aim-targets'
@@ -16,6 +15,7 @@ const OPEN_SPEED = 5 // higher = faster opening/closing
 // One sliding double door in a rotunda doorway. Its local +z points into the rotunda,
 // so the signs face visitors standing in the rotunda.
 function Door({ door }: { door: DoorLayout }) {
+  const { ui, roomNames } = useContent()
   const group = useRef<Group>(null)
   const left = useRef<Mesh>(null)
   const right = useRef<Mesh>(null)

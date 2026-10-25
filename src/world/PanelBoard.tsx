@@ -1,8 +1,7 @@
 import { useEffect, useMemo } from 'react'
+import { useContent } from '../content/use-content'
 import { useThree } from '@react-three/fiber'
 import { CanvasTexture, DoubleSide, MeshBasicMaterial, SRGBColorSpace } from 'three'
-import { getExhibitText } from '../content/exhibits'
-import { ui } from '../content/ui'
 import { BOARD_FRAME, type BoardTheme } from './style'
 import { drawWrappedText, paintFont, useFontsReady } from './fonts'
 
@@ -77,6 +76,7 @@ function paintPaper(ctx: CanvasRenderingContext2D, theme: BoardTheme, w: number,
 }
 
 export default function PanelBoard({ exhibitId, width, height, aimed, theme }: PanelBoardProps) {
+  const { ui, exhibit } = useContent()
   const fontsReady = useFontsReady()
   const maxAnisotropy = useThree((state) => state.gl.capabilities.getMaxAnisotropy())
   const { look } = theme
@@ -84,7 +84,7 @@ export default function PanelBoard({ exhibitId, width, height, aimed, theme }: P
   const faceHeight = height - 2 * FRAME
 
   const texture = useMemo(() => {
-    const text = getExhibitText(exhibitId)
+    const text = exhibit(exhibitId)
     const font = paintFont(fontsReady) // repainted once the museum font has loaded
     const canvas = document.createElement('canvas')
     canvas.width = Math.round(faceWidth * PIXELS_PER_METRE)
@@ -142,7 +142,7 @@ export default function PanelBoard({ exhibitId, width, height, aimed, theme }: P
     tex.colorSpace = SRGBColorSpace
     tex.anisotropy = maxAnisotropy // stays sharp when seen at an angle
     return tex
-  }, [exhibitId, faceWidth, faceHeight, maxAnisotropy, fontsReady, theme, look])
+  }, [exhibitId, faceWidth, faceHeight, maxAnisotropy, fontsReady, theme, look, ui, exhibit])
 
   useEffect(() => () => texture.dispose(), [texture])
 

@@ -43,8 +43,9 @@ const SPRINT = ['ShiftLeft', 'ShiftRight']
 // A released key must stay released this long before walking stops (see onKeyUp).
 const KEY_RELEASE_GRACE_MS = 60
 
-// Tutorial: the "look" step is done after turning this far, the "move" step after walking this far.
-const TUTORIAL_TURN = 1.2 // radians, about 70 degrees
+// Tutorial: the "look" step is done after this much time spent turning the camera (time,
+// not angle, so it feels the same at any sensitivity), the "move" step after walking this far.
+const TUTORIAL_LOOK_TIME = 1 // seconds
 const TUTORIAL_WALK = 3 // metres
 const TUTORIAL_SPRINT = 4 // metres run with Shift to finish the "sprint" step
 
@@ -277,8 +278,9 @@ export default function Player({ walls }: PlayerProps) {
 
     // Tutorial "look" step: done after turning about 70 degrees in total.
     if (store.tutorial === 'look') {
-      tutorialProgress.current += Math.abs(yaw.current - oldYaw) + Math.abs(pitch.current - oldPitch)
-      if (tutorialProgress.current > TUTORIAL_TURN) {
+      const turning = Math.abs(yaw.current - oldYaw) + Math.abs(pitch.current - oldPitch) > 0.0005
+      if (turning) tutorialProgress.current += dt
+      if (tutorialProgress.current > TUTORIAL_LOOK_TIME) {
         tutorialProgress.current = 0
         store.advanceTutorial('look')
       }

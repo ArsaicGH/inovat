@@ -1,13 +1,14 @@
 import { useState } from 'react'
-import { site } from '../content/site'
-import { ui } from '../content/ui'
+import { useContent } from '../content/use-content'
 import { useMuseumStore, hasSavedProgress } from '../state/useMuseumStore'
 import LockButton from './LockButton'
+import LanguageSwitch from './LanguageSwitch'
 
 // First screen: the decorated INNOVA title and a start button. After "Bắt đầu" the visitor
 // chooses whether to take the guided tutorial; either choice captures the mouse and the
 // Player then switches to "exploring".
 export default function StartScreen() {
+  const { ui, site } = useContent()
   const [asking, setAsking] = useState(false)
   const setTutorial = useMuseumStore((state) => state.setTutorial)
   const continueSavedVisit = useMuseumStore((state) => state.continueSavedVisit)
@@ -47,6 +48,10 @@ export default function StartScreen() {
             </div>
           </div>
         )}
+      </div>
+      {/* Near the bottom of the screen, out of the way of the title. */}
+      <div className="language-bottom">
+        <LanguageSwitch />
       </div>
     </div>
   )

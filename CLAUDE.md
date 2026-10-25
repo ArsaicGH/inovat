@@ -4,7 +4,7 @@ Project: browser-based 3D virtual museum about the four Industrial Revolutions (
 
 ## Who I am working with
 - A school group of complete beginners in web development.
-- We talk in **English**. The finished website is **100% Vietnamese**.
+- We talk in **English**. The finished website is **bilingual: Vietnamese (default) and English**, chosen by the visitor.
 
 ## How to work with us
 - Explain every unfamiliar term and every command **before** running it, in plain language.
@@ -23,11 +23,14 @@ Project: browser-based 3D virtual museum about the four Industrial Revolutions (
 - Folder layout is in `PLAN.md` section 3. Keep the 3D layer (`src/world/`), the interface (`src/ui/`) and the text (`src/content/`) separate.
 - File names: lowercase, hyphens, no spaces, no Vietnamese diacritics.
 - Read movement keys by physical key position (`event.code`), so Unikey and EVKey do not break controls.
-- Every key the game uses is listed in the key list shown with Space (`ui.keyList` in `src/content/ui.ts`). When a key is added or changed, update that list (and the tutorial, if the key is important).
+- Every key the game uses is listed in the key list shown with Space (`ui.keyList` in `src/content/ui.ts`). When a key is added or changed, update that list in both languages, in tutorial order (and the tutorial, if the key is important).
 - Run `npm run build` before every commit.
 
 ## Content rules
-- All visible website text is Vietnamese and lives in `src/content/`, never hard-coded in components.
+- All visible website text lives in `src/content/` in **both** Vietnamese (`vi`) and English (`en`), never hard-coded in components. Components read it with `useContent()`.
+- **Parallel content:** every time any text is added or changed, write or update both languages in the same change. Never leave one language behind or fill it in later.
+- Both languages must read naturally (written for a native reader, not word-for-word translation). Names that stay the same in both (INNOVA, key names) are fine.
+- Placeholders are marked `[CẦN KIỂM TRA]` in Vietnamese and `[NEEDS CHECKING]` in English.
 - **Never invent historical facts, dates, names or sources.** Every exhibit and quiz question needs a real source that I provided or that you looked up and cited. If unsure, write `[CẦN KIỂM TRA]` and tell me.
 - Every image and 3D model must be listed in `src/content/credits.ts` with author and licence.
 

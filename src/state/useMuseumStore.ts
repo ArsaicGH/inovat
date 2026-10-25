@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { ERA_ROOMS, type RoomId } from '../types'
+import { LANGUAGES, type Language } from '../content/language'
 
 // The app is always in exactly one mode (PLAN.md section 3). Only in "exploring"
 // is the mouse captured and walking allowed. "quiz" and "results" come with M7.
@@ -70,6 +71,27 @@ export function saveProgress(pose: Pose) {
 const savedProgress = loadProgress()
 export const hasSavedProgress = savedProgress !== null
 
+// Language of every text in the game, remembered in this browser (Vietnamese by default).
+const LANGUAGE_STORAGE_KEY = 'innova-language'
+
+function loadLanguage(): Language {
+  try {
+    const saved = localStorage.getItem(LANGUAGE_STORAGE_KEY) as Language | null
+    if (saved && LANGUAGES.includes(saved)) return saved
+  } catch {
+    // ignore
+  }
+  return 'vi'
+}
+
+function saveLanguage(value: Language) {
+  try {
+    localStorage.setItem(LANGUAGE_STORAGE_KEY, value)
+  } catch {
+    // ignore
+  }
+}
+
 // GUIDED TUTORIAL (optional, chosen on the start screen). Each step unlocks one more control:
 // intro (everything frozen) -> look -> move -> sprint -> interact -> map -> pause -> keys -> done.
 export type TutorialStep = 'intro' | 'look' | 'move' | 'sprint' | 'interact' | 'map' | 'pause' | 'keys' | 'done'
@@ -91,6 +113,8 @@ interface MuseumState {
   startExploring: () => void
 
   mouseSensitivity: number
+  language: Language
+  setLanguage: (value: Language) => void
   setMouseSensitivity: (value: number) => void
 
   // True when a Vietnamese typing tool (Unikey/EVKey) seems to be eating our keys.
@@ -148,6 +172,11 @@ export const useMuseumStore = create<MuseumState>((set) => ({
     set((state) => ({ mode: 'exploring', openExhibitId: null, tutorial: state.tutorial === 'done' ? null : state.tutorial })),
 
   mouseSensitivity: loadSensitivity(),
+  language: loadLanguage(),
+  setLanguage: (value) => {
+    saveLanguage(value)
+    set({ language: value })
+  },
   setMouseSensitivity: (value) => {
     saveSensitivity(value)
     set({ mouseSensitivity: value })

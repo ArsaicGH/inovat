@@ -4,13 +4,29 @@ import StartScreen from './ui/StartScreen'
 import PauseScreen from './ui/PauseScreen'
 import InfoPanel from './ui/InfoPanel'
 import MapMenu from './ui/MapMenu'
+import DeviceMessage from './ui/DeviceMessage'
+import { useEffect } from 'react'
 import { useMuseumStore } from './state/useMuseumStore'
+import { useContent } from './content/use-content'
+import { isComputer } from './ui/device'
+
+const ON_COMPUTER = isComputer()
 
 // Two layers: the 3D world underneath, the HTML interface on top.
 // Which screen is shown depends only on the current mode.
 function App() {
   const mode = useMuseumStore((state) => state.mode)
   const worldReady = useMuseumStore((state) => state.worldReady)
+  const { language, site } = useContent()
+
+  // Keep the page's language and tab title in step with the chosen language.
+  useEffect(() => {
+    document.documentElement.lang = language
+    document.title = site.pageTitle
+  }, [language, site])
+
+  // Phones and tablets: a message instead of the museum.
+  if (!ON_COMPUTER) return <DeviceMessage />
 
   return (
     <>

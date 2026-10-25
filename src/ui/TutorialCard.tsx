@@ -1,9 +1,10 @@
-import { ui } from '../content/ui'
 import { useMuseumStore, TUTORIAL_STEPS } from '../state/useMuseumStore'
+import { useContent } from '../content/use-content'
 
 // The current tutorial instruction, at the top of the screen while walking. The step is
 // completed by doing it (Player.tsx / Interaction.tsx notice and move on).
 export default function TutorialCard() {
+  const { ui } = useContent()
   const step = useMuseumStore((state) => state.tutorial)
   if (!step || step === 'done') return null
 

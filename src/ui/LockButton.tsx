@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ui } from '../content/ui'
+import { useContent } from '../content/use-content'
 import { requestPointerLock } from '../world/pointer-lock'
 
 interface LockButtonProps {
@@ -11,6 +11,7 @@ interface LockButtonProps {
 // Button that captures the mouse (start and pause screens). The click itself is the user
 // action the browser requires. If the browser refuses, we say so instead of doing nothing.
 export default function LockButton({ label, className, onBeforeLock }: LockButtonProps) {
+  const { ui } = useContent()
   const [refused, setRefused] = useState(false)
 
   async function handleClick() {

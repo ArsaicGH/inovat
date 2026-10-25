@@ -10,7 +10,7 @@ const AIM_DISTANCE = 3
 
 // Keys by PHYSICAL position (event.code), like the movement keys.
 const OPEN_KEY = 'KeyE'
-const MAP_KEY = 'KeyM'
+const MAP_KEY = 'KeyQ' // Q: easy to reach next to W A S D
 const SPACE = 'Space' // starts the tutorial; later shows / hides the key list
 
 // Aiming and opening: shoots an invisible line ("ray") from the centre of the screen

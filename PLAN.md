@@ -1,7 +1,7 @@
 # PLAN.md: Virtual 3D Museum of the Four Industrial Revolutions
 
 Working language of the team and of Claude: **English**.
-Language of the finished website: **100% Vietnamese** (all visible text, panels, quiz, buttons, credits).
+Languages of the finished website: **Vietnamese and English** (leader's decision). Every visible text (panels, quiz, buttons, signs, credits) exists in both; the visitor picks one with the Tiếng Việt / English switch on the start screen or in the pause menu, and Vietnamese is the default. Both versions must read naturally, not as word-for-word translations. **Content is developed in parallel:** every new or changed text is written in both languages in the same change, never one now and the other later.
 
 Museum name: **INNOVA** (from "innovation"; decided by the group). Descriptive subtitle (Vietnamese): **Bảo tàng Cách mạng Công nghiệp**.
 
@@ -80,7 +80,7 @@ Two layers stacked in one web page, connected by a shared store:
 - **Layer 1, 3D world (R3F):** rooms, walls, lights, exhibits, player.
 - **Layer 2, HTML interface (React):** start screen, crosshair, prompts, info panels, map menu, quiz, results.
 - **Shared state (Zustand):** current mode, current room, open exhibit, quiz score.
-- **Content files:** Vietnamese text, quiz, sources, credits.
+- **Content files:** Vietnamese and English text, quiz, sources, credits (both languages side by side).
 
 **Modes.** The app is always in exactly one mode: `start`, `exploring`, `paused`, `reading`, `map`, `quiz`, `results`. Only in `exploring` is the mouse captured and movement allowed. Every action checks the mode first.
 
@@ -117,7 +117,7 @@ bao-tang-cmcn/
 │   ├── main.tsx
 │   ├── App.tsx
 │   ├── types.ts
-│   ├── content/            (ALL Vietnamese text)
+│   ├── content/            (ALL visible text, Vietnamese and English)
 │   │   ├── rooms.ts
 │   │   ├── exhibits.ts
 │   │   ├── quiz.ts
@@ -146,7 +146,7 @@ bao-tang-cmcn/
 {
   id: "ir1-exhibit-01",
   room: "ir1",
-  title: "…",       // Vietnamese
+  title: "…",       // in both languages: { vi: "…", en: "…" }
   summary: "…",     // 1-2 sentences, shown on approach
   body: "…",        // full panel text
   image: "/images/ir1/exhibit-01.webp",
@@ -207,11 +207,11 @@ Create the Vite React + TypeScript project, push to GitHub, connect Vercel.
 
 ### Phase C: The complete game with placeholders (the "skeleton")
 
-**M6. Visual identity and themed rooms**: a shared style guide (colours, fonts, panels, signs) and one distinct, impressive atmosphere per room, balanced with performance. Direction: the hall is a welcoming museum lobby; CMCN 1 historical (brick, wood, warm lamplight); CMCN 2 steel and early electric light; CMCN 3 beige computers and fluorescent light; CMCN 4 futuristic (white glass, screens, glow); the quiz room playful. Tools: textured materials, emissive (glowing) lights, an environment map for reflections, fog, bloom, 3D signs with a bundled Vietnamese font, decoration props. Placeholder prototypes on every pedestal and placeholder text on every panel. (New packages or downloads are asked for first.)
-- [ ] All rooms use the same UI components and fonts (full Vietnamese support, e.g. Be Vietnam Pro). (Be Vietnam Pro bundled and used everywhere; rooms still to be themed.)
-- [ ] Each room is recognisable at a glance from lighting, materials and decoration.
-- [ ] Doorways and signs make the route Sảnh -> CMCN 1 -> ... -> Phòng trò chơi obvious.
-- [ ] Still 30 fps or more at 1080p on the leader's laptop, with at most one shadow-casting light.
+**M6. Visual identity and themed rooms**: a shared style guide (colours, fonts, panels, signs) and one distinct, impressive atmosphere per room, balanced with performance. Direction: the hall is a welcoming museum lobby; CMCN 1 historical (brick, wood, warm lamplight); CMCN 2 steel and early electric light; CMCN 3 beige computers and fluorescent light; CMCN 4 futuristic (white glass, screens, glow); the quiz room playful. Tools: textured materials, emissive (glowing) lights, an environment map for reflections, fog, bloom, 3D signs with a bundled font that supports Vietnamese, decoration props. Placeholder prototypes on every pedestal and placeholder text on every panel. (New packages or downloads are asked for first.)
+- [x] All rooms use the same UI components and fonts (full Vietnamese support, e.g. Be Vietnam Pro). (Be Vietnam Pro bundled and used everywhere.)
+- [x] Each room is recognisable at a glance from lighting, materials and decoration.
+- [x] Doorways and signs make the route Sảnh -> CMCN 1 -> ... -> Phòng trò chơi obvious.
+- [x] Still 30 fps or more at 1080p on the leader's laptop, with at most one shadow-casting light. (Leader reviewed it running smoothly; measured again in the M9 performance pass.)
 - [x] The style guide is written in README.md.
 
 **M7. Quiz room engine (Phòng trò chơi)**: questions from `quiz.ts`, multiple choice, immediate feedback with a short explanation, scoring, results screen, retry. Uses clearly fake placeholder questions until Phase D.
@@ -222,7 +222,7 @@ Create the Vite React + TypeScript project, push to GitHub, connect Vercel.
 **M8. Game shell**: loading screen with progress, credits screen (reads `credits.ts`), the intro hall's placeholder panels (introduction, overview of the four revolutions, our team, credits, sources, controls), the "Vui lòng dùng máy tính" message for phones/tablets, final start/pause/map screens styled to match M6.
 - [ ] Loading screen shows progress and disappears when the museum is ready.
 - [ ] The credits screen lists every placeholder asset with author and licence.
-- [ ] Phone/tablet visitors see "Vui lòng dùng máy tính".
+- [x] Phone/tablet visitors see "Vui lòng dùng máy tính". (Done early: `device.ts` + `DeviceMessage.tsx`; the 3D museum is not loaded on phones and tablets.)
 - [ ] The intro hall has a readable placeholder panel for each section: introduction, overview, our team, credits, sources.
 - [ ] Every screen and sign uses text from `src/content/`.
 
@@ -292,7 +292,7 @@ Testing: manual checklists (the acceptance criteria above) before every merge; `
 
 **Performance:** weak integrated graphics (use low-poly models, textures of 1024 px or less, instancing); lights and shadows are expensive (mostly ambient light plus a few lamps, glowing materials, at most one shadow-casting light); cap pixel ratio at 1.5; compress models; detect disabled hardware acceleration and show instructions.
 
-**Compatibility:** mouse capture needs a click and Esc always releases it (treat Esc as "pause" with a clear "Nhấp để tiếp tục" overlay); embedding in other sites can block mouse capture (share the direct link); Vietnamese typing tools (Unikey, EVKey) can interfere with keys (read physical key positions, suggest English mode on the start screen); phones and tablets are unsupported at first; test 1366x768 to 1920x1080 and 125% zoom; bundle a font with full Vietnamese support (for example Be Vietnam Pro) and set `lang="vi"`.
+**Compatibility:** mouse capture needs a click and Esc always releases it (treat Esc as "pause" with a clear "Nhấp để tiếp tục" overlay); embedding in other sites can block mouse capture (share the direct link); Vietnamese typing tools (Unikey, EVKey) can interfere with keys (read physical key positions, suggest English mode on the start screen); phones and tablets are unsupported at first; test 1366x768 to 1920x1080 and 125% zoom; bundle a font with full Vietnamese support (for example Be Vietnam Pro) and set `lang` to the chosen language (`vi` or `en`).
 
 **Deployment:** capital letters in file names break on Vercel (follow the file-name rule); the release build is stricter than the dev server (always run `npm run build` first); GitHub rejects files over 100 MB (compress assets; never commit `node_modules`); everyone uses the same Node LTS version; press Ctrl+F5 after a deploy to bypass the cache; test the `vercel.app` URL on the school network during M1.
 
@@ -398,3 +398,5 @@ Plan: aim for A, keep B as a cheap fallback (only `Player.tsx` changes). Decide 
   - Progress saving: rooms visited, tutorial step and position are kept in sessionStorage (this tab only) about once a second; after a reload the title screen shows "Tiếp tục hành trình trước" under "Bắt đầu" to continue it. (Reloads came from the development server's live connection dropping while the tab was in the background, or from Edge putting the tab to sleep.)
   - Door lag fix: each part of the museum uploads its pictures and builds its drawing code (`compileAsync`) behind the title screen, instead of the first time its door opens (`prepareForDrawing` in `Museum.tsx`).
   - Shift to sprint (5.5 m/s instead of 3 m/s), taught in a new tutorial step right after W A S D (7 steps now). Fixed the flickering gold edges of the hall's red carpet (they shared the carpet's plane).
+  - Before M7 (leader's list): huge decorated era numbers 1-4 above each overview board instead of the name signs (`EraNumeral.tsx`); English added (`src/content/*` hold `vi` and `en`, read with `useContent()`; Tiếng Việt / English pill on the start screen and in the pause menu, remembered in the browser); key list in tutorial order; phones and tablets get a "please use a computer" message (`device.ts`). E closes boards, the map key closes the map, Esc pauses; Space shows the key list (tutorial step 8).
+  - Keys: the map moved from M to Q (easier to reach beside W A S D). Esc only pauses; a click continues (Continue, or anywhere around the pause menu), the same in a window and in full screen (leader's decision; Esc-to-continue via full screen "keyboard lock" was tried and dropped). Full screen (F11) is only recommended, in the tutorial's first tip. Map restyled in the title screen's gold-and-glass look; language pill at the bottom of the start screen and styled like the pause menu's settings.

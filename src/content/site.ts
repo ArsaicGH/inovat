@@ -1,6 +1,19 @@
-// All visible website text lives in src/content/ (see CLAUDE.md).
-export const site = {
+import type { Language } from './language'
+
+// All visible website text lives in src/content/, in both languages (see CLAUDE.md).
+const vi = {
   name: 'INNOVA',
   subtitle: 'Bảo tàng Cách mạng Công nghiệp',
   tagline: 'Bảo tàng 3D về bốn cuộc Cách mạng Công nghiệp, sắp ra mắt.',
+  // Browser tab title.
+  pageTitle: 'INNOVA – Bảo tàng Cách mạng Công nghiệp',
 }
+
+const en: typeof vi = {
+  name: 'INNOVA',
+  subtitle: 'Museum of the Industrial Revolutions',
+  tagline: 'A 3D museum of the four Industrial Revolutions, coming soon.',
+  pageTitle: 'INNOVA – Museum of the Industrial Revolutions',
+}
+
+export const siteText: Record<Language, typeof vi> = { vi, en }

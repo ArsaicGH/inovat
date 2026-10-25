@@ -1,7 +1,9 @@
 import { useMuseumStore } from '../state/useMuseumStore'
 
 // Pointer lock = the browser hides the cursor and sends mouse movement to the 3D view.
-// Browsers only allow it right after a click or key press, and Esc always releases it.
+// Browsers only allow it right after a click or key press (never Esc), and Esc always
+// releases it, after which only a click may capture it again. So Esc pauses and a click
+// continues, the same in a window and in full screen.
 
 // The 3D canvas lives inside this wrapper (see Museum.tsx).
 export const CANVAS_WRAPPER_ID = 'museum-canvas'
@@ -32,13 +34,6 @@ export async function requestPointerLock(): Promise<boolean> {
 // so the Player does not mistake this for a pause.
 export function releasePointer() {
   if (document.pointerLockElement) document.exitPointerLock()
-}
-
-// Esc on the pause menu: try to capture the mouse again. Browsers usually refuse after a
-// key press like Esc, so then walk on with the keyboard; a click captures the mouse.
-export async function resumeFromKeyboard() {
-  const ok = await requestPointerLock()
-  if (!ok) useMuseumStore.getState().startExploring()
 }
 
 // Go back to walking from a panel or the map. If the browser refuses to capture the

@@ -1,5 +1,8 @@
-// Interface text (buttons, screens). All visible text lives in src/content/.
-export const ui = {
+import type { Language } from './language'
+
+// Interface text (buttons, screens), in both languages. All visible text lives in
+// src/content/. When you change one language, change the other in the same edit.
+const vi = {
   start: {
     button: 'Bắt đầu',
     // Under "Bắt đầu" when this tab still holds an earlier visit (e.g. after a reload).
@@ -31,11 +34,11 @@ export const ui = {
       },
       interact: {
         title: 'Xem hiện vật',
-        text: 'Đến gần một bảng thông tin trên tường, nhắm vào nó rồi nhấn E hoặc nhấp chuột để phóng to. Nhấn E hoặc Esc để đóng.',
+        text: 'Đến gần một bảng thông tin, nhắm vào nó rồi nhấn E hoặc nhấp chuột để phóng to.',
       },
       map: {
         title: 'Bản đồ',
-        text: 'Nhấn M để mở bản đồ bảo tàng. Chọn một phòng để đi thẳng đến đó.',
+        text: 'Nhấn Q để mở bản đồ bảo tàng. Chọn một phòng để đi thẳng đến đó.',
       },
       pause: {
         title: 'Tạm dừng',
@@ -47,35 +50,38 @@ export const ui = {
       },
     },
     // Shown in the pause menu during the tutorial's "pause" step.
-    pauseIntro: 'Đây là menu tạm dừng với các cài đặt. Nhấn Esc hoặc Tiếp tục để quay lại tham quan.',
+    pauseIntro: 'Đây là menu tạm dừng với các cài đặt. Nhấn Tiếp tục để quay lại tham quan.',
   },
   pause: {
     title: 'Tạm dừng',
     resume: 'Tiếp tục',
-    resumeHint: 'Nhấn Esc để tiếp tục',
+    clickHint: 'Nhấp vào khoảng trống hoặc nhấn Tiếp tục',
     map: 'Bản đồ',
   },
   // While walking without the mouse captured (e.g. after resuming with Esc).
   clickToLook: 'Nhấp chuột để dùng chuột xoay góc nhìn',
-  // KEY LIST: shown with Space while walking. Keep it complete: every new key goes here
-  // (see CLAUDE.md).
+  // KEY LIST: shown with Space while walking, in the order the tutorial teaches them.
+  // Keep it complete: every new key goes here (see CLAUDE.md).
   keyList: {
     title: 'Danh sách phím',
     hint: 'Nhấn Space để ẩn',
     keys: [
+      { keys: 'Chuột / touchpad / phím mũi tên', action: 'Nhìn xung quanh' },
       { keys: 'W A S D', action: 'Di chuyển' },
       { keys: 'Shift', action: 'Chạy nhanh (giữ khi đi)' },
-      { keys: 'Chuột / touchpad / phím mũi tên', action: 'Nhìn xung quanh' },
       { keys: 'E / nhấp chuột', action: 'Xem bảng thông tin (E để đóng)' },
-      { keys: 'M', action: 'Mở / đóng bản đồ' },
-      { keys: 'Esc', action: 'Tạm dừng / tiếp tục' },
+      { keys: 'Q', action: 'Mở / đóng bản đồ' },
+      { keys: 'Esc', action: 'Tạm dừng' },
       { keys: 'Space', action: 'Hiện / ẩn danh sách phím' },
     ],
   },
   sensitivity: {
     label: 'Độ nhạy camera',
   },
-  // Text painted on decorations in the 3D world.
+  language: {
+    label: 'Ngôn ngữ',
+  },
+  // Text painted on decorations in the 3D world (the same in both languages).
   decor: {
     // Quiz room: answer tiles like a TV quiz show, and question marks on the side walls.
     quizAnswers: ['A', 'B', 'C', 'D'],
@@ -86,11 +92,10 @@ export const ui = {
   // Shown under the crosshair when an exhibit is within reach.
   prompt: 'Nhấn E để xem',
   infoPanel: {
-    imagePlaceholder: 'Hình minh họa (sẽ bổ sung)',
     sourcesLabel: 'Nguồn',
     sourcesPlaceholder: 'Chưa có nguồn. [CẦN KIỂM TRA]',
     close: 'Đóng',
-    closeHint: 'Nhấn E để đóng',
+    closeHint: 'Nhấp vào khoảng trống hoặc nhấn E để đóng',
   },
   map: {
     title: 'Bản đồ bảo tàng',
@@ -99,7 +104,7 @@ export const ui = {
     locked: 'Đang khóa',
     visited: 'Đã tham quan',
     close: 'Đóng',
-    closeHint: 'Nhấn M để đóng',
+    closeHint: 'Nhấp vào khoảng trống hoặc nhấn Q để đóng',
   },
   // Shown near the locked quiz-room door; {count} = era rooms visited so far.
   quizLocked: 'Phòng trò chơi đang khóa. Hãy tham quan cả 4 phòng trưng bày trước ({count}/4).',
@@ -109,4 +114,118 @@ export const ui = {
   // Shown when the browser refuses to capture the mouse.
   lockRefused:
     'Trình duyệt chưa cho phép điều khiển chuột. Hãy đợi một giây rồi nhấp lại. Nếu vẫn không được, hãy mở trang trực tiếp trong một thẻ Chrome hoặc Edge.',
+  // Shown instead of the museum on phones and tablets.
+  device: {
+    title: 'Vui lòng dùng máy tính',
+    text: 'INNOVA là bảo tàng 3D điều khiển bằng bàn phím và chuột hoặc touchpad, nên hiện chỉ chơi được trên máy tính. Hãy mở trang này trên máy tính để bàn hoặc máy tính xách tay.',
+  },
 }
+
+export type UiText = typeof vi
+
+const en: UiText = {
+  start: {
+    button: 'Start',
+    continue: 'Continue previous visit',
+    tutorialQuestion: 'Would you like a quick guide to the controls?',
+    tutorialYes: 'Yes, show me',
+    tutorialNo: 'No, start exploring',
+  },
+  tutorial: {
+    progress: 'Tutorial {n}/{total}',
+    steps: {
+      intro: {
+        title: 'Welcome to INNOVA',
+        text: 'This guide introduces the controls one at a time. Press Space to begin.',
+        tip: 'Tip: press F11 to play in full screen for the best experience.',
+      },
+      look: {
+        title: 'Look around',
+        text: 'Move your mouse or touchpad, or use the arrow keys, to turn the camera.',
+      },
+      move: {
+        title: 'Walk',
+        text: 'Use W A S D to walk. If a Vietnamese typing tool (Unikey, EVKey...) is on, switch it to English mode.',
+      },
+      sprint: {
+        title: 'Sprint',
+        text: 'Hold Shift while walking to move faster, for example when crossing the Central Hall.',
+      },
+      interact: {
+        title: 'View exhibits',
+        text: 'Walk up to an information board, aim at it and press E or click to enlarge it.',
+      },
+      map: {
+        title: 'Map',
+        text: 'Press Q to open the museum map. Pick a room to go straight there.',
+      },
+      pause: {
+        title: 'Pause',
+        text: 'Press Esc to pause. The pause menu holds the settings, such as camera sensitivity.',
+      },
+      keys: {
+        title: 'Key list',
+        text: 'Press Space at any time to show or hide a list of all the keys. This is the last step of the guide.',
+      },
+    },
+    pauseIntro: 'This is the pause menu, where the settings are. Click Continue to return to the museum.',
+  },
+  pause: {
+    title: 'Paused',
+    resume: 'Continue',
+    clickHint: 'Click on blank space or press Continue',
+    map: 'Map',
+  },
+  clickToLook: 'Click to look around with the mouse',
+  keyList: {
+    title: 'Key list',
+    hint: 'Press Space to hide',
+    keys: [
+      { keys: 'Mouse / touchpad / arrow keys', action: 'Look around' },
+      { keys: 'W A S D', action: 'Walk' },
+      { keys: 'Shift', action: 'Sprint (hold while walking)' },
+      { keys: 'E / click', action: 'View an information board (E to close)' },
+      { keys: 'Q', action: 'Open / close the map' },
+      { keys: 'Esc', action: 'Pause' },
+      { keys: 'Space', action: 'Show / hide this list' },
+    ],
+  },
+  sensitivity: {
+    label: 'Camera sensitivity',
+  },
+  language: {
+    label: 'Language',
+  },
+  decor: {
+    quizAnswers: ['A', 'B', 'C', 'D'],
+    quizMark: '?',
+  },
+  panelMore: '…',
+  prompt: 'Press E to view',
+  infoPanel: {
+    sourcesLabel: 'Sources',
+    sourcesPlaceholder: 'No sources yet. [NEEDS CHECKING]',
+    close: 'Close',
+    closeHint: 'Click on blank space or press E to close',
+  },
+  map: {
+    title: 'Museum map',
+    hint: 'Pick a room to go there.',
+    youAreHere: 'You are here',
+    locked: 'Locked',
+    visited: 'Visited',
+    close: 'Close',
+    closeHint: 'Click on blank space or press Q to close',
+  },
+  quizLocked: 'The Game Room is locked. Visit all 4 exhibition rooms first ({count}/4).',
+  typingToolWarning:
+    'A Vietnamese typing tool (Unikey/EVKey) seems to be on, so some keys do not work. Please switch it to English mode.',
+  lockRefused:
+    'The browser has not allowed mouse control yet. Wait a second and click again. If it still does not work, open the page directly in a Chrome or Edge tab.',
+  device: {
+    title: 'Please use a computer',
+    text: 'INNOVA is a 3D museum controlled with a keyboard and a mouse or touchpad, so for now it can only be played on a computer. Please open this page on a desktop or laptop.',
+  },
+}
+
+export const uiText: Record<Language, UiText> = { vi, en }

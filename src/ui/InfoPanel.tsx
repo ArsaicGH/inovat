@@ -1,6 +1,5 @@
-import { useEffect, useState, type CSSProperties } from 'react'
-import { ui } from '../content/ui'
-import { getExhibitText } from '../content/exhibits'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { useContent } from '../content/use-content'
 import { useMuseumStore } from '../state/useMuseumStore'
 import { resumeWalking } from '../world/pointer-lock'
 import { EXHIBIT_SPOTS } from '../world/layout'
@@ -15,11 +14,16 @@ const CLOSE_ANIMATION_MS = 220
 // under the crosshair, i.e. in the middle of the screen) and shrinks back when closed.
 // It stays mounted for a moment after closing so the shrink animation can play.
 export default function InfoPanel() {
+  const { ui, exhibit } = useContent()
   const openId = useMuseumStore((state) => state.openExhibitId)
   // The exhibit currently on screen: follows openId, but lingers while shrinking away.
   const [shownId, setShownId] = useState<string | null>(openId)
   if (openId && openId !== shownId) setShownId(openId) // a new panel opened: show it now
   const closing = !openId && shownId !== null
+  const openedAt = useRef(0)
+  useEffect(() => {
+    if (openId) openedAt.current = performance.now()
+  }, [openId])
 
   // After closing, remove the panel once the shrink animation has finished.
   useEffect(() => {
@@ -41,7 +45,7 @@ export default function InfoPanel() {
   }, [openId])
 
   if (!shownId) return null
-  const text = getExhibitText(shownId)
+  const text = exhibit(shownId)
   const spot = EXHIBIT_SPOTS.find((s) => s.id === shownId)
   const [width, height] =
     spot?.kind === 'wall' ? BOARD_SIZE.wall : spot?.kind === 'overview' ? BOARD_SIZE.overview : BOARD_SIZE.stand
@@ -60,7 +64,16 @@ export default function InfoPanel() {
   } as CSSProperties
 
   return (
-    <div className={closing ? 'overlay info-overlay info-closing' : 'overlay info-overlay'}>
+    // A click on blank space around the board closes it, like the pause menu.
+    <div
+      className={closing ? 'overlay info-overlay info-closing' : 'overlay info-overlay'}
+      onClick={(event) => {
+        const target = event.target as HTMLElement
+        // (Ignored just after opening: the click that opened the board must not close it.)
+        if (closing || performance.now() - openedAt.current < 400) return
+        if (target === event.currentTarget || target.classList.contains('info-panel')) void resumeWalking()
+      }}
+    >
       <div className="info-panel">
         <article className={`board-zoom board-look-${theme.look}`} style={look}>
           <div className="board-frame">

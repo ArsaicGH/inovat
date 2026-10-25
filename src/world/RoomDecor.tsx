@@ -1,14 +1,13 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, type ReactNode } from 'react'
+import { useContent } from '../content/use-content'
 import { useFrame } from '@react-three/fiber'
 import { CanvasTexture, Color, MeshBasicMaterial, Object3D, SRGBColorSpace, type Group, type InstancedMesh, type MeshStandardMaterial } from 'three'
 import type { RoomId } from '../types'
-import { roomNames } from '../content/rooms'
-import { site } from '../content/site'
-import { ui } from '../content/ui'
 import { DOOR_WIDTH, HALL_PLANTS, roomById, toWorld } from './layout'
 import { ROOM_ACCENT, DARK_WOOD, GOLD } from './style'
 import { paintFont, useFontsReady } from './fonts'
 import Sign from './Sign'
+import EraNumeral from './EraNumeral'
 import { useMuseumStore } from '../state/useMuseumStore'
 
 // DECORATION OF EACH ROOM (M6), built from simple shapes. Inside each room the local axes
@@ -28,16 +27,26 @@ interface RoomSize {
   h: number // height
 }
 
-// Name sign high on the back wall and a medallion in the middle of the floor.
+// Era number (or the quiz room's name sign) high on the back wall, and a medallion in
+// the middle of the floor.
 function RoomIdentity({ room, size }: { room: ThemedRoom; size: RoomSize }) {
+  const { roomNames } = useContent()
   const name = roomNames[room]
   const accent = ROOM_ACCENT[room]
   const inlay = { polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }
   return (
     <>
-      <group position={[0, size.h - 1.1, -size.d / 2 + 0.03]}>
-        <Sign title={name.short} subtitle={name.short !== name.name ? name.name : undefined} width={5.2} height={1.2} />
-      </group>
+      {/* Era rooms: a huge decorated number above the overview board (which ends at
+          2.78 m). The quiz room keeps a name sign. */}
+      {room === 'ir1' || room === 'ir2' || room === 'ir3' || room === 'ir4' ? (
+        <group position={[0, 3.6, -size.d / 2 + 0.03]}>
+          <EraNumeral era={room} />
+        </group>
+      ) : (
+        <group position={[0, size.h - 1.1, -size.d / 2 + 0.03]}>
+          <Sign title={name.short} subtitle={name.short !== name.name ? name.name : undefined} width={5.2} height={1.2} />
+        </group>
+      )}
       <group rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.004, 0]}>
         <mesh>
           <ringGeometry args={[1.6, 1.75, 64]} />
@@ -319,6 +328,7 @@ function Plant({ x, z }: { x: number; z: number }) {
 // The museum's name on the hall's back wall. Hidden while the title screen shows the same
 // words, then fades in once the visit starts.
 function FadingSignText({ width, height }: { width: number; height: number }) {
+  const { site } = useContent()
   const material = useRef<MeshStandardMaterial>(null)
   useFrame((_, delta) => {
     if (!material.current) return
@@ -338,6 +348,7 @@ function FadingSignText({ width, height }: { width: number; height: number }) {
 // gold rail, a red carpet from the start point to the door, two small chandeliers, plants
 // in the corners, the museum's name on the back wall and a sign above the door.
 function IntroHall({ size }: { size: RoomSize }) {
+  const { roomNames } = useContent()
   const doorGap = DOOR_WIDTH / 2 + 0.15
   const gold = <meshStandardMaterial color={GOLD} metalness={0.9} roughness={0.3} />
   const inlay = { polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }
@@ -497,6 +508,7 @@ function MarqueeBulbs({ size }: { size: RoomSize }) {
 // question marks on the side walls, show bulbs along the top and four stage lights aimed
 // at the pedestal in the middle (where the quiz will start, M7).
 function QuizRoom({ size }: { size: RoomSize }) {
+  const { ui } = useContent()
   const answers = ui.decor.quizAnswers
   const stageLights: [number, number][] = [
     [-2.6, -2.2],

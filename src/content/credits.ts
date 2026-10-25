@@ -1,20 +1,22 @@
 // Every image, texture, font and 3D model used in the museum, with author and licence
 // (CLAUDE.md). Shown on the credits screen (M8). Add an entry for every new asset.
 
+import type { Language } from './language'
+
 export interface Credit {
-  item: string // what it is and where it is used
+  item: Record<Language, string> // what it is and where it is used
   author: string
-  licence: string
+  licence: Record<Language, string>
   source: string // where it was downloaded
   files: string[] // paths inside /public
 }
 
 const AMBIENTCG = 'ambientCG (Lennart Demes)'
-const CC0 = 'CC0 1.0 (phạm vi công cộng)'
+const CC0 = { vi: 'CC0 1.0 (phạm vi công cộng)', en: 'CC0 1.0 (public domain)' }
 
-function texture(id: string, use: string, file: string): Credit {
+function texture(id: string, use: Record<Language, string>, file: string): Credit {
   return {
-    item: `Vật liệu ${id} – ${use}`,
+    item: { vi: `Vật liệu ${id} – ${use.vi}`, en: `Texture ${id} – ${use.en}` },
     author: AMBIENTCG,
     licence: CC0,
     source: `https://ambientcg.com/view?id=${id}`,
@@ -24,9 +26,9 @@ function texture(id: string, use: string, file: string): Credit {
 
 export const credits: Credit[] = [
   {
-    item: 'Phông chữ Be Vietnam Pro',
+    item: { vi: 'Phông chữ Be Vietnam Pro', en: 'Be Vietnam Pro font' },
     author: 'The Be Vietnam Pro Project Authors',
-    licence: 'SIL Open Font License 1.1',
+    licence: { vi: 'SIL Open Font License 1.1', en: 'SIL Open Font License 1.1' },
     source: 'https://github.com/google/fonts/tree/main/ofl/bevietnampro',
     files: [
       'fonts/be-vietnam-pro-regular.ttf',
@@ -36,11 +38,11 @@ export const credits: Credit[] = [
       'fonts/be-vietnam-pro-ofl.txt',
     ],
   },
-  texture('Marble012', 'sàn đá cẩm thạch', 'marble'),
-  texture('PaintedPlaster017', 'tường vữa sơn', 'plaster'),
-  texture('WoodFloor051', 'sàn gỗ', 'wood-floor'),
-  texture('Bricks113A', 'tường gạch', 'bricks'),
-  texture('MetalPlates006', 'tấm kim loại', 'metal-plates'),
-  texture('Concrete034', 'bê tông', 'concrete'),
-  texture('Tiles139', 'sàn gạch ô', 'tiles'),
+  texture('Marble012', { vi: 'sàn đá cẩm thạch', en: 'marble floor' }, 'marble'),
+  texture('PaintedPlaster017', { vi: 'tường vữa sơn', en: 'painted plaster walls' }, 'plaster'),
+  texture('WoodFloor051', { vi: 'sàn gỗ', en: 'wooden floor' }, 'wood-floor'),
+  texture('Bricks113A', { vi: 'tường gạch', en: 'brick walls' }, 'bricks'),
+  texture('MetalPlates006', { vi: 'tấm kim loại', en: 'metal plates' }, 'metal-plates'),
+  texture('Concrete034', { vi: 'bê tông', en: 'concrete' }, 'concrete'),
+  texture('Tiles139', { vi: 'sàn gạch ô', en: 'tiled floor' }, 'tiles'),
 ]
