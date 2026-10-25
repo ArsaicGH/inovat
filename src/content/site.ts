@@ -2,5 +2,5 @@
 export const site = {
   name: 'INNOVA',
   subtitle: 'Bảo tàng Cách mạng Công nghiệp',
-  tagline: 'Bảo tàng 3D về bốn cuộc Cách mạng Công nghiệp đang được xây dựng.',
+  tagline: 'Bảo tàng 3D về bốn cuộc Cách mạng Công nghiệp, sắp ra mắt.',
 }
