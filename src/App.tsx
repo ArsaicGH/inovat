@@ -1,12 +1,13 @@
-import { site } from './content/site'
+import Museum from './world/Museum'
+import Hud from './ui/Hud'
 
+// Two layers: the 3D world underneath, the HTML interface on top.
 function App() {
   return (
-    <main style={{ textAlign: 'center', padding: '4rem 1rem' }}>
-      <h1>{site.name}</h1>
-      <h2>{site.subtitle}</h2>
-      <p>{site.tagline}</p>
-    </main>
+    <>
+      <Museum />
+      <Hud />
+    </>
   )
 }
 

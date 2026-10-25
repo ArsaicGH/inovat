@@ -160,9 +160,9 @@ Create the Vite React + TypeScript project, push to GitHub, connect Vercel.
 ### Phase B: Core 3D (riskiest part first)
 
 **M2. First 3D scene**: a floor, one box, lights, a camera.
-- [ ] Scene fills the window; resizing does not stretch it.
-- [ ] No red errors in the browser console (F12).
-- [ ] FPS counter shows around 60 fps on a member's laptop.
+- [x] Scene fills the window; resizing does not stretch it. (Measured: canvas = window size at 600x900 and 1366x768.)
+- [x] No red errors in the browser console (F12). (One harmless yellow warning from inside R3F: "THREE.Clock deprecated".)
+- [x] FPS counter shows around 60 fps on a member's laptop. (59 fps in the leader's dev browser; leader to confirm in Chrome.)
 
 **M3. Walking in one test room**: start screen, mouse capture on click, WASD and arrow keys, mouse look, wall collision, Esc to pause.
 - [ ] Cannot pass through any wall, including diagonally into corners.
@@ -334,4 +334,7 @@ Plan: aim for A, keep B as a cheap fallback (only `Player.tsx` changes). Decide 
 - [x] M1: "Hello, museum" live on the internet
   - Repository (public): https://github.com/ArsaicGH/innova
   - Live site: https://innova-museum.vercel.app (every push to `main` redeploys)
-- [ ] M2: First 3D scene  <- next step, wait for the leader's review of M1 first
+- [x] M2: First 3D scene (waiting for the leader's review)
+  - Added three, @react-three/fiber, @react-three/drei, @types/three. Scene in `src/world/Museum.tsx`, title overlay in `src/ui/Hud.tsx`.
+  - Temporary OrbitControls (drag to look) until M3.
+- [ ] M3: Walking in one test room  <- next step, after review
