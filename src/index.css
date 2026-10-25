@@ -37,3 +37,101 @@ body {
   font-size: 14px;
   opacity: 0.8;
 }
+
+/* Full-screen dark layer for the start and pause screens. */
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 11, 15, 0.75);
+}
+
+.overlay-card {
+  max-width: 440px;
+  padding: 32px;
+  border-radius: 12px;
+  background: #1f2129;
+  text-align: center;
+}
+
+.overlay-card h1 {
+  margin: 0;
+  font-size: 40px;
+  letter-spacing: 2px;
+}
+
+.overlay-card h2 {
+  margin: 4px 0 20px;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.overlay-card h3 {
+  margin: 0 0 8px;
+  font-size: 15px;
+}
+
+.overlay-card ul {
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+  line-height: 1.7;
+}
+
+.overlay-tip {
+  margin: 0 0 20px;
+  font-size: 13px;
+  opacity: 0.75;
+}
+
+.overlay-card button {
+  padding: 12px 28px;
+  border: none;
+  border-radius: 8px;
+  background: #c98a3c;
+  color: #111;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.overlay-card button:hover {
+  background: #dda04f;
+}
+
+.sensitivity {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0 0 20px;
+  font-size: 14px;
+}
+
+.sensitivity input {
+  width: 100%;
+  accent-color: #c98a3c;
+}
+
+/* Warning banner at the top while walking (e.g. Unikey/EVKey is on). */
+.hud-warning {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: min(560px, calc(100% - 32px));
+  margin: 0;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: rgba(120, 40, 30, 0.9);
+  font-size: 14px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.overlay-error {
+  margin: 16px 0 0;
+  font-size: 13px;
+  color: #f5b5a8;
+}

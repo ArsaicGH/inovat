@@ -165,11 +165,11 @@ Create the Vite React + TypeScript project, push to GitHub, connect Vercel.
 - [x] FPS counter shows around 60 fps on a member's laptop. (59 fps in the leader's dev browser; leader to confirm in Chrome.)
 
 **M3. Walking in one test room**: start screen, mouse capture on click, WASD and arrow keys, mouse look, wall collision, Esc to pause.
-- [ ] Cannot pass through any wall, including diagonally into corners.
-- [ ] Camera cannot flip upside-down.
-- [ ] Walking speed is the same on fast and slow computers.
-- [ ] Esc shows a pause screen; "Tiếp tục" resumes.
-- [ ] Movement works while Unikey or EVKey is running (read physical key positions).
+- [x] Cannot pass through any wall, including diagonally into corners. (Script test: straight, both corners, sliding, pillar corner, all pass.)
+- [x] Camera cannot flip upside-down. (Up/down look is capped just short of 90°; tested with an extreme mouse movement.)
+- [x] Walking speed is the same on fast and slow computers. (Distance = speed x frame time. Below 10 fps walking slows on purpose, so a stutter cannot jump through a wall.)
+- [x] Esc shows a pause screen; "Tiếp tục" resumes. (Leader tested in Edge; mouse capture needs a normal browser tab, not an in-app preview.)
+- [x] Movement works while Unikey or EVKey is running (read physical key positions). (Works in English mode. In Vietnamese mode Unikey swallows Telex keys before the browser sees them; the page detects this and shows a warning until 4 normal key presses arrive.)
 
 **M4. Interacting with one exhibit**: crosshair, "Nhấn E để xem" prompt, info panel, back to walking.
 - [ ] Prompt appears only when aiming at the exhibit within about 3 m.
@@ -213,6 +213,7 @@ Create the Vite React + TypeScript project, push to GitHub, connect Vercel.
 - [ ] Loading screen with progress.
 - [ ] Tested in Chrome, Edge, Firefox (and Safari if available).
 - [ ] Phone/tablet visitors see "Vui lòng dùng máy tính".
+- [ ] Movement jitter investigated (from M3). Leader's laptop (AMD Radeon 780M, ~120 Hz): 3-10% of frames take exactly two refreshes (~16.7 ms), even with `?dpr=1&aa=0&shadows=0` and Edge energy saver off, so graphics load is not the cause. Next: measure main-thread blocking (long tasks) and our own per-frame work time; test other browsers/computers and Windows power modes. Dev-only tools: frame timing readout (`src/world/FrameTimingProbe.tsx`) and address-bar switches `?dpr=1`, `?aa=0`, `?shadows=0`.
 
 **M11. Final polish and launch**
 - [ ] A classmate who has never seen the project can start it, visit every room, read exhibits and finish the quiz unaided.
@@ -334,7 +335,11 @@ Plan: aim for A, keep B as a cheap fallback (only `Player.tsx` changes). Decide 
 - [x] M1: "Hello, museum" live on the internet
   - Repository (public): https://github.com/ArsaicGH/innova
   - Live site: https://innova-museum.vercel.app (every push to `main` redeploys)
-- [x] M2: First 3D scene (waiting for the leader's review)
+- [x] M2: First 3D scene (reviewed and pushed)
   - Added three, @react-three/fiber, @react-three/drei, @types/three. Scene in `src/world/Museum.tsx`, title overlay in `src/ui/Hud.tsx`.
-  - Temporary OrbitControls (drag to look) until M3.
-- [ ] M3: Walking in one test room  <- next step, after review
+- [x] M3: Walking in one test room (reviewed by the leader; jitter investigation moved to M10)
+  - Added zustand. Mode store `src/state/useMuseumStore.ts`; `Player.tsx`, `Room.tsx`, `collision.ts`, `pointer-lock.ts`; `StartScreen.tsx`, `PauseScreen.tsx`; text in `src/content/ui.ts`.
+  - Controls (leader's decision): W A S D move; arrow keys / mouse / touchpad move the camera (arrow keys help touchpad users, whose touchpad is often disabled while typing). Sensitivity slider on start and pause screens, saved in the browser. Normal (not raw) mouse input, so each visitor's OS mouse/touchpad settings apply; fake mouse jumps (> 1/4 window) are ignored.
+  - Unikey/EVKey in Vietnamese mode swallows Telex keys (a, s, d, w); no code can recover them. The page detects it and shows a warning asking to switch to English mode.
+  - Smoothing: camera glides to the mouse target, walking accelerates/decelerates, frame time averaged. Shadows drawn once (static room); `powerPreference: 'high-performance'`.
+- [ ] M4: Interacting with one exhibit  <- next step
