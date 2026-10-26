@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { Raycaster, Vector2 } from 'three'
+import { Raycaster, Vector2, type Intersection, type Object3D } from 'three'
 import { useMuseumStore, canUse } from '../state/useMuseumStore'
 import { aimTargets, exhibitIdOf, isQuizTarget } from './aim-targets'
 import { releasePointer, requestPointerLock } from './pointer-lock'
@@ -14,6 +14,16 @@ const QUIZ_AIM_DISTANCE = 6
 const OPEN_KEY = 'KeyE'
 const MAP_KEY = 'KeyQ' // Q: easy to reach next to W A S D
 const SPACE = 'Space' // starts the tutorial; later shows / hides the key list
+
+// Reused every frame (no new lists, so no garbage to clean up, which causes pauses).
+const shownTargets: Object3D[] = []
+const hits: Intersection[] = []
+
+// Is this object drawn (it and every group around it visible)?
+function isShown(object: Object3D): boolean {
+  for (let o: Object3D | null = object; o; o = o.parent) if (!o.visible) return false
+  return true
+}
 
 // Aiming and opening: shoots an invisible line ("ray") from the centre of the screen
 // every frame. If it hits an exhibit within reach (and no wall is in front of it), that
@@ -32,8 +42,14 @@ export default function Interaction() {
     // (In the tutorial, aiming only starts at the "interact" step.)
     if (store.mode === 'exploring' && canUse(store.tutorial, 'interact')) {
       raycaster.setFromCamera(screenCentre, camera)
-      // The nearest hit wins, so a wall in front of an exhibit blocks it.
-      const nearest = raycaster.intersectObjects(aimTargets, true)[0]
+      // Only things that are drawn can be aimed at (hidden rooms are skipped, which saves
+      // testing the whole museum every frame). The nearest hit wins, so a wall in front
+      // of an exhibit blocks it.
+      shownTargets.length = 0
+      for (const target of aimTargets) if (isShown(target)) shownTargets.push(target)
+      hits.length = 0
+      raycaster.intersectObjects(shownTargets, true, hits)
+      const nearest = hits[0]
       aimed = nearest ? exhibitIdOf(nearest.object) : null
       if (aimed && !isQuizTarget(aimed) && nearest.distance > AIM_DISTANCE) aimed = null
     }

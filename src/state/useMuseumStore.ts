@@ -150,6 +150,8 @@ interface MuseumState {
   // ambient occlusion, 0 = also shadows only redrawn when the key light moves.
   graphicsLevel: 0 | 1 | 2
   lowerGraphics: () => void
+  qualityChosen: boolean // the quality was measured and set during loading (Museum.tsx)
+  setQualityChosen: () => void
   setWarmedUp: () => void
   worldReady: boolean
   setWorldReady: () => void
@@ -225,6 +227,8 @@ export const useMuseumStore = create<MuseumState>((set) => ({
   warmedUp: false,
   graphicsLevel: 2,
   lowerGraphics: () => set((state) => ({ graphicsLevel: Math.max(0, state.graphicsLevel - 1) as 0 | 1 | 2 })),
+  qualityChosen: false,
+  setQualityChosen: () => set({ qualityChosen: true }),
   setWarmedUp: () => set({ warmedUp: true }),
   worldReady: false,
   setWorldReady: () => set({ worldReady: true }),

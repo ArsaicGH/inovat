@@ -1,7 +1,7 @@
 import { Suspense, useEffect, useMemo, useRef, type ReactNode, type RefObject } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Environment, Lightformer, Stats } from '@react-three/drei'
-import { Bloom, EffectComposer, N8AO, ToneMapping, Vignette } from '@react-three/postprocessing'
+import { Bloom, EffectComposer, N8AO, SMAA, ToneMapping, Vignette } from '@react-three/postprocessing'
 import { ToneMappingMode } from 'postprocessing'
 import { Color, HalfFloatType, Object3D, Texture, WebGLRenderTarget, type Camera, type Group, type HemisphereLight, type Mesh, type PointLight, type SpotLight, type Scene, type WebGLRenderer } from 'three'
 import type { RoomId } from '../types'
@@ -306,57 +306,80 @@ function PreparedDoors({ children }: { children: ReactNode }) {
 
 // Redraw the shadows once a part has loaded (harmless now that they are redrawn every
 // frame, but keeps the shadows right if that is ever switched off again).
-// AUTOMATIC QUALITY: the expensive work (ambient occlusion, edge smoothing, lights,
-// shadows) costs per pixel, and visitors' computers differ a lot. Every 2 seconds the
-// game checks its frame rate. When frames are slow it steps down, one step at a time:
-// resolution to 1x, then ambient occlusion off, then resolution to 0.75x, then shadows
-// only redrawn when the key light moves. When there is time to spare it raises the
-// resolution again (never above 1.5, CLAUDE.md); effects that were switched off stay off
-// for the visit, because switching them back and forth would be noticed.
+// AUTOMATIC QUALITY, decided ONCE, behind the loading screen. Changing the resolution or
+// the effects rebuilds the effects' picture buffers, and the ambient-occlusion effect then
+// rebuilds its drawing code, which on Windows browsers can freeze everything for many
+// seconds (the leader saw a 20 s freeze). So nothing changes during play.
+//
+// How it decides: after the warm-up drawing, the camera is moved for a moment into the
+// ROTUNDA, the heaviest view (measuring in the light intro hall picked settings that were
+// too high for the rotunda), the frame rate is measured there, then the camera goes back
+// to the start. The expensive work costs per pixel, so the frame rate at another resolution
+// can be estimated (1x instead of 1.5x = 2.25 times fewer pixels). It then picks, in this
+// order, giving up as little as possible:
+// 1. the highest resolution step that still reaches 60 fps (1.5, 1.25, 1, 0.85);
+// 2. if even 1x is too slow: ambient occlusion off (assumed to save about a quarter);
+// 3. then 0.75x, and shadows only redrawn when the key light moves.
+const RATIO_STEPS = [1.5, 1.25, 1, 0.85]
 const MIN_PIXEL_RATIO = 0.75
-const SLOW_FPS = 50
-const FAST_FPS = 80
+const TARGET_FPS = 60
+const AO_SAVING = 1.3 // frame rate gain assumed from turning ambient occlusion off
+const SETTLE = 1 // seconds to wait in the rotunda before measuring (lights fade in)
+const MEASURE = 1.5 // seconds of frames measured
 function AdaptiveQuality() {
   const setDpr = useThree((state) => state.setDpr)
-  const ratio = useRef(Math.min(window.devicePixelRatio, MAX_PIXEL_RATIO))
-  const frames = useRef(0)
+  const phase = useRef<'waiting' | 'settling' | 'measuring' | 'done'>('waiting')
   const time = useRef(0)
-  const calmPeriods = useRef(0)
+  const frames = useRef(0)
+  const visitedBefore = useRef<RoomId[]>([])
   useFrame((_, delta) => {
     const store = useMuseumStore.getState()
-    // Only typical walking frames count (not loading, menus or the very first seconds).
-    if (!store.worldReady || store.mode !== 'exploring') {
-      frames.current = 0
+    if (phase.current === 'done' || store.qualityChosen || !store.warmedUp) return
+    // Only behind the loading screen: if loading gave up waiting and the visit has already
+    // started, keep the full settings rather than move the camera mid-game.
+    if (store.worldReady && phase.current === 'waiting') {
+      store.setQualityChosen()
+      phase.current = 'done'
+      return
+    }
+    if (phase.current === 'waiting') {
+      visitedBefore.current = store.visitedRooms
+      store.requestTeleport('rotunda')
+      phase.current = 'settling'
       time.current = 0
       return
     }
-    frames.current += 1
     time.current += delta
-    if (time.current < 2) return
-    const fps = frames.current / time.current
-    frames.current = 0
-    time.current = 0
+    if (phase.current === 'settling') {
+      if (time.current < SETTLE) return
+      phase.current = 'measuring'
+      time.current = 0
+      frames.current = 0
+      return
+    }
+    frames.current += 1
+    if (time.current < MEASURE) return
 
-    let next = ratio.current
-    if (fps < SLOW_FPS) {
-      calmPeriods.current = 0
-      if (ratio.current > 1) next = Math.max(1, ratio.current - 0.25)
-      else if (store.graphicsLevel === 2) store.lowerGraphics() // ambient occlusion off
-      else if (ratio.current > MIN_PIXEL_RATIO) next = MIN_PIXEL_RATIO
-      else if (store.graphicsLevel === 1) store.lowerGraphics() // fewer shadow redraws
-    } else if (fps > FAST_FPS) {
-      calmPeriods.current += 1
-      if (calmPeriods.current >= 3) {
-        next = Math.min(MAX_PIXEL_RATIO, ratio.current + 0.25)
-        calmPeriods.current = 0
+    const fps = frames.current / time.current
+    const ratio = Math.min(window.devicePixelRatio, MAX_PIXEL_RATIO)
+    const at = (r: number) => fps * (ratio / r) ** 2 // estimated frame rate at resolution r
+    const steps = RATIO_STEPS.filter((r) => r <= ratio)
+    let next = steps.find((r) => r >= 1 && at(r) >= TARGET_FPS)
+    if (next === undefined) {
+      store.lowerGraphics() // ambient occlusion off
+      next = steps.find((r) => at(r) * AO_SAVING >= TARGET_FPS)
+      if (next === undefined) {
+        next = MIN_PIXEL_RATIO
+        if (at(next) * AO_SAVING < TARGET_FPS * 0.7) store.lowerGraphics() // fewer shadow redraws
       }
-    } else {
-      calmPeriods.current = 0
     }
-    if (next !== ratio.current) {
-      ratio.current = next
-      setDpr(next)
-    }
+    if (next !== ratio) setDpr(next)
+
+    // Back to the start, as if nothing happened.
+    store.requestTeleport('hall')
+    useMuseumStore.setState({ visitedRooms: visitedBefore.current })
+    store.setQualityChosen()
+    phase.current = 'done'
   })
   return null
 }
@@ -394,6 +417,10 @@ export default function Museum() {
       // Laptops with two graphics chips: ask for the faster one.
       gl={{ powerPreference: 'high-performance', antialias: ANTIALIAS }}
       onCreated={({ gl }) => {
+        // If the graphics driver resets (Windows does this when the graphics card stalls),
+        // say so in the console: it explains a long freeze or a black picture.
+        gl.domElement.addEventListener('webglcontextlost', () => console.warn('INNOVA: graphics context lost (driver reset)'))
+        gl.domElement.addEventListener('webglcontextrestored', () => console.warn('INNOVA: graphics context restored'))
         // Shadows are redrawn by ShadowThrottle (every third frame), not every frame.
         gl.shadowMap.autoUpdate = false
         gl.shadowMap.needsUpdate = true
@@ -424,7 +451,9 @@ export default function Museum() {
       {/* Bloom: things brighter than white (bulbs, oculus, gold rings) glow softly.
           ToneMapping turns the bright picture into screen colours (needed with effects). */}
       {EFFECTS && (
-        <EffectComposer multisampling={ANTIALIAS ? 2 : 0}>
+        // Edge smoothing by SMAA (a filter on the finished picture) instead of multisampling
+        // (extra samples for every pixel): the same smooth edges for much less work.
+        <EffectComposer multisampling={0}>
           {/* Ambient occlusion: the soft darkening where objects meet the floor and in
               corners, which real rooms always have. Half resolution keeps it cheap. */}
           {AO && graphicsLevel === 2 ? <N8AO halfRes quality="performance" aoSamples={8} denoiseSamples={4} aoRadius={1.2} distanceFalloff={1} intensity={2.2} /> : <></>}
@@ -433,6 +462,7 @@ export default function Museum() {
           <ToneMapping mode={ToneMappingMode.AGX} />
           {/* Slightly darker corners, like a camera lens: a cinematic frame. */}
           <Vignette offset={0.3} darkness={0.55} />
+          {ANTIALIAS ? <SMAA /> : <></>}
         </EffectComposer>
       )}
 

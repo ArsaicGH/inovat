@@ -1,6 +1,9 @@
 import { useEffect, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { debugStats } from './debug-stats'
+import { useMuseumStore } from '../state/useMuseumStore'
+
+const QUALITY_NAMES = ['low (no ambient occlusion, fewer shadow redraws)', 'medium (no ambient occlusion)', 'full']
 
 // DEVELOPMENT-ONLY diagnostic (never shown on the live site, so English is fine).
 // The FPS counter only shows an average; jitter comes from frames that take UNEVEN
@@ -59,6 +62,8 @@ export default function FrameTimingProbe() {
       `mouse signals: ${Math.round(debugStats.mouseMoves / elapsed.current)} per second\n` +
       `key chatter ${debugStats.keyChatter} (fake key releases so far)\n` +
       `pixels ${canvas.width}x${canvas.height} (ratio ${renderer.getPixelRatio()})\n` +
+      // The quality chosen during loading (Museum.tsx AdaptiveQuality).
+      `quality: ${QUALITY_NAMES[useMuseumStore.getState().graphicsLevel]}\n` +
       // Shortened: the full name is very long and would cover the view on small windows.
       `gpu ${gpuName(renderer.getContext()).slice(0, 40)}`
     debugStats.keyDowns = 0

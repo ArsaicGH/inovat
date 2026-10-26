@@ -17,6 +17,7 @@ export default function LoadingScreen() {
   const { progress, active, total } = useProgress() // pictures being downloaded (0-100)
   const parts = useMuseumStore((state) => state.partsPrepared)
   const warmedUp = useMuseumStore((state) => state.warmedUp)
+  const qualityChosen = useMuseumStore((state) => state.qualityChosen)
   const worldReady = useMuseumStore((state) => state.worldReady)
   const setWorldReady = useMuseumStore((state) => state.setWorldReady)
   const fontsReady = useFontsReady()
@@ -29,12 +30,13 @@ export default function LoadingScreen() {
   const textures = total === 0 ? 0 : active ? progress : 100
   const target = textures * 0.7 + Math.min(parts / PART_COUNT, 1) * 30
   if (target > shown) setShown(target)
-  const done = parts >= PART_COUNT && warmedUp && fontsReady && !active
+  const done = parts >= PART_COUNT && warmedUp && qualityChosen && fontsReady && !active
 
   useEffect(() => {
     if (!done || worldReady) return
-    // A short pause so the bar visibly reaches the end and the first frames are drawn.
-    const timer = setTimeout(setWorldReady, 350)
+    // A short pause so the bar visibly reaches the end, and any rebuild after the quality
+    // choice is finished behind the loading screen.
+    const timer = setTimeout(setWorldReady, 600)
     return () => clearTimeout(timer)
   }, [done, worldReady, setWorldReady])
 

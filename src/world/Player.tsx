@@ -108,6 +108,7 @@ export default function Player({ walls }: PlayerProps) {
 
   const lastSave = useRef(0)
   const stepDistance = useRef(0) // metres since the last footstep sound
+  const blockers = useRef<Box[][]>([[], []])
 
   // Stand at a room's spawn point (start of the visit, map teleport), or at a saved spot.
   function placeAt(room: RoomId, saved: { x: number; z: number; yaw: number } | null = null) {
@@ -328,7 +329,10 @@ export default function Player({ walls }: PlayerProps) {
     if (Math.abs(v.x) < 0.001 && Math.abs(v.z) < 0.001) return
 
     // Distance = speed x time, so the speed is the same on fast and slow computers.
-    const next = moveWithCollision(camera.position.x, camera.position.z, v.x * dt, v.z * dt, [walls, closedDoorBlockers()])
+    // (The same list is reused every frame: fixed walls + the doors that are shut now.)
+    blockers.current[0] = walls
+    blockers.current[1] = closedDoorBlockers()
+    const next = moveWithCollision(camera.position.x, camera.position.z, v.x * dt, v.z * dt, blockers.current)
     // If a wall stopped us in one direction, drop that part of the speed too.
     if (next.x === camera.position.x) v.x = 0
     if (next.z === camera.position.z) v.z = 0
