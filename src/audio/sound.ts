@@ -50,8 +50,8 @@ let nextFoot = 0
 const AMBIENCE: Record<RoomId, string> = {
   rotunda: '/sounds/ambience/rotunda.ogg',
   hall: '/sounds/ambience/hall.ogg',
-  // Era music: Beethoven's "Für Elise", Joplin's ragtime (1906 recording), an 8-bit
-  // "Korobeiniki" (the Tetris tune), futuristic sci-fi ambient.
+  // Era music: Verdi's "Anvil Chorus" (hammers on anvils, like a forge), Joplin's ragtime
+  // (1906 recording), an 8-bit "Korobeiniki" (the Tetris tune), futuristic sci-fi ambient.
   ir1: '/sounds/music/ir1.ogg',
   ir2: '/sounds/music/ir2.ogg',
   ir3: '/sounds/music/ir3.ogg',
@@ -62,10 +62,10 @@ const AMBIENCE: Record<RoomId, string> = {
 const AMBIENCE_LEVEL: Record<RoomId, number> = {
   rotunda: 0.55,
   hall: 0.4,
-  ir1: 0.6, // Für Elise is a quiet solo piano recording
+  ir1: 0.42, // the same level as CMCN 2 (both recordings are about equally loud)
   ir2: 0.42,
   ir3: 0.32,
-  ir4: 0.4,
+  ir4: 0.55, // a soft ambient track, mastered quieter than the old placeholder
   quiz: 0.35,
 }
 const AMBIENCE_FADE = 1.5 // seconds to cross-fade between areas

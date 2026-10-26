@@ -76,10 +76,10 @@ export const credits: Credit[] = [
     files: ['sounds/ambience/rotunda.ogg', 'sounds/ambience/quiz.ogg'],
   },
   {
-    item: { vi: 'Nhạc CMCN 1: Beethoven, "Für Elise" (1810), bản thu piano', en: 'CMCN 1 music: Beethoven, "Für Elise" (1810), piano recording' },
-    author: 'Ludwig van Beethoven (composer); recording from Wikimedia Commons',
-    licence: { vi: 'Phạm vi công cộng', en: 'Public domain' },
-    source: 'https://commons.wikimedia.org/wiki/File:FurElise.ogg',
+    item: { vi: 'Nhạc CMCN 1: Giuseppe Verdi, "Điệp khúc cái đe" (Anvil Chorus) trong vở opera "Il trovatore" (1853), bản thu của Musopen', en: 'CMCN 1 music: Giuseppe Verdi, "Anvil Chorus" from the opera "Il trovatore" (1853), Musopen recording' },
+    author: 'Giuseppe Verdi (composer); Musopen (recording)',
+    licence: CC0,
+    source: 'https://commons.wikimedia.org/wiki/File:Giuseppe_Verdi_-_Anvil_Chorus.ogg',
     files: ['sounds/music/ir1.ogg'],
   },
   {
