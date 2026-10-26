@@ -7,6 +7,10 @@ import { AUDIO_ENABLED } from '../features'
 //   in the central hall, era music in the four era rooms, a calm prelude in the Game Room. The
 //   intro hall has no loop: the opening of Vivaldi's "Spring" plays once when the start
 //   screen closes.
+// - Music (the long tracks) is STREAMED: played by the browser's own audio player, which
+//   unpacks only the next moment of sound, and routed into the same volumes and fades.
+//   Unpacking them in advance, like the short sounds, took about 650 MB of memory (the
+//   laptop's sound runs at 96 kHz) and 4 seconds of processor time while loading.
 // Volumes: master x (effects or ambience), plus an on/off switch; all set from the
 // settings (useMuseumStore) through setVolumes().
 // Browsers only allow sound after the visitor's first click or key press, so nothing
@@ -48,7 +52,8 @@ const PITCH: Partial<Record<EffectName, number>> = {
 const STEP_FILES = ['/sounds/steps/step-0.ogg', '/sounds/steps/step-1.ogg']
 let nextFoot = 0
 
-// (No entry = no loop in that area.)
+// (No entry = no loop in that area.) Music tracks (in /music/) are streamed; the short
+// central-hall loop is unpacked in advance, so it repeats without a gap.
 const AMBIENCE: Partial<Record<RoomId, string>> = {
   rotunda: '/sounds/ambience/rotunda.ogg',
   // Era music: atmospheric ambient tracks (CC0, OpenGameArt), one per era, for now:
@@ -83,6 +88,40 @@ let ambienceBus: GainNode | null = null
 const buffers = new Map<string, AudioBuffer>()
 let loading: Promise<void> | null = null
 
+const isMusic = (url: string) => url.includes('/music/')
+
+// A streamed track: the browser's audio player, routed through its own volume control.
+interface Stream {
+  element: HTMLAudioElement
+  gain: GainNode
+  stopTimer: number
+}
+const streams = new Map<string, Stream>()
+
+function stream(url: string, loop: boolean): Stream | null {
+  const existing = streams.get(url)
+  if (existing) return existing
+  if (!context || !ambienceBus) return null
+  const element = new Audio(url)
+  element.loop = loop
+  element.preload = 'auto' // fetch the (small) file early, so it can start at once
+  const gain = context.createGain()
+  gain.gain.value = 0
+  context.createMediaElementSource(element).connect(gain).connect(ambienceBus)
+  const created = { element, gain, stopTimer: 0 }
+  streams.set(url, created)
+  return created
+}
+
+// Start a stream; browsers refuse until the first click, so remember to retry then.
+const waitingToPlay = new Set<HTMLAudioElement>()
+function play(element: HTMLAudioElement) {
+  element.play().then(
+    () => waitingToPlay.delete(element),
+    () => waitingToPlay.add(element),
+  )
+}
+
 function setUp(): AudioContext | null {
   if (!AUDIO_ENABLED) return null // sound switched off (src/features.ts)
   if (context) return context
@@ -103,6 +142,10 @@ function setUp(): AudioContext | null {
 async function load(url: string) {
   const ctx = setUp()
   if (!ctx || buffers.has(url)) return
+  if (isMusic(url)) {
+    stream(url, url !== WELCOME) // streamed: only prepared here, never unpacked in full
+    return
+  }
   try {
     const data = await (await fetch(url)).arrayBuffer()
     buffers.set(url, await ctx.decodeAudioData(data))
@@ -111,7 +154,8 @@ async function load(url: string) {
   }
 }
 
-// Download and decode every sound (about 0.7 MB in total), in the background.
+// Download every sound in the background: the short ones are unpacked (about 8 MB in
+// memory), the music only prepared for streaming.
 export function loadSounds(): Promise<void> {
   if (!loading) {
     const urls = [
@@ -129,6 +173,7 @@ export function loadSounds(): Promise<void> {
 export function unlockAudio() {
   const ctx = setUp()
   if (ctx && ctx.state === 'suspended') void ctx.resume()
+  for (const element of waitingToPlay) play(element)
 }
 
 // Settings: on/off and the three volumes (0-1).
@@ -164,34 +209,57 @@ export function playStep(volume = 0.3) {
 
 // ---- Ambience ----
 let ambienceRoom: RoomId | null = null
-let ambienceSource: AudioBufferSourceNode | null = null
-let ambienceGain: GainNode | null = null
+let ambienceGain: GainNode | null = null // the volume of the area's current loop
+let ambienceSource: AudioBufferSourceNode | null = null // set when that loop is unpacked
+let ambienceStream: Stream | null = null // set when that loop is streamed
 let ambienceDucked = false
+
+// Fade the current loop out and stop it once silent.
+function fadeOutAmbience(now: number) {
+  ambienceGain?.gain.setTargetAtTime(0, now, AMBIENCE_FADE / 3)
+  if (ambienceSource) ambienceSource.stop(now + AMBIENCE_FADE * 2)
+  const old = ambienceStream
+  if (old) {
+    window.clearTimeout(old.stopTimer)
+    old.stopTimer = window.setTimeout(() => {
+      old.element.pause()
+      waitingToPlay.delete(old.element)
+    }, AMBIENCE_FADE * 2000)
+  }
+  ambienceSource = null
+  ambienceStream = null
+  ambienceGain = null
+}
 
 // Play the loop of `room` (cross-fading from the previous one), or fade to silence in an
 // area without a loop.
 export function setAmbience(room: RoomId) {
   if (!context || !ambienceBus || room === ambienceRoom) return
   const url = AMBIENCE[room]
-  const buffer = url ? buffers.get(url) : undefined
-  if (url && !buffer) return // not loaded yet: tried again on the next change
+  const buffer = url && !isMusic(url) ? buffers.get(url) : undefined
+  const streamed = url && isMusic(url) ? stream(url, true) : null
+  if (url && !buffer && !streamed) return // not loaded yet: tried again on the next change
   const now = context.currentTime
-  // Fade the old loop out and stop it afterwards.
-  if (ambienceSource && ambienceGain) {
-    const oldSource = ambienceSource
-    ambienceGain.gain.setTargetAtTime(0, now, AMBIENCE_FADE / 3)
-    oldSource.stop(now + AMBIENCE_FADE * 2)
-    ambienceSource = null
-    ambienceGain = null
-  }
+  fadeOutAmbience(now)
   ambienceRoom = room
+  const level = ambienceDucked ? 0 : AMBIENCE_LEVEL[room]
+  if (streamed) {
+    // Coming back while it was still fading out: just fade back in, without restarting.
+    window.clearTimeout(streamed.stopTimer)
+    if (streamed.element.paused) streamed.element.currentTime = 0
+    play(streamed.element)
+    streamed.gain.gain.setTargetAtTime(level, now, AMBIENCE_FADE / 3)
+    ambienceStream = streamed
+    ambienceGain = streamed.gain
+    return
+  }
   if (!buffer) return
   const source = context.createBufferSource()
   source.buffer = buffer
   source.loop = true
   const gain = context.createGain()
   gain.gain.value = 0
-  gain.gain.setTargetAtTime(ambienceDucked ? 0 : AMBIENCE_LEVEL[room], now, AMBIENCE_FADE / 3)
+  gain.gain.setTargetAtTime(level, now, AMBIENCE_FADE / 3)
   source.connect(gain).connect(ambienceBus)
   source.start()
   ambienceSource = source
@@ -201,16 +269,12 @@ export function setAmbience(room: RoomId) {
 // The welcome sound, once (on the ambience volume, like the music).
 let welcomed = false
 export function playWelcome() {
-  if (welcomed || !context || context.state !== 'running' || !ambienceBus) return
-  const buffer = buffers.get(WELCOME)
-  if (!buffer) return
+  if (welcomed || !context || context.state !== 'running') return
+  const welcome = stream(WELCOME, false)
+  if (!welcome) return
   welcomed = true
-  const source = context.createBufferSource()
-  source.buffer = buffer
-  const gain = context.createGain()
-  gain.gain.value = WELCOME_LEVEL
-  source.connect(gain).connect(ambienceBus)
-  source.start()
+  welcome.gain.gain.value = WELCOME_LEVEL
+  play(welcome.element)
 }
 
 // While paused or in a menu, the ambience fades away; it comes back when walking again.
@@ -223,6 +287,13 @@ export function duckAmbience(ducked: boolean) {
 // When the tab is hidden, all sound stops; it resumes when the visitor comes back.
 document.addEventListener('visibilitychange', () => {
   if (!context) return
-  if (document.hidden) void context.suspend()
-  else void context.resume()
+  // Streamed music is paused too, so it continues where it was, not further on.
+  const current = ambienceStream?.element
+  if (document.hidden) {
+    void context.suspend()
+    current?.pause()
+  } else {
+    void context.resume()
+    if (current) play(current)
+  }
 })

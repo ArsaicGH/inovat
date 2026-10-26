@@ -1,7 +1,8 @@
 import { useMuseumStore, TUTORIAL_STEPS } from '../state/useMuseumStore'
 import { useContent } from '../content/use-content'
 
-// The current tutorial instruction, at the top of the screen while walking. The step is
+// The current tutorial instruction, at the top of the screen while walking. The first card
+// (the welcome) sits in the middle of the screen, so it is noticed at once. The step is
 // completed by doing it (Player.tsx / Interaction.tsx notice and move on).
 export default function TutorialCard() {
   const { ui } = useContent()
@@ -19,7 +20,7 @@ export default function TutorialCard() {
 
   return (
     // key={step}: a new card (with its fade-in) for every step.
-    <div key={step} className="tutorial-card">
+    <div key={step} className={step === TUTORIAL_STEPS[0] ? 'tutorial-card tutorial-card-centre' : 'tutorial-card'}>
       <div className="tutorial-progress">{progress}</div>
       <h3>{title}</h3>
       <p>{text}</p>

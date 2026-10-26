@@ -1,9 +1,8 @@
-import { Suspense, useEffect, useMemo, useRef, type ReactNode, type RefObject } from 'react'
+import { Suspense, lazy, useLayoutEffect, useEffect, useMemo, useRef, type ReactNode, type RefObject } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { Environment, Lightformer, Stats } from '@react-three/drei'
-import { Bloom, EffectComposer, N8AO, SMAA, ToneMapping, Vignette } from '@react-three/postprocessing'
-import { ToneMappingMode } from 'postprocessing'
-import { Color, HalfFloatType, Object3D, Texture, WebGLRenderTarget, type Camera, type Group, type HemisphereLight, type Mesh, type PointLight, type SpotLight, type Scene, type WebGLRenderer } from 'three'
+import { Bloom, EffectComposer, FXAA, N8AO, SMAA, ToneMapping, Vignette } from '@react-three/postprocessing'
+import { CopyPass, EffectPass, ToneMappingMode, type EffectComposer as Composer } from 'postprocessing'
+import { Color, CubeCamera, DefaultLoadingManager, DoubleSide, HalfFloatType, Mesh as MeshObject, MeshBasicMaterial, PlaneGeometry, RingGeometry, Scene as SceneObject, WebGLCubeRenderTarget, Object3D, Texture, WebGLRenderTarget, type Camera, type Group, type HemisphereLight, type Mesh, type PointLight, type SpotLight, type Scene, type WebGLRenderer } from 'three'
 import type { RoomId } from '../types'
 import { useMuseumStore } from '../state/useMuseumStore'
 import Room from './Room'
@@ -14,6 +13,15 @@ import Exhibit from './Exhibit'
 import Player from './Player'
 import Interaction from './Interaction'
 import FrameTimingProbe from './FrameTimingProbe'
+import { reportFileProgress, reportFilesDone } from '../ui/load-progress'
+
+// File downloads (textures) are reported to the loading screen.
+DefaultLoadingManager.onStart = (_item, loaded, total) => reportFileProgress(loaded, total)
+DefaultLoadingManager.onProgress = (_item, loaded, total) => reportFileProgress(loaded, total)
+DefaultLoadingManager.onLoad = () => reportFilesDone()
+
+// FPS counter while developing only (loaded on demand, so the live site never downloads it).
+const DevStats = import.meta.env.DEV ? lazy(() => import('@react-three/drei').then((drei) => ({ default: drei.Stats }))) : null
 import { CHANDELIER_Y, COLLISION_BOXES, DOORS, EXHIBIT_SPOTS, PART_COUNT, ROOMS, roomById, toWorld } from './layout'
 import { isPartVisible } from './door-state'
 import { ROOM_THEMES } from './room-themes'
@@ -74,6 +82,19 @@ function Lighting() {
   const keyArea = useRef<RoomId | null>(null)
   const keyLevel = useRef(0)
   const sky = useRef<HemisphereLight>(null)
+  // Weakest computers (lowest quality level): a shadow picture of half the size (a quarter
+  // of the pixels to draw), slightly softer shadow edges. The old picture is thrown away so
+  // the next shadow drawing makes one of the new size.
+  const graphicsLevel = useMuseumStore((state) => state.graphicsLevel)
+  useEffect(() => {
+    const light = keyLight.current
+    if (!light) return
+    const size = graphicsLevel === 0 ? 512 : 1024
+    if (light.shadow.mapSize.x === size) return
+    light.shadow.mapSize.set(size, size)
+    light.shadow.map?.dispose()
+    light.shadow.map = null
+  }, [graphicsLevel])
   // Five spotlights that move to the room you are in (spot-plan.ts), each with the point
   // it shines at (a spotlight's target must be in the scene too).
   const spots = useRef<(SpotLight | null)[]>([])
@@ -199,13 +220,56 @@ function Lighting() {
       />
       {/* Reflections: a small "light map" of glowing shapes, made once at start (no
           download). Shiny surfaces such as marble and gold reflect it. */}
-      <Environment resolution={128} frames={1}>
-        <Lightformer form="ring" intensity={1.2} color="#ffe4b8" scale={10} position={[0, 12, 0]} rotation={[Math.PI / 2, 0, 0]} />
-        <Lightformer form="rect" intensity={0.2} color="#fff3e0" scale={[20, 4, 1]} position={[0, 4, -12]} />
-        <Lightformer form="rect" intensity={0.15} color="#ffe9cc" scale={[20, 4, 1]} position={[0, 4, 12]} rotation={[0, Math.PI, 0]} />
-      </Environment>
+      <StudioEnvironment />
     </>
   )
+}
+
+// REFLECTIONS: a small "light map" of glowing shapes (a ring above, two soft panels at the
+// sides), drawn ONCE into a 128 px cube picture at start; shiny surfaces such as marble and
+// gold reflect it. (Made with three.js alone: the helper library used before brought along
+// 226 KB of image-file readers the game never used.)
+function StudioEnvironment() {
+  const get = useThree((state) => state.get)
+  useLayoutEffect(() => {
+    const { gl, scene } = get()
+    const shapes = new SceneObject()
+    const glow = (colour: string, intensity: number) =>
+      new MeshBasicMaterial({ color: new Color(colour).multiplyScalar(intensity), side: DoubleSide, toneMapped: false })
+    const ring = new MeshObject(new RingGeometry(0.25, 0.5, 64), glow('#ffe4b8', 1.2))
+    ring.scale.setScalar(10)
+    ring.position.set(0, 12, 0)
+    ring.rotation.set(Math.PI / 2, 0, 0)
+    const back = new MeshObject(new PlaneGeometry(1, 1), glow('#fff3e0', 0.2))
+    back.scale.set(20, 4, 1)
+    back.position.set(0, 4, -12)
+    back.lookAt(0, 0, 0)
+    const front = new MeshObject(new PlaneGeometry(1, 1), glow('#ffe9cc', 0.15))
+    front.scale.set(20, 4, 1)
+    front.position.set(0, 4, 12)
+    front.rotation.set(0, Math.PI, 0)
+    shapes.add(ring, back, front)
+    const target = new WebGLCubeRenderTarget(128)
+    target.texture.type = HalfFloatType
+    const camera = new CubeCamera(0.1, 1000, target)
+    shapes.add(camera)
+    const autoClear = gl.autoClear
+    gl.autoClear = true
+    camera.update(gl, shapes)
+    gl.autoClear = autoClear
+    scene.environment = target.texture
+    return () => {
+      scene.environment = null
+      target.dispose()
+      shapes.traverse((object) => {
+        const mesh = object as MeshObject
+        if (!mesh.isMesh) return
+        mesh.geometry.dispose()
+        ;(mesh.material as MeshBasicMaterial).dispose()
+      })
+    }
+  }, [get])
+  return null
 }
 
 // Upload every picture of a part to the graphics card and build its drawing code
@@ -309,7 +373,9 @@ function PreparedDoors({ children }: { children: ReactNode }) {
 // AUTOMATIC QUALITY, decided ONCE, behind the loading screen. Changing the resolution or
 // the effects rebuilds the effects' picture buffers, and the ambient-occlusion effect then
 // rebuilds its drawing code, which on Windows browsers can freeze everything for many
-// seconds (the leader saw a 20 s freeze). So nothing changes during play.
+// seconds (the leader saw a 20 s freeze). So nothing changes during play, except the
+// resolution after the window is resized on a machine that needed it lower (ResizeQuality),
+// combined with the rebuild the resize causes anyway.
 //
 // How it decides: after the warm-up drawing, the camera is moved for a moment into the
 // ROTUNDA, the heaviest view (measuring in the light intro hall picked settings that were
@@ -326,8 +392,14 @@ const TARGET_FPS = 60
 const AO_SAVING = 1.3 // frame rate gain assumed from turning ambient occlusion off
 const SETTLE = 1 // seconds to wait in the rotunda before measuring (lights fade in)
 const MEASURE = 1.5 // seconds of frames measured
+// Set by AdaptiveQuality on machines that needed a lower resolution: the number of pixels
+// they draw at 60 fps, and the resolution chosen (never exceeded later).
+let pixelBudget: number | null = null
+let pixelRatioCeiling = MAX_PIXEL_RATIO
+
 function AdaptiveQuality() {
   const setDpr = useThree((state) => state.setDpr)
+  const size = useThree((state) => state.size)
   const phase = useRef<'waiting' | 'settling' | 'measuring' | 'done'>('waiting')
   const time = useRef(0)
   const frames = useRef(0)
@@ -374,6 +446,10 @@ function AdaptiveQuality() {
       }
     }
     if (next !== ratio) setDpr(next)
+    // A machine that needed a lower resolution keeps the same NUMBER of pixels if the
+    // window is resized later (ResizeQuality).
+    pixelBudget = next < ratio ? next * next * size.width * size.height : null
+    pixelRatioCeiling = next
 
     // Back to the start, as if nothing happened.
     store.requestTeleport('hall')
@@ -381,6 +457,31 @@ function AdaptiveQuality() {
     store.setQualityChosen()
     phase.current = 'done'
   })
+  return null
+}
+
+// WINDOW RESIZED during the visit (e.g. full screen after loading), on a machine whose
+// resolution had to be lowered: step the resolution so the number of pixels drawn stays
+// what that machine managed at 60 fps (lower for a bigger window, back up for a smaller one,
+// never above the original choice). Applied once, half a second after the resizing stops,
+// right after the rebuild the resize causes anyway. Machines with room to spare: unchanged.
+function ResizeQuality() {
+  const size = useThree((state) => state.size)
+  const setDpr = useThree((state) => state.setDpr)
+  const viewport = useThree((state) => state.viewport)
+  useEffect(() => {
+    const budget = pixelBudget
+    if (budget === null) return
+    const timer = window.setTimeout(() => {
+      const fits = Math.sqrt(budget / (size.width * size.height))
+      const steps = [...RATIO_STEPS, MIN_PIXEL_RATIO].filter((r) => r <= pixelRatioCeiling)
+      const next = steps.find((r) => r <= fits * 1.02) ?? MIN_PIXEL_RATIO
+      if (Math.abs(next - viewport.dpr) > 0.01) setDpr(next)
+    }, 500)
+    return () => window.clearTimeout(timer)
+    // Only window size changes start this (viewport.dpr is read at that moment).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [size.width, size.height, setDpr])
   return null
 }
 
@@ -403,8 +504,65 @@ function ShadowRefresh() {
   return null
 }
 
+// The ambient occlusion effect (N8AO) switches itself into a "transparency-aware" mode as
+// soon as the scene holds any see-through material (a glass bulb, the quiz panels). That
+// mode draws the scene twice more every frame at full resolution and searches every object
+// five times per frame. Our see-through objects are flat panels and glows, which look the
+// same without it, so it is switched off for good (and the per-frame search with it).
+//
+// It also draws its finished picture into a private buffer and then copies that whole
+// picture into the next effect's buffer: a full-screen copy every frame for nothing. While
+// it draws, its private buffer is pointed at the next effect's buffer and the copy is
+// skipped, so it draws there directly. (Swapped back right after, so resizing still works.)
+interface N8AOPassInternals {
+  configuration: { transparencyAware: boolean }
+  autoDetectTransparency: boolean
+  renderToScreen: boolean
+  outputTargetInternal: unknown
+  copyQuad: { render: (renderer: unknown) => void }
+  render: (renderer: unknown, inputBuffer: unknown, outputBuffer: unknown, ...rest: unknown[]) => void
+  drawsDirectly?: boolean
+}
+function tuneAmbientOcclusion(pass: N8AOPassInternals | null) {
+  if (!pass) return
+  pass.autoDetectTransparency = false
+  pass.configuration.transparencyAware = false
+  if (pass.drawsDirectly) return
+  pass.drawsDirectly = true
+  const render = pass.render.bind(pass)
+  const copy = pass.copyQuad.render.bind(pass.copyQuad)
+  const skipCopy = () => {}
+  pass.render = (renderer, inputBuffer, outputBuffer, ...rest) => {
+    if (pass.renderToScreen || !outputBuffer || outputBuffer === inputBuffer) return render(renderer, inputBuffer, outputBuffer, ...rest)
+    const own = pass.outputTargetInternal
+    pass.outputTargetInternal = outputBuffer
+    pass.copyQuad.render = skipCopy
+    try {
+      render(renderer, inputBuffer, outputBuffer, ...rest)
+    } finally {
+      pass.outputTargetInternal = own
+      pass.copyQuad.render = copy
+    }
+  }
+}
+
+// The effects library adds a final full-screen copy whenever ambient occlusion is used,
+// even when the last effect can draw straight to the screen: a whole extra pass over every
+// pixel each frame. Remove it, so the last effect draws to the screen itself. Checked every
+// frame (cheap), because the library rebuilds the chain when the quality changes.
+function DropTrailingCopy({ composer }: { composer: RefObject<Composer | null> }) {
+  useFrame(() => {
+    const passes = composer.current?.passes
+    if (!passes || passes.length < 2) return
+    const last = passes[passes.length - 1]
+    if (last instanceof CopyPass && passes[passes.length - 2] instanceof EffectPass) composer.current?.removePass(last)
+  })
+  return null
+}
+
 export default function Museum() {
   const graphicsLevel = useMuseumStore((state) => state.graphicsLevel)
+  const composer = useRef<Composer>(null)
   return (
     // The Canvas resizes itself with the window, so the scene never stretches.
     <Canvas
@@ -415,7 +573,10 @@ export default function Museum() {
       dpr={[1, MAX_PIXEL_RATIO]}
       camera={{ fov: 70, near: 0.1, far: 120 }}
       // Laptops with two graphics chips: ask for the faster one.
-      gl={{ powerPreference: 'high-performance', antialias: ANTIALIAS }}
+      // No multisampling on the page's own canvas when the effects run: every frame is drawn
+      // and smoothed (SMAA) in the effects chain first, so the canvas's own smoothing would
+      // change nothing on screen and only cost memory and work on large screens.
+      gl={{ powerPreference: 'high-performance', antialias: ANTIALIAS && !EFFECTS }}
       onCreated={({ gl }) => {
         // If the graphics driver resets (Windows does this when the graphics card stalls),
         // say so in the console: it explains a long freeze or a black picture.
@@ -440,7 +601,9 @@ export default function Museum() {
       {/* Doors are always drawn: you see them from both the rotunda and the rooms. */}
       <WarmUp />
       <AdaptiveQuality />
+      <ResizeQuality />
       <ShadowThrottle />
+      <DropTrailingCopy composer={composer} />
       <PreparedDoors>
         <Doors />
       </PreparedDoors>
@@ -453,21 +616,27 @@ export default function Museum() {
       {EFFECTS && (
         // Edge smoothing by SMAA (a filter on the finished picture) instead of multisampling
         // (extra samples for every pixel): the same smooth edges for much less work.
-        <EffectComposer multisampling={0}>
+        <EffectComposer ref={composer} multisampling={0}>
           {/* Ambient occlusion: the soft darkening where objects meet the floor and in
               corners, which real rooms always have. Half resolution keeps it cheap. */}
-          {AO && graphicsLevel === 2 ? <N8AO halfRes quality="performance" aoSamples={8} denoiseSamples={4} aoRadius={1.2} distanceFalloff={1} intensity={2.2} /> : <></>}
+          {AO && graphicsLevel === 2 ? <N8AO ref={tuneAmbientOcclusion as never} halfRes quality="performance" aoSamples={8} denoiseSamples={4} aoRadius={1.2} distanceFalloff={1} intensity={2.2} /> : <></>}
           <Bloom mipmapBlur luminanceThreshold={1} luminanceSmoothing={0.2} intensity={0.45} />
           {/* AgX: a natural, film-like way of turning light into screen colours. */}
           <ToneMapping mode={ToneMappingMode.AGX} />
           {/* Slightly darker corners, like a camera lens: a cinematic frame. */}
           <Vignette offset={0.3} darkness={0.55} />
-          {ANTIALIAS ? <SMAA /> : <></>}
+          {/* Edge smoothing. On the weakest computers (lowest quality level) the cheaper
+              FXAA, about a third of the work, slightly softer edges. */}
+          {ANTIALIAS ? graphicsLevel === 0 ? <FXAA /> : <SMAA /> : <></>}
         </EffectComposer>
       )}
 
       {/* FPS counter, only while developing (never shown on the live site). */}
-      {import.meta.env.DEV && <Stats />}
+      {DevStats && (
+        <Suspense fallback={null}>
+          <DevStats />
+        </Suspense>
+      )}
       {import.meta.env.DEV && <FrameTimingProbe />}
     </Canvas>
   )

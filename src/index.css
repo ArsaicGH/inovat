@@ -698,6 +698,16 @@ body {
   from { opacity: 0; transform: translate(-50%, -10px); }
   to { opacity: 1; transform: translate(-50%, 0); }
 }
+/* The first (welcome) card: in the middle of the screen, for immediate attention. */
+.tutorial-card-centre {
+  top: 50%;
+  transform: translate(-50%, -50%);
+  animation-name: tutorial-in-centre;
+}
+@keyframes tutorial-in-centre {
+  from { opacity: 0; transform: translate(-50%, calc(-50% - 10px)); }
+  to { opacity: 1; transform: translate(-50%, -50%); }
+}
 .tutorial-progress {
   font-size: 12px;
   letter-spacing: 0.1em;

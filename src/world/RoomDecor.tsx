@@ -8,6 +8,7 @@ import { ROOM_ACCENT, DARK_WOOD, GOLD } from './style'
 import Sign from './Sign'
 import EraNumeral from './EraNumeral'
 import QuizWall from './QuizWall'
+import MergeStatic from './MergeStatic'
 import PortalDoor from './PortalDoor'
 import { useMuseumStore } from '../state/useMuseumStore'
 
@@ -230,7 +231,7 @@ function DigitalAge({ size }: { size: RoomSize }) {
         <torusGeometry args={[3 * spread(size), 0.05, 8, 80]} />
         <Glow colour="#7fe9ff" intensity={1} />
       </mesh>
-      <group ref={hologram} position={[0, 2.2, 0]}>
+      <group ref={hologram} position={[0, 2.2, 0]} userData={{ keepSeparate: true }}>
         <mesh>
           <icosahedronGeometry args={[0.7, 1]} />
           <meshStandardMaterial color="#3fd0e0" emissive="#3fd0e0" emissiveIntensity={1.5} wireframe toneMapped={false} />
@@ -348,7 +349,7 @@ function FadingSignText({ width, height }: { width: number; height: number }) {
     material.current.visible = material.current.opacity > 0.001
   })
   return (
-    <group position={[0, 0, 0.004]}>
+    <group position={[0, 0, 0.004]} userData={{ keepSeparate: true }}>
       <Sign title={site.name} subtitle={site.subtitle} width={width} height={height} textOnly materialRef={material} />
     </group>
   )
@@ -509,7 +510,7 @@ function QuizRoom({ size }: { size: RoomSize }) {
             <boxGeometry args={[QUIZ_STAND.width + 0.15, SCREEN_DEPTH + 0.15, 0.012]} />
             {gold}
           </mesh>
-          <group position={[0, -DISPLAY.y * STAND_SCALE, 0]} scale={STAND_SCALE}>
+          <group position={[0, -DISPLAY.y * STAND_SCALE, 0]} scale={STAND_SCALE} userData={{ keepSeparate: true }}>
             <QuizWall />
           </group>
         </group>
@@ -538,7 +539,7 @@ function QuizRoom({ size }: { size: RoomSize }) {
           </mesh>
         ))}
       </group>
-      <group position={[0, 0, -size.d / 2]}>
+      <group position={[0, 0, -size.d / 2]} userData={{ keepSeparate: true }}>
         <PortalDoor />
       </group>
       {/* Wainscot: cream panelling to 1 m, a gold rail on top and a gold line at the floor. */}
@@ -648,9 +649,13 @@ export default function RoomDecor({ room }: { room: ThemedRoom }) {
   const Decor = DECOR[room]
   return (
     <group position={[x, 0, z]} rotation={[0, layout.frame.angle, 0]}>
-      {/* The hall shows the museum's own name instead (IntroHall). */}
-      {room !== 'hall' && <RoomIdentity room={room} size={size} />}
-      {Decor && <Decor size={size} />}
+      {/* Static decoration is joined into a few meshes per room (far fewer draw calls);
+          the parts that move or change are marked keepSeparate. */}
+      <MergeStatic>
+        {/* The hall shows the museum's own name instead (IntroHall). */}
+        {room !== 'hall' && <RoomIdentity room={room} size={size} />}
+        {Decor && <Decor size={size} />}
+      </MergeStatic>
     </group>
   )
 }

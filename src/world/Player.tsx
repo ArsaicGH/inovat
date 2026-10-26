@@ -46,8 +46,8 @@ const KEY_RELEASE_GRACE_MS = 60
 
 // Tutorial: the "look" step is done after this much time spent turning the camera (time,
 // not angle, so it feels the same at any sensitivity), the "move" step after walking this far.
-const TUTORIAL_LOOK_TIME = 1 // seconds
-const TUTORIAL_WALK = 3 // metres
+const TUTORIAL_LOOK_TIME = 2 // seconds of turning
+const TUTORIAL_WALK_TIME = 2 // seconds of walking
 
 // FOOTSTEPS: one step sound every STEP_LENGTH metres. At walking speed (3 m/s) that is
 // 2 steps a second, a calm walk; sprinting (5.5 m/s) gives about 2.6, a brisk run.
@@ -101,7 +101,7 @@ export default function Player({ walls }: PlayerProps) {
   const pitch = useRef(0)
   const velocity = useRef({ x: 0, z: 0 }) // metres per second
   const normalPresses = useRef(0)
-  const tutorialProgress = useRef(0) // turned (radians) or walked (metres) in the current step
+  const tutorialProgress = useRef(0) // seconds turned or walked, or metres sprinted, in the current step
   // -1 = nothing handled yet, so the very first frame "teleports" us to the store's
   // starting room (the hall). Map teleports later reuse the same code.
   const handledTeleports = useRef(-1)
@@ -157,13 +157,27 @@ export default function Player({ walls }: PlayerProps) {
     // Chrome/Edge also send smaller fake jumps now and then (a single event much bigger
     // than the ones around it), which jerk the camera up or down. A real hand speeds up
     // gradually, so an event far bigger than the recent average is ignored.
+    // A fake jump is often followed straight away by a jump BACK (the camera flicks up and
+    // down). So right after a dropped jump, a big move in the opposite direction is dropped
+    // too; a big move in the same direction is a real fast flick and goes through.
     let recentMove = 0 // average size of recent mouse events (pixels)
+    let lastSpikeX = 0
+    let lastSpikeY = 0
     function isMouseSpike(event: MouseEvent): boolean {
       const size = Math.hypot(event.movementX, event.movementY)
+      const bounceBack = size > 40 && event.movementX * lastSpikeX + event.movementY * lastSpikeY < 0
+      lastSpikeX = 0
+      lastSpikeY = 0
+      if (bounceBack) return true
       const spike = size > 60 && size > recentMove * 6 + 20
-      // A spike still raises the average a lot, so a real fast flick (many big events in
-      // a row) gets through from its second event on; only a lone jump is dropped.
-      recentMove = spike ? recentMove * 0.5 + size * 0.5 : recentMove * 0.8 + size * 0.2
+      if (spike) {
+        lastSpikeX = event.movementX
+        lastSpikeY = event.movementY
+      }
+      // A dropped spike raises the average only gradually (at most about doubling it), so a
+      // real fast flick, which builds up over a few frames, gets through after a frame or
+      // two, while two or three fake jumps in a row (a flick to the ceiling) are all dropped.
+      recentMove = recentMove * 0.8 + (spike ? Math.min(size, recentMove * 6 + 20) : size) * 0.2
       return spike
     }
 
@@ -336,10 +350,10 @@ export default function Player({ walls }: PlayerProps) {
     // If a wall stopped us in one direction, drop that part of the speed too.
     if (next.x === camera.position.x) v.x = 0
     if (next.z === camera.position.z) v.z = 0
-    // Tutorial "move" step: done after walking about 3 metres.
+    // Tutorial "move" step: done after 2 seconds of walking.
     if (store.tutorial === 'move') {
-      tutorialProgress.current += Math.hypot(next.x - camera.position.x, next.z - camera.position.z)
-      if (tutorialProgress.current > TUTORIAL_WALK) {
+      if (next.x !== camera.position.x || next.z !== camera.position.z) tutorialProgress.current += dt
+      if (tutorialProgress.current > TUTORIAL_WALK_TIME) {
         tutorialProgress.current = 0
         store.advanceTutorial('move')
       }

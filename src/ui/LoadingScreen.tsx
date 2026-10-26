@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useProgress } from '@react-three/drei'
+import { useLoadProgress } from './load-progress'
 import { useMuseumStore } from '../state/useMuseumStore'
 import { PART_COUNT } from '../world/layout'
 import { useFontsReady } from '../world/fonts'
@@ -14,7 +14,7 @@ import { useFontsReady } from '../world/fonts'
 const GIVE_UP_AFTER = 30000
 
 export default function LoadingScreen() {
-  const { progress, active, total } = useProgress() // pictures being downloaded (0-100)
+  const { progress, active, total } = useLoadProgress() // pictures being downloaded (0-100)
   const parts = useMuseumStore((state) => state.partsPrepared)
   const warmedUp = useMuseumStore((state) => state.warmedUp)
   const qualityChosen = useMuseumStore((state) => state.qualityChosen)
