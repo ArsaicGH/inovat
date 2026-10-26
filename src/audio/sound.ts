@@ -17,6 +17,13 @@ import { AUDIO_ENABLED } from '../features'
 // plays before that (unlockAudio is called on the first interaction).
 // Every sound file is listed in src/content/credits.ts.
 
+// FILE FORMAT: every sound exists as .ogg (small, played by Chrome, Edge, Firefox) and as
+// .m4a (played by Safari, which every browser on iPhones and iPads uses underneath, and
+// which may not play .ogg). Each browser downloads only the one it can play. The paths
+// below say .ogg; fileFor() swaps the ending where needed.
+const PLAYS_OGG = typeof Audio !== 'undefined' && new Audio().canPlayType('audio/ogg; codecs="vorbis"') !== ''
+const fileFor = (url: string) => (PLAYS_OGG ? url : url.replace(/\.ogg$/, '.m4a'))
+
 const EFFECTS = {
   click: '/sounds/ui/click.ogg',
   open: '/sounds/ui/open.ogg',
@@ -102,7 +109,7 @@ function stream(url: string, loop: boolean): Stream | null {
   const existing = streams.get(url)
   if (existing) return existing
   if (!context || !ambienceBus) return null
-  const element = new Audio(url)
+  const element = new Audio(fileFor(url))
   element.loop = loop
   element.preload = 'auto' // fetch the (small) file early, so it can start at once
   const gain = context.createGain()
@@ -147,7 +154,7 @@ async function load(url: string) {
     return
   }
   try {
-    const data = await (await fetch(url)).arrayBuffer()
+    const data = await (await fetch(fileFor(url))).arrayBuffer()
     buffers.set(url, await ctx.decodeAudioData(data))
   } catch {
     // A missing or unreadable file is skipped (no sound), never a crash.

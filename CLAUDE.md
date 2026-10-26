@@ -20,11 +20,12 @@ Project: browser-based 3D virtual museum about the four Industrial Revolutions (
 - Stack: React, TypeScript, Vite, Three.js, React Three Fiber, drei, Zustand. Do not add other dependencies without asking first and explaining why.
 - No backend, database, login, paid API, AI model or API key in the product. Everything runs in the visitor's browser.
 - Keep lightweight 3D assets: models about 2 MB or less each, textures 1024 px or less, about 30 MB total.
-- Cap the renderer pixel ratio at 1.5. Use at most one shadow-casting light.
+- Cap the renderer pixel ratio at 1.5 on computers and 2 on phones and tablets (small but very sharp screens; leader's decision). Use at most one shadow-casting light.
 - Folder layout is in `PLAN.md` section 3. Keep the 3D layer (`src/world/`), the interface (`src/ui/`) and the text (`src/content/`) separate.
 - File names: lowercase, hyphens, no spaces, no Vietnamese diacritics.
 - Read movement keys by physical key position (`event.code`), so Unikey and EVKey do not break controls.
 - Every key the game uses is listed in the key list shown with Space (`ui.keyList` in `src/content/ui.ts`). When a key is added or changed, update that list in both languages, in tutorial order (and the tutorial, if the key is important).
+- Touch devices (phones, tablets) use on-screen controls (`src/ui/TouchControls.tsx`) and touch wording (`src/content/ui-touch.ts`). Every text that mentions a key or the mouse has a touch version there; when such a text or a control changes, update its touch version too, in both languages.
 - Run `npm run build` before every commit.
 
 ## Content rules

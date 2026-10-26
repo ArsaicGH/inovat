@@ -140,6 +140,15 @@ const vi = {
       retry: 'Đừng nản lòng! Hãy tham quan lại các phòng trưng bày rồi thử lần nữa.',
     },
   },
+  // On-screen buttons on phones and tablets (names read out by screen readers), and the
+  // note asking to turn the device sideways.
+  touch: {
+    map: 'Bản đồ',
+    pause: 'Tạm dừng',
+    help: 'Cách điều khiển',
+    joystick: 'Cần điều khiển',
+    rotate: 'Hãy xoay ngang thiết bị để tham quan bảo tàng.',
+  },
   // Shown instead of the museum on phones and tablets.
   device: {
     title: 'Vui lòng dùng máy tính',
@@ -271,6 +280,13 @@ const en: UiText = {
       good: 'Well done! Revisit a few exhibition rooms to get a perfect score.',
       retry: "Don't give up! Walk through the exhibition rooms again and have another go.",
     },
+  },
+  touch: {
+    map: 'Map',
+    pause: 'Pause',
+    help: 'Controls',
+    joystick: 'Joystick',
+    rotate: 'Please turn your device sideways to visit the museum.',
   },
   device: {
     title: 'Please use a computer',

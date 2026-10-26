@@ -3,15 +3,17 @@ import StartScreen from './ui/StartScreen'
 import PauseScreen from './ui/PauseScreen'
 import InfoPanel from './ui/InfoPanel'
 import MapMenu from './ui/MapMenu'
-import DeviceMessage from './ui/DeviceMessage'
+import TouchControls from './ui/TouchControls'
+import { IS_TOUCH } from './ui/touch'
 import LoadingScreen from './ui/LoadingScreen'
 import SoundDirector from './audio/SoundDirector'
 import { Suspense, lazy, useEffect } from 'react'
 import { useMuseumStore } from './state/useMuseumStore'
 import { useContent } from './content/use-content'
-import { isComputer } from './ui/device'
 
-const ON_COMPUTER = isComputer()
+// Phones and tablets get on-screen controls (the page is marked, so the layout can adapt).
+// (For now every touch device is allowed; later only tablets, with DeviceMessage on phones.)
+if (IS_TOUCH) document.documentElement.classList.add('touch')
 
 // The 3D world (three.js and the effects, most of the download) arrives as a separate
 // file, so the loading screen shows at once instead of after the whole script.
@@ -22,16 +24,13 @@ const Museum = lazy(() => import('./world/Museum'))
 function App() {
   const mode = useMuseumStore((state) => state.mode)
   const worldReady = useMuseumStore((state) => state.worldReady)
-  const { language, site } = useContent()
+  const { language, site, ui } = useContent()
 
   // Keep the page's language and tab title in step with the chosen language.
   useEffect(() => {
     document.documentElement.lang = language
     document.title = site.pageTitle
   }, [language, site])
-
-  // Phones and tablets: a message instead of the museum.
-  if (!ON_COMPUTER) return <DeviceMessage />
 
   return (
     <>
@@ -40,6 +39,7 @@ function App() {
       </Suspense>
       {/* Black cover over the 3D world until it has loaded, then a fade into view. */}
       <div className={worldReady ? 'world-cover world-cover-gone' : 'world-cover'} aria-hidden="true" />
+      {mode === 'exploring' && IS_TOUCH && <TouchControls />}
       {mode === 'exploring' && <Hud />}
       {/* The title screen waits until everything has loaded (LoadingScreen). */}
       {mode === 'start' && worldReady && <StartScreen />}
@@ -49,6 +49,12 @@ function App() {
       {mode === 'map' && <MapMenu />}
       <LoadingScreen />
       <SoundDirector />
+      {/* Touch devices held upright: ask to turn them sideways (shown by index.css). */}
+      {IS_TOUCH && (
+        <div className="rotate-hint">
+          <p>{ui.touch.rotate}</p>
+        </div>
+      )}
     </>
   )
 }

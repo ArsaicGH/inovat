@@ -8,6 +8,7 @@ import { closedDoorBlockers } from './door-state'
 import { ERA_ROOMS, type RoomId } from '../types'
 import { debugStats } from './debug-stats'
 import { playStep } from '../audio/sound'
+import { touchInput } from '../ui/touch'
 
 const WALK_SPEED = 3 // metres per second
 const SPRINT_SPEED = 5.5 // while Shift is held (crossing the rotunda faster)
@@ -17,6 +18,11 @@ const EYE_HEIGHT = 1.6 // metres, roughly a standing visitor
 // Radians per pixel of mouse movement at sensitivity 1. The visitor's own OS mouse and
 // touchpad settings still apply on top, and the slider multiplies this.
 const BASE_MOUSE_SENSITIVITY = 0.0015
+// Touch screens: radians per pixel of finger drag at sensitivity 1 (dragging across a
+// phone screen turns roughly half way round). The same sensitivity slider applies.
+const BASE_TOUCH_SENSITIVITY = 0.005
+// Pushing the on-screen joystick this far (of its full reach) sprints.
+const JOYSTICK_SPRINT = 0.95
 // Stop just short of straight up/down, so the camera can never flip upside-down.
 const MAX_PITCH = Math.PI / 2 - 0.05
 
@@ -297,13 +303,23 @@ export default function Player({ walls }: PlayerProps) {
     // In the tutorial, controls unlock one at a time.
     const canLook = canUse(store.tutorial, 'look')
     const canMove = canUse(store.tutorial, 'move')
-    const sprinting = canUse(store.tutorial, 'sprint') && isDown(SPRINT)
+    // On-screen joystick (touch devices): how far it is pushed, 0-1.
+    const stick = canMove ? Math.min(1, Math.hypot(touchInput.moveX, touchInput.moveY)) : 0
+    const sprinting = canUse(store.tutorial, 'sprint') && (isDown(SPRINT) || stick >= JOYSTICK_SPRINT)
 
     // Camera: arrow keys change the target, then the camera glides towards it.
     const turn = canLook ? (isDown(TURN_RIGHT) ? 1 : 0) - (isDown(TURN_LEFT) ? 1 : 0) : 0
     const tilt = canLook ? (isDown(LOOK_UP) ? 1 : 0) - (isDown(LOOK_DOWN) ? 1 : 0) : 0
     targetYaw.current -= turn * TURN_SPEED * dt
     targetPitch.current += tilt * TILT_SPEED * dt
+    // Finger drags on a touch screen, added up since the last frame.
+    if (canLook && (touchInput.lookX || touchInput.lookY)) {
+      const touchSensitivity = BASE_TOUCH_SENSITIVITY * store.mouseSensitivity
+      targetYaw.current -= touchInput.lookX * touchSensitivity
+      targetPitch.current -= touchInput.lookY * touchSensitivity
+    }
+    touchInput.lookX = 0
+    touchInput.lookY = 0
     targetPitch.current = Math.max(-MAX_PITCH, Math.min(MAX_PITCH, targetPitch.current))
     const oldYaw = yaw.current
     const oldPitch = pitch.current
@@ -322,16 +338,22 @@ export default function Player({ walls }: PlayerProps) {
     }
 
     // Walking: work out the wanted direction on the floor, based on where we face.
-    const forward = canMove ? (isDown(FORWARD) ? 1 : 0) - (isDown(BACKWARD) ? 1 : 0) : 0
-    const strafe = canMove ? (isDown(STEP_RIGHT) ? 1 : 0) - (isDown(STEP_LEFT) ? 1 : 0) : 0
+    // (Keys, or the on-screen joystick: pushed up = forward.)
+    let forward = canMove ? (isDown(FORWARD) ? 1 : 0) - (isDown(BACKWARD) ? 1 : 0) : 0
+    let strafe = canMove ? (isDown(STEP_RIGHT) ? 1 : 0) - (isDown(STEP_LEFT) ? 1 : 0) : 0
+    if (stick > 0 && forward === 0 && strafe === 0) {
+      forward = -touchInput.moveY
+      strafe = touchInput.moveX
+    }
     const sin = Math.sin(yaw.current)
     const cos = Math.cos(yaw.current)
     let wantX = -sin * forward + cos * strafe
     let wantZ = -cos * forward - sin * strafe
-    // Diagonal keys should not be faster than straight ones.
+    // Diagonal keys should not be faster than straight ones. A joystick pushed part way
+    // walks slower (keys always count as fully pushed).
     const length = Math.hypot(wantX, wantZ)
     if (length > 0) {
-      const speed = sprinting ? SPRINT_SPEED : WALK_SPEED
+      const speed = (sprinting ? SPRINT_SPEED : WALK_SPEED) * Math.min(1, length)
       wantX = (wantX / length) * speed
       wantZ = (wantZ / length) * speed
     }

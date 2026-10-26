@@ -1,6 +1,8 @@
 import type { Language } from './language'
 import { siteText } from './site'
 import { uiText } from './ui'
+import { withTouch } from './ui-touch'
+import { IS_TOUCH } from '../ui/touch'
 import { roomNamesText } from './rooms'
 import { getExhibitText } from './exhibits'
 import { useMuseumStore } from '../state/useMuseumStore'
@@ -11,7 +13,8 @@ export function getContent(language: Language) {
   return {
     language,
     site: siteText[language],
-    ui: uiText[language],
+    // On phones and tablets, texts that mention keys or the mouse get their touch version.
+    ui: IS_TOUCH ? withTouch(uiText[language], language) : uiText[language],
     roomNames: roomNamesText[language],
     exhibit: (id: string) => getExhibitText(id, language),
   }

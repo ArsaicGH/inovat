@@ -755,7 +755,13 @@ body {
   background: rgba(20, 17, 13, 0.88);
   color: #f3e7cf;
   pointer-events: none;
-  animation: tutorial-in 0.25s ease-out both;
+  /* Its own animation: the tutorial card's one ends at translate(-50%, 0), which moved
+     the list left and down, off the screen on short screens. */
+  animation: key-list-in 0.25s ease-out both;
+}
+@keyframes key-list-in {
+  from { opacity: 0; transform: translate(10px, -50%); }
+  to { opacity: 1; transform: translate(0, -50%); }
 }
 .key-list h3 {
   margin: 0 0 10px;
@@ -991,4 +997,247 @@ body {
 }
 .language-bottom .sensitivity input {
   accent-color: #c9a25a;
+}
+
+/* ---------- Touch devices (phones and tablets): on-screen controls ---------- */
+/* No pull-to-refresh, text selection or long-press menus while playing. (Finger gestures
+   are switched off only on the game area itself, .touch-layer, so menus can still scroll.) */
+.touch,
+.touch body {
+  overscroll-behavior: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+/* The whole screen takes finger drags (look) and taps; the HUD on top lets them through. */
+.touch-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  touch-action: none;
+}
+/* Joystick in the bottom-left corner: a gold ring with a knob. */
+.touch-stick {
+  position: fixed;
+  left: max(28px, env(safe-area-inset-left));
+  bottom: max(28px, env(safe-area-inset-bottom));
+  width: 120px;
+  height: 120px;
+  border: 2px solid rgba(232, 199, 126, 0.55);
+  border-radius: 50%;
+  background: rgba(20, 17, 13, 0.35);
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+.touch-stick-off {
+  opacity: 0.35;
+}
+.touch-knob {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #f1d898, #b8893d);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+/* Map, pause and "?" buttons in the top-right corner. */
+.touch-buttons {
+  position: fixed;
+  top: max(14px, env(safe-area-inset-top));
+  right: max(14px, env(safe-area-inset-right));
+  z-index: 2;
+  display: flex;
+  gap: 10px;
+}
+.touch-button {
+  width: 48px;
+  height: 48px;
+  border: 1px solid rgba(232, 199, 126, 0.6);
+  border-radius: 50%;
+  background: rgba(20, 17, 13, 0.6);
+  color: #e8c77e;
+  font: 700 22px/1 inherit;
+  display: grid;
+  place-items: center;
+  padding: 0;
+}
+.touch-button:disabled {
+  opacity: 0.35;
+}
+.touch-button svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+/* The room name moves to the bottom-right corner (the joystick has the bottom-left, the
+   buttons the top-right). */
+.touch .hud-title {
+  left: auto;
+  right: max(16px, env(safe-area-inset-right));
+  bottom: max(12px, env(safe-area-inset-bottom));
+  text-align: right;
+}
+/* The controls list sits between the round buttons (top-right) and the room name
+   (bottom-right). */
+.touch .key-list {
+  top: calc(50% + 7px);
+  max-height: calc(100% - 140px);
+  overflow-y: auto;
+}
+/* Text on screen is drawn above the touch area and the joystick. */
+.touch .tutorial-card,
+.touch .key-list,
+.touch .hud-prompt,
+.touch .hud-notice,
+.touch .hud-title {
+  z-index: 3;
+}
+/* The tutorial card stays clear of the buttons in the top-right corner (equal room on both
+   sides, as it is centred). */
+.touch .tutorial-card {
+  box-sizing: border-box;
+  width: min(560px, calc(100% - 380px));
+  min-width: 300px;
+}
+.touch .tutorial-card-centre {
+  width: min(560px, calc(100% - 32px));
+}
+/* Held upright: a note asking to turn the device sideways, over everything. */
+.rotate-hint {
+  display: none;
+}
+@media (orientation: portrait) {
+  .rotate-hint {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: grid;
+    place-items: center;
+    padding: 32px;
+    background: #0b0a09;
+    color: #f3e7cf;
+    font-size: 20px;
+    text-align: center;
+  }
+}
+
+/* ---------- Short screens (phones on their side, ~360-520 px tall) ---------- */
+/* Everything is laid out for laptop heights; here it is tightened so each screen fits. */
+@media (max-height: 520px) {
+  /* Title screen: smaller title and buttons, settings in one row at the bottom. */
+  .title-block {
+    gap: 4px;
+    padding: 8px 16px;
+  }
+  .title-ornament {
+    width: min(360px, 60vw);
+  }
+  .game-title {
+    font-size: clamp(34px, 11vh, 56px);
+  }
+  .game-subtitle {
+    font-size: 13px;
+  }
+  .start-buttons {
+    gap: 6px;
+  }
+  .start-button {
+    margin-top: 4px;
+    padding: 8px 26px;
+    font-size: 14px;
+  }
+  .tutorial-question p {
+    margin: 4px 0 6px;
+    font-size: 14px;
+  }
+  .language-bottom {
+    bottom: 8px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+    /* Its natural width: centred with left: 50%, it would otherwise get only half the
+       screen and wrap onto two lines. */
+    width: max-content;
+  }
+  /* Tutorial cards: compact, at the very top (the welcome card stays in the middle). */
+  .tutorial-card {
+    padding: 8px 14px;
+  }
+  .tutorial-card:not(.tutorial-card-centre) {
+    top: 8px;
+  }
+  .tutorial-card h3 {
+    margin: 2px 0 4px;
+    font-size: 15px;
+  }
+  .tutorial-card p {
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  .tutorial-card .tutorial-tip {
+    margin-top: 6px;
+    padding: 6px 10px;
+  }
+  /* Controls / key list: smaller rows, never taller than the screen. */
+  .key-list {
+    max-height: calc(100% - 24px);
+    overflow-y: auto;
+    padding: 10px 14px;
+  }
+  .key-list h3 {
+    margin: 0 0 4px;
+    font-size: 15px;
+  }
+  .key-list dl > div {
+    padding: 3px 0;
+    font-size: 12px;
+  }
+  /* Pause menu: tighter spacing so all settings and buttons fit. */
+  .pause-card {
+    max-height: calc(100% - 16px);
+    overflow-y: auto;
+    padding: 10px 20px;
+  }
+  .pause-card .sensitivity,
+  .pause-card .language-setting {
+    margin: 0 0 8px;
+  }
+  .pause-card .start-button {
+    margin-top: 0;
+  }
+  .map-ornament {
+    margin: 2px auto 6px;
+  }
+  /* The map's circle of rooms: smaller, so title, map and close button fit unscrolled. */
+  .map-plan {
+    width: min(500px, 100%, 40vh);
+  }
+  /* Notices (e.g. the locked Game Room door) just above the middle, clear of the tutorial
+     card at the top. */
+  .hud-notice {
+    top: calc(50% - 64px);
+  }
+  .map-title {
+    font-size: 20px;
+  }
+  .pause-hint,
+  .map-hint {
+    margin: 4px 0 6px;
+    font-size: 12px;
+  }
+  /* Enlarged exhibit board: a little smaller, so the close button below still fits. */
+  .board-zoom {
+    width: min(92vw, calc(70vh * var(--ratio)), 1000px);
+  }
+  .info-panel {
+    gap: 8px;
+  }
+  .hud-title h1 {
+    font-size: 18px;
+  }
 }

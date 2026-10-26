@@ -13,6 +13,7 @@ import Exhibit from './Exhibit'
 import Player from './Player'
 import Interaction from './Interaction'
 import FrameTimingProbe from './FrameTimingProbe'
+import { IS_TOUCH } from '../ui/touch'
 import { reportFileProgress, reportFilesDone } from '../ui/load-progress'
 
 // File downloads (textures) are reported to the loading screen.
@@ -35,7 +36,9 @@ import { useFontsReady } from './fonts'
 // ?fx=0 (no bloom glow), ?ao=0 (no ambient occlusion). They can be combined: ?dpr=1&fx=0.
 // Ignored on the live site.
 const testSwitches = new URLSearchParams(import.meta.env.DEV ? window.location.search : '')
-const MAX_PIXEL_RATIO = testSwitches.get('dpr') === '1' ? 1 : 1.5
+// Phones and tablets may go up to 2: their screens have far fewer pixels than a laptop's
+// but are very sharp, so a low factor makes text on the boards blurry.
+const MAX_PIXEL_RATIO = testSwitches.get('dpr') === '1' ? 1 : IS_TOUCH ? 2 : 1.5
 const ANTIALIAS = testSwitches.get('aa') !== '0'
 const SHADOWS = testSwitches.get('shadows') !== '0'
 const EFFECTS = testSwitches.get('fx') !== '0'
@@ -386,7 +389,7 @@ function PreparedDoors({ children }: { children: ReactNode }) {
 // 1. the highest resolution step that still reaches 60 fps (1.5, 1.25, 1, 0.85);
 // 2. if even 1x is too slow: ambient occlusion off (assumed to save about a quarter);
 // 3. then 0.75x, and shadows only redrawn when the key light moves.
-const RATIO_STEPS = [1.5, 1.25, 1, 0.85]
+const RATIO_STEPS = [2, 1.75, 1.5, 1.25, 1, 0.85]
 const MIN_PIXEL_RATIO = 0.75
 const TARGET_FPS = 60
 const AO_SAVING = 1.3 // frame rate gain assumed from turning ambient occlusion off
@@ -436,14 +439,23 @@ function AdaptiveQuality() {
     const ratio = Math.min(window.devicePixelRatio, MAX_PIXEL_RATIO)
     const at = (r: number) => fps * (ratio / r) ** 2 // estimated frame rate at resolution r
     const steps = RATIO_STEPS.filter((r) => r <= ratio)
-    let next = steps.find((r) => r >= 1 && at(r) >= TARGET_FPS)
-    if (next === undefined) {
+    // Touch devices: ambient occlusion (soft corner shadows, hard to see on a small screen)
+    // goes BEFORE any sharpness, since blurry text matters far more there.
+    if (IS_TOUCH && at(ratio) < TARGET_FPS) store.lowerGraphics()
+    const saving = IS_TOUCH && at(ratio) < TARGET_FPS ? AO_SAVING : 1
+    let next = steps.find((r) => r >= 1 && at(r) * saving >= TARGET_FPS)
+    if (next === undefined && !IS_TOUCH) {
       store.lowerGraphics() // ambient occlusion off
       next = steps.find((r) => at(r) * AO_SAVING >= TARGET_FPS)
       if (next === undefined) {
         next = MIN_PIXEL_RATIO
         if (at(next) * AO_SAVING < TARGET_FPS * 0.7) store.lowerGraphics() // fewer shadow redraws
       }
+    }
+    if (next === undefined) {
+      // Touch device too slow even at 1x without ambient occlusion.
+      next = MIN_PIXEL_RATIO
+      if (at(next) * AO_SAVING < TARGET_FPS * 0.7) store.lowerGraphics() // fewer shadow redraws
     }
     if (next !== ratio) setDpr(next)
     // A machine that needed a lower resolution keeps the same NUMBER of pixels if the

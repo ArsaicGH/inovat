@@ -1,4 +1,5 @@
 import { useMuseumStore } from '../state/useMuseumStore'
+import { IS_TOUCH } from '../ui/touch'
 
 // Pointer lock = the browser hides the cursor and sends mouse movement to the 3D view.
 // Browsers only allow it right after a click or key press (never Esc), and Esc always
@@ -16,6 +17,15 @@ export function getCanvas(): HTMLCanvasElement | null {
 // Common refusals: clicking again within ~1 second after Esc (Chrome's cooldown), or the
 // page is shown inside another app/frame instead of a normal browser tab.
 export async function requestPointerLock(): Promise<boolean> {
+  // Touch devices have no mouse to capture: walking starts straight away (the on-screen
+  // controls take over). Phones that allow it also switch to full screen, which the tap
+  // that got us here permits. (iPhones do not allow it for web pages; nothing happens.)
+  if (IS_TOUCH) {
+    if (!document.fullscreenElement) void document.documentElement.requestFullscreen?.().catch(() => {})
+    useMuseumStore.getState().setMouseCaptured(true)
+    useMuseumStore.getState().startExploring()
+    return true
+  }
   const canvas = getCanvas()
   if (!canvas) return false
   try {
