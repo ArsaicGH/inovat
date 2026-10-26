@@ -1,5 +1,5 @@
 import type { RoomId } from '../types'
-import { EXHIBIT_SPOTS, panelPosition, roomById, toWorld } from './layout'
+import { EXHIBIT_SPOTS, roomById, toWorld } from './layout'
 
 // MUSEUM SPOTLIGHTS: like a real museum, each room is fairly dark and the exhibits are lit
 // by warm spotlights from the ceiling. Five real spotlights follow the visitor from room
@@ -49,24 +49,22 @@ function quiz(): SpotAim[] {
   const room = roomById('quiz')
   if (!room) return []
   const aims: SpotAim[] = []
-  // Two lamps on the big screen...
-  for (const u of [-2.8, 2.8]) {
-    const [tx, tz] = toWorld(room.frame, u, room.vBack - 0.2)
-    const [fx, fz] = toWorld(room.frame, u, room.vBack - 2.6)
-    aims.push({ from: [fx, room.height - 0.25, fz], to: [tx, 2.2, tz] })
+  const v = (room.vFront + room.vBack) / 2
+  // Two lamps on the portal door in the back wall...
+  for (const u of [-1.4, 1.4]) {
+    const [tx, tz] = toWorld(room.frame, u * 0.5, room.vBack - 0.1)
+    const [fx, fz] = toWorld(room.frame, u, room.vBack - 2.2)
+    aims.push({ from: [fx, room.height - 0.25, fz], to: [tx, 1.7, tz], strength: 0.5 })
   }
-  // ...and two on the pedestal and its board.
-  const info = EXHIBIT_SPOTS.find((s) => s.id === 'quiz-info')
-  if (info) {
-    const [px, pz] = panelPosition(info)
-    const [cx, cz] = toWorld(room.frame, 0, (room.vFront + room.vBack) / 2)
-    // The pedestal: straight above, centred. Its board: from in front, like the hall's.
-    aims.push({ from: [info.x, room.height - 0.25, info.z], to: [info.x, 0, info.z], narrow: true })
-    const dx = cx - px
-    const dz = cz - pz
-    const length = Math.hypot(dx, dz) || 1
-    aims.push({ from: [px + (dx / length) * 2, room.height - 0.25, pz + (dz / length) * 2], to: [px, 1.55, pz], strength: 0.29 })
+  // ...one on the middle panel of each side wall...
+  for (const side of [-1, 1]) {
+    const [tx, tz] = toWorld(room.frame, side * (room.width / 2 - 0.05), v)
+    const [fx, fz] = toWorld(room.frame, side * (room.width / 2 - 2.2), v)
+    aims.push({ from: [fx, room.height - 0.25, fz], to: [tx, 2.3, tz], strength: 0.35 })
   }
+  // ...and the strongest straight down on the raised quiz platform: the player's stage.
+  const [cx, cz] = toWorld(room.frame, 0, v + 0.4)
+  aims.push({ from: [cx, room.height - 0.25, cz], to: [cx, 0, cz], strength: 0.9 })
   return aims
 }
 
@@ -89,7 +87,7 @@ export interface KeyAim extends SpotAim {
 
 // How strong each room's wash is: the darker the room, the more the exhibits stand out.
 // (The intro hall is a bright, welcoming lobby; only the era rooms are dim.)
-const WASH: Partial<Record<RoomId, number>> = { hall: 40, ir1: 12, ir2: 9, ir3: 7, ir4: 7, quiz: 10 }
+const WASH: Partial<Record<RoomId, number>> = { hall: 40, ir1: 12, ir2: 9, ir3: 7, ir4: 7, quiz: 40 }
 
 function roomKey(id: RoomId): KeyAim[] {
   const room = roomById(id)

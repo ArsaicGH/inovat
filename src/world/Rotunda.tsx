@@ -1,7 +1,7 @@
 import Centrepiece from './Centrepiece'
 import MergeStatic from './MergeStatic'
 import HangingSculptures from './HangingSculptures'
-import { paintDome } from './dome-painting'
+import { paintCrown, paintDome } from './dome-painting'
 import { useEffect, useMemo } from 'react'
 import { BackSide } from 'three'
 import {
@@ -22,7 +22,7 @@ import { DARK_WOOD, GOLD } from './style'
 // THE ROTUNDA: a grand Victorian dome hall (M6). Everything is built from simple shapes
 // plus a few textures, so it stays light: marble floor with gold inlays, plaster walls with
 // a wood wainscot and a cornice, 12 columns, framed damask panels with wall lamps on the
-// blank walls, a coffered dome with a glowing oculus, and a chandelier.
+// blank walls, a coffered dome with a painted crown, and a chandelier.
 //
 // 12-sided shapes are "circles" with 12 segments, turned 15 degrees so their flat sides
 // line up with the walls (flat sides facing north and south).
@@ -35,7 +35,7 @@ function corner(apothem: number) {
   return apothem / Math.cos(Math.PI / ROTUNDA_SIDES)
 }
 
-// Things that glow (bulbs, oculus, gold inlays) are brighter than white, so the bloom
+// Things that glow (bulbs, gold inlays) are brighter than white, so the bloom
 // effect picks them up. toneMapped={false} keeps them bright.
 function Glow({ colour, intensity }: { colour: string; intensity: number }) {
   return <meshStandardMaterial color={colour} emissive={colour} emissiveIntensity={intensity} toneMapped={false} />
@@ -224,10 +224,17 @@ function useDomeTexture() {
   return texture
 }
 
+function useCrownTexture() {
+  const texture = useMemo(() => paintCrown(), [])
+  useEffect(() => () => texture.dispose(), [texture])
+  return texture
+}
+
 function Dome() {
   const coffers = useDomeTexture()
+  const crown = useCrownTexture()
   const radius = ROTUNDA_RADIUS
-  const oculusAngle = 0.18 // leaves a round opening about 4.4 m wide at the top
+  const oculusAngle = 0.18 // the round crown at the top, about 4.4 m wide
   const top = H + radius * Math.cos(oculusAngle)
   const oculusRadius = radius * Math.sin(oculusAngle)
   return (
@@ -237,10 +244,11 @@ function Dome() {
         <sphereGeometry args={[radius, 64, 24, 0, Math.PI * 2, oculusAngle, Math.PI / 2 - oculusAngle]} />
         <meshStandardMaterial map={coffers} roughness={0.7} side={BackSide} />
       </mesh>
-      {/* Oculus: a bright sky disc above the opening, with a gold ring around it. */}
-      <mesh position={[0, top + 0.6, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <circleGeometry args={[oculusRadius + 0.5, 48]} />
-        <Glow colour="#fff4dc" intensity={3} />
+      {/* Crown: a painted rosette closing the top of the dome (no skylight; the chandelier
+          lights the hall), framed by the gold ring. */}
+      <mesh position={[0, top + 0.02, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[oculusRadius + 0.3, 64]} />
+        <meshStandardMaterial map={crown} roughness={0.6} />
       </mesh>
       <mesh position={[0, top, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[oculusRadius, 0.14, 10, 64]} />

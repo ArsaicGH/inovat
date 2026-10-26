@@ -186,3 +186,83 @@ export function paintDome(): CanvasTexture {
   texture.anisotropy = 8
   return texture
 }
+
+// THE CROWN of the dome: a closed, painted ceiling disc where the oculus was (the hall is
+// lit by the chandelier, not a skylight). A classical rosette in the hall's cream and gold:
+// gilded rings, a sunburst of rays, twelve petals (one per wall) and a gold boss in the
+// middle where the chandelier's chain hangs from. Painted once at start.
+export function paintCrown(): CanvasTexture {
+  const size = 1024
+  const canvas = document.createElement('canvas')
+  canvas.width = size
+  canvas.height = size
+  const ctx = canvas.getContext('2d')
+  if (ctx) {
+    const c = size / 2
+    const ring = (r: number, width: number, colour: string) => {
+      ctx.strokeStyle = colour
+      ctx.lineWidth = width
+      ctx.beginPath()
+      ctx.arc(c, c, r, 0, Math.PI * 2)
+      ctx.stroke()
+    }
+    const disc = (x: number, y: number, r: number, colour: string) => {
+      ctx.fillStyle = colour
+      ctx.beginPath()
+      ctx.arc(x, y, r, 0, Math.PI * 2)
+      ctx.fill()
+    }
+    // Cream ground, a little deeper towards the middle, like a shallow recessed bowl.
+    const ground = ctx.createRadialGradient(c, c, 0, c, c, c)
+    ground.addColorStop(0, 'rgb(206, 192, 162)')
+    ground.addColorStop(1, 'rgb(228, 216, 190)')
+    ctx.fillStyle = ground
+    ctx.fillRect(0, 0, size, size)
+    // Sunburst: 48 thin gold rays between the outer bands and the petals.
+    ctx.fillStyle = GOLD
+    for (let i = 0; i < 48; i++) {
+      const a = (i / 48) * Math.PI * 2
+      const w = 0.018
+      ctx.beginPath()
+      ctx.moveTo(c + Math.cos(a - w) * c * 0.78, c + Math.sin(a - w) * c * 0.78)
+      ctx.lineTo(c + Math.cos(a) * c * 0.42, c + Math.sin(a) * c * 0.42)
+      ctx.lineTo(c + Math.cos(a + w) * c * 0.78, c + Math.sin(a + w) * c * 0.78)
+      ctx.closePath()
+      ctx.fill()
+    }
+    // Outer bands: a gold rim, a row of beads and a thin inner line.
+    ring(c * 0.96, c * 0.06, GOLD)
+    ring(c * 0.9, c * 0.012, GOLD)
+    for (let i = 0; i < 60; i++) {
+      const a = (i / 60) * Math.PI * 2
+      disc(c + Math.cos(a) * c * 0.85, c + Math.sin(a) * c * 0.85, c * 0.014, GOLD)
+    }
+    ring(c * 0.8, c * 0.01, GOLD)
+    // Twelve petals: cream leaves outlined in gold, pointing out to the twelve walls.
+    for (let i = 0; i < 12; i++) {
+      const a = (i / 12) * Math.PI * 2
+      ctx.save()
+      ctx.translate(c, c)
+      ctx.rotate(a)
+      ctx.beginPath()
+      ctx.moveTo(c * 0.16, 0)
+      ctx.quadraticCurveTo(c * 0.3, -c * 0.1, c * 0.42, 0)
+      ctx.quadraticCurveTo(c * 0.3, c * 0.1, c * 0.16, 0)
+      ctx.fillStyle = RIB
+      ctx.fill()
+      ctx.strokeStyle = GOLD
+      ctx.lineWidth = c * 0.012
+      ctx.stroke()
+      ctx.restore()
+    }
+    ring(c * 0.44, c * 0.02, GOLD)
+    // The boss: gold rings and a gold centre.
+    disc(c, c, c * 0.16, RIB)
+    ring(c * 0.15, c * 0.02, GOLD)
+    disc(c, c, c * 0.1, GOLD)
+  }
+  const texture = new CanvasTexture(canvas)
+  texture.colorSpace = SRGBColorSpace
+  texture.anisotropy = 8
+  return texture
+}

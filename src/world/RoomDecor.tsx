@@ -1,14 +1,14 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, type ReactNode } from 'react'
+import { useRef, type ReactNode } from 'react'
 import { useContent } from '../content/use-content'
 import { useFrame } from '@react-three/fiber'
-import { CanvasTexture, Color, MeshBasicMaterial, Object3D, SRGBColorSpace, type Group, type InstancedMesh, type MeshStandardMaterial } from 'three'
+import type { Group, MeshStandardMaterial } from 'three'
 import type { RoomId } from '../types'
-import { DOOR_WIDTH, HALL_PLANTS, roomById, toWorld } from './layout'
-import { ROOM_ACCENT, DARK_WOOD, GOLD, QUIZ_COLOURS } from './style'
-import { paintFont, useFontsReady } from './fonts'
+import { DOOR_WIDTH, HALL_PLANTS, QUIZ_BOARD as DISPLAY, QUIZ_PLATFORM, QUIZ_STAND, roomById, toWorld } from './layout'
+import { ROOM_ACCENT, DARK_WOOD, GOLD } from './style'
 import Sign from './Sign'
 import EraNumeral from './EraNumeral'
 import QuizWall from './QuizWall'
+import PortalDoor from './PortalDoor'
 import { useMuseumStore } from '../state/useMuseumStore'
 
 // DECORATION OF EACH ROOM (M6), built from simple shapes. Inside each room the local axes
@@ -55,6 +55,7 @@ function RoomIdentity({ room, size }: { room: ThemedRoom; size: RoomSize }) {
           </group>
         )
       )}
+      {room !== 'quiz' && (
       <group rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.004, 0]}>
         <mesh>
           <ringGeometry args={[1.6, 1.75, 64]} />
@@ -65,6 +66,7 @@ function RoomIdentity({ room, size }: { room: ThemedRoom; size: RoomSize }) {
           <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.6} metalness={0.6} roughness={0.3} {...inlay} />
         </mesh>
       </group>
+      )}
     </>
   )
 }
@@ -426,130 +428,199 @@ function IntroHall({ size }: { size: RoomSize }) {
   )
 }
 
-// A coloured tile with one big letter on it (quiz answer tiles, question marks).
-function LetterTile({ letter, colour, width, height }: { letter: string; colour: string; width: number; height: number }) {
-  const fontsReady = useFontsReady()
-  const texture = useMemo(() => {
-    const canvas = document.createElement('canvas')
-    canvas.width = Math.round(width * 200)
-    canvas.height = Math.round(height * 200)
-    const ctx = canvas.getContext('2d')
-    if (ctx) {
-      const r = canvas.height * 0.18
-      ctx.fillStyle = colour
-      ctx.beginPath()
-      ctx.roundRect(0, 0, canvas.width, canvas.height, r)
-      ctx.fill()
-      const line = canvas.height * 0.05
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)'
-      ctx.lineWidth = line
-      ctx.beginPath()
-      ctx.roundRect(line, line, canvas.width - 2 * line, canvas.height - 2 * line, r * 0.8)
-      ctx.stroke()
-      ctx.fillStyle = '#ffffff'
-      ctx.textAlign = 'center'
-      ctx.textBaseline = 'middle'
-      ctx.font = `700 ${canvas.height * 0.62}px ${paintFont(fontsReady)}`
-      ctx.fillText(letter, canvas.width / 2, canvas.height * 0.54)
-    }
-    const tex = new CanvasTexture(canvas)
-    tex.colorSpace = SRGBColorSpace
-    return tex
-  }, [letter, colour, width, height, fontsReady])
-  useEffect(() => () => texture.dispose(), [texture])
-  return (
-    <mesh>
-      <planeGeometry args={[width, height]} />
-      {/* Rounded corners are see-through; slightly self-lit so the colours stay bright. */}
-      <meshStandardMaterial map={texture} transparent emissive="#ffffff" emissiveMap={texture} emissiveIntensity={0.45} />
-    </mesh>
-  )
-}
-
-
-// Show bulbs along the top of the back and side walls, in the quiz colours. One
-// "instanced" mesh draws all of them in a single step, much cheaper than one mesh each.
-function MarqueeBulbs({ size }: { size: RoomSize }) {
-  const mesh = useRef<InstancedMesh>(null)
-  const spots = useMemo(() => {
-    const list: [number, number][] = []
-    for (let x = -size.w / 2 + 0.4; x <= size.w / 2 - 0.4; x += 0.5) list.push([x, -size.d / 2 + 0.06])
-    for (let z = -size.d / 2 + 0.4; z <= size.d / 2 - 0.4; z += 0.5) {
-      list.push([-size.w / 2 + 0.06, z], [size.w / 2 - 0.06, z])
-    }
-    return list
-  }, [size])
-  // Unlit bulbs, brighter than white so the bloom makes them glow (the colour of each
-  // bulb is multiplied by this).
-  const material = useMemo(() => {
-    const m = new MeshBasicMaterial({ toneMapped: false })
-    m.color.setRGB(3, 3, 3)
-    return m
-  }, [])
-  useEffect(() => () => material.dispose(), [material])
-
-  useLayoutEffect(() => {
-    const bulbs = mesh.current
-    if (!bulbs) return
-    const place = new Object3D()
-    const colour = new Color()
-    spots.forEach(([x, z], i) => {
-      place.position.set(x, size.h - 0.28, z)
-      place.updateMatrix()
-      bulbs.setMatrixAt(i, place.matrix)
-      bulbs.setColorAt(i, colour.set(QUIZ_COLOURS[i % QUIZ_COLOURS.length]))
-    })
-    bulbs.instanceMatrix.needsUpdate = true
-    if (bulbs.instanceColor) bulbs.instanceColor.needsUpdate = true
-  }, [spots, size])
-
-  return (
-    <instancedMesh ref={mesh} args={[undefined, material, spots.length]}>
-      <sphereGeometry args={[0.06, 10, 8]} />
-    </instancedMesh>
-  )
-}
-
-// QUIZ ROOM: a playful TV quiz-show set. Coloured answer tiles on the back wall, big
-// question marks on the side walls, show bulbs along the top and four stage lights aimed
-// at the pedestal in the middle (where the quiz will start, M7).
+// Game Room: a bright white-and-gold salon like the intro hall and the rotunda. Cream
+// panelled walls with gold frames between white pilasters, warm sconces, a gold crown
+// moulding, a red carpet from the door up to a raised round platform under a spotlight,
+// where the quiz stand waits, and the portal door in the back wall (PortalDoor.tsx).
+const PANEL_W = 2.3
+const CREAM = '#e9dcc2'
+const IVORY = '#f6f0e4'
+// The quiz lectern: a plinth, a slim column and a sloping top with the quiz screen, like a
+// conference lectern but in ivory and gold. The screen's layout is drawn large
+// (QuizWall.tsx) and shrunk to fit. Its centre stands TOP_Y above the platform, tilted
+// back so it faces the eyes (1.6 m) of a visitor standing just in front of it.
+const STAND_SCALE = QUIZ_STAND.width / (DISPLAY.w + 0.6)
+const TOP_Y = 1.0
+const TILT = -0.7 // radians about x: the screen faces up and towards the visitor's eyes (about 40 degrees)
+const SCREEN_DEPTH = (DISPLAY.h + 0.6) * STAND_SCALE // depth of the sloping top
 function QuizRoom({ size }: { size: RoomSize }) {
-  const { ui } = useContent()
-  const stageLights: [number, number][] = [
-    [-2.6, -2.2],
-    [2.6, -2.2],
-    [-2.6, 2.2],
-    [2.6, 2.2],
-  ]
+  const gold = <meshStandardMaterial color={GOLD} metalness={0.9} roughness={0.3} />
+  const ivory = <meshStandardMaterial color={IVORY} roughness={0.35} />
+  const doorGap = DOOR_WIDTH / 2 + 0.15
+  // Along each side wall: three panels, with a pilaster before, between and after them.
+  const panelZs = [-1, 0, 1].map((k) => k * (size.d / 3))
+  const pilasterZs = [-1.5, -0.5, 0.5, 1.5].map((k) => k * (size.d / 3))
+  const p = QUIZ_PLATFORM
+  const carpetStart = p.z + p.radius - 0.1
+  const carpetLength = size.d / 2 - carpetStart
   return (
     <>
-      <MarqueeBulbs size={size} />
-      {/* The back wall is the quiz itself. */}
-      <group position={[0, 0, -size.d / 2 + 0.01]}>
-        <QuizWall />
+      {/* Raised round platform: white marble on a gold-edged step. */}
+      <group position={[0, 0, p.z]}>
+        <mesh position={[0, p.height / 2, 0]} receiveShadow>
+          <cylinderGeometry args={[p.radius, p.radius + 0.05, p.height, 64]} />
+          <meshStandardMaterial color="#f7f3ea" roughness={0.2} />
+        </mesh>
+        <mesh position={[0, p.height + 0.002, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[p.radius - 0.18, p.radius - 0.1, 64]} />
+          {gold}
+        </mesh>
+        <mesh position={[0, p.height + 0.002, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[0.8, 0.86, 48]} />
+          {gold}
+        </mesh>
+        <mesh position={[0, p.height - 0.02, 0]} rotation={[Math.PI / 2, 0, 0]}>
+          <torusGeometry args={[p.radius + 0.02, 0.03, 8, 64]} />
+          {gold}
+        </mesh>
       </group>
-      {/* Question marks on the side walls, towards the back (the quiz pedestal and its
-          board stand by the left wall nearer the entrance). */}
-      {[-1, 1].map((s, i) => (
-        <group key={s} position={[s * (size.w / 2 - 0.03), 2.2, -3]} rotation={[0, -s * Math.PI / 2, 0]}>
-          <LetterTile letter={ui.decor.quizMark} colour={QUIZ_COLOURS[i + 1]} width={1.6} height={1.6} />
+      {/* The quiz lectern. */}
+      <group position={[0, p.height, QUIZ_STAND.z]}>
+        {/* Plinth: a wide ivory base with a gold edge. */}
+        <mesh position={[0, 0.05, 0]} castShadow receiveShadow>
+          <boxGeometry args={[0.9, 0.1, 0.6]} />
+          {ivory}
+        </mesh>
+        <mesh position={[0, 0.105, 0]}>
+          <boxGeometry args={[0.8, 0.012, 0.5]} />
+          {gold}
+        </mesh>
+        {/* Column with gold bands. */}
+        <mesh position={[0, (TOP_Y - 0.1) / 2 + 0.05, -0.05]} castShadow>
+          <boxGeometry args={[0.34, TOP_Y - 0.1, 0.22]} />
+          {ivory}
+        </mesh>
+        {[0.2, TOP_Y - 0.22].map((y) => (
+          <mesh key={y} position={[0, y, -0.05]}>
+            <boxGeometry args={[0.36, 0.035, 0.24]} />
+            {gold}
+          </mesh>
+        ))}
+        {/* Sloping top: an ivory case with a gold rim, the screen set into it. */}
+        <group position={[0, TOP_Y, 0]} rotation={[TILT, 0, 0]}>
+          <mesh position={[0, 0, -0.03]} castShadow>
+            <boxGeometry args={[QUIZ_STAND.width + 0.12, SCREEN_DEPTH + 0.12, 0.06]} />
+            {ivory}
+          </mesh>
+          <mesh position={[0, 0, -0.064]}>
+            <boxGeometry args={[QUIZ_STAND.width + 0.15, SCREEN_DEPTH + 0.15, 0.012]} />
+            {gold}
+          </mesh>
+          <group position={[0, -DISPLAY.y * STAND_SCALE, 0]} scale={STAND_SCALE}>
+            <QuizWall />
+          </group>
         </group>
-      ))}
-      {/* A dark skirting band along the bottom of the walls. */}
-      <WallBand size={size} y={0.2} height={0.4} thickness={0.03} doorGap={DOOR_WIDTH / 2 + 0.15}>
-        <meshStandardMaterial color="#231b30" roughness={0.6} />
+        {/* A slim gold gooseneck microphone at the back corner. */}
+        <group position={[QUIZ_STAND.width / 2 - 0.05, TOP_Y + 0.1, -0.2]}>
+          <mesh position={[0, 0.15, 0]} rotation={[0.35, 0, 0]}>
+            <cylinderGeometry args={[0.008, 0.012, 0.32, 8]} />
+            {gold}
+          </mesh>
+          <mesh position={[0, 0.3, 0.06]}>
+            <sphereGeometry args={[0.02, 10, 8]} />
+            {gold}
+          </mesh>
+        </group>
+      </group>
+      {/* Red carpet from the door to the platform, with gold edges. */}
+      <group position={[0, 0.006, carpetStart + carpetLength / 2]} rotation={[-Math.PI / 2, 0, 0]}>
+        <mesh receiveShadow>
+          <planeGeometry args={[1.6, carpetLength]} />
+          <meshStandardMaterial color="#8c1a24" roughness={0.95} />
+        </mesh>
+        {[-1, 1].map((s) => (
+          <mesh key={s} position={[s * 0.74, 0, 0.001]}>
+            <planeGeometry args={[0.06, carpetLength]} />
+            {gold}
+          </mesh>
+        ))}
+      </group>
+      <group position={[0, 0, -size.d / 2]}>
+        <PortalDoor />
+      </group>
+      {/* Wainscot: cream panelling to 1 m, a gold rail on top and a gold line at the floor. */}
+      <WallBand size={size} y={0.5} height={1} thickness={0.06} doorGap={doorGap}>
+        <meshStandardMaterial color={CREAM} roughness={0.5} />
       </WallBand>
-      {/* Stage lights: tilted so their glowing lens faces the middle of the room. */}
-      {stageLights.map(([x, z], i) => (
-        <group key={i} position={[x, size.h - 0.35, z]} rotation={[0.5 * Math.sign(z), 0, -0.5 * Math.sign(x)]}>
-          <mesh>
-            <cylinderGeometry args={[0.16, 0.2, 0.4, 16]} />
-            <meshStandardMaterial color="#1c1c22" metalness={0.6} roughness={0.4} />
-          </mesh>
-          <mesh position={[0, -0.201, 0]} rotation={[Math.PI / 2, 0, 0]}>
-            <circleGeometry args={[0.17, 20]} />
-            <Glow colour={QUIZ_COLOURS[i]} intensity={5} />
-          </mesh>
+      <WallBand size={size} y={1.02} height={0.06} thickness={0.1} doorGap={doorGap}>
+        {gold}
+      </WallBand>
+      <WallBand size={size} y={0.05} height={0.1} thickness={0.08} doorGap={doorGap}>
+        {gold}
+      </WallBand>
+      {/* Crown moulding: a gold band under the ceiling all round the room. */}
+      <WallBand size={size} y={size.h - 0.12} height={0.24} thickness={0.12} doorGap={0}>
+        {gold}
+      </WallBand>
+      {[-1, 1].map((s) => (
+        // On each side wall, local x runs along the wall and +z points into the room.
+        <group key={s} position={[s * (size.w / 2), 0, 0]} rotation={[0, -s * Math.PI / 2, 0]}>
+          {panelZs.map((z) => (
+            <group key={z} position={[-s * z, 2.4, 0]}>
+              <mesh position={[0, 0, 0.02]}>
+                <planeGeometry args={[PANEL_W, 2.2]} />
+                <meshStandardMaterial color={CREAM} roughness={0.6} />
+              </mesh>
+              {[
+                [0, 1.1, PANEL_W + 0.1, 0.08],
+                [0, -1.1, PANEL_W + 0.1, 0.08],
+                [-PANEL_W / 2, 0, 0.08, 2.2],
+                [PANEL_W / 2, 0, 0.08, 2.2],
+              ].map(([x, y, w, h], i) => (
+                <mesh key={i} position={[x, y, 0.05]}>
+                  <boxGeometry args={[w, h, 0.06]} />
+                  {gold}
+                </mesh>
+              ))}
+              {/* A gold diamond in the middle of each panel. */}
+              <mesh position={[0, 0, 0.04]} rotation={[0, 0, Math.PI / 4]}>
+                <boxGeometry args={[0.42, 0.42, 0.03]} />
+                {gold}
+              </mesh>
+              <mesh position={[0, 0, 0.05]} rotation={[0, 0, Math.PI / 4]}>
+                <boxGeometry args={[0.28, 0.28, 0.03]} />
+                <meshStandardMaterial color={CREAM} roughness={0.6} />
+              </mesh>
+            </group>
+          ))}
+          {/* Pilasters: white with a gold base and capital; the two inner ones carry a warm
+              sconce (self-lit bulbs, no real light). */}
+          {pilasterZs.map((z, i) => (
+            <group key={z} position={[-s * z, 0, 0]}>
+              <mesh position={[0, (size.h - 0.24) / 2, 0.08]}>
+                <boxGeometry args={[0.36, size.h - 0.24, 0.16]} />
+                {ivory}
+              </mesh>
+              <mesh position={[0, 1.08, 0.12]}>
+                <boxGeometry args={[0.46, 0.14, 0.2]} />
+                {gold}
+              </mesh>
+              <mesh position={[0, size.h - 0.36, 0.12]}>
+                <boxGeometry args={[0.5, 0.2, 0.22]} />
+                {gold}
+              </mesh>
+              {(i === 1 || i === 2) && (
+                <group position={[0, 2.5, 0.16]}>
+                  <mesh>
+                    <boxGeometry args={[0.16, 0.4, 0.04]} />
+                    {gold}
+                  </mesh>
+                  <mesh position={[0, 0, 0.14]} rotation={[Math.PI / 2, 0, 0]}>
+                    <cylinderGeometry args={[0.02, 0.02, 0.28, 8]} />
+                    {gold}
+                  </mesh>
+                  <mesh position={[0, 0.06, 0.28]}>
+                    <cylinderGeometry args={[0.05, 0.07, 0.08, 16]} />
+                    {gold}
+                  </mesh>
+                  <mesh position={[0, 0.17, 0.28]}>
+                    <sphereGeometry args={[0.07, 14, 10]} />
+                    <Glow colour="#ffcf8a" intensity={5} />
+                  </mesh>
+                </group>
+              )}
+            </group>
+          ))}
         </group>
       ))}
     </>

@@ -236,12 +236,9 @@ export const SURFACES: Surface[] = ROOMS.flatMap((room) => [
 ])
 
 // The 12 rotunda corners, where pillars stand.
-// Columns stand 0.5 m in from the wall corners, so they protrude clearly from the walls.
-const PILLAR_INSET = 0.5
 export const PILLARS: [number, number][] = Array.from({ length: ROTUNDA_SIDES }, (_, i) => {
   const theta = ((i + 0.5) * 2 * Math.PI) / ROTUNDA_SIDES
-  const r = ROTUNDA_RADIUS - PILLAR_INSET
-  return [r * Math.sin(theta), -r * Math.cos(theta)]
+  return [ROTUNDA_RADIUS * Math.sin(theta), -ROTUNDA_RADIUS * Math.cos(theta)]
 })
 export const PILLAR_RADIUS = 0.4
 
@@ -309,15 +306,9 @@ function buildSpots(): ExhibitSpot[] {
         spots.push({ id, room: room.id, kind: 'wall', number: 0, x, z, yaw: faceTowards(-sideU * f.tx, -sideU * f.tz), panelSide: 1 })
       }
     } else if (room.id === 'quiz') {
-      // The pedestal and its board stand aside, by the left wall near the entrance: the
-      // back wall is the quiz screen (QuizWall.tsx), so the middle stays free to play.
-      const [x, z] = at(-(room.width / 2 - 1.7), room.vFront + 2.8)
-      const yaw = faceTowards(f.tx, f.tz) // facing across the room
-      // Board on the side further from the door (so it stays clear of the entrance).
-      const spot: ExhibitSpot = { id: 'quiz-info', room: room.id, kind: 'centre', number: 0, x, z, yaw, panelSide: 1 }
-      const [, vPlus] = toLocal(f, ...panelPosition(spot))
-      const [, vMinus] = toLocal(f, ...panelPosition({ ...spot, panelSide: -1 }))
-      spots.push({ ...spot, panelSide: vPlus >= vMinus ? 1 : -1 })
+      // No boards here for now: the back wall is the quiz screen (QuizWall.tsx) and the
+      // side walls carry decoration (RoomDecor.tsx). (The 'quiz-info' text stays in
+      // exhibits.ts, ready if a board comes back.)
     } else {
       // Overview board on the back wall (1 cm off it), facing the entrance.
       const [ox, oz] = at(0, room.vBack - 0.01)
@@ -374,6 +365,22 @@ function hallPlantBoxes(): Box[] {
   })
 }
 
+// THE GAME ROOM'S QUIZ PLATFORM: a low round dais in the middle of the room with the
+// quiz lectern on it (a screen on a plinth, RoomDecor.tsx). Distances in the room's own
+// coordinates: z from the middle of the room towards the entrance (negative = towards
+// the back wall). `width` is the lectern's screen width.
+export const QUIZ_PLATFORM = { radius: 1.5, height: 0.12, z: 0 }
+export const QUIZ_STAND = { z: -0.45, width: 1.25 }
+// The quiz screen as laid out in QuizWall.tsx (drawn large, then scaled to QUIZ_STAND.width).
+export const QUIZ_BOARD = { y: 2.24, w: 11.2, h: 3.56, bezel: 0.1, depth: 0.16 }
+
+function quizStandBox(): Box[] {
+  const room = roomById('quiz')
+  if (!room) return []
+  const [x, z] = toWorld(room.frame, 0, (room.vFront + room.vBack) / 2 - QUIZ_STAND.z)
+  return [makeBox(x, z, QUIZ_STAND.width / 2 + 0.05, 0.35, room.frame.angle)]
+}
+
 // The desk of old computers along CMCN 3's back wall (RoomDecor.tsx), local x 0,
 // z = 0.7 m in front of the back wall, 4.4 x 0.9 m.
 function ir3DeskBox(): Box[] {
@@ -392,6 +399,7 @@ export const COLLISION_BOXES: Box[] = [
   // Column bases are about 1 m wide (Rotunda.tsx).
   ...PILLARS.map(([x, z]) => makeBox(x, z, 0.55, 0.55)),
   ...ir3DeskBox(),
+  ...quizStandBox(),
   // The centrepiece in the middle of the rotunda (Centrepiece.tsx), about 3.4 m across.
   makeBox(0, 0, 1.75, 1.75, Math.PI / 4),
   ...EXHIBIT_SPOTS.filter((spot) => spot.kind === 'corner' || spot.kind === 'centre').flatMap((spot) => {

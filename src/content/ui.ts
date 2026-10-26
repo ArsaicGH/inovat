@@ -121,7 +121,9 @@ const vi = {
   quiz: {
     prompt: 'Nhấn E để chọn',
     title: 'Trò chơi câu hỏi',
-    intro: 'Câu hỏi và bốn đáp án sẽ hiện trên bức tường này. Nhắm vào đáp án bạn chọn rồi nhấn E hoặc nhấp chuột.',
+    intro: 'Câu hỏi và bốn đáp án sẽ hiện trên bảng này. Nhắm vào đáp án bạn chọn rồi nhấn E hoặc nhấp chuột. Trả lời đúng ít nhất một nửa để mở cánh cửa phía sau.',
+    doorOpen: 'Cánh cửa phía sau đã mở.',
+    doorLocked: 'Cần đúng ít nhất một nửa để mở cánh cửa phía sau.',
     progress: 'Câu {n}/{total}',
     answerLabel: 'Đáp án {letter}',
     correct: 'Chính xác!',
@@ -251,7 +253,9 @@ const en: UiText = {
   quiz: {
     prompt: 'Press E to choose',
     title: 'The Quiz',
-    intro: 'The questions and their four answers appear on this wall. Aim at the answer you choose, then press E or click.',
+    intro: 'The questions and their four answers appear on this panel. Aim at the answer you choose, then press E or click. Get at least half right to open the door at the back.',
+    doorOpen: 'The door at the back is now open.',
+    doorLocked: 'Get at least half right to open the door at the back.',
     progress: 'Question {n}/{total}',
     answerLabel: 'Answer {letter}',
     correct: 'Correct!',

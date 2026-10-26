@@ -448,7 +448,7 @@ export default function Museum() {
       <Player walls={COLLISION_BOXES} />
       <Interaction />
 
-      {/* Bloom: things brighter than white (bulbs, oculus, gold rings) glow softly.
+      {/* Bloom: things brighter than white (bulbs, gold rings) glow softly.
           ToneMapping turns the bright picture into screen colours (needed with effects). */}
       {EFFECTS && (
         // Edge smoothing by SMAA (a filter on the finished picture) instead of multisampling

@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { ERA_ROOMS, type RoomId } from '../types'
 import { LANGUAGES, type Language } from '../content/language'
 import { QUIZ_QUESTIONS } from '../content/quiz'
+import { resultLevel, scoreQuiz } from './quiz-score'
 
 // The app is always in exactly one mode (PLAN.md section 3). Only in "exploring"
 // is the mouse captured and walking allowed. (The quiz is played while exploring: it is
@@ -217,6 +218,7 @@ interface MuseumState {
   startQuiz: () => void
   answerQuiz: (choice: number) => void
   nextQuizQuestion: () => void // to the next question, or to the results after the last
+  quizPassed: boolean // half or more right once: the portal door in the back wall opens
 }
 
 export const useMuseumStore = create<MuseumState>((set) => ({
@@ -303,8 +305,11 @@ export const useMuseumStore = create<MuseumState>((set) => ({
     set((state) => {
       if (state.quizStage !== 'question' || state.quizAnswers[state.quizIndex] === null) return state // answer first
       const next = state.quizIndex + 1
-      return next < QUIZ_QUESTIONS.length ? { quizIndex: next } : { quizStage: 'results' }
+      if (next < QUIZ_QUESTIONS.length) return { quizIndex: next }
+      const passed = resultLevel(scoreQuiz(QUIZ_QUESTIONS, state.quizAnswers), QUIZ_QUESTIONS.length) !== 'retry'
+      return { quizStage: 'results', quizPassed: state.quizPassed || passed }
     }),
+  quizPassed: false,
 
   continueSavedVisit: () =>
     set((state) => {

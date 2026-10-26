@@ -1,11 +1,13 @@
 import type { RoomId } from '../types'
 import type { SurfaceName } from './textures'
+import type { PaintedName } from './painted-surfaces'
 
 // THE LOOK OF EACH ROOM (M6). Surfaces, light colour and brightness per room.
 // Part of the style guide (README.md). The rotunda has its own look (Rotunda.tsx).
 
 export interface SurfaceStyle {
   texture?: SurfaceName // leave out for a plain colour
+  painted?: PaintedName // or a surface painted in code (painted-surfaces.ts)
   colour: string // tint (white = the texture's own colours)
   tile: number // metres covered by one copy of the texture
   roughness: number // 0 = mirror-like, 1 = matte
@@ -16,6 +18,7 @@ export interface RoomTheme {
   floor: SurfaceStyle
   walls: SurfaceStyle
   ceiling: string
+  ceilingSurface?: SurfaceStyle // a patterned ceiling instead of the plain colour
   sky: string // colour of the soft "sky" fill light while in this room
   fill: number // how strong that fill light is (low = dark room, exhibits stand out)
   // A coloured light from the room's own lamps (lanterns, bulbs, panels, light strips),
@@ -55,8 +58,9 @@ export const ROOM_THEMES: Record<Exclude<RoomId, 'rotunda'>, RoomTheme> = {
   // CMCN 3: computers. Beige panels, checkered floor, fluorescent light.
   ir3: {
     floor: { texture: 'tiles', colour: '#d6cfc2', tile: 1.6, roughness: 0.45 },
-    walls: { colour: '#b4a88c', tile: 1, roughness: 0.75 },
+    walls: { painted: 'office-panels', colour: '#ffffff', tile: 1.2, roughness: 0.8 },
     ceiling: '#6a655a',
+    ceilingSurface: { painted: 'ceiling-tiles', colour: '#d9d6cc', tile: 1.2, roughness: 0.9 },
     sky: '#f2f6ff',
     fill: 0.08,
     accent: { colour: '#e4efff', intensity: 13, at: [0, 3.9, 0] }, // the fluorescent panels
@@ -64,19 +68,21 @@ export const ROOM_THEMES: Record<Exclude<RoomId, 'rotunda'>, RoomTheme> = {
   // CMCN 4: digital and smart technology. White gloss, glass, cyan light.
   ir4: {
     floor: { colour: '#a3acb3', tile: 1, roughness: 0.12, metalness: 0.2 },
-    walls: { colour: '#c3ccd4', tile: 1, roughness: 0.3 },
+    walls: { painted: 'tech-panels', colour: '#dfe6eb', tile: 1.5, roughness: 0.3 },
     ceiling: '#535b61',
+    ceilingSurface: { painted: 'tech-ceiling', colour: '#c4ccd1', tile: 2.4, roughness: 0.5 },
     sky: '#d8f6ff',
     fill: 0.08,
     accent: { colour: '#5fe3f2', intensity: 14, at: [0, 3.9, 0] }, // the cyan light ring
   },
-  // Quiz room (finished in M6 step 3).
+  // Game Room: a bright white-and-gold salon like the intro hall and the rotunda (white
+  // marble, cream walls, gold), with a red carpet up to the quiz platform.
   quiz: {
-    floor: { texture: 'tiles', colour: '#ffd9e6', tile: 1.6, roughness: 0.5 },
-    walls: { colour: '#3a2f4a', tile: 1, roughness: 0.7 },
-    ceiling: '#2a2236',
-    sky: '#ffd6e8',
-    fill: 0.1,
-    accent: { colour: '#ff8fc0', intensity: 10, at: [0, 3.6, -3] }, // the show bulbs
+    floor: { texture: 'marble', colour: '#f4efe6', tile: 3, roughness: 0.18 },
+    walls: { texture: 'plaster', colour: '#efe4cf', tile: 3, roughness: 0.85 },
+    ceiling: '#e6dccb',
+    sky: '#fff1dc',
+    fill: 0.32,
+    accent: { colour: '#ffd49a', intensity: 22, at: [0, 3.4, 0] }, // the wall sconces
   },
 }

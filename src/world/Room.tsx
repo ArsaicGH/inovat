@@ -19,7 +19,11 @@ export default function Room({ room }: { room: Exclude<RoomId, 'rotunda'> }) {
           {/* The ceiling faces down and casts no shadow, so the light still reaches inside. */}
           <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, ceilingHeight, 0]}>
             <planeGeometry args={[box.hx * 2, box.hz * 2]} />
-            <meshStandardMaterial color={theme.ceiling} roughness={0.8} />
+            {theme.ceilingSurface ? (
+              <SurfaceMaterial style={theme.ceilingSurface} width={box.hx * 2} height={box.hz * 2} />
+            ) : (
+              <meshStandardMaterial color={theme.ceiling} roughness={0.8} />
+            )}
           </mesh>
         </group>
       ))}
