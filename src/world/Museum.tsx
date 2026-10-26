@@ -179,7 +179,7 @@ function Lighting() {
       {/* The lit room's coloured lamp light (no shadows). */}
       <pointLight ref={accent} intensity={0} decay={2} />
       {/* Always on (switching it on only when the rotunda came into view made it pop). */}
-      <pointLight color="#ffd9a0" intensity={110} decay={2} position={[0, CHANDELIER_Y - 0.3, 0]} />
+      <pointLight color="#ffd9a0" intensity={125} decay={2} position={[0, CHANDELIER_Y - 0.3, 0]} />
       {/* The key light: the only shadow-casting light (CLAUDE.md allows one). A big soft
           spotlight from high above the area you are in (spot-plan.ts, KEY_PLANS). */}
       <primitive object={keyTarget} />
@@ -419,8 +419,8 @@ export default function Museum() {
       onCreated={({ gl }) => {
         // If the graphics driver resets (Windows does this when the graphics card stalls),
         // say so in the console: it explains a long freeze or a black picture.
-        gl.domElement.addEventListener('webglcontextlost', () => console.warn('INNOVA: graphics context lost (driver reset)'))
-        gl.domElement.addEventListener('webglcontextrestored', () => console.warn('INNOVA: graphics context restored'))
+        gl.domElement.addEventListener('webglcontextlost', () => console.warn('INOVAT: graphics context lost (driver reset)'))
+        gl.domElement.addEventListener('webglcontextrestored', () => console.warn('INOVAT: graphics context restored'))
         // Shadows are redrawn by ShadowThrottle (every third frame), not every frame.
         gl.shadowMap.autoUpdate = false
         gl.shadowMap.needsUpdate = true

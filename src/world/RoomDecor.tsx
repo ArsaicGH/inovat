@@ -28,6 +28,10 @@ interface RoomSize {
   h: number // height
 }
 
+// The decorations were laid out for a 14 m room; positions are stretched by this factor so
+// they spread out evenly in rooms of any size.
+const spread = (size: RoomSize) => size.w / 14
+
 // Era number (or the quiz room's name sign) high on the back wall, and a medallion in
 // the middle of the floor.
 function RoomIdentity({ room, size }: { room: ThemedRoom; size: RoomSize }) {
@@ -40,7 +44,7 @@ function RoomIdentity({ room, size }: { room: ThemedRoom; size: RoomSize }) {
       {/* Era rooms: a huge decorated number above the overview board (which ends at
           2.78 m). */}
       {room === 'ir1' || room === 'ir2' || room === 'ir3' || room === 'ir4' ? (
-        <group position={[0, 3.6, -size.d / 2 + 0.03]}>
+        <group position={[0, size.h - 1.6, -size.d / 2 + 0.03]}>
           <EraNumeral era={room} />
         </group>
       ) : (
@@ -68,14 +72,14 @@ function RoomIdentity({ room, size }: { room: ThemedRoom; size: RoomSize }) {
 // CMCN 1: dark wooden ceiling beams, wall lanterns, iron gears on the back wall.
 function SteamAge({ size }: { size: RoomSize }) {
   const lanterns: [number, number, number][] = [
-    [-size.w / 2 + 0.15, 2.6, -3],
-    [-size.w / 2 + 0.15, 2.6, 3],
-    [size.w / 2 - 0.15, 2.6, -3],
-    [size.w / 2 - 0.15, 2.6, 3],
+    [-size.w / 2 + 0.15, 2.6, -3 * spread(size)],
+    [-size.w / 2 + 0.15, 2.6, 3 * spread(size)],
+    [size.w / 2 - 0.15, 2.6, -3 * spread(size)],
+    [size.w / 2 - 0.15, 2.6, 3 * spread(size)],
   ]
   return (
     <>
-      {[-4.5, -1.5, 1.5, 4.5].map((z) => (
+      {[-4.5, -1.5, 1.5, 4.5].map((z) => z * spread(size)).map((z) => (
         <mesh key={z} position={[0, size.h - 0.2, z]}>
           <boxGeometry args={[size.w, 0.4, 0.35]} />
           <meshStandardMaterial color={DARK_WOOD} roughness={0.7} />
@@ -95,8 +99,8 @@ function SteamAge({ size }: { size: RoomSize }) {
       ))}
       {/* Gears on the back wall, either side of the overview board. */}
       {[
-        [-4.4, 1.2],
-        [4.4, 0.85],
+        [-(size.w / 2 - 2.6), 1.2],
+        [size.w / 2 - 2.6, 0.85],
       ].map(([x, r], i) => (
         <group key={i} position={[x, 1.9, -size.d / 2 + 0.12]}>
           <mesh>
@@ -123,7 +127,7 @@ function ElectricAge({ size }: { size: RoomSize }) {
   const steel = <meshStandardMaterial color="#5b636c" metalness={0.8} roughness={0.35} />
   return (
     <>
-      {[-4, 0, 4].map((z) => (
+      {[-4, 0, 4].map((z) => z * spread(size)).map((z) => (
         <group key={z} position={[0, size.h - 0.25, z]}>
           <mesh>
             <boxGeometry args={[size.w, 0.5, 0.06]} />
@@ -137,8 +141,8 @@ function ElectricAge({ size }: { size: RoomSize }) {
           ))}
         </group>
       ))}
-      {[-3, 0, 3].flatMap((x) =>
-        [-3, 3].map((z) => (
+      {[-3, 0, 3].map((x) => x * spread(size)).flatMap((x) =>
+        [-3, 3].map((z) => z * spread(size)).map((z) => (
           <group key={`${x}${z}`} position={[x, 0, z]}>
             <mesh position={[0, size.h - 0.75, 0]}>
               <cylinderGeometry args={[0.01, 0.01, 1.5, 4]} />
@@ -160,8 +164,8 @@ function ComputerAge({ size }: { size: RoomSize }) {
   const beige = <meshStandardMaterial color="#e3d6b6" roughness={0.6} />
   return (
     <>
-      {[-3.5, 0, 3.5].flatMap((x) =>
-        [-3.5, 0, 3.5].map((z) => (
+      {[-3.5, 0, 3.5].map((x) => x * spread(size)).flatMap((x) =>
+        [-3.5, 0, 3.5].map((z) => z * spread(size)).map((z) => (
           <mesh key={`${x}${z}`} position={[x, size.h - 0.01, z]} rotation={[Math.PI / 2, 0, 0]}>
             <planeGeometry args={[1.8, 0.5]} />
             <Glow colour="#eef6ff" intensity={0.35} />
@@ -221,7 +225,7 @@ function DigitalAge({ size }: { size: RoomSize }) {
         )),
       )}
       <mesh position={[0, size.h - 0.05, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[3, 0.05, 8, 80]} />
+        <torusGeometry args={[3 * spread(size), 0.05, 8, 80]} />
         <Glow colour="#7fe9ff" intensity={1} />
       </mesh>
       <group ref={hologram} position={[0, 2.2, 0]}>

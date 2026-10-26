@@ -16,15 +16,16 @@ export const WALL_THICKNESS = 0.2
 const T = WALL_THICKNESS
 
 export const ROTUNDA_SIDES = 12
-export const ROTUNDA_APOTHEM = 12 // centre to the middle of each side: 24 m across (leader's choice)
+export const ROTUNDA_APOTHEM = 12 // centre to the middle of each side: 24 m across (leader's choice, more immersive than 18 m)
 export const ROTUNDA_RADIUS = ROTUNDA_APOTHEM / Math.cos(Math.PI / ROTUNDA_SIDES) // centre to each corner
 export const SIDE_LENGTH = 2 * ROTUNDA_APOTHEM * Math.tan(Math.PI / ROTUNDA_SIDES) // about 6.4 m
 export const ROTUNDA_HEIGHT = 8
 export const CHANDELIER_Y = 9.4 // height of the chandelier in the rotunda
 
 export const DOOR_WIDTH = 2.4
-// Rooms start this far from the centre. Closer, and neighbouring rooms would overlap.
-const ROOM_START = 15
+// Rooms start this far from the centre. Closer, and neighbouring rooms (era rooms 18 m
+// wide, 60 degrees apart) would overlap; beyond the rotunda wall this leaves a passage.
+const ROOM_START = 17
 const CORNER_INSET = 3.4 // how far corner exhibits stand from the walls
 const PANEL_OFFSET = 2.3 // text panel distance from the centre of its plinth
 
@@ -32,15 +33,15 @@ export type DoorStyle = 'grand' | 'plain'
 const DOOR_HEIGHT: Record<DoorStyle, number> = { grand: 3.6, plain: 3 }
 
 // side: which rotunda side the room is on, counted clockwise from north (0 = north).
-const ROOM_SPECS: { id: RoomId; side: number; width: number; depth: number; doorStyle: DoorStyle }[] = [
-  { id: 'hall', side: 6, width: 12, depth: 10, doorStyle: 'plain' }, // south: start
-  { id: 'ir1', side: 8, width: 14, depth: 14, doorStyle: 'grand' }, // south-west
-  { id: 'ir2', side: 10, width: 14, depth: 14, doorStyle: 'grand' }, // north-west
-  { id: 'ir3', side: 2, width: 14, depth: 14, doorStyle: 'grand' }, // north-east
-  { id: 'ir4', side: 4, width: 14, depth: 14, doorStyle: 'grand' }, // south-east
-  { id: 'quiz', side: 0, width: 12, depth: 10, doorStyle: 'plain' }, // north: end
+// Era rooms are large and tall, to match the 24 m rotunda (leader: spacious, comfortable).
+const ROOM_SPECS: { id: RoomId; side: number; width: number; depth: number; height: number; doorStyle: DoorStyle }[] = [
+  { id: 'hall', side: 6, width: 12, depth: 10, height: 4.5, doorStyle: 'plain' }, // south: start
+  { id: 'ir1', side: 8, width: 18, depth: 18, height: 5.5, doorStyle: 'grand' }, // south-west
+  { id: 'ir2', side: 10, width: 18, depth: 18, height: 5.5, doorStyle: 'grand' }, // north-west
+  { id: 'ir3', side: 2, width: 18, depth: 18, height: 5.5, doorStyle: 'grand' }, // north-east
+  { id: 'ir4', side: 4, width: 18, depth: 18, height: 5.5, doorStyle: 'grand' }, // south-east
+  { id: 'quiz', side: 0, width: 12, depth: 10, height: 4.5, doorStyle: 'plain' }, // north: end
 ]
-const ROOM_HEIGHT = 4.5
 
 // A collision box. cos/sin are stored so they are not recalculated every frame.
 // (Kept here, not in collision.ts, so this file only borrows TYPES from other files and a
@@ -104,12 +105,11 @@ export const ROOMS: RoomLayout[] = ROOM_SPECS.map((spec) => {
   const vFront = ROOM_START + T
   const vBack = vFront + spec.depth
   // Arrive just inside the entrance, looking into the room. The visit starts a little
-  // further in, facing the INNOVA sign on the hall's back wall.
+  // further in, facing the INOVAT sign on the hall's back wall.
   const spawnV = spec.id === 'hall' ? vFront + 3 : vFront + 1.5
   return {
     ...spec,
     frame,
-    height: ROOM_HEIGHT,
     vFront,
     vBack,
     doorHeight: DOOR_HEIGHT[spec.doorStyle],
@@ -236,9 +236,12 @@ export const SURFACES: Surface[] = ROOMS.flatMap((room) => [
 ])
 
 // The 12 rotunda corners, where pillars stand.
+// Columns stand 0.5 m in from the wall corners, so they protrude clearly from the walls.
+const PILLAR_INSET = 0.5
 export const PILLARS: [number, number][] = Array.from({ length: ROTUNDA_SIDES }, (_, i) => {
   const theta = ((i + 0.5) * 2 * Math.PI) / ROTUNDA_SIDES
-  return [ROTUNDA_RADIUS * Math.sin(theta), -ROTUNDA_RADIUS * Math.cos(theta)]
+  const r = ROTUNDA_RADIUS - PILLAR_INSET
+  return [r * Math.sin(theta), -r * Math.cos(theta)]
 })
 export const PILLAR_RADIUS = 0.4
 

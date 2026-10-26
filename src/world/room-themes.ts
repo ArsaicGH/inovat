@@ -41,7 +41,7 @@ export const ROOM_THEMES: Record<Exclude<RoomId, 'rotunda'>, RoomTheme> = {
     ceiling: '#3b2a1e',
     sky: '#ffcf96',
     fill: 0.13,
-    accent: { colour: '#ffa04d', intensity: 14, at: [-5.6, 2.6, 0] }, // the wall lanterns
+    accent: { colour: '#ffa04d', intensity: 16, at: [-7.4, 2.6, 0] }, // the wall lanterns
   },
   // CMCN 2: electricity and mass production. Steel, concrete, early bulbs.
   ir2: {

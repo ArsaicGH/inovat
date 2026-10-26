@@ -91,7 +91,7 @@ export const credits: Credit[] = [
   },
   {
     item: { vi: 'Nhạc CMCN 3: "Korobeiniki" (dân ca Nga, nhạc nền Tetris) phong cách 8-bit, do nhóm tự tạo bằng mã', en: 'CMCN 3 music: "Korobeiniki" (Russian folk song, the Tetris theme) in 8-bit style, generated in code by the team' },
-    author: 'INNOVA (arrangement); traditional melody',
+    author: 'INOVAT (arrangement); traditional melody',
     licence: { vi: 'Giai điệu thuộc phạm vi công cộng; bản phối do nhóm tạo', en: 'Melody in the public domain; arrangement made by the team' },
     source: 'https://en.wikipedia.org/wiki/Korobeiniki',
     files: ['sounds/music/ir3.ogg'],
@@ -105,7 +105,7 @@ export const credits: Credit[] = [
   },
   {
     item: { vi: 'Âm thanh chào đón ở sảnh giới thiệu (nhịp binaural) và tiếng chuông bước hướng dẫn, do nhóm tạo bằng FFmpeg', en: 'Intro hall welcome sound (binaural beat) and tutorial step chime, generated with FFmpeg by the team' },
-    author: 'INNOVA',
+    author: 'INOVAT',
     licence: { vi: 'Sản phẩm của nhóm', en: 'Our own work' },
     source: 'https://ffmpeg.org',
     files: ['sounds/ambience/hall.ogg', 'sounds/ui/step-done.ogg'],

@@ -1,7 +1,9 @@
 import Centrepiece from './Centrepiece'
 import MergeStatic from './MergeStatic'
+import HangingSculptures from './HangingSculptures'
+import { paintDome } from './dome-painting'
 import { useEffect, useMemo } from 'react'
-import { BackSide, CanvasTexture, RepeatWrapping, SRGBColorSpace } from 'three'
+import { BackSide } from 'three'
 import {
   DOOR_WIDTH,
   PILLARS,
@@ -106,7 +108,8 @@ function WallDecor() {
 
 // Blank-wall decoration: a gold-framed fabric panel between two glowing wall lamps.
 function DamaskPanel({ halfSide }: { halfSide: number }) {
-  const w = 3
+  // Sized from the wall, with room for the wall lamps on either side.
+  const w = halfSide * 0.9
   const h = 3.4
   const y = 3.9
   const t = 0.12 // frame thickness
@@ -128,7 +131,7 @@ function DamaskPanel({ halfSide }: { halfSide: number }) {
         </mesh>
       ))}
       {[-1, 1].map((s) => (
-        <group key={s} position={[s * (halfSide - 0.85), 3.1, 0]}>
+        <group key={s} position={[s * (halfSide - 0.5), 3.1, 0]}>
           <mesh position={[0, 0, 0.03]}>
             <boxGeometry args={[0.16, 0.36, 0.06]} />
             <meshStandardMaterial color={GOLD} metalness={0.9} roughness={0.3} />
@@ -146,31 +149,40 @@ function DamaskPanel({ halfSide }: { halfSide: number }) {
 // A column at each of the 12 corners: base, shaft, gold rings and a capital.
 function Columns() {
   const shaftHeight = H - 1.05
+  // White polished marble with cream stone and gilded bases, rings and capitals.
+  const marble = <meshStandardMaterial color="#f1ebdd" roughness={0.25} />
+  const stone = <meshStandardMaterial color="#e3dac8" roughness={0.4} />
+  const gold = <meshStandardMaterial color={GOLD} metalness={0.9} roughness={0.3} />
   return (
     <>
       {PILLARS.map(([x, z], i) => (
         <group key={i} position={[x, 0, z]} rotation={[0, Math.atan2(x, z), 0]}>
           <mesh position={[0, 0.25, 0]} castShadow receiveShadow>
             <boxGeometry args={[1.0, 0.5, 1.0]} />
-            <meshStandardMaterial color="#e3dac8" roughness={0.4} />
+            {stone}
+          </mesh>
+          <mesh position={[0, 0.56, 0]} castShadow>
+            <cylinderGeometry args={[0.46, 0.5, 0.12, 24]} />
+            {gold}
           </mesh>
           <mesh position={[0, 0.5 + shaftHeight / 2, 0]} castShadow receiveShadow>
             <cylinderGeometry args={[0.36, 0.4, shaftHeight, 24]} />
-            <meshStandardMaterial color="#f1ebdd" roughness={0.3} />
+            {marble}
           </mesh>
-          {[0.58, H - 0.62].map((y) => (
-            <mesh key={y} position={[0, y, 0]}>
-              <torusGeometry args={[0.41, 0.035, 8, 32]} />
-              <meshStandardMaterial color={GOLD} metalness={0.9} roughness={0.25} />
+          {/* Gold rings round the shaft, lying flat. */}
+          {[0.68, 2.4, H - 0.62].map((y) => (
+            <mesh key={y} position={[0, y, 0]} rotation={[Math.PI / 2, 0, 0]}>
+              <torusGeometry args={[y < 1 ? 0.41 : 0.38, 0.035, 8, 32]} />
+              {gold}
             </mesh>
           ))}
           <mesh position={[0, H - 0.4, 0]} receiveShadow>
             <cylinderGeometry args={[0.55, 0.38, 0.3, 24]} />
-            <meshStandardMaterial color="#e9e1cf" roughness={0.35} />
+            {gold}
           </mesh>
           <mesh position={[0, H - 0.15, 0]} receiveShadow>
             <boxGeometry args={[1.15, 0.2, 1.15]} />
-            <meshStandardMaterial color="#e9e1cf" roughness={0.35} />
+            {stone}
           </mesh>
         </group>
       ))}
@@ -204,40 +216,16 @@ function Cornice() {
 
 // Coffers (recessed square panels) painted onto a small picture that repeats over the dome.
 // On a dome the squares naturally get smaller towards the top, like real coffers.
-function useCofferTexture() {
-  const texture = useMemo(() => {
-    const size = 128
-    const canvas = document.createElement('canvas')
-    canvas.width = canvas.height = size
-    const ctx = canvas.getContext('2d')
-    if (ctx) {
-      ctx.fillStyle = '#e8dcc3' // ribs between coffers
-      ctx.fillRect(0, 0, size, size)
-      for (let i = 0; i < 4; i++) {
-        // Nested squares, darker inwards, to look recessed.
-        const inset = 14 + i * 9
-        const shade = 200 - i * 22
-        ctx.fillStyle = `rgb(${shade + 20}, ${shade + 8}, ${shade - 20})`
-        ctx.fillRect(inset, inset, size - 2 * inset, size - 2 * inset)
-      }
-      ctx.fillStyle = '#c9a25a' // small gold rosette in the middle
-      ctx.beginPath()
-      ctx.arc(size / 2, size / 2, 7, 0, Math.PI * 2)
-      ctx.fill()
-    }
-    const tex = new CanvasTexture(canvas)
-    tex.colorSpace = SRGBColorSpace
-    tex.wrapS = tex.wrapT = RepeatWrapping
-    tex.repeat.set(32, 7)
-    tex.anisotropy = 8
-    return tex
-  }, [])
+// The dome's painting (dome-painting.ts): classical coffers with an era section above
+// each era door. Painted once.
+function useDomeTexture() {
+  const texture = useMemo(() => paintDome(), [])
   useEffect(() => () => texture.dispose(), [texture])
   return texture
 }
 
 function Dome() {
-  const coffers = useCofferTexture()
+  const coffers = useDomeTexture()
   const radius = ROTUNDA_RADIUS
   const oculusAngle = 0.18 // leaves a round opening about 4.4 m wide at the top
   const top = H + radius * Math.cos(oculusAngle)
@@ -262,37 +250,105 @@ function Dome() {
   )
 }
 
-// A two-tier chandelier hanging from the dome, with glowing candle bulbs. (Its real light
-// lives in Museum.tsx, outside the hide-when-unseen group: see ChandelierLight there.)
+// A grand three-tier chandelier hanging from the dome: an ornate gilded column, curved-
+// looking arms out to three rings of candles (gold cups, cream candles, glowing flames)
+// and strings of crystal drops that catch the light. (Its real light lives in Museum.tsx,
+// outside the hide-when-unseen group.) Static, so it is merged into a few meshes.
 function Chandelier() {
   const y = CHANDELIER_Y
   const tiers: [number, number, number][] = [
-    [1.6, 0, 16], // radius, height offset, bulbs
-    [0.95, -0.45, 8],
+    [2.5, 0, 24], // radius, height offset, candles
+    [1.75, -0.6, 16],
+    [1.0, -1.15, 10],
   ]
+  const gold = <meshStandardMaterial color={GOLD} metalness={0.9} roughness={0.25} />
+  const crystal = (
+    <meshStandardMaterial color="#f4f7ff" emissive="#fff1d8" emissiveIntensity={1.4} roughness={0.05} toneMapped={false} />
+  )
   return (
     <group position={[0, y, 0]}>
+      {/* Chain up to the dome and a canopy where it hangs. */}
       <mesh position={[0, 5.4, 0]}>
-        <cylinderGeometry args={[0.03, 0.03, 10.6, 6]} />
+        <cylinderGeometry args={[0.035, 0.035, 10.6, 6]} />
         <meshStandardMaterial color="#2e2a26" metalness={0.6} />
       </mesh>
-      <mesh>
-        <sphereGeometry args={[0.32, 24, 16]} />
-        <meshStandardMaterial color={GOLD} metalness={0.9} roughness={0.25} />
+      {/* Ornate central column: stacked gold forms. */}
+      {[
+        [0.55, 0.22, 0.32],
+        [0.2, 0.18, 0.5],
+        [-0.25, 0.38, 0.3],
+        [-0.75, 0.24, 0.45],
+        [-1.25, 0.3, 0.25],
+      ].map(([dy, r, h], i) => (
+        <mesh key={i} position={[0, dy, 0]}>
+          <cylinderGeometry args={[r * 0.8, r, h, 20]} />
+          {gold}
+        </mesh>
+      ))}
+      <mesh position={[0, -0.25, 0]}>
+        <sphereGeometry args={[0.42, 24, 16]} />
+        {gold}
       </mesh>
-      {tiers.map(([r, dy, bulbs]) => (
+      {/* Finial and a big crystal at the bottom. */}
+      <mesh position={[0, -1.55, 0]}>
+        <coneGeometry args={[0.18, 0.4, 16]} />
+        {gold}
+      </mesh>
+      <mesh position={[0, -1.95, 0]} rotation={[0, 0, 0]}>
+        <octahedronGeometry args={[0.16, 0]} />
+        {crystal}
+      </mesh>
+
+      {tiers.map(([r, dy, candles]) => (
         <group key={r} position={[0, dy, 0]}>
+          {/* The ring and a thinner ring just below it. */}
           <mesh rotation={[Math.PI / 2, 0, 0]}>
-            <torusGeometry args={[r, 0.045, 8, 64]} />
-            <meshStandardMaterial color={GOLD} metalness={0.9} roughness={0.25} />
+            <torusGeometry args={[r, 0.06, 10, 72]} />
+            {gold}
           </mesh>
-          {Array.from({ length: bulbs }, (_, i) => {
-            const a = (i / bulbs) * Math.PI * 2
+          <mesh position={[0, -0.12, 0]} rotation={[Math.PI / 2, 0, 0]}>
+            <torusGeometry args={[r * 0.96, 0.025, 8, 72]} />
+            {gold}
+          </mesh>
+          {/* Arms from the column to the ring (six per tier). */}
+          {Array.from({ length: 6 }, (_, i) => {
+            const a = (i / 6) * Math.PI * 2 + r
             return (
-              <mesh key={i} position={[Math.cos(a) * r, 0.1, Math.sin(a) * r]}>
-                <sphereGeometry args={[0.07, 10, 8]} />
-                <Glow colour="#ffd49a" intensity={8} />
+              <mesh key={i} position={[(Math.cos(a) * r) / 2, -0.05, (Math.sin(a) * r) / 2]} rotation={[0, -a, 0.08]}>
+                <boxGeometry args={[r, 0.05, 0.05]} />
+                {gold}
               </mesh>
+            )
+          })}
+          {Array.from({ length: candles }, (_, i) => {
+            const a = (i / candles) * Math.PI * 2
+            const cx = Math.cos(a) * r
+            const cz = Math.sin(a) * r
+            return (
+              <group key={i} position={[cx, 0, cz]}>
+                {/* Gold cup, cream candle, glowing flame. */}
+                <mesh position={[0, 0.06, 0]}>
+                  <cylinderGeometry args={[0.09, 0.05, 0.08, 12]} />
+                  {gold}
+                </mesh>
+                <mesh position={[0, 0.2, 0]}>
+                  <cylinderGeometry args={[0.035, 0.035, 0.2, 8]} />
+                  <meshStandardMaterial color="#f3ead6" roughness={0.6} />
+                </mesh>
+                <mesh position={[0, 0.34, 0]}>
+                  <sphereGeometry args={[0.045, 10, 8]} />
+                  <Glow colour="#ffd49a" intensity={8} />
+                </mesh>
+                {/* A crystal drop hanging below each candle. */}
+                <mesh position={[0, -0.32, 0]}>
+                  <cylinderGeometry args={[0.004, 0.004, 0.36, 4]} />
+                  {gold}
+                </mesh>
+                <mesh position={[0, -0.55, 0]}>
+                  <octahedronGeometry args={[0.07, 0]} />
+                  {crystal}
+                </mesh>
+              </group>
             )
           })}
         </group>
@@ -315,6 +371,7 @@ export default function Rotunda() {
         <Chandelier />
       </MergeStatic>
       <Centrepiece />
+      <HangingSculptures />
     </>
   )
 }

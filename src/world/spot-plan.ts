@@ -105,9 +105,10 @@ function roomKey(id: RoomId): KeyAim[] {
 
 export const KEY_PLANS = new Map<RoomId, KeyAim>(
   [
-    // Rotunda: grand and welcoming, not dim: a wide warm light from the dome over the whole
-    // hall (the cinematic darkness is kept for the era rooms).
-    ['rotunda', { from: [0, 11.8, 1.2], to: [0, 0.8, 0], angle: 1.0, intensity: 300 } as KeyAim],
+    // Rotunda: a soft-edged spotlight from the dome onto the centrepiece (not so bright that
+    // it washes it out). The hall around stays welcoming: the chandelier and an even fill
+    // light it (see Lighting in Museum.tsx), so only the light from above was toned down.
+    ['rotunda', { from: [0, 11.8, 1.2], to: [0, 0.8, 0], angle: 0.36, intensity: 210 } as KeyAim],
     ...(['hall', 'ir1', 'ir2', 'ir3', 'ir4', 'quiz'] as RoomId[]).flatMap((id) => roomKey(id).map((key) => [id, key] as [RoomId, KeyAim])),
   ],
 )

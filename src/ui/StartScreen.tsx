@@ -5,7 +5,7 @@ import LockButton from './LockButton'
 import LanguageSwitch from './LanguageSwitch'
 import VolumeSlider from './VolumeSlider'
 
-// First screen: the decorated INNOVA title and a start button. After "Bắt đầu" the visitor
+// First screen: the decorated INOVAT title and a start button. After "Bắt đầu" the visitor
 // chooses whether to take the guided tutorial; either choice captures the mouse and the
 // Player then switches to "exploring".
 export default function StartScreen() {

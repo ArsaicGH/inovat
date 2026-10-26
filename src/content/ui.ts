@@ -16,7 +16,7 @@ const vi = {
     progress: 'Hướng dẫn {n}/{total}',
     steps: {
       intro: {
-        title: 'Chào mừng đến INNOVA',
+        title: 'Chào mừng đến INOVAT',
         text: 'Hướng dẫn sẽ giới thiệu từng thao tác. Nhấn phím cách (Space) để bắt đầu.',
         tip: 'Mẹo: nhấn F11 để chơi toàn màn hình, cho trải nghiệm tốt nhất.',
       },
@@ -141,7 +141,7 @@ const vi = {
   // Shown instead of the museum on phones and tablets.
   device: {
     title: 'Vui lòng dùng máy tính',
-    text: 'INNOVA là bảo tàng 3D điều khiển bằng bàn phím và chuột hoặc touchpad, nên hiện chỉ chơi được trên máy tính. Hãy mở trang này trên máy tính để bàn hoặc máy tính xách tay.',
+    text: 'INOVAT là bảo tàng 3D điều khiển bằng bàn phím và chuột hoặc touchpad, nên hiện chỉ chơi được trên máy tính. Hãy mở trang này trên máy tính để bàn hoặc máy tính xách tay.',
   },
 }
 
@@ -159,7 +159,7 @@ const en: UiText = {
     progress: 'Tutorial {n}/{total}',
     steps: {
       intro: {
-        title: 'Welcome to INNOVA',
+        title: 'Welcome to INOVAT',
         text: 'This guide introduces the controls one at a time. Press Space to begin.',
         tip: 'Tip: press F11 to play in full screen for the best experience.',
       },
@@ -270,7 +270,7 @@ const en: UiText = {
   },
   device: {
     title: 'Please use a computer',
-    text: 'INNOVA is a 3D museum controlled with a keyboard and a mouse or touchpad, so for now it can only be played on a computer. Please open this page on a desktop or laptop.',
+    text: 'INOVAT is a 3D museum controlled with a keyboard and a mouse or touchpad, so for now it can only be played on a computer. Please open this page on a desktop or laptop.',
   },
 }
 

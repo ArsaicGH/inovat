@@ -595,7 +595,7 @@ body {
   to { opacity: 1; transform: none; }
 }
 
-/* INNOVA in polished gold: a gradient painted inside the letters, with a soft glow. */
+/* INOVAT in polished gold: a gradient painted inside the letters, with a soft glow. */
 .game-title {
   margin: 0;
   font-size: clamp(64px, 11vw, 148px);
