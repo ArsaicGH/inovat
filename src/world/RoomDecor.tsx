@@ -451,8 +451,11 @@ function QuizRoom({ size }: { size: RoomSize }) {
   const panelZs = [-1, 0, 1].map((k) => k * (size.d / 3))
   const pilasterZs = [-1.5, -0.5, 0.5, 1.5].map((k) => k * (size.d / 3))
   const p = QUIZ_PLATFORM
-  const carpetStart = p.z + p.radius - 0.1
-  const carpetLength = size.d / 2 - carpetStart
+  // The carpet runs from the start of the entrance passage (5 m long) to the portal door;
+  // the platform sits on top of it.
+  const carpetFront = size.d / 2 + 4.8
+  const carpetBack = -size.d / 2 + 0.05
+  const carpetLength = carpetFront - carpetBack
   return (
     <>
       {/* Raised round platform: white marble on a gold-edged step. */}
@@ -522,14 +525,14 @@ function QuizRoom({ size }: { size: RoomSize }) {
           </mesh>
         </group>
       </group>
-      {/* Red carpet from the door to the platform, with gold edges. */}
-      <group position={[0, 0.006, carpetStart + carpetLength / 2]} rotation={[-Math.PI / 2, 0, 0]}>
+      {/* Red carpet from the entrance to the portal door, with gold edges. */}
+      <group position={[0, 0.006, (carpetFront + carpetBack) / 2]} rotation={[-Math.PI / 2, 0, 0]}>
         <mesh receiveShadow>
           <planeGeometry args={[1.6, carpetLength]} />
           <meshStandardMaterial color="#8c1a24" roughness={0.95} />
         </mesh>
         {[-1, 1].map((s) => (
-          <mesh key={s} position={[s * 0.74, 0, 0.001]}>
+          <mesh key={s} position={[s * 0.74, 0, 0.003]}>
             <planeGeometry args={[0.06, carpetLength]} />
             {gold}
           </mesh>

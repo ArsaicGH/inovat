@@ -54,17 +54,17 @@ function quiz(): SpotAim[] {
   for (const u of [-1.4, 1.4]) {
     const [tx, tz] = toWorld(room.frame, u * 0.5, room.vBack - 0.1)
     const [fx, fz] = toWorld(room.frame, u, room.vBack - 2.2)
-    aims.push({ from: [fx, room.height - 0.25, fz], to: [tx, 1.7, tz], strength: 0.5 })
+    aims.push({ from: [fx, room.height - 0.25, fz], to: [tx, 1.7, tz], strength: 0.15 })
   }
   // ...one on the middle panel of each side wall...
   for (const side of [-1, 1]) {
     const [tx, tz] = toWorld(room.frame, side * (room.width / 2 - 0.05), v)
     const [fx, fz] = toWorld(room.frame, side * (room.width / 2 - 2.2), v)
-    aims.push({ from: [fx, room.height - 0.25, fz], to: [tx, 2.3, tz], strength: 0.35 })
+    aims.push({ from: [fx, room.height - 0.25, fz], to: [tx, 2.3, tz], strength: 0.2 })
   }
-  // ...and the strongest straight down on the raised quiz platform: the player's stage.
-  const [cx, cz] = toWorld(room.frame, 0, v + 0.4)
-  aims.push({ from: [cx, room.height - 0.25, cz], to: [cx, 0, cz], strength: 0.9 })
+  // ...and by far the strongest, a tight beam on the quiz lectern: the centre of attention.
+  const [cx, cz] = toWorld(room.frame, 0, v + 0.45)
+  aims.push({ from: [cx, room.height - 0.25, cz], to: [cx, 0.9, cz], narrow: true, strength: 1.1 })
   return aims
 }
 
@@ -87,7 +87,7 @@ export interface KeyAim extends SpotAim {
 
 // How strong each room's wash is: the darker the room, the more the exhibits stand out.
 // (The intro hall is a bright, welcoming lobby; only the era rooms are dim.)
-const WASH: Partial<Record<RoomId, number>> = { hall: 40, ir1: 12, ir2: 9, ir3: 7, ir4: 7, quiz: 40 }
+const WASH: Partial<Record<RoomId, number>> = { hall: 40, ir1: 12, ir2: 9, ir3: 7, ir4: 7, quiz: 10 }
 
 function roomKey(id: RoomId): KeyAim[] {
   const room = roomById(id)

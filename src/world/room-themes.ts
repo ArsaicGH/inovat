@@ -82,7 +82,7 @@ export const ROOM_THEMES: Record<Exclude<RoomId, 'rotunda'>, RoomTheme> = {
     walls: { texture: 'plaster', colour: '#efe4cf', tile: 3, roughness: 0.85 },
     ceiling: '#e6dccb',
     sky: '#fff1dc',
-    fill: 0.32,
-    accent: { colour: '#ffd49a', intensity: 22, at: [0, 3.4, 0] }, // the wall sconces
+    fill: 0.12, // dimmer than the hall, so the spotlit quiz lectern is the centre of attention
+    accent: { colour: '#ffd49a', intensity: 11, at: [0, 3.4, 0] }, // the wall sconces
   },
 }
