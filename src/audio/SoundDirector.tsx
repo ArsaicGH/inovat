@@ -3,7 +3,7 @@ import { AUDIO_ENABLED } from '../features'
 import { useMuseumStore } from '../state/useMuseumStore'
 import { QUIZ_QUESTIONS } from '../content/quiz'
 import { ERA_ROOMS } from '../types'
-import { duckAmbience, loadSounds, playEffect, setAmbience, setVolumes, unlockAudio } from './sound'
+import { duckAmbience, loadSounds, playEffect, playWelcome, setAmbience, setVolumes, unlockAudio } from './sound'
 
 // Listens to what happens in the game (the shared store) and plays the matching sound.
 // Footsteps and doors are played from Player.tsx and Doors.tsx, where they happen.
@@ -31,6 +31,8 @@ export default function SoundDirector() {
 
       // Menus and panels.
       if (state.mode !== before.mode) {
+        // Leaving the start screen (after the tutorial question): the welcome sound, once.
+        if (before.mode === 'start') playWelcome()
         if (state.mode === 'reading') playEffect('open')
         if (before.mode === 'reading') playEffect('close')
         if (state.mode === 'map') playEffect('mapOpen')

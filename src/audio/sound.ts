@@ -3,9 +3,10 @@ import { AUDIO_ENABLED } from '../features'
 
 // SOUND ENGINE (M8b), using the browser's built-in Web Audio (no extra package).
 // - Effects: short sounds played once (clicks, footsteps, doors, quiz).
-// - Ambience: one loop per area, cross-faded when you move between areas: a welcoming
-//   binaural tone in the intro hall, quiet room tone in the central hall and the Game Room,
-//   era music in the four era rooms.
+// - Ambience: one loop per area, cross-faded when you move between areas: quiet room tone
+//   in the central hall, era music in the four era rooms, a calm prelude in the Game Room. The
+//   intro hall has no loop: the opening of Vivaldi's "Spring" plays once when the start
+//   screen closes.
 // Volumes: master x (effects or ambience), plus an on/off switch; all set from the
 // settings (useMuseumStore) through setVolumes().
 // Browsers only allow sound after the visitor's first click or key press, so nothing
@@ -47,26 +48,31 @@ const PITCH: Partial<Record<EffectName, number>> = {
 const STEP_FILES = ['/sounds/steps/step-0.ogg', '/sounds/steps/step-1.ogg']
 let nextFoot = 0
 
-const AMBIENCE: Record<RoomId, string> = {
+// (No entry = no loop in that area.)
+const AMBIENCE: Partial<Record<RoomId, string>> = {
   rotunda: '/sounds/ambience/rotunda.ogg',
-  hall: '/sounds/ambience/hall.ogg',
-  // Era music: Verdi's "Anvil Chorus" (hammers on anvils, like a forge), Joplin's ragtime
-  // (1906 recording), an 8-bit "Korobeiniki" (the Tetris tune), futuristic sci-fi ambient.
+  // Era music: atmospheric ambient tracks (CC0, OpenGameArt), one per era, for now:
+  // "Factory ambiance", "Elevator To Reactor", "Life in corrupted binary", "Claimed by the Void".
   ir1: '/sounds/music/ir1.ogg',
   ir2: '/sounds/music/ir2.ogg',
   ir3: '/sounds/music/ir3.ogg',
   ir4: '/sounds/music/ir4.ogg',
-  quiz: '/sounds/ambience/quiz.ogg',
+  // Game Room: "Prelude in F# Minor", calm and grand for the quiz.
+  quiz: '/sounds/music/quiz.ogg',
 }
+// Played once, when the visitor leaves the start screen (after the tutorial question).
+const WELCOME = '/sounds/music/welcome.ogg'
+const WELCOME_LEVEL = 0.6
 // How loud each area's loop is (they were recorded at very different levels).
 const AMBIENCE_LEVEL: Record<RoomId, number> = {
   rotunda: 0.55,
-  hall: 0.4,
-  ir1: 0.42, // the same level as CMCN 2 (both recordings are about equally loud)
-  ir2: 0.42,
-  ir3: 0.32,
-  ir4: 0.55, // a soft ambient track, mastered quieter than the old placeholder
-  quiz: 0.35,
+  hall: 0,
+  // The four era tracks are level-matched when converted, so they share one level.
+  ir1: 0.5,
+  ir2: 0.5,
+  ir3: 0.5,
+  ir4: 0.5,
+  quiz: 0.45,
 }
 const AMBIENCE_FADE = 1.5 // seconds to cross-fade between areas
 
@@ -112,6 +118,7 @@ export function loadSounds(): Promise<void> {
       ...Object.values(EFFECTS),
       ...STEP_FILES,
       ...Object.values(AMBIENCE),
+      WELCOME,
     ]
     loading = Promise.all(urls.map(load)).then(() => undefined)
   }
@@ -161,18 +168,24 @@ let ambienceSource: AudioBufferSourceNode | null = null
 let ambienceGain: GainNode | null = null
 let ambienceDucked = false
 
-// Play the loop of `room` (cross-fading from the previous one).
+// Play the loop of `room` (cross-fading from the previous one), or fade to silence in an
+// area without a loop.
 export function setAmbience(room: RoomId) {
   if (!context || !ambienceBus || room === ambienceRoom) return
-  const buffer = buffers.get(AMBIENCE[room])
-  if (!buffer) return // not loaded yet: tried again on the next change
+  const url = AMBIENCE[room]
+  const buffer = url ? buffers.get(url) : undefined
+  if (url && !buffer) return // not loaded yet: tried again on the next change
   const now = context.currentTime
   // Fade the old loop out and stop it afterwards.
   if (ambienceSource && ambienceGain) {
     const oldSource = ambienceSource
     ambienceGain.gain.setTargetAtTime(0, now, AMBIENCE_FADE / 3)
     oldSource.stop(now + AMBIENCE_FADE * 2)
+    ambienceSource = null
+    ambienceGain = null
   }
+  ambienceRoom = room
+  if (!buffer) return
   const source = context.createBufferSource()
   source.buffer = buffer
   source.loop = true
@@ -181,9 +194,23 @@ export function setAmbience(room: RoomId) {
   gain.gain.setTargetAtTime(ambienceDucked ? 0 : AMBIENCE_LEVEL[room], now, AMBIENCE_FADE / 3)
   source.connect(gain).connect(ambienceBus)
   source.start()
-  ambienceRoom = room
   ambienceSource = source
   ambienceGain = gain
+}
+
+// The welcome sound, once (on the ambience volume, like the music).
+let welcomed = false
+export function playWelcome() {
+  if (welcomed || !context || context.state !== 'running' || !ambienceBus) return
+  const buffer = buffers.get(WELCOME)
+  if (!buffer) return
+  welcomed = true
+  const source = context.createBufferSource()
+  source.buffer = buffer
+  const gain = context.createGain()
+  gain.gain.value = WELCOME_LEVEL
+  source.connect(gain).connect(ambienceBus)
+  source.start()
 }
 
 // While paused or in a menu, the ambience fades away; it comes back when walking again.

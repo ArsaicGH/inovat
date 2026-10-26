@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Candidate music downloads to listen to (large; the chosen track goes to public/sounds/music)
+/soundtracks/
