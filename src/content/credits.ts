@@ -83,10 +83,10 @@ export const credits: Credit[] = [
     files: ['sounds/music/ir1.ogg'],
   },
   {
-    item: { vi: 'Nhạc CMCN 2: "Elevator To Reactor" (nhạc nền không khí)', en: 'CMCN 2 music: "Elevator To Reactor" (atmospheric ambience)' },
-    author: 'Hazmat Harry (OpenGameArt)',
+    item: { vi: 'Nhạc CMCN 2: "Factorio Clone Music" (nhạc nền nhà máy)', en: 'CMCN 2 music: "Factorio Clone Music" (factory background music)' },
+    author: 'Pro Sensory (OpenGameArt)',
     licence: CC0,
-    source: 'https://opengameart.org/content/elevator-to-reactor-loop',
+    source: 'https://opengameart.org/content/factorio-clone-music',
     files: ['sounds/music/ir2.ogg'],
   },
   {
