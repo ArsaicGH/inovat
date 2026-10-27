@@ -944,8 +944,8 @@ body {
 /* ---------- Pause menu: gold and glass ---------- */
 .pause-card {
   box-sizing: border-box;
-  width: min(460px, calc(100% - 32px));
-  padding: 26px 32px 22px;
+  width: min(520px, calc(100% - 32px));
+  padding: 34px 44px 28px;
   border: 1px solid rgba(201, 162, 90, 0.45);
   border-radius: 16px;
   background: rgba(24, 19, 13, 0.7);
@@ -958,20 +958,21 @@ body {
 }
 .pause-card .sensitivity,
 .pause-card .language-setting {
-  margin: 0 0 18px;
+  gap: 10px;
+  margin: 0 0 30px;
   color: #e9dcc0;
 }
 .pause-card .sensitivity input {
   accent-color: #c9a25a;
 }
 .pause-card .button-row .start-button {
-  margin-top: 4px;
+  margin-top: 10px;
   padding: 11px 30px;
   font-size: 15px;
   letter-spacing: 0.08em;
 }
 .pause-card .pause-hint {
-  margin: 14px 0 0;
+  margin: 22px 0 0;
 }
 .pause-card .tutorial-done {
   text-align: left;
@@ -1038,7 +1039,7 @@ body {
 }
 .pause-card .title-ornament {
   width: auto;
-  margin: 10px 0 16px;
+  margin: 14px 0 30px;
 }
 
 /* ---------- Volume slider on the start screen (above the language pill) ---------- */

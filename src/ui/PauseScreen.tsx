@@ -33,8 +33,8 @@ export default function PauseScreen() {
         {tutorialHere && <p className="tutorial-done">{ui.tutorial.pauseIntro}</p>}
         {/* Settings live here (more can be added as the game grows). */}
         <SensitivitySlider />
-        <GraphicsSlider />
         <VolumeSlider />
+        <GraphicsSlider />
         <LanguageSwitch label={ui.language.label} />
         <div className="button-row">
           <LockButton label={ui.pause.resume} className="start-button" />
