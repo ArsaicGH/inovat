@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useContent } from '../content/use-content'
 import { useMuseumStore, isQuizUnlocked } from '../state/useMuseumStore'
 import { resumeWalking } from '../world/pointer-lock'
-import type { RoomId } from '../types'
+import { ERA_ROOMS, type RoomId } from '../types'
 
 // The map follows the museum's shape: the rotunda in the middle, the rooms on a circle
 // around it (north at the top). Each room's place is set in index.css (.map-<room>).
@@ -53,7 +53,10 @@ export default function MapMenu() {
         <p className="map-hint">{ui.map.hint}</p>
         <div className="map-plan">
           {MAP_ROOMS.map((room) => {
-            const locked = room === 'quiz' && !quizOpen
+            // Only rooms already visited can be travelled to (the halls are always open;
+            // the Game Room opens once all four era rooms are visited).
+            const unvisited = ERA_ROOMS.includes(room) && !visited.includes(room) && room !== currentRoom
+            const locked = (room === 'quiz' && !quizOpen) || unvisited
             const classes = ['map-room', `map-${room}`]
             if (room === currentRoom) classes.push('map-room-current')
             return (
@@ -69,8 +72,8 @@ export default function MapMenu() {
                   <span className="map-room-name">{roomNames[room].name}</span>
                 )}
                 {room === currentRoom && <span className="map-here">{ui.map.youAreHere}</span>}
-                {locked && <span className="map-here">{ui.map.locked}</span>}
-                {room !== currentRoom && visited.includes(room) && <span className="map-visited">{ui.map.visited}</span>}
+                {room === 'quiz' && !quizOpen && <span className="map-visited">{ui.map.locked}</span>}
+                {unvisited && <span className="map-visited">{ui.map.notVisited}</span>}
               </button>
             )
           })}

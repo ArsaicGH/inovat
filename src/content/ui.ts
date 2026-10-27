@@ -38,7 +38,7 @@ const vi = {
       },
       map: {
         title: 'Bản đồ',
-        text: 'Nhấn Q để mở bản đồ bảo tàng. Chọn một phòng để đi thẳng đến đó.',
+        text: 'Nhấn Q để mở bản đồ bảo tàng. Chọn một phòng để đi thẳng đến đó. Bạn chỉ có thể dịch chuyển đến những phòng đã tham quan.',
       },
       pause: {
         title: 'Tạm dừng',
@@ -109,8 +109,8 @@ const vi = {
     title: 'Bản đồ bảo tàng',
     hint: 'Chọn một phòng để đi đến đó.',
     youAreHere: 'Bạn đang ở đây',
-    locked: 'Đang khóa',
-    visited: 'Đã tham quan',
+    locked: 'Sau khi tham quan tất cả phòng',
+    notVisited: 'Chưa tham quan',
     close: 'Đóng',
     closeHint: 'Nhấp vào khoảng trống hoặc nhấn Q để đóng',
   },
@@ -198,7 +198,7 @@ const en: UiText = {
       },
       map: {
         title: 'Map',
-        text: 'Press Q to open the museum map. Pick a room to go straight there.',
+        text: 'Press Q to open the museum map. Pick a room to go straight there. You can only travel to rooms you have visited.',
       },
       pause: {
         title: 'Pause',
@@ -260,8 +260,8 @@ const en: UiText = {
     title: 'Museum map',
     hint: 'Pick a room to go there.',
     youAreHere: 'You are here',
-    locked: 'Locked',
-    visited: 'Visited',
+    locked: 'After visiting every room',
+    notVisited: 'Not visited yet',
     close: 'Close',
     closeHint: 'Click on blank space or press Q to close',
   },

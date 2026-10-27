@@ -486,8 +486,10 @@ body {
   border-radius: 50%;
   aspect-ratio: 1;
 }
+/* Locked rooms (not visited yet, or the Game Room before every room is visited): grey. */
 .map-room:disabled {
   opacity: 0.45;
+  filter: grayscale(1);
   cursor: not-allowed;
 }
 .map-room-short {

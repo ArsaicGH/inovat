@@ -30,7 +30,7 @@ const vi: TouchText = {
     move: { text: 'Dùng cần điều khiển ở góc dưới bên trái để đi lại.' },
     sprint: { text: 'Đẩy cần điều khiển hết cỡ để chạy nhanh hơn, ví dụ khi băng qua sảnh trung tâm.' },
     interact: { text: 'Đến gần một bảng thông tin rồi chạm vào nó để phóng to.' },
-    map: { text: 'Chạm nút bản đồ ở góc trên bên phải. Chọn một phòng để đi thẳng đến đó.' },
+    map: { text: 'Chạm nút bản đồ ở góc trên bên phải. Chọn một phòng để đi thẳng đến đó. Bạn chỉ có thể dịch chuyển đến những phòng đã tham quan.' },
     pause: { text: 'Chạm nút tạm dừng ở góc trên bên phải. Menu tạm dừng chứa các cài đặt, ví dụ độ nhạy camera.' },
     keys: {
       title: 'Cách điều khiển',
@@ -69,7 +69,7 @@ const en: TouchText = {
     move: { text: 'Use the joystick in the bottom-left corner to walk.' },
     sprint: { text: 'Push the joystick all the way to move faster, for example when crossing the Central Hall.' },
     interact: { text: 'Walk up to an information board and tap it to enlarge it.' },
-    map: { text: 'Tap the map button in the top-right corner. Pick a room to go straight there.' },
+    map: { text: 'Tap the map button in the top-right corner. Pick a room to go straight there. You can only travel to rooms you have visited.' },
     pause: { text: 'Tap the pause button in the top-right corner. The pause menu holds the settings, such as camera sensitivity.' },
     keys: {
       title: 'Controls',
