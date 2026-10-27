@@ -261,7 +261,8 @@ Create the Vite React + TypeScript project, push to GitHub, connect Vercel.
 - [ ] Tested on the leader's phone (first test done: 60 fps on an Adreno 740 phone); then an iPad and an Android tablet. PAUSED here at the end of the session (leader); continue from this list. Test on a phone with `npx vite --host --port 5180` and the laptop's Wi-Fi address.
 - [ ] Phone/tablet quality level tuned on real devices (the automatic quality check runs as on computers).
 - [x] ~~Restrict to laptops and tablets~~: dropped, phones stay supported (leader).
-- [x] Phone fixes after the leader's test: ambient occlusion off on touch devices (it made the walls grey and smudgy), the welcome music now starts on phones too, smaller text and enlarged boards on phone screens.
+- [x] Phone fixes after the leader's test: ambient occlusion off on touch devices (it made the walls grey and smudgy), the welcome music now starts on phones too, smaller text on enlarged boards on phone screens.
+- [x] Dynamic thumbstick like Roblox's (leader): appears wherever the thumb lands on the left 45% of the screen, a walking ring (speed grows with the drag), a dashed sprint ring further out that lights up gold when passed (sprint), trailing dots, and the centre follows a thumb that goes too far. Right side: look around. Taps work on both sides.
 
 ### Phase D: Real content (needs the group's content document)
 

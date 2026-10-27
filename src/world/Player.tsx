@@ -21,8 +21,6 @@ const BASE_MOUSE_SENSITIVITY = 0.0015
 // Touch screens: radians per pixel of finger drag at sensitivity 1 (dragging across a
 // phone screen turns roughly half way round). The same sensitivity slider applies.
 const BASE_TOUCH_SENSITIVITY = 0.005
-// Pushing the on-screen joystick this far (of its full reach) sprints.
-const JOYSTICK_SPRINT = 0.95
 // Stop just short of straight up/down, so the camera can never flip upside-down.
 const MAX_PITCH = Math.PI / 2 - 0.05
 
@@ -54,7 +52,7 @@ const KEY_RELEASE_GRACE_MS = 60
 // not angle, so it feels the same at any sensitivity), the "move" step after walking this far.
 const TUTORIAL_LOOK_TIME = 2 // seconds of turning
 const TUTORIAL_WALK_TIME = 2 // seconds of walking
-const TUTORIAL_SPRINT_TIME = 2 // seconds of moving with Shift held (or the joystick pushed all the way)
+const TUTORIAL_SPRINT_TIME = 2 // seconds of moving with Shift held (or the thumbstick pulled past its sprint ring)
 
 // FOOTSTEPS: one step sound every STEP_LENGTH metres. At walking speed (3 m/s) that is
 // 2 steps a second, a calm walk; sprinting (5.5 m/s) gives about 2.6, a brisk run.
@@ -308,7 +306,7 @@ export default function Player({ walls }: PlayerProps) {
     const canMove = canUse(store.tutorial, 'move')
     // On-screen joystick (touch devices): how far it is pushed, 0-1.
     const stick = canMove ? Math.min(1, Math.hypot(touchInput.moveX, touchInput.moveY)) : 0
-    const sprinting = canUse(store.tutorial, 'sprint') && (isDown(SPRINT) || stick >= JOYSTICK_SPRINT)
+    const sprinting = canUse(store.tutorial, 'sprint') && (isDown(SPRINT) || (stick > 0 && touchInput.sprint))
 
     // Camera: arrow keys change the target, then the camera glides towards it.
     const turn = canLook ? (isDown(TURN_RIGHT) ? 1 : 0) - (isDown(TURN_LEFT) ? 1 : 0) : 0

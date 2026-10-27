@@ -1097,29 +1097,65 @@ body {
   z-index: 1;
   touch-action: none;
 }
-/* Joystick in the bottom-left corner: a gold ring with a knob. */
-.touch-stick {
+/* DYNAMIC THUMBSTICK (TouchControls.tsx), like Roblox's: it appears wherever a thumb lands
+   on the left side of the screen. All its parts are centred on their point (--x, --y). */
+.stick-part {
   position: fixed;
-  left: max(28px, env(safe-area-inset-left));
-  bottom: max(28px, env(safe-area-inset-bottom));
-  width: 120px;
-  height: 120px;
-  border: 2px solid rgba(232, 199, 126, 0.55);
+  left: var(--x);
+  top: var(--y);
+  transform: translate(-50%, -50%);
   border-radius: 50%;
-  background: rgba(20, 17, 13, 0.35);
-  display: grid;
-  place-items: center;
   pointer-events: none;
 }
-.touch-stick-off {
+/* While not touched: a faint ring in the bottom-left corner shows where to put a thumb. */
+.stick-rest {
+  left: max(96px, calc(env(safe-area-inset-left) + 68px));
+  top: auto;
+  bottom: max(36px, env(safe-area-inset-bottom));
+  transform: translate(-50%, 0);
+  width: 112px;
+  height: 112px;
+  border: 2px solid rgba(232, 199, 126, 0.3);
+  background: rgba(20, 17, 13, 0.2);
+}
+.stick-rest-off {
   opacity: 0.35;
 }
-.touch-knob {
+/* Where the thumb landed: the walking ring (pushed to its edge = full walking speed). */
+.stick-base {
+  width: var(--size);
+  height: var(--size);
+  border: 2px solid rgba(232, 199, 126, 0.55);
+  background: rgba(20, 17, 13, 0.3);
+}
+/* The sprint ring, further out: pull the thumb past it to run. Faint until reached. */
+.stick-sprint {
+  width: var(--size);
+  height: var(--size);
+  border: 1.5px dashed rgba(232, 199, 126, 0.3);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.stick-sprint-on {
+  border: 2px solid rgba(255, 214, 130, 0.95);
+  box-shadow: 0 0 18px rgba(255, 200, 110, 0.55), inset 0 0 18px rgba(255, 200, 110, 0.3);
+}
+/* Small dots from the ring to the thumb, fading out towards it. */
+.stick-dot {
+  width: 9px;
+  height: 9px;
+  background: rgba(241, 216, 152, var(--alpha));
+}
+/* Under the thumb: the gold knob (brighter, with a glow, while sprinting). */
+.stick-knob {
   width: 52px;
   height: 52px;
-  border-radius: 50%;
   background: radial-gradient(circle at 40% 35%, #f1d898, #b8893d);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  transition: box-shadow 0.15s;
+}
+.stick-knob-sprint {
+  background: radial-gradient(circle at 40% 35%, #fff2c8, #e0a84a);
+  box-shadow: 0 0 22px rgba(255, 200, 110, 0.8);
 }
 /* Map, pause and "?" buttons in the top-right corner. */
 .touch-buttons {
@@ -1254,10 +1290,10 @@ body {
   }
   .tutorial-card h3 {
     margin: 2px 0 4px;
-    font-size: 14px;
+    font-size: 15px;
   }
   .tutorial-card p {
-    font-size: 12px;
+    font-size: 13px;
     line-height: 1.45;
   }
   .tutorial-card .tutorial-tip {
@@ -1272,11 +1308,11 @@ body {
   }
   .key-list h3 {
     margin: 0 0 4px;
-    font-size: 14px;
+    font-size: 15px;
   }
   .key-list dl > div {
     padding: 3px 0;
-    font-size: 11px;
+    font-size: 12px;
   }
   /* Pause menu: tighter spacing so all settings and buttons fit. */
   .pause-card {
@@ -1311,25 +1347,18 @@ body {
     margin: 4px 0 6px;
     font-size: 12px;
   }
-  /* Enlarged exhibit board: smaller (on a phone held close, a full-screen board makes the
-     text far bigger than needed), so the close button below fits too. */
+  /* Enlarged exhibit board: a little smaller, so the close button below still fits; and
+     smaller text on it (a phone is held close: the laptop text size looked oversized). */
   .board-zoom {
-    width: min(72vw, calc(62vh * var(--ratio)), 1000px);
+    width: min(92vw, calc(70vh * var(--ratio)), 1000px);
+  }
+  .board-paper {
+    --unit: clamp(10px, 3.4cqw, 15px);
   }
   .info-panel {
     gap: 8px;
   }
   .hud-title h1 {
-    font-size: 15px;
-  }
-  .hud-title p {
-    font-size: 11px;
-  }
-  /* Smaller on-screen text: a phone is held close, so laptop sizes look oversized. (Only
-     here, by screen height: tablets keep the laptop sizes, only their controls differ.) */
-  .hud-prompt,
-  .hud-notice {
-    padding: 6px 12px;
-    font-size: 12px;
+    font-size: 18px;
   }
 }

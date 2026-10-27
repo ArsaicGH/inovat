@@ -21,6 +21,8 @@ export const touchInput = {
   // Joystick: -1..1 each way (x = right, y = down on screen, so pushing up = walk forward).
   moveX: 0,
   moveY: 0,
+  // The thumbstick is pulled past its sprint ring (TouchControls.tsx): run.
+  sprint: false,
   // Finger drags to look around, in screen pixels, added up since the last frame.
   lookX: 0,
   lookY: 0,

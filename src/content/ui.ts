@@ -158,7 +158,7 @@ const vi = {
     map: 'Bản đồ',
     pause: 'Tạm dừng',
     help: 'Cách điều khiển',
-    joystick: 'Cần điều khiển',
+    joystick: 'Cần điều khiển (nửa trái màn hình)',
     rotate: 'Hãy xoay ngang thiết bị để tham quan bảo tàng.',
   },
   // Shown instead of the museum on phones and tablets.
@@ -307,7 +307,7 @@ const en: UiText = {
     map: 'Map',
     pause: 'Pause',
     help: 'Controls',
-    joystick: 'Joystick',
+    joystick: 'Thumbstick (left half of the screen)',
     rotate: 'Please turn your device sideways to visit the museum.',
   },
   device: {
