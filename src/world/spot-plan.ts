@@ -50,8 +50,14 @@ function quiz(): SpotAim[] {
   if (!room) return []
   const aims: SpotAim[] = []
   const v = (room.vFront + room.vBack) / 2
-  // (No lamps on the portal door in the back wall: they competed with the lectern. Leader.)
-  // One on the middle panel of each side wall...
+  // Two faint lamps on the portal door in the back wall, just enough to pick it out (at a
+  // third of their old strength: brighter, they competed with the lectern. Leader.)...
+  for (const u of [-1.4, 1.4]) {
+    const [tx, tz] = toWorld(room.frame, u * 0.5, room.vBack - 0.1)
+    const [fx, fz] = toWorld(room.frame, u, room.vBack - 2.2)
+    aims.push({ from: [fx, room.height - 0.25, fz], to: [tx, 1.7, tz], strength: 0.05 })
+  }
+  // ...one on the middle panel of each side wall...
   for (const side of [-1, 1]) {
     const [tx, tz] = toWorld(room.frame, side * (room.width / 2 - 0.05), v)
     const [fx, fz] = toWorld(room.frame, side * (room.width / 2 - 2.2), v)
