@@ -42,7 +42,10 @@ const MAX_PIXEL_RATIO = testSwitches.get('dpr') === '1' ? 1 : IS_TOUCH ? 2 : 1.5
 const ANTIALIAS = testSwitches.get('aa') !== '0'
 const SHADOWS = testSwitches.get('shadows') !== '0'
 const EFFECTS = testSwitches.get('fx') !== '0'
-const AO = testSwitches.get('ao') !== '0'
+// Never on phones and tablets: their less precise depth pictures turned the effect into
+// grey, smudgy patches on the big flat walls (leader's phone). It is hard to see on a small
+// screen anyway, and dropping it saves work there.
+const AO = testSwitches.get('ao') !== '0' && !IS_TOUCH
 // The screen's full sharpness, within the cap above.
 const FULL_RATIO = Math.min(window.devicePixelRatio, MAX_PIXEL_RATIO)
 

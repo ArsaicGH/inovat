@@ -1254,10 +1254,10 @@ body {
   }
   .tutorial-card h3 {
     margin: 2px 0 4px;
-    font-size: 15px;
+    font-size: 14px;
   }
   .tutorial-card p {
-    font-size: 13px;
+    font-size: 12px;
     line-height: 1.45;
   }
   .tutorial-card .tutorial-tip {
@@ -1272,11 +1272,11 @@ body {
   }
   .key-list h3 {
     margin: 0 0 4px;
-    font-size: 15px;
+    font-size: 14px;
   }
   .key-list dl > div {
     padding: 3px 0;
-    font-size: 12px;
+    font-size: 11px;
   }
   /* Pause menu: tighter spacing so all settings and buttons fit. */
   .pause-card {
@@ -1311,14 +1311,25 @@ body {
     margin: 4px 0 6px;
     font-size: 12px;
   }
-  /* Enlarged exhibit board: a little smaller, so the close button below still fits. */
+  /* Enlarged exhibit board: smaller (on a phone held close, a full-screen board makes the
+     text far bigger than needed), so the close button below fits too. */
   .board-zoom {
-    width: min(92vw, calc(70vh * var(--ratio)), 1000px);
+    width: min(72vw, calc(62vh * var(--ratio)), 1000px);
   }
   .info-panel {
     gap: 8px;
   }
   .hud-title h1 {
-    font-size: 18px;
+    font-size: 15px;
+  }
+  .hud-title p {
+    font-size: 11px;
+  }
+  /* Smaller on-screen text: a phone is held close, so laptop sizes look oversized. (Only
+     here, by screen height: tablets keep the laptop sizes, only their controls differ.) */
+  .hud-prompt,
+  .hud-notice {
+    padding: 6px 12px;
+    font-size: 12px;
   }
 }

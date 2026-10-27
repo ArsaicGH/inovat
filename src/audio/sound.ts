@@ -275,8 +275,13 @@ export function setAmbience(room: RoomId) {
 
 // The welcome sound, once (on the ambience volume, like the music).
 let welcomed = false
+// Not only when the sound system is already running: on phones it is often still starting
+// up (resume() takes a moment) at the tap that closes the start screen, and the welcome
+// was then skipped for good. Now it starts anyway and is heard as soon as sound is on
+// (or, if the browser refuses, on the next tap, like the music).
 export function playWelcome() {
-  if (welcomed || !context || context.state !== 'running') return
+  if (welcomed || !context) return
+  if (context.state === 'suspended') void context.resume()
   const welcome = stream(WELCOME, false)
   if (!welcome) return
   welcomed = true

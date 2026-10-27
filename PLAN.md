@@ -251,7 +251,7 @@ Create the Vite React + TypeScript project, push to GitHub, connect Vercel.
   - Tried and removed (made the camera worse for the leader): raw mouse input, a frame pacer, mouse-report filters, switching off the 3D library's click/hover system. Found: the leader's laptop drops frames even on an empty test page (laptop/browser setting, not the game; leader chose to ignore it).
 - [ ] **Skeleton complete:** a classmate can start the game, visit every room, open every placeholder exhibit and finish the placeholder quiz unaided.
 
-**M9b. Phones and tablets** (leader: the organisation uses many tablets, mostly iPads, some Android). Built for all touch devices for now, because the leader tests on a phone; once polished, only laptops and tablets will be allowed (phones get DeviceMessage again).
+**M9b. Phones and tablets** (leader: the organisation uses many tablets, mostly iPads, some Android). Phones are supported too (leader's decision: screen size is no problem), so DeviceMessage stays unused. Tablets use the laptop text sizes; only phone-sized (short) screens get smaller text.
 - [x] Touch input: joystick bottom-left (pushed all the way = sprint), drag anywhere else to look, tap an exhibit or quiz answer to open or choose it (aimed at the tapped point), buttons top-right for map, pause and "?" (controls list). Several fingers at once.
 - [x] No mouse capture on touch: Start / Continue begin walking directly (and switch Android phones to full screen).
 - [x] Touch wording for every key or mouse text, both languages (`ui-touch.ts`), including the tutorial (tap to begin, joystick, tap, buttons) and the controls list.
@@ -260,7 +260,8 @@ Create the Vite React + TypeScript project, push to GitHub, connect Vercel.
 - [x] Phone layout fixed after the leader's first test (start screen, tutorial cards, controls list), and every screen checked by measurement at 740x360, 948x460 and 1024x768 (no real overlaps or overflow). Touch devices may draw up to 2x (CLAUDE.md); on touch, ambient occlusion is dropped before any sharpness.
 - [ ] Tested on the leader's phone (first test done: 60 fps on an Adreno 740 phone); then an iPad and an Android tablet. PAUSED here at the end of the session (leader); continue from this list. Test on a phone with `npx vite --host --port 5180` and the laptop's Wi-Fi address.
 - [ ] Phone/tablet quality level tuned on real devices (the automatic quality check runs as on computers).
-- [ ] Restrict to laptops and tablets (phones: message).
+- [x] ~~Restrict to laptops and tablets~~: dropped, phones stay supported (leader).
+- [x] Phone fixes after the leader's test: ambient occlusion off on touch devices (it made the walls grey and smudgy), the welcome music now starts on phones too, smaller text and enlarged boards on phone screens.
 
 ### Phase D: Real content (needs the group's content document)
 
