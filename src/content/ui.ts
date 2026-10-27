@@ -56,7 +56,6 @@ const vi = {
     title: 'Tạm dừng',
     resume: 'Tiếp tục',
     clickHint: 'Nhấp vào khoảng trống hoặc nhấn Tiếp tục',
-    map: 'Bản đồ',
   },
   // While walking without the mouse captured (e.g. after resuming with Esc).
   clickToLook: 'Nhấp chuột để dùng chuột xoay góc nhìn',
@@ -216,7 +215,6 @@ const en: UiText = {
     title: 'Paused',
     resume: 'Continue',
     clickHint: 'Click on blank space or press Continue',
-    map: 'Map',
   },
   clickToLook: 'Click to look around with the mouse',
   keyList: {

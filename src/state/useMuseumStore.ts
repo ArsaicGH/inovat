@@ -12,7 +12,7 @@ export type Mode = 'start' | 'exploring' | 'paused' | 'reading' | 'map'
 // Mouse/touchpad sensitivity is a multiplier: 1 = default speed.
 export const SENSITIVITY_MIN = 0.2
 export const SENSITIVITY_MAX = 3
-const SENSITIVITY_STORAGE_KEY = 'innova-mouse-sensitivity'
+const SENSITIVITY_STORAGE_KEY = 'inovat-mouse-sensitivity'
 
 // Remember the visitor's choice in this browser. Storage can be blocked
 // (private windows, strict settings), so failures just fall back to the default.
@@ -38,7 +38,7 @@ function saveSensitivity(value: number) {
 // to the development server dropped, F5...), the title screen offers to continue the
 // earlier visit: rooms visited, tutorial step, position. Kept in sessionStorage, which
 // belongs to this tab only, so a new visit in a new tab starts fresh.
-const PROGRESS_STORAGE_KEY = 'innova-progress'
+const PROGRESS_STORAGE_KEY = 'inovat-progress'
 
 export interface Pose {
   x: number
@@ -75,7 +75,7 @@ const savedProgress = loadProgress()
 export const hasSavedProgress = savedProgress !== null
 
 // Language of every text in the game, remembered in this browser (Vietnamese by default).
-const LANGUAGE_STORAGE_KEY = 'innova-language'
+const LANGUAGE_STORAGE_KEY = 'inovat-language'
 
 function loadLanguage(): Language {
   try {
@@ -104,7 +104,7 @@ export interface Volumes {
   effects: number
   ambience: number
 }
-const SOUND_STORAGE_KEY = 'innova-sound'
+const SOUND_STORAGE_KEY = 'inovat-sound'
 const DEFAULT_SOUND = { on: true, volumes: { master: 0.8, effects: 0.8, ambience: 0.7 } }
 
 function loadSound(): { on: boolean; volumes: Volumes } {
@@ -132,7 +132,7 @@ const savedSound = loadSound()
 // loading (AdaptiveQuality); otherwise the visitor's own choice. Remembered in this browser.
 export type GraphicsLevel = 0 | 1 | 2 | 3 | 4
 export const GRAPHICS_LEVEL_MAX: GraphicsLevel = 4
-const GRAPHICS_STORAGE_KEY = 'innova-graphics'
+const GRAPHICS_STORAGE_KEY = 'inovat-graphics'
 
 function loadGraphics(): { auto: boolean; level: GraphicsLevel } {
   try {

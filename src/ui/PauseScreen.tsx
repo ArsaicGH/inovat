@@ -10,7 +10,6 @@ import GraphicsSlider from './GraphicsSlider'
 // Shown after Esc (or whenever the mouse is released while walking).
 export default function PauseScreen() {
   const { ui } = useContent()
-  const setMode = useMuseumStore((state) => state.setMode)
   // During the tutorial's last steps the menu explains itself.
   const tutorialHere = useMuseumStore((state) => state.tutorial === 'keys')
 
@@ -34,14 +33,11 @@ export default function PauseScreen() {
         {tutorialHere && <p className="tutorial-done">{ui.tutorial.pauseIntro}</p>}
         {/* Settings live here (more can be added as the game grows). */}
         <SensitivitySlider />
-        <VolumeSlider />
         <GraphicsSlider />
+        <VolumeSlider />
         <LanguageSwitch label={ui.language.label} />
         <div className="button-row">
           <LockButton label={ui.pause.resume} className="start-button" />
-          <button type="button" className="start-button start-button-quiet" onClick={() => setMode('map')}>
-            {ui.pause.map}
-          </button>
         </div>
         <p className="map-hint pause-hint">{ui.pause.clickHint}</p>
       </div>

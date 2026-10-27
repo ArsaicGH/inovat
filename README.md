@@ -1,7 +1,7 @@
-# INOVAT – Bảo tàng Cách mạng Công nghiệp
+# INOVAT - Bảo tàng Cách mạng Công nghiệp
 
 A browser-based 3D virtual museum about the four Industrial Revolutions, made by a school group.
-Live site: https://innova-museum.vercel.app — full plan and status: [PLAN.md](PLAN.md).
+Live site: https://inovat-museum.vercel.app - full plan and status: [PLAN.md](PLAN.md).
 
 ## Run it locally
 

@@ -49,7 +49,7 @@ function buildTexts(lang: Language): Record<string, ExhibitText> {
       body: credits
         // (Sound credits only while sound is switched on, see src/features.ts.)
         .filter((c) => AUDIO_ENABLED || !c.files.every((file) => file.startsWith('sounds/')))
-        .map((c) => `${c.item[lang]} – ${c.author} (${c.licence[lang]})`).join('; ') + '.',
+        .map((c) => `${c.item[lang]} - ${c.author} (${c.licence[lang]})`).join('; ') + '.',
       placeholder: false,
     },
     'hall-sources': vi ? p('Nguồn tham khảo', 'Danh sách tài liệu tham khảo.') : p('References', 'The list of references.'),
@@ -69,8 +69,8 @@ function buildTexts(lang: Language): Record<string, ExhibitText> {
       : p(`IR ${era} Overview`, `An overview of the ${ordinal} Industrial Revolution: when it happened, its background and why it matters.`)
     for (let slot = 1; slot <= 4; slot++) {
       texts[`ir${era}-${slot}`] = vi
-        ? p(`Phát minh ${slot} – CMCN ${era}`, `Phát minh tiêu biểu số ${slot} của cuộc Cách mạng Công nghiệp lần thứ ${ordinal}.`)
-        : p(`Invention ${slot} – IR ${era}`, `Key invention no. ${slot} of the ${ordinal} Industrial Revolution.`)
+        ? p(`Phát minh ${slot} - CMCN ${era}`, `Phát minh tiêu biểu số ${slot} của cuộc Cách mạng Công nghiệp lần thứ ${ordinal}.`)
+        : p(`Invention ${slot} - IR ${era}`, `Key invention no. ${slot} of the ${ordinal} Industrial Revolution.`)
     }
   }
   return texts

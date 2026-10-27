@@ -16,7 +16,7 @@ const CC0 = { vi: 'CC0 1.0 (phạm vi công cộng)', en: 'CC0 1.0 (public domai
 
 function texture(id: string, use: Record<Language, string>, file: string): Credit {
   return {
-    item: { vi: `Vật liệu ${id} – ${use.vi}`, en: `Texture ${id} – ${use.en}` },
+    item: { vi: `Vật liệu ${id} - ${use.vi}`, en: `Texture ${id} - ${use.en}` },
     author: AMBIENTCG,
     licence: CC0,
     source: `https://ambientcg.com/view?id=${id}`,
@@ -48,28 +48,28 @@ export const credits: Credit[] = [
 
   // Sounds (M8b). Converted to small .ogg files; listed per source pack.
   {
-    item: { vi: 'Âm thanh giao diện (nhấp, mở, đóng, đúng/sai...) – bộ Interface Sounds', en: 'Interface sounds (clicks, open, close, right/wrong...) – Interface Sounds pack' },
+    item: { vi: 'Âm thanh giao diện (nhấp, mở, đóng, đúng/sai...) - bộ Interface Sounds', en: 'Interface sounds (clicks, open, close, right/wrong...) - Interface Sounds pack' },
     author: 'Kenney (kenney.nl)',
     licence: CC0,
     source: 'https://kenney.nl/assets/interface-sounds',
     files: ['sounds/ui/click.ogg', 'sounds/ui/open.ogg', 'sounds/ui/close.ogg', 'sounds/ui/map-open.ogg', 'sounds/ui/map-close.ogg', 'sounds/ui/teleport.ogg', 'sounds/ui/select.ogg', 'sounds/ui/correct.ogg', 'sounds/ui/wrong.ogg', 'sounds/world/new-room.ogg'],
   },
   {
-    item: { vi: 'Tiếng bước chân, tiếng cửa và chốt khóa – bộ RPG Audio', en: 'Footsteps, door and latch sounds – RPG Audio pack' },
+    item: { vi: 'Tiếng bước chân, tiếng cửa và chốt khóa - bộ RPG Audio', en: 'Footsteps, door and latch sounds - RPG Audio pack' },
     author: 'Kenney (kenney.nl)',
     licence: CC0,
     source: 'https://kenney.nl/assets/rpg-audio',
     files: ['sounds/steps/step-0.ogg', 'sounds/steps/step-1.ogg', 'sounds/world/door-open.ogg', 'sounds/world/door-close.ogg', 'sounds/world/locked.ogg'],
   },
   {
-    item: { vi: 'Nhạc hiệu kết quả trò chơi – bộ Music Jingles', en: 'Quiz results jingle – Music Jingles pack' },
+    item: { vi: 'Nhạc hiệu kết quả trò chơi - bộ Music Jingles', en: 'Quiz results jingle - Music Jingles pack' },
     author: 'Kenney (kenney.nl)',
     licence: CC0,
     source: 'https://kenney.nl/assets/music-jingles',
     files: ['sounds/ui/results.ogg'],
   },
   {
-    item: { vi: 'Âm thanh nền sảnh trung tâm – bộ 30 CC0 SFX loops', en: 'Central Hall background sound – 30 CC0 SFX loops pack' },
+    item: { vi: 'Âm thanh nền sảnh trung tâm - bộ 30 CC0 SFX loops', en: 'Central Hall background sound - 30 CC0 SFX loops pack' },
     author: 'rubberduck (OpenGameArt)',
     licence: CC0,
     source: 'https://opengameart.org/content/30-cc0-sfx-loops',

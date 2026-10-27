@@ -54,12 +54,12 @@ const KEY_RELEASE_GRACE_MS = 60
 // not angle, so it feels the same at any sensitivity), the "move" step after walking this far.
 const TUTORIAL_LOOK_TIME = 2 // seconds of turning
 const TUTORIAL_WALK_TIME = 2 // seconds of walking
+const TUTORIAL_SPRINT_TIME = 2 // seconds of moving with Shift held (or the joystick pushed all the way)
 
 // FOOTSTEPS: one step sound every STEP_LENGTH metres. At walking speed (3 m/s) that is
 // 2 steps a second, a calm walk; sprinting (5.5 m/s) gives about 2.6, a brisk run.
 const STEP_LENGTH = 1.5
 const SPRINT_STEP_LENGTH = 2.1
-const TUTORIAL_SPRINT = 4 // metres run with Shift to finish the "sprint" step
 
 // After this many normal W/A/S/D presses in a row, we trust the typing tool is off.
 const NORMAL_PRESSES_TO_CLEAR_WARNING = 4
@@ -380,10 +380,10 @@ export default function Player({ walls }: PlayerProps) {
         store.advanceTutorial('move')
       }
     }
-    // Tutorial "sprint" step: done after running about 4 metres with Shift held.
+    // Tutorial "sprint" step: done after 2 seconds of moving with Shift held.
     if (store.tutorial === 'sprint' && sprinting) {
-      tutorialProgress.current += Math.hypot(next.x - camera.position.x, next.z - camera.position.z)
-      if (tutorialProgress.current > TUTORIAL_SPRINT) {
+      if (next.x !== camera.position.x || next.z !== camera.position.z) tutorialProgress.current += dt
+      if (tutorialProgress.current > TUTORIAL_SPRINT_TIME) {
         tutorialProgress.current = 0
         store.advanceTutorial('sprint')
       }

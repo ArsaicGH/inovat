@@ -3,7 +3,7 @@
 Working language of the team and of Claude: **English**.
 Languages of the finished website: **Vietnamese and English** (leader's decision). Every visible text (panels, quiz, buttons, signs, credits) exists in both; the visitor picks one with the Tiếng Việt / English switch on the start screen or in the pause menu, and Vietnamese is the default. Both versions must read naturally, not as word-for-word translations. **Content is developed in parallel:** every new or changed text is written in both languages in the same change, never one now and the other later.
 
-Museum name: **INOVAT** (from "innovation"; decided by the group; renamed from the earlier "INNOVA"). The GitHub repository is `inovat`; the Vercel address (`innova-museum`) keeps the old name for now. Descriptive subtitle (Vietnamese): **Bảo tàng Cách mạng Công nghiệp**.
+Museum name: **INOVAT** (from "innovation"; decided by the group; renamed from the earlier "INNOVA"). The GitHub repository is `inovat`; the live site is `inovat-museum.vercel.app`. Descriptive subtitle (Vietnamese): **Bảo tàng Cách mạng Công nghiệp**.
 
 Content draft: a private Google Doc kept by the project leader. The link is deliberately not stored here because this repository is public; the leader shares it each session.
 
@@ -174,7 +174,7 @@ Install Node.js (LTS), Git, VS Code. Create GitHub accounts for everyone and one
 
 **M1. "Hello, museum" live on the internet**
 Create the Vite React + TypeScript project, push to GitHub, connect Vercel.
-- [x] A page titled "Bảo tàng Cách mạng Công nghiệp" with correct diacritics opens at the public `.vercel.app` URL, on another computer and on the school network. (Page title is now "INOVAT – Bảo tàng Cách mạng Công nghiệp". Checked from the leader's computer only; another computer and the school network are NOT tested yet, by decision. Retest before M12.)
+- [x] A page titled "Bảo tàng Cách mạng Công nghiệp" with correct diacritics opens at the public `.vercel.app` URL, on another computer and on the school network. (Page title is now "INOVAT - Bảo tàng Cách mạng Công nghiệp". Checked from the leader's computer only; another computer and the school network are NOT tested yet, by decision. Retest before M12.)
 - [x] Editing the text and pushing updates the live site within minutes. (Tested: live in about 20 seconds.)
 - [x] Every member can download the project and run it locally. (Leader only, by decision: `git clone https://github.com/ArsaicGH/inovat.git`, then `npm install`, then `npm run dev`.)
 
@@ -283,6 +283,7 @@ Create the Vite React + TypeScript project, push to GitHub, connect Vercel.
 - [ ] Performance re-checked with the real assets (same targets as M9).
 - [ ] A classmate who has never seen the project can start it, visit every room, read exhibits and finish the quiz unaided.
 - [ ] No console errors; README finished; final URL shared.
+- [ ] After release (optional, leader): rename the local project folder `INNOVA` to `INOVAT`. Players never see it. Before renaming, close sessions, VS Code and dev servers; afterwards copy Claude's memory folder from `.claude\projects\D--Personal-Coding-INNOVA\memory` to `...\D--Personal-Coding-INOVAT\memory`.
 
 ---
 
@@ -399,7 +400,7 @@ Plan: aim for A, keep B as a cheap fallback (only `Player.tsx` changes). Decide 
   - Windows 11: Node.js v24.22.1, npm 11.19.1, Git 2.55.0 installed with winget. Leader has GitHub, VS Code and Vercel.
 - [x] M1: "Hello, museum" live on the internet
   - Repository (public): https://github.com/ArsaicGH/inovat
-  - Live site: https://innova-museum.vercel.app (every push to `main` redeploys)
+  - Live site: https://inovat-museum.vercel.app (every push to `main` redeploys)
 - [x] M2: First 3D scene (reviewed and pushed)
   - Added three, @react-three/fiber, @react-three/drei, @types/three. Scene in `src/world/Museum.tsx`, title overlay in `src/ui/Hud.tsx`.
 - [x] M3: Walking in one test room (reviewed by the leader; jitter investigation moved to M9, the performance pass)
@@ -459,7 +460,7 @@ Plan: aim for A, keep B as a cheap fallback (only `Player.tsx` changes). Decide 
   - Rotunda light: the wide light from the dome became a soft-edged spotlight on the centrepiece (the only shadow light there); the chandelier and even fill keep the hall welcoming.
   - Rotunda dome painted by era (leader's idea): the dome is one painted picture (`dome-painting.ts`, 36 x 7 coffers). The classical cream ribs and gold stay everywhere; the 60-degree section above each era door gets muted era colours (sepia/copper, enamel navy, screen green, slate teal), small gilded emblems in the coffers (cog, lightning bolt, pixel chequer, network hexagon) and one large gilded medallion straight above the door; gilded ribs mark the section edges; the sections above the Game Room and intro hall doors stay classical. Painted once, no cost per frame. (Picture 1728 x 512, a canvas, not a downloaded file.)
   - Rotunda richer (leader): columns in deep green polished marble with gilded bases, rings and capitals (they stood out too little against the cream walls); four large era sculptures hang on cables from the dome in front of the era doors, well above head height, turning slowly (`HangingSculptures.tsx`: brass cog, glowing light bulb, floppy disk, glowing polyhedron); grand three-tier chandelier (ornate gilded column, 50 candles in gold cups, crystal drops, arms, double rings).
-  - Renamed INNOVA -> INOVAT everywhere in the game and the docs (leader). Later the GitHub repository was renamed to `inovat` too. Not renamed (for now): the Vercel address and the browser-storage keys (`innova-...`, invisible to visitors; renaming would reset saved settings).
+  - Renamed INNOVA -> INOVAT everywhere in the game and the docs (leader). Later the GitHub repository was renamed to `inovat` too. Later also the Vercel address and the browser-storage keys (`inovat-...`; settings saved under the old keys reset once).
   - Rotunda: columns back to white marble (gold trim kept). The glowing oculus at the top of the dome is replaced by a painted cream-and-gold rosette (`paintCrown()` in `dome-painting.ts`); the chandelier lights the hall.
   - Game Room redesigned (leader): bright white-and-gold like the intro hall and rotunda (white marble floor, cream panelled walls with gold frames, white pilasters, sconces, gold crown moulding). The giant wall screen is gone: the quiz now sits on an ivory board in a gilded frame on gold posts, on a raised round platform under a strong spotlight in the middle of the room, with a red carpet from the door. The side board and pedestal were removed for now (its text stays in `exhibits.ts`). The back wall has a portal door (`PortalDoor.tsx`): a closed white-and-gold double door that swings open onto glowing light once the visitor gets at least half the answers right (`quizPassed`; not saved between visits). It leads nowhere yet.
   - CMCN 3 and CMCN 4 walls and ceilings textured (leader: they looked plain next to CMCN 1 and 2). Painted in code, no downloads (`painted-surfaces.ts`, also used as bump maps): CMCN 3 has beige woven vinyl wall panels with grooved joins and a suspended ceiling of speckled mineral-fibre tiles in a metal grid (an 80s/90s computer room); CMCN 4 has white composite wall panels with seams, faint circuit traces and perforation strips, and a white panel ceiling in a slim dark grid with cyan light slots.
