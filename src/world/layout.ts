@@ -2,7 +2,7 @@ import type { RoomId } from '../types'
 import type { Box } from './collision'
 
 // MUSEUM FLOOR PLAN, seen from above, in metres. x = left/right, z = up/down on the map
-// (-z is "north", towards the quiz room).
+// (-z is "north", towards CMCN 3).
 //
 // A 12-sided rotunda sits in the middle, with flat sides facing north and south. Every
 // other side has a door (6 doors, 6 blank walls). Behind each door a short passage leads
@@ -33,14 +33,17 @@ export type DoorStyle = 'grand' | 'plain'
 const DOOR_HEIGHT: Record<DoorStyle, number> = { grand: 3.6, plain: 3 }
 
 // side: which rotunda side the room is on, counted clockwise from north (0 = north).
+// The visit goes round the rotunda clockwise, in order (leader): intro hall, CMCN 1 to 4,
+// and the Game Room last, right next to the intro hall. The map shows the way round with a
+// gold arrow (MapMenu.tsx).
 // Era rooms are large and tall, to match the 24 m rotunda (leader: spacious, comfortable).
 const ROOM_SPECS: { id: RoomId; side: number; width: number; depth: number; height: number; doorStyle: DoorStyle }[] = [
   { id: 'hall', side: 6, width: 12, depth: 10, height: 4.5, doorStyle: 'plain' }, // south: start
   { id: 'ir1', side: 8, width: 18, depth: 18, height: 5.5, doorStyle: 'grand' }, // south-west
   { id: 'ir2', side: 10, width: 18, depth: 18, height: 5.5, doorStyle: 'grand' }, // north-west
-  { id: 'ir3', side: 2, width: 18, depth: 18, height: 5.5, doorStyle: 'grand' }, // north-east
-  { id: 'ir4', side: 4, width: 18, depth: 18, height: 5.5, doorStyle: 'grand' }, // south-east
-  { id: 'quiz', side: 0, width: 12, depth: 10, height: 4.5, doorStyle: 'plain' }, // north: end
+  { id: 'ir3', side: 0, width: 18, depth: 18, height: 5.5, doorStyle: 'grand' }, // north
+  { id: 'ir4', side: 2, width: 18, depth: 18, height: 5.5, doorStyle: 'grand' }, // north-east
+  { id: 'quiz', side: 4, width: 12, depth: 10, height: 4.5, doorStyle: 'plain' }, // south-east: end
 ]
 
 // A collision box. cos/sin are stored so they are not recalculated every frame.

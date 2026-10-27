@@ -9,7 +9,8 @@ import type { UiText } from './ui'
 type Steps = UiText['tutorial']['steps']
 
 interface TouchText {
-  steps: { [K in keyof Steps]: { title?: string; text: string; tip?: string } }
+  // Only steps whose text mentions keys or the mouse need a touch version.
+  steps: { [K in keyof Steps]?: { title?: string; text: string; tip?: string } }
   pauseIntro: string
   pauseClickHint: string
   prompt: string
@@ -34,7 +35,7 @@ const vi: TouchText = {
     pause: { text: 'Chạm nút tạm dừng ở góc trên bên phải. Menu tạm dừng chứa các cài đặt, ví dụ độ nhạy camera.' },
     keys: {
       title: 'Cách điều khiển',
-      text: 'Chạm nút "?" ở góc trên bên phải bất cứ lúc nào để xem lại cách điều khiển. Đây là bước cuối của hướng dẫn.',
+      text: 'Chạm nút "?" ở góc trên bên phải bất cứ lúc nào để xem lại cách điều khiển.',
     },
   },
   pauseIntro: 'Đây là menu tạm dừng với các cài đặt. Chạm Tiếp tục để quay lại tham quan.',
@@ -73,7 +74,7 @@ const en: TouchText = {
     pause: { text: 'Tap the pause button in the top-right corner. The pause menu holds the settings, such as camera sensitivity.' },
     keys: {
       title: 'Controls',
-      text: 'Tap the "?" button in the top-right corner at any time to see the controls again. This is the last step of the guide.',
+      text: 'Tap the "?" button in the top-right corner at any time to see the controls again.',
     },
   },
   pauseIntro: 'This is the pause menu, where the settings are. Tap Continue to return to the museum.',

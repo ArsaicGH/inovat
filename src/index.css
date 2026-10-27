@@ -432,6 +432,30 @@ body {
   border-radius: 50%;
   box-shadow: 0 0 30px rgba(201, 162, 90, 0.08) inset;
 }
+/* The gold arrow round the ring, in visiting order (MapMenu.tsx, MapRoute). Clicks pass
+   through it (a click on blank map space closes the map). */
+.map-route {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  opacity: 0.25;
+}
+.map-route-glow {
+  fill: none;
+  stroke: rgba(232, 199, 126, 0.05);
+  stroke-width: 1.4;
+  filter: blur(1px);
+}
+.map-route-line {
+  fill: none;
+  stroke-width: 0.2;
+}
+.map-route-chevron {
+  filter: none;
+}
 /* Every room is centred on its point of the circle (--x, --y set per room below). */
 .map-plan > .map-room {
   position: absolute;
@@ -441,9 +465,9 @@ body {
   transform: translate(-50%, -50%);
 }
 /* Points on a circle of radius 38% around the centre, 60 degrees apart. */
-.map-quiz { --x: 50%; --y: 12%; }
-.map-ir3 { --x: 82.9%; --y: 31%; }
-.map-ir4 { --x: 82.9%; --y: 69%; }
+.map-ir3 { --x: 50%; --y: 12%; }
+.map-ir4 { --x: 82.9%; --y: 31%; }
+.map-quiz { --x: 82.9%; --y: 69%; }
 .map-hall { --x: 50%; --y: 88%; }
 .map-ir1 { --x: 17.1%; --y: 69%; }
 .map-ir2 { --x: 17.1%; --y: 31%; }

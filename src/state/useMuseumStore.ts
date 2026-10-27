@@ -162,9 +162,10 @@ function drawnLevel(state: { graphicsAuto: boolean; qualityChosen: boolean; auto
 }
 
 // GUIDED TUTORIAL (optional, chosen on the start screen). Each step unlocks one more control:
-// intro (everything frozen) -> look -> move -> sprint -> interact -> map -> pause -> keys -> done.
-export type TutorialStep = 'intro' | 'look' | 'move' | 'sprint' | 'interact' | 'map' | 'pause' | 'keys' | 'done'
-export const TUTORIAL_STEPS: TutorialStep[] = ['intro', 'look', 'move', 'sprint', 'interact', 'map', 'pause', 'keys', 'done']
+// intro (everything frozen) -> look -> move -> sprint -> interact -> map -> pause -> keys -> enjoy
+// (a goodbye card that closes by itself) -> done.
+export type TutorialStep = 'intro' | 'look' | 'move' | 'sprint' | 'interact' | 'map' | 'pause' | 'keys' | 'enjoy' | 'done'
+export const TUTORIAL_STEPS: TutorialStep[] = ['intro', 'look', 'move', 'sprint', 'interact', 'map', 'pause', 'keys', 'enjoy', 'done']
 export type Control = 'look' | 'move' | 'sprint' | 'interact' | 'map' | 'keys'
 
 // May this control be used now? Always, unless the tutorial has not reached it yet.

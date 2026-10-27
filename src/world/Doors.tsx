@@ -16,7 +16,7 @@ const OPEN_SPEED = 5 // higher = faster opening/closing
 // One sliding double door in a rotunda doorway. Its local +z points into the rotunda,
 // so the signs face visitors standing in the rotunda.
 function Door({ door }: { door: DoorLayout }) {
-  const { ui, roomNames } = useContent()
+  const { roomNames } = useContent()
   const group = useRef<Group>(null)
   const left = useRef<Mesh>(null)
   const right = useRef<Mesh>(null)
@@ -94,7 +94,7 @@ function Door({ door }: { door: DoorLayout }) {
       ) : (
         // Plain start/end door: just a smaller sign above it.
         <group position={[0, door.height + 0.45, 0.12]}>
-          <Sign title={name.name} subtitle={locked ? ui.map.locked : undefined} width={2.6} height={0.6} />
+          <Sign title={name.name} width={2.6} height={0.6} />
         </group>
       )}
     </group>

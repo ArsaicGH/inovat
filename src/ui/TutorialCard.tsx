@@ -1,5 +1,9 @@
+import { useEffect } from 'react'
 import { useMuseumStore, TUTORIAL_STEPS } from '../state/useMuseumStore'
 import { useContent } from '../content/use-content'
+
+// The last card ("have fun") needs nothing done: it closes by itself after this long.
+const ENJOY_SECONDS = 5
 
 // The current tutorial instruction, at the top of the screen while walking. The first card
 // (the welcome) sits in the middle of the screen, so it is noticed at once. The step is
@@ -7,6 +11,11 @@ import { useContent } from '../content/use-content'
 export default function TutorialCard() {
   const { ui } = useContent()
   const step = useMuseumStore((state) => state.tutorial)
+  useEffect(() => {
+    if (step !== 'enjoy') return
+    const timer = window.setTimeout(() => useMuseumStore.getState().advanceTutorial('enjoy'), ENJOY_SECONDS * 1000)
+    return () => window.clearTimeout(timer)
+  }, [step])
   if (!step || step === 'done') return null
 
   const total = TUTORIAL_STEPS.length - 1 // "done" is not a step to do

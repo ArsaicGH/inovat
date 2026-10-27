@@ -18,9 +18,9 @@ const ROW_H = HEIGHT / ROWS
 
 type Section = 'classic' | 'ir1' | 'ir2' | 'ir3' | 'ir4'
 
-// Which section the dome is in, at an angle measured clockwise from north (the Game Room
-// door is north, then CMCN 3, CMCN 4, the intro hall, CMCN 1, CMCN 2 every 60 degrees).
-const SECTIONS: Section[] = ['classic', 'ir3', 'ir4', 'classic', 'ir1', 'ir2']
+// Which section the dome is in, at an angle measured clockwise from north (the
+// CMCN 3 door is north, then CMCN 4, the Game Room, the intro hall, CMCN 1, CMCN 2 every 60 degrees).
+const SECTIONS: Section[] = ['ir3', 'ir4', 'classic', 'classic', 'ir1', 'ir2']
 
 interface Style {
   shades: [number, number, number][] // coffer colours from the outer step to the deepest

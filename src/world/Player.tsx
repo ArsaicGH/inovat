@@ -287,7 +287,10 @@ export default function Player({ walls }: PlayerProps) {
     const region = regionAt(camera.position.x, camera.position.z)
     if (region) {
       if (region.room !== store.currentRoom) store.setCurrentRoom(region.room)
-      if (region.inside && ERA_ROOMS.includes(region.room) && !store.visitedRooms.includes(region.room)) {
+      // The era rooms count as visited once inside; the Central Hall once walked into (the map
+      // then lets the visitor travel there).
+      const counts = ERA_ROOMS.includes(region.room) || region.room === 'rotunda'
+      if (region.inside && counts && !store.visitedRooms.includes(region.room)) {
         store.markVisited(region.room)
       }
     }

@@ -83,18 +83,18 @@ export const credits: Credit[] = [
     files: ['sounds/music/ir1.ogg'],
   },
   {
-    item: { vi: 'Nhạc CMCN 2: "Factorio Clone Music" (nhạc nền nhà máy)', en: 'CMCN 2 music: "Factorio Clone Music" (factory background music)' },
+    item: { vi: 'Nhạc CMCN 3: "Factorio Clone Music" (nhạc nền nhà máy)', en: 'CMCN 3 music: "Factorio Clone Music" (factory background music)' },
     author: 'Pro Sensory (OpenGameArt)',
     licence: CC0,
     source: 'https://opengameart.org/content/factorio-clone-music',
-    files: ['sounds/music/ir2.ogg'],
+    files: ['sounds/music/ir3.ogg'],
   },
   {
-    item: { vi: 'Nhạc CMCN 3: "Life in corrupted binary" (nhạc nền điện tử không khí)', en: 'CMCN 3 music: "Life in corrupted binary" (atmospheric electronic ambience)' },
+    item: { vi: 'Nhạc CMCN 2: "Life in corrupted binary" (nhạc nền điện tử không khí)', en: 'CMCN 2 music: "Life in corrupted binary" (atmospheric electronic ambience)' },
     author: 'HaelDB (OpenGameArt)',
     licence: CC0,
     source: 'https://opengameart.org/content/life-corrupted-binary',
-    files: ['sounds/music/ir3.ogg'],
+    files: ['sounds/music/ir2.ogg'],
   },
   {
     item: { vi: 'Nhạc CMCN 4: "Claimed by the Void" (nhạc nền khoa học viễn tưởng)', en: 'CMCN 4 music: "Claimed by the Void" (sci-fi ambient)' },

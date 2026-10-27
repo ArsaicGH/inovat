@@ -46,7 +46,12 @@ const vi = {
       },
       keys: {
         title: 'Danh sách phím',
-        text: 'Nhấn phím cách (Space) bất cứ lúc nào để hiện hoặc ẩn danh sách tất cả các phím. Đây là bước cuối của hướng dẫn.',
+        text: 'Nhấn phím cách (Space) bất cứ lúc nào để hiện hoặc ẩn danh sách tất cả các phím.',
+      },
+      // Last card: closes by itself after a few seconds (TutorialCard.tsx).
+      enjoy: {
+        title: 'Sẵn sàng rồi!',
+        text: 'Chúc bạn tham quan bảo tàng vui vẻ!',
       },
     },
     // Shown in the pause menu during the tutorial's "pause" step.
@@ -109,7 +114,7 @@ const vi = {
     title: 'Bản đồ bảo tàng',
     hint: 'Chọn một phòng để đi đến đó.',
     youAreHere: 'Bạn đang ở đây',
-    locked: 'Sau khi tham quan tất cả phòng',
+    locked: 'Đang khóa',
     notVisited: 'Chưa tham quan',
     close: 'Đóng',
     closeHint: 'Nhấp vào khoảng trống hoặc nhấn Q để đóng',
@@ -206,7 +211,11 @@ const en: UiText = {
       },
       keys: {
         title: 'Key list',
-        text: 'Press Space at any time to show or hide a list of all the keys. This is the last step of the guide.',
+        text: 'Press Space at any time to show or hide a list of all the keys.',
+      },
+      enjoy: {
+        title: 'All set!',
+        text: 'Have fun exploring the museum!',
       },
     },
     pauseIntro: 'This is the pause menu, where the settings are. Click Continue to return to the museum.',
@@ -260,7 +269,7 @@ const en: UiText = {
     title: 'Museum map',
     hint: 'Pick a room to go there.',
     youAreHere: 'You are here',
-    locked: 'After visiting every room',
+    locked: 'Locked',
     notVisited: 'Not visited yet',
     close: 'Close',
     closeHint: 'Click on blank space or press Q to close',

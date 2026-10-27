@@ -64,7 +64,7 @@ let nextFoot = 0
 const AMBIENCE: Partial<Record<RoomId, string>> = {
   rotunda: '/sounds/ambience/rotunda.ogg',
   // Era music: atmospheric ambient tracks (CC0, OpenGameArt), one per era, for now:
-  // "Factory ambiance", "Factorio Clone Music", "Life in corrupted binary", "Claimed by the Void".
+  // "Factory ambiance", "Life in corrupted binary", "Factorio Clone Music", "Claimed by the Void".
   ir1: '/sounds/music/ir1.ogg',
   ir2: '/sounds/music/ir2.ogg',
   ir3: '/sounds/music/ir3.ogg',
