@@ -977,6 +977,60 @@ body {
   text-align: left;
 }
 
+/* Graphics slider: the level name on the left, the "Automatic" switch on the right. */
+.graphics-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.graphics-auto {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 3px 10px 3px 4px;
+  border: 1px solid rgba(201, 162, 90, 0.55);
+  border-radius: 999px;
+  background: rgba(20, 17, 13, 0.6);
+  color: #d9ccb2;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.graphics-auto i {
+  position: relative;
+  width: 26px;
+  height: 14px;
+  border-radius: 999px;
+  background: rgba(217, 204, 178, 0.25);
+  transition: background 0.2s;
+}
+.graphics-auto i::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #d9ccb2;
+  transition: transform 0.2s;
+}
+.graphics-auto-on {
+  color: #f3e7cf;
+}
+.graphics-auto-on i {
+  background: linear-gradient(180deg, #e8c77e, #b8893d);
+}
+.graphics-auto-on i::after {
+  background: #2b2620;
+  transform: translateX(12px);
+}
+.graphics-hint {
+  color: rgba(217, 204, 178, 0.6);
+  font-size: 12px;
+}
+
 /* Pause menu: the title's letter spacing also adds space after the last letter, which
    pushed it off centre; the ornament spans the card instead of a fixed width. */
 .pause-card .map-title {

@@ -20,7 +20,7 @@ Project: browser-based 3D virtual museum about the four Industrial Revolutions (
 - Stack: React, TypeScript, Vite, Three.js, React Three Fiber, drei, Zustand. Do not add other dependencies without asking first and explaining why.
 - No backend, database, login, paid API, AI model or API key in the product. Everything runs in the visitor's browser.
 - Keep lightweight 3D assets: models about 2 MB or less each, textures 1024 px or less, about 30 MB total.
-- Cap the renderer pixel ratio at 1.5 on computers and 2 on phones and tablets (small but very sharp screens; leader's decision). Use at most one shadow-casting light.
+- Cap the renderer pixel ratio at 1.5 on computers and 2 on phones and tablets (small but very sharp screens; leader's decision). Use at most one shadow-casting light, except at the "Ultra" graphics level (pause menu), where the museum spotlights cast shadows too (leader's decision).
 - Folder layout is in `PLAN.md` section 3. Keep the 3D layer (`src/world/`), the interface (`src/ui/`) and the text (`src/content/`) separate.
 - File names: lowercase, hyphens, no spaces, no Vietnamese diacritics.
 - Read movement keys by physical key position (`event.code`), so Unikey and EVKey do not break controls.

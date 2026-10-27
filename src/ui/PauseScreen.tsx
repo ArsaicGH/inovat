@@ -5,6 +5,7 @@ import LockButton from './LockButton'
 import SensitivitySlider from './SensitivitySlider'
 import LanguageSwitch from './LanguageSwitch'
 import VolumeSlider from './VolumeSlider'
+import GraphicsSlider from './GraphicsSlider'
 
 // Shown after Esc (or whenever the mouse is released while walking).
 export default function PauseScreen() {
@@ -34,6 +35,7 @@ export default function PauseScreen() {
         {/* Settings live here (more can be added as the game grows). */}
         <SensitivitySlider />
         <VolumeSlider />
+        <GraphicsSlider />
         <LanguageSwitch label={ui.language.label} />
         <div className="button-row">
           <LockButton label={ui.pause.resume} className="start-button" />

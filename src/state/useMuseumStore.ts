@@ -127,6 +127,40 @@ function saveSound(on: boolean, volumes: Volumes) {
 
 const savedSound = loadSound()
 
+// GRAPHICS LEVEL (pause menu): 0 = very low ... 3 = high, 4 = ultra. What each level
+// changes is in Museum.tsx (GRAPHICS_LEVELS). "Automatic" uses the level measured during
+// loading (AdaptiveQuality); otherwise the visitor's own choice. Remembered in this browser.
+export type GraphicsLevel = 0 | 1 | 2 | 3 | 4
+export const GRAPHICS_LEVEL_MAX: GraphicsLevel = 4
+const GRAPHICS_STORAGE_KEY = 'innova-graphics'
+
+function loadGraphics(): { auto: boolean; level: GraphicsLevel } {
+  try {
+    const saved = JSON.parse(localStorage.getItem(GRAPHICS_STORAGE_KEY) ?? 'null') as { auto: boolean; level: number } | null
+    if (saved && typeof saved.auto === 'boolean' && Number.isInteger(saved.level) && saved.level >= 0 && saved.level <= GRAPHICS_LEVEL_MAX)
+      return { auto: saved.auto, level: saved.level as GraphicsLevel }
+  } catch {
+    // ignore
+  }
+  return { auto: true, level: 3 }
+}
+
+function saveGraphics(auto: boolean, level: GraphicsLevel) {
+  try {
+    localStorage.setItem(GRAPHICS_STORAGE_KEY, JSON.stringify({ auto, level }))
+  } catch {
+    // ignore
+  }
+}
+
+const savedGraphics = loadGraphics()
+
+// The level actually drawn. Until the measurement during loading is done, always the
+// automatic one (it starts at "high", the level the measurement is made at).
+function drawnLevel(state: { graphicsAuto: boolean; qualityChosen: boolean; autoGraphics: GraphicsLevel; graphicsChoice: GraphicsLevel }) {
+  return state.graphicsAuto || !state.qualityChosen ? state.autoGraphics : state.graphicsChoice
+}
+
 // GUIDED TUTORIAL (optional, chosen on the start screen). Each step unlocks one more control:
 // intro (everything frozen) -> look -> move -> sprint -> interact -> map -> pause -> keys -> done.
 export type TutorialStep = 'intro' | 'look' | 'move' | 'sprint' | 'interact' | 'map' | 'pause' | 'keys' | 'done'
@@ -147,10 +181,14 @@ interface MuseumState {
   partsPrepared: number
   markPartPrepared: () => void
   warmedUp: boolean // the whole museum has been drawn once off-screen (Museum.tsx WarmUp)
-  // Automatic graphics level (Museum.tsx AdaptiveResolution): 2 = everything, 1 = no
-  // ambient occlusion, 0 = also shadows only redrawn when the key light moves.
-  graphicsLevel: 0 | 1 | 2
-  lowerGraphics: () => void
+  // GRAPHICS (see GraphicsLevel above). graphicsLevel = the level drawn now.
+  graphicsLevel: GraphicsLevel
+  graphicsAuto: boolean // "Automatic" is on in the pause menu
+  graphicsChoice: GraphicsLevel // the visitor's own level, used when automatic is off
+  autoGraphics: GraphicsLevel // the level measured during loading (Museum.tsx AdaptiveQuality)
+  setAutoGraphics: (level: GraphicsLevel) => void
+  setGraphicsChoice: (level: GraphicsLevel) => void // also turns automatic off
+  setGraphicsAuto: (on: boolean) => void
   qualityChosen: boolean // the quality was measured and set during loading (Museum.tsx)
   setQualityChosen: () => void
   setWarmedUp: () => void
@@ -227,10 +265,23 @@ export const useMuseumStore = create<MuseumState>((set) => ({
   partsPrepared: 0,
   markPartPrepared: () => set((state) => ({ partsPrepared: state.partsPrepared + 1 })),
   warmedUp: false,
-  graphicsLevel: 2,
-  lowerGraphics: () => set((state) => ({ graphicsLevel: Math.max(0, state.graphicsLevel - 1) as 0 | 1 | 2 })),
+  graphicsLevel: 3,
+  graphicsAuto: savedGraphics.auto,
+  graphicsChoice: savedGraphics.level,
+  autoGraphics: 3,
+  setAutoGraphics: (level) =>
+    set((state) => ({ autoGraphics: level, graphicsLevel: drawnLevel({ ...state, autoGraphics: level }) })),
+  setGraphicsChoice: (level) => {
+    saveGraphics(false, level)
+    set((state) => ({ graphicsAuto: false, graphicsChoice: level, graphicsLevel: drawnLevel({ ...state, graphicsAuto: false, graphicsChoice: level }) }))
+  },
+  setGraphicsAuto: (on) =>
+    set((state) => {
+      saveGraphics(on, state.graphicsChoice)
+      return { graphicsAuto: on, graphicsLevel: drawnLevel({ ...state, graphicsAuto: on }) }
+    }),
   qualityChosen: false,
-  setQualityChosen: () => set({ qualityChosen: true }),
+  setQualityChosen: () => set((state) => ({ qualityChosen: true, graphicsLevel: drawnLevel({ ...state, qualityChosen: true }) })),
   setWarmedUp: () => set({ warmedUp: true }),
   worldReady: false,
   setWorldReady: () => set({ worldReady: true }),

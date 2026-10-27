@@ -3,7 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { debugStats } from './debug-stats'
 import { useMuseumStore } from '../state/useMuseumStore'
 
-const QUALITY_NAMES = ['low (no ambient occlusion, fewer shadow redraws)', 'medium (no ambient occlusion)', 'full']
+const QUALITY_NAMES = ['very low', 'low', 'medium', 'high', 'ultra']
 
 // DEVELOPMENT-ONLY diagnostic (never shown on the live site, so English is fine).
 // The FPS counter only shows an average; jitter comes from frames that take UNEVEN

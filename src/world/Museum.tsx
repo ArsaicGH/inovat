@@ -4,7 +4,7 @@ import { Bloom, EffectComposer, FXAA, N8AO, SMAA, ToneMapping, Vignette } from '
 import { CopyPass, EffectPass, ToneMappingMode, type EffectComposer as Composer } from 'postprocessing'
 import { Color, CubeCamera, DefaultLoadingManager, DoubleSide, HalfFloatType, Mesh as MeshObject, MeshBasicMaterial, PlaneGeometry, RingGeometry, Scene as SceneObject, WebGLCubeRenderTarget, Object3D, Texture, WebGLRenderTarget, type Camera, type Group, type HemisphereLight, type Mesh, type PointLight, type SpotLight, type Scene, type WebGLRenderer } from 'three'
 import type { RoomId } from '../types'
-import { useMuseumStore } from '../state/useMuseumStore'
+import { useMuseumStore, type GraphicsLevel } from '../state/useMuseumStore'
 import Room from './Room'
 import Rotunda from './Rotunda'
 import Walls from './Walls'
@@ -43,6 +43,38 @@ const ANTIALIAS = testSwitches.get('aa') !== '0'
 const SHADOWS = testSwitches.get('shadows') !== '0'
 const EFFECTS = testSwitches.get('fx') !== '0'
 const AO = testSwitches.get('ao') !== '0'
+// The screen's full sharpness, within the cap above.
+const FULL_RATIO = Math.min(window.devicePixelRatio, MAX_PIXEL_RATIO)
+
+// GRAPHICS LEVELS, chosen in the pause menu (or automatically, AdaptiveQuality below).
+// What stays at every level, because it IS the museum's look: all the lights, the bloom
+// glow, the film-like colours and the darker corners. What changes, cheapest last:
+// - sharpness: the share of the screen's full resolution drawn (the biggest saving);
+// - ambient occlusion: the soft darkening where things meet and in corners. "half" =
+//   worked out at half resolution with few samples; "full" = every pixel, many samples:
+//   clean, detailed contact shadows (only for strong graphics cards);
+// - shadows: size of the shadow picture (crispness), softness of the edges (in shadow
+//   picture pixels), and how often they are redrawn (every Nth frame; 0 = only when the
+//   key light moves, so turning prototypes keep a still shadow). At ultra the museum
+//   spotlights cast shadows too, not just the one key light;
+// - edge smoothing: SMAA, or the cheaper FXAA (about a third of the work, softer edges).
+// "High" is what every computer got before this menu existed; "ultra" goes beyond it.
+interface GraphicsSettings {
+  sharpness: number
+  ao: 'off' | 'half' | 'full'
+  shadowSize: number
+  shadowSoftness: number
+  shadowEvery: number
+  spotShadows: boolean // the museum spotlights cast shadows too (ultra only)
+  smoothing: 'smaa' | 'fxaa'
+}
+const GRAPHICS_LEVELS: Record<GraphicsLevel, GraphicsSettings> = {
+  0: { sharpness: 0.75, ao: 'off', shadowSize: 512, shadowSoftness: 1, shadowEvery: 0, spotShadows: false, smoothing: 'fxaa' }, // very low
+  1: { sharpness: 0.85, ao: 'off', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 3, spotShadows: false, smoothing: 'smaa' }, // low
+  2: { sharpness: 1, ao: 'off', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 3, spotShadows: false, smoothing: 'smaa' }, // medium
+  3: { sharpness: 1, ao: 'half', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 3, spotShadows: false, smoothing: 'smaa' }, // high
+  4: { sharpness: 1, ao: 'full', shadowSize: 2048, shadowSoftness: 2, shadowEvery: 1, spotShadows: true, smoothing: 'smaa' }, // ultra
+}
 
 const GROUPS: RoomId[] = ['rotunda', ...ROOMS.map((room) => room.id)]
 
@@ -79,25 +111,42 @@ const SPOT_INTENSITY = 120
 // The NUMBER of lights never changes (switching lights on/off would make the browser
 // re-prepare its drawing code, causing hitches); only their brightness and place do.
 function Lighting() {
+  const get = useThree((state) => state.get)
   const accent = useRef<PointLight>(null) // the lit room's coloured lamp light
   const keyLight = useRef<SpotLight>(null)
   const keyTarget = useMemo(() => new Object3D(), [])
   const keyArea = useRef<RoomId | null>(null)
   const keyLevel = useRef(0)
   const sky = useRef<HemisphereLight>(null)
-  // Weakest computers (lowest quality level): a shadow picture of half the size (a quarter
-  // of the pixels to draw), slightly softer shadow edges. The old picture is thrown away so
-  // the next shadow drawing makes one of the new size.
+  // Shadow sharpness follows the graphics level (GRAPHICS_LEVELS): a bigger shadow picture
+  // gives crisper shadows, a wider softness blurs their edges like real light. The old
+  // picture is thrown away so the next shadow drawing makes one of the new size.
   const graphicsLevel = useMuseumStore((state) => state.graphicsLevel)
   useEffect(() => {
     const light = keyLight.current
     if (!light) return
-    const size = graphicsLevel === 0 ? 512 : 1024
-    if (light.shadow.mapSize.x === size) return
-    light.shadow.mapSize.set(size, size)
+    const { shadowSize, shadowSoftness, spotShadows } = GRAPHICS_LEVELS[graphicsLevel]
+    light.shadow.radius = shadowSoftness
+    get().gl.shadowMap.needsUpdate = true
+    // Ultra only: the museum spotlights cast shadows too (leader's decision; CLAUDE.md
+    // allows it at this level only). Each exhibit then throws a real shadow onto its
+    // plinth and each board onto its wall. Switched off below ultra, and their shadow
+    // pictures freed. (Changing the number of shadow lights rebuilds the drawing code of
+    // every material: part of the freeze the pause menu warns about.)
+    for (const spot of spots.current) {
+      if (!spot || spot.castShadow === spotShadows) continue
+      spot.castShadow = spotShadows
+      spot.shadow.radius = shadowSoftness
+      if (!spotShadows) {
+        spot.shadow.map?.dispose()
+        spot.shadow.map = null
+      }
+    }
+    if (light.shadow.mapSize.x === shadowSize) return
+    light.shadow.mapSize.set(shadowSize, shadowSize)
     light.shadow.map?.dispose()
     light.shadow.map = null
-  }, [graphicsLevel])
+  }, [graphicsLevel, get])
   // Five spotlights that move to the room you are in (spot-plan.ts), each with the point
   // it shines at (a spotlight's target must be in the scene too).
   const spots = useRef<(SpotLight | null)[]>([])
@@ -127,6 +176,10 @@ function Lighting() {
           spot.penumbra = aim.narrow ? 0.9 : 0.5
           spotTargets[i].position.set(...aim.to)
           spotTargets[i].updateMatrixWorld()
+        })
+        // Spotlights this room does not use (dark) skip their shadow drawing at ultra.
+        spots.current.forEach((spot, i) => {
+          if (spot) spot.shadow.autoUpdate = plan[i] !== undefined
         })
       }
     } else {
@@ -182,7 +235,8 @@ function Lighting() {
       <ambientLight intensity={0.04} />
       {/* Even fill in the room's colour (a ceiling lamp here made a fake bright spot). */}
       <hemisphereLight ref={sky} args={['#fff1dc', '#2a2219', 0.13]} />
-      {/* The museum spotlights (no shadows: CLAUDE.md allows only one shadow light). */}
+      {/* The museum spotlights. Shadows only at the ultra graphics level (switched on in
+          the effect above; CLAUDE.md allows only one shadow light at the other levels). */}
       {spotTargets.map((spotTarget, i) => (
         <group key={i}>
           <primitive object={spotTarget} />
@@ -197,6 +251,11 @@ function Lighting() {
             angle={0.42}
             penumbra={0.5}
             decay={2}
+            shadow-mapSize={[1024, 1024]}
+            shadow-bias={-0.0004}
+            shadow-normalBias={0.02}
+            shadow-camera-near={0.3}
+            shadow-camera-far={14}
           />
         </group>
       ))}
@@ -340,12 +399,19 @@ function MuseumPart({ id }: { id: RoomId }) {
 // picture, with every room shown and nothing skipped for being off-screen. The graphics
 // card does some work only the first time each thing is really drawn; doing it here,
 // behind the loading screen, avoids a hitch the first time a room comes into view.
+// Done again when the spotlight shadows are switched on or off (ultra graphics level): that
+// changes the drawing code of every material, and rooms out of sight would otherwise
+// rebuild theirs the moment they come into view.
 function WarmUp() {
   const target = useMemo(() => new WebGLRenderTarget(64, 64, { type: HalfFloatType }), [])
   useEffect(() => () => target.dispose(), [target])
+  const spotShadows = GRAPHICS_LEVELS[useMuseumStore((state) => state.graphicsLevel)].spotShadows
+  const warmedWith = useRef(spotShadows)
   useFrame(({ gl, scene, camera }) => {
     const store = useMuseumStore.getState()
-    if (store.warmedUp || store.partsPrepared < PART_COUNT) return
+    const again = store.warmedUp && warmedWith.current !== spotShadows
+    if ((store.warmedUp && !again) || store.partsPrepared < PART_COUNT) return
+    warmedWith.current = spotShadows
     const changed: [Object3D, boolean, boolean][] = []
     scene.traverse((object) => {
       changed.push([object, object.visible, object.frustumCulled])
@@ -383,12 +449,18 @@ function PreparedDoors({ children }: { children: ReactNode }) {
 // How it decides: after the warm-up drawing, the camera is moved for a moment into the
 // ROTUNDA, the heaviest view (measuring in the light intro hall picked settings that were
 // too high for the rotunda), the frame rate is measured there, then the camera goes back
-// to the start. The expensive work costs per pixel, so the frame rate at another resolution
-// can be estimated (1x instead of 1.5x = 2.25 times fewer pixels). It then picks, in this
-// order, giving up as little as possible:
+// to the start. The measurement is made at the "high" graphics level. The expensive work
+// costs per pixel, so the frame rate at another resolution can be estimated (1x instead of
+// 1.5x = 2.25 times fewer pixels). It then picks, in this order, giving up as little as
+// possible:
 // 1. the highest resolution step that still reaches 60 fps (1.5, 1.25, 1, 0.85);
 // 2. if even 1x is too slow: ambient occlusion off (assumed to save about a quarter);
-// 3. then 0.75x, and shadows only redrawn when the key light moves.
+// 3. then 0.75x and the "very low" level.
+// It never picks "ultra": the frame rate cannot rise above the screen's refresh rate
+// (usually 60), so there is no way to see how much power is left over. Ultra is the
+// visitor's own choice in the pause menu.
+// The pause menu shows the result as a level; the resolution chosen here is kept as long
+// as "automatic" is on (GraphicsResolution).
 const RATIO_STEPS = [2, 1.75, 1.5, 1.25, 1, 0.85]
 const MIN_PIXEL_RATIO = 0.75
 const TARGET_FPS = 60
@@ -398,7 +470,18 @@ const MEASURE = 1.5 // seconds of frames measured
 // Set by AdaptiveQuality on machines that needed a lower resolution: the number of pixels
 // they draw at 60 fps, and the resolution chosen (never exceeded later).
 let pixelBudget: number | null = null
-let pixelRatioCeiling = MAX_PIXEL_RATIO
+let pixelRatioCeiling = FULL_RATIO
+
+// The resolution automatic mode draws at in a window of this size: the one chosen during
+// loading, or, on a machine that needed it lowered, the step that keeps the same number of
+// pixels (a bigger window gets a lower resolution, a smaller one goes back up, never above
+// the original choice).
+function autoPixelRatio(width: number, height: number): number {
+  if (pixelBudget === null) return pixelRatioCeiling
+  const fits = Math.sqrt(pixelBudget / (width * height))
+  const steps = [...RATIO_STEPS, MIN_PIXEL_RATIO].filter((r) => r <= pixelRatioCeiling)
+  return steps.find((r) => r <= fits * 1.02) ?? MIN_PIXEL_RATIO
+}
 
 function AdaptiveQuality() {
   const setDpr = useThree((state) => state.setDpr)
@@ -436,27 +519,27 @@ function AdaptiveQuality() {
     if (time.current < MEASURE) return
 
     const fps = frames.current / time.current
-    const ratio = Math.min(window.devicePixelRatio, MAX_PIXEL_RATIO)
+    const ratio = FULL_RATIO
     const at = (r: number) => fps * (ratio / r) ** 2 // estimated frame rate at resolution r
     const steps = RATIO_STEPS.filter((r) => r <= ratio)
+    let level: GraphicsLevel = 3 // high
     // Touch devices: ambient occlusion (soft corner shadows, hard to see on a small screen)
     // goes BEFORE any sharpness, since blurry text matters far more there.
-    if (IS_TOUCH && at(ratio) < TARGET_FPS) store.lowerGraphics()
-    const saving = IS_TOUCH && at(ratio) < TARGET_FPS ? AO_SAVING : 1
+    if (IS_TOUCH && at(ratio) < TARGET_FPS) level = 2
+    const saving = level < 3 ? AO_SAVING : 1
     let next = steps.find((r) => r >= 1 && at(r) * saving >= TARGET_FPS)
     if (next === undefined && !IS_TOUCH) {
-      store.lowerGraphics() // ambient occlusion off
+      level = 2 // ambient occlusion off
       next = steps.find((r) => at(r) * AO_SAVING >= TARGET_FPS)
-      if (next === undefined) {
-        next = MIN_PIXEL_RATIO
-        if (at(next) * AO_SAVING < TARGET_FPS * 0.7) store.lowerGraphics() // fewer shadow redraws
-      }
     }
     if (next === undefined) {
-      // Touch device too slow even at 1x without ambient occlusion.
+      // Too slow even at 1x without ambient occlusion.
       next = MIN_PIXEL_RATIO
-      if (at(next) * AO_SAVING < TARGET_FPS * 0.7) store.lowerGraphics() // fewer shadow redraws
+      if (at(next) * AO_SAVING < TARGET_FPS * 0.7) level = 0 // fewer shadow redraws, FXAA
     }
+    // No ambient occlusion and less than full sharpness: shown as "low" in the pause menu.
+    if (level === 2 && next < ratio) level = 1
+    store.setAutoGraphics(level)
     if (next !== ratio) setDpr(next)
     // A machine that needed a lower resolution keeps the same NUMBER of pixels if the
     // window is resized later (ResizeQuality).
@@ -472,38 +555,47 @@ function AdaptiveQuality() {
   return null
 }
 
-// WINDOW RESIZED during the visit (e.g. full screen after loading), on a machine whose
-// resolution had to be lowered: step the resolution so the number of pixels drawn stays
-// what that machine managed at 60 fps (lower for a bigger window, back up for a smaller one,
-// never above the original choice). Applied once, half a second after the resizing stops,
-// right after the rebuild the resize causes anyway. Machines with room to spare: unchanged.
-function ResizeQuality() {
+// RESOLUTION after loading:
+// - a level chosen in the pause menu: that level's share of the screen's full sharpness;
+// - automatic: the resolution chosen during loading. If the window is resized during the
+//   visit (e.g. full screen after loading) on a machine whose resolution had to be lowered,
+//   it is stepped so the number of pixels drawn stays what that machine managed at 60 fps
+//   (autoPixelRatio). Applied once, half a second after the resizing stops, right after the
+//   rebuild the resize causes anyway. Machines with room to spare: unchanged.
+function GraphicsResolution() {
   const size = useThree((state) => state.size)
   const setDpr = useThree((state) => state.setDpr)
-  const viewport = useThree((state) => state.viewport)
+  const get = useThree((state) => state.get)
+  const qualityChosen = useMuseumStore((state) => state.qualityChosen)
+  const auto = useMuseumStore((state) => state.graphicsAuto)
+  const level = useMuseumStore((state) => state.graphicsLevel)
+  const apply = (width: number, height: number) => {
+    const next = auto ? autoPixelRatio(width, height) : FULL_RATIO * GRAPHICS_LEVELS[level].sharpness
+    if (Math.abs(next - get().viewport.dpr) > 0.01) setDpr(next)
+  }
+  // A new level or mode: at once (the visitor is in the pause menu).
   useEffect(() => {
-    const budget = pixelBudget
-    if (budget === null) return
-    const timer = window.setTimeout(() => {
-      const fits = Math.sqrt(budget / (size.width * size.height))
-      const steps = [...RATIO_STEPS, MIN_PIXEL_RATIO].filter((r) => r <= pixelRatioCeiling)
-      const next = steps.find((r) => r <= fits * 1.02) ?? MIN_PIXEL_RATIO
-      if (Math.abs(next - viewport.dpr) > 0.01) setDpr(next)
-    }, 500)
-    return () => window.clearTimeout(timer)
-    // Only window size changes start this (viewport.dpr is read at that moment).
+    if (qualityChosen) apply(size.width, size.height)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [size.width, size.height, setDpr])
+  }, [qualityChosen, auto, level])
+  // A new window size: only automatic mode on a machine that needed a lower resolution.
+  useEffect(() => {
+    if (!qualityChosen || !auto || pixelBudget === null) return
+    const timer = window.setTimeout(() => apply(size.width, size.height), 500)
+    return () => window.clearTimeout(timer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [size.width, size.height])
   return null
 }
 
-// Shadows: redrawn every third frame (the key light moves rarely and the prototypes turn
-// slowly). At the lowest graphics level only when the key light has moved.
+// Shadows: redrawn every Nth frame (GRAPHICS_LEVELS; the key light moves rarely and the
+// prototypes turn slowly). At the lowest graphics level only when the key light has moved.
 function ShadowThrottle() {
   const frame = useRef(0)
   useFrame(({ gl }) => {
     frame.current += 1
-    if (useMuseumStore.getState().graphicsLevel > 0 && frame.current % 3 === 0) gl.shadowMap.needsUpdate = true
+    const every = GRAPHICS_LEVELS[useMuseumStore.getState().graphicsLevel].shadowEvery
+    if (every > 0 && frame.current % every === 0) gl.shadowMap.needsUpdate = true
   })
   return null
 }
@@ -573,7 +665,7 @@ function DropTrailingCopy({ composer }: { composer: RefObject<Composer | null> }
 }
 
 export default function Museum() {
-  const graphicsLevel = useMuseumStore((state) => state.graphicsLevel)
+  const settings = GRAPHICS_LEVELS[useMuseumStore((state) => state.graphicsLevel)]
   const composer = useRef<Composer>(null)
   return (
     // The Canvas resizes itself with the window, so the scene never stretches.
@@ -594,7 +686,7 @@ export default function Museum() {
         // say so in the console: it explains a long freeze or a black picture.
         gl.domElement.addEventListener('webglcontextlost', () => console.warn('INOVAT: graphics context lost (driver reset)'))
         gl.domElement.addEventListener('webglcontextrestored', () => console.warn('INOVAT: graphics context restored'))
-        // Shadows are redrawn by ShadowThrottle (every third frame), not every frame.
+        // Shadows are redrawn by ShadowThrottle (every Nth frame, by graphics level).
         gl.shadowMap.autoUpdate = false
         gl.shadowMap.needsUpdate = true
       }}
@@ -613,7 +705,7 @@ export default function Museum() {
       {/* Doors are always drawn: you see them from both the rotunda and the rooms. */}
       <WarmUp />
       <AdaptiveQuality />
-      <ResizeQuality />
+      <GraphicsResolution />
       <ShadowThrottle />
       <DropTrailingCopy composer={composer} />
       <PreparedDoors>
@@ -630,16 +722,25 @@ export default function Museum() {
         // (extra samples for every pixel): the same smooth edges for much less work.
         <EffectComposer ref={composer} multisampling={0}>
           {/* Ambient occlusion: the soft darkening where objects meet the floor and in
-              corners, which real rooms always have. Half resolution keeps it cheap. */}
-          {AO && graphicsLevel === 2 ? <N8AO ref={tuneAmbientOcclusion as never} halfRes quality="performance" aoSamples={8} denoiseSamples={4} aoRadius={1.2} distanceFalloff={1} intensity={2.2} /> : <></>}
+              corners, which real rooms always have. "High": half resolution and few
+              samples keep it cheap. "Ultra": every pixel and four times the samples, so
+              the contact shadows are clean and follow small details. */}
+          {AO && settings.ao !== 'off' ? (
+            settings.ao === 'full' ? (
+              <N8AO ref={tuneAmbientOcclusion as never} halfRes={false} aoSamples={32} denoiseSamples={8} denoiseRadius={6} aoRadius={1.2} distanceFalloff={1} intensity={2.2} />
+            ) : (
+              <N8AO ref={tuneAmbientOcclusion as never} halfRes quality="performance" aoSamples={8} denoiseSamples={4} aoRadius={1.2} distanceFalloff={1} intensity={2.2} />
+            )
+          ) : (
+            <></>
+          )}
           <Bloom mipmapBlur luminanceThreshold={1} luminanceSmoothing={0.2} intensity={0.45} />
           {/* AgX: a natural, film-like way of turning light into screen colours. */}
           <ToneMapping mode={ToneMappingMode.AGX} />
           {/* Slightly darker corners, like a camera lens: a cinematic frame. */}
           <Vignette offset={0.3} darkness={0.55} />
-          {/* Edge smoothing. On the weakest computers (lowest quality level) the cheaper
-              FXAA, about a third of the work, slightly softer edges. */}
-          {ANTIALIAS ? graphicsLevel === 0 ? <FXAA /> : <SMAA /> : <></>}
+          {/* Edge smoothing: SMAA, or at the lowest level the cheaper FXAA. */}
+          {ANTIALIAS ? settings.smoothing === 'fxaa' ? <FXAA /> : <SMAA /> : <></>}
         </EffectComposer>
       )}
 
