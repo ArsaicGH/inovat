@@ -74,6 +74,7 @@ const vi = {
       { keys: 'W A S D', action: 'Di chuyển' },
       { keys: 'Shift', action: 'Chạy nhanh (giữ khi đi)' },
       { keys: 'E / nhấp chuột', action: 'Xem bảng thông tin (E để đóng)' },
+      { keys: '1 2 3 4', action: 'Chọn đáp án A B C D (Phòng trò chơi)' },
       { keys: 'Q', action: 'Mở / đóng bản đồ' },
       { keys: 'Esc', action: 'Tạm dừng' },
       { keys: 'Space', action: 'Hiện / ẩn danh sách phím' },
@@ -132,7 +133,7 @@ const vi = {
   quiz: {
     prompt: 'Nhấn E để chọn',
     title: 'Trò chơi câu hỏi',
-    intro: 'Câu hỏi và bốn đáp án sẽ hiện trên bảng này. Nhắm vào đáp án bạn chọn rồi nhấn E hoặc nhấp chuột. Trả lời đúng ít nhất một nửa để mở cánh cửa phía sau.',
+    intro: 'Câu hỏi và bốn đáp án sẽ hiện trên bảng này. Nhắm vào đáp án bạn chọn rồi nhấn E hoặc nhấp chuột, hoặc nhấn phím 1, 2, 3, 4 để chọn A, B, C, D. Trả lời đúng ít nhất một nửa để mở cánh cửa phía sau.',
     doorOpen: 'Cánh cửa phía sau đã mở.',
     doorLocked: 'Cần đúng ít nhất một nửa để mở cánh cửa phía sau.',
     progress: 'Câu {n}/{total}',
@@ -234,6 +235,7 @@ const en: UiText = {
       { keys: 'W A S D', action: 'Walk' },
       { keys: 'Shift', action: 'Sprint (hold while walking)' },
       { keys: 'E / click', action: 'View an information board (E to close)' },
+      { keys: '1 2 3 4', action: 'Choose answer A B C D (Game Room)' },
       { keys: 'Q', action: 'Open / close the map' },
       { keys: 'Esc', action: 'Pause' },
       { keys: 'Space', action: 'Show / hide this list' },
@@ -282,7 +284,7 @@ const en: UiText = {
   quiz: {
     prompt: 'Press E to choose',
     title: 'The Quiz',
-    intro: 'The questions and their four answers appear on this panel. Aim at the answer you choose, then press E or click. Get at least half right to open the door at the back.',
+    intro: 'The questions and their four answers appear on this panel. Aim at the answer you choose, then press E or click, or press 1, 2, 3 or 4 to choose A, B, C or D. Get at least half right to open the door at the back.',
     doorOpen: 'The door at the back is now open.',
     doorLocked: 'Get at least half right to open the door at the back.',
     progress: 'Question {n}/{total}',

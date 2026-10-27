@@ -245,24 +245,35 @@ function DigitalAge({ size }: { size: RoomSize }) {
   )
 }
 
+// Half the width of the Game Room's portal door with its white surround (PortalDoor.tsx:
+// 2.2 m opening plus a 0.3 m frame each side). The wall bands leave this gap, so the door
+// and its light reach the floor.
+const PORTAL_GAP = 1.4
+
 // A band running around all four walls at one height (wainscot, rails, mouldings), with a
 // gap for the door in the front wall. thickness = how far it sticks out of the wall.
-function WallBand({ size, y, height, thickness, doorGap, children }: {
+function WallBand({ size, y, height, thickness, doorGap, backGap = 0, children }: {
   size: RoomSize
   y: number // centre height
   height: number
   thickness: number
   doorGap: number // half width of the gap left around the door (0 = no gap)
+  backGap?: number // the same in the back wall (the Game Room's portal door)
   children: ReactNode // the material
 }) {
   const { w, d } = size
   const half = thickness / 2
   // x, z, rotation, length of each piece: back wall, two side walls, front wall.
   const pieces: [number, number, number, number][] = [
-    [0, -d / 2 + half, 0, w],
     [-w / 2 + half, 0, Math.PI / 2, d],
     [w / 2 - half, 0, Math.PI / 2, d],
   ]
+  if (backGap > 0) {
+    const len = w / 2 - backGap
+    pieces.push([-(backGap + len / 2), -d / 2 + half, 0, len], [backGap + len / 2, -d / 2 + half, 0, len])
+  } else {
+    pieces.push([0, -d / 2 + half, 0, w])
+  }
   if (doorGap > 0) {
     const len = w / 2 - doorGap
     pieces.push([-(doorGap + len / 2), d / 2 - half, 0, len], [doorGap + len / 2, d / 2 - half, 0, len])
@@ -543,13 +554,13 @@ function QuizRoom({ size }: { size: RoomSize }) {
         <PortalDoor />
       </group>
       {/* Wainscot: cream panelling to 1 m, a gold rail on top and a gold line at the floor. */}
-      <WallBand size={size} y={0.5} height={1} thickness={0.06} doorGap={doorGap}>
+      <WallBand size={size} y={0.5} height={1} thickness={0.06} doorGap={doorGap} backGap={PORTAL_GAP}>
         <meshStandardMaterial color={CREAM} roughness={0.5} />
       </WallBand>
-      <WallBand size={size} y={1.02} height={0.06} thickness={0.1} doorGap={doorGap}>
+      <WallBand size={size} y={1.02} height={0.06} thickness={0.1} doorGap={doorGap} backGap={PORTAL_GAP}>
         {gold}
       </WallBand>
-      <WallBand size={size} y={0.05} height={0.1} thickness={0.08} doorGap={doorGap}>
+      <WallBand size={size} y={0.05} height={0.1} thickness={0.08} doorGap={doorGap} backGap={PORTAL_GAP}>
         {gold}
       </WallBand>
       {/* Crown moulding: a gold band under the ceiling all round the room. */}

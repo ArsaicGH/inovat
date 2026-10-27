@@ -8,6 +8,7 @@ import { addAimTarget, removeAimTarget } from './aim-targets'
 import { drawWrappedText, paintFont, useFontsReady } from './fonts'
 import { QUIZ_COLOURS } from './style'
 import { QUIZ_BOARD } from './layout'
+import { IS_TOUCH } from '../ui/touch'
 
 // THE QUIZ STAND on the Game Room's platform. Everything is painted onto pictures (canvas
 // textures) on an ivory board in a gilded frame: the question, four answer tiles, a
@@ -268,6 +269,15 @@ export default function QuizWall() {
     ctx.textBaseline = 'top'
     ctx.fillStyle = INK
     fitText(ctx, text.options[i], h * 0.78, h * 0.22, w - h * 0.95, h * 0.2, 500, font, h * 0.9)
+    // Small grey key hint, like "[E]" on the next button: 1-4 choose A-D (Interaction.tsx).
+    // Not on touch screens, which have no keys.
+    if (!IS_TOUCH && !answered) {
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'alphabetic'
+      ctx.fillStyle = '#9a9186'
+      ctx.font = `600 ${h * 0.13}px ${font}`
+      ctx.fillText(`[${i + 1}]`, cx, h * 0.9)
+    }
     ctx.globalAlpha = 1
   }
 
