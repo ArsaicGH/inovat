@@ -647,7 +647,7 @@ function QuizRoom({ size }: { size: RoomSize }) {
 // smaller, hanging on a thin cable from the ceiling above the floor medallion and turning
 // slowly. (CMCN 4 has its floating hologram instead: the futuristic one needs no cable.)
 const CENTRE_SCALE = 0.62
-const CENTRE_HEIGHT = 3.6 // high enough not to hide the overview board on the back wall from the door
+const CENTRE_HEIGHT = 2.2 // the same height as the CMCN 4 hologram (leader)
 function CentreSculpture({ room, size }: { room: ThemedRoom; size: RoomSize }) {
   const spin = useRef<Group>(null)
   useFrame((_, delta) => {
