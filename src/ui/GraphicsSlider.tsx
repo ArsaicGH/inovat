@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
-import { GRAPHICS_LEVEL_MAX, useMuseumStore, type GraphicsLevel } from '../state/useMuseumStore'
+import { GRAPHICS_LEVEL_MAX, GRAPHICS_LEVEL_MIN, useMuseumStore, type GraphicsLevel } from '../state/useMuseumStore'
 import { useContent } from '../content/use-content'
 
-// One graphics slider in the pause menu, from "very low" (fast on weak computers) to
-// "ultra" (the best picture, for strong graphics cards), with an "Automatic" switch.
+// One graphics slider in the pause menu, from "low" (fast on weak computers) to "high"
+// (the best picture), with an "Automatic" switch.
 // Automatic = the level measured while loading; the slider then shows that level. Moving
 // the slider switches automatic off. Remembered in this browser (see useMuseumStore).
 //
@@ -23,7 +23,7 @@ export default function GraphicsSlider() {
   const timer = useRef(0)
   useEffect(() => () => window.clearTimeout(timer.current), [])
 
-  const shown = moving ?? (auto ? autoLevel : choice)
+  const shown = Math.min(GRAPHICS_LEVEL_MAX, Math.max(GRAPHICS_LEVEL_MIN, moving ?? (auto ? autoLevel : choice))) as GraphicsLevel
 
   function move(level: GraphicsLevel) {
     setMoving(level)
@@ -55,7 +55,7 @@ export default function GraphicsSlider() {
       </div>
       <input
         type="range"
-        min={0}
+        min={GRAPHICS_LEVEL_MIN}
         max={GRAPHICS_LEVEL_MAX}
         step={1}
         value={shown}

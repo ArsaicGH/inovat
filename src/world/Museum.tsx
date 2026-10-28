@@ -29,6 +29,7 @@ import { ROOM_THEMES } from './room-themes'
 import { CANVAS_WRAPPER_ID } from './pointer-lock'
 import { KEY_PLANS, SPOT_COUNT, SPOT_PLANS } from './spot-plan'
 import SpotFixtures from './SpotFixtures'
+import EndingScene from './EndingScene'
 import { useFontsReady } from './fonts'
 
 // DEVELOPMENT-ONLY test switches in the address bar, to find what slows frames down:
@@ -71,6 +72,9 @@ interface GraphicsSettings {
   spotShadows: boolean // the museum spotlights cast shadows too (ultra only)
   smoothing: 'smaa' | 'fxaa'
 }
+// How many museum spotlights may cast shadows at the ultra level.
+const SPOT_SHADOWS = 4
+
 const GRAPHICS_LEVELS: Record<GraphicsLevel, GraphicsSettings> = {
   0: { sharpness: 0.75, ao: 'off', shadowSize: 512, shadowSoftness: 1, shadowEvery: 0, spotShadows: false, smoothing: 'fxaa' }, // very low
   1: { sharpness: 0.85, ao: 'off', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 3, spotShadows: false, smoothing: 'smaa' }, // low
@@ -136,15 +140,18 @@ function Lighting() {
     // plinth and each board onto its wall. Switched off below ultra, and their shadow
     // pictures freed. (Changing the number of shadow lights rebuilds the drawing code of
     // every material: part of the freeze the pause menu warns about.)
-    for (const spot of spots.current) {
-      if (!spot || spot.castShadow === spotShadows) continue
-      spot.castShadow = spotShadows
+    spots.current.forEach((spot, i) => {
+      // (At most SPOT_SHADOWS of them: with all six plus the key light, the graphics card
+      // refused to draw anything at all; a grey screen.)
+      const casts = spotShadows && i < SPOT_SHADOWS
+      if (!spot || spot.castShadow === casts) return
+      spot.castShadow = casts
       spot.shadow.radius = shadowSoftness
-      if (!spotShadows) {
+      if (!casts) {
         spot.shadow.map?.dispose()
         spot.shadow.map = null
       }
-    }
+    })
     if (light.shadow.mapSize.x === shadowSize) return
     light.shadow.mapSize.set(shadowSize, shadowSize)
     light.shadow.map?.dispose()
@@ -159,7 +166,7 @@ function Lighting() {
   const skyColour = useMemo(() => new Color(), [])
   const bounceColour = useMemo(() => new Color(), [])
 
-  useFrame(({ camera, gl }, delta) => {
+  useFrame(({ camera, gl, scene }, delta) => {
     const here = useMuseumStore.getState().currentRoom
     const want = litRoom(here, camera.position.x, camera.position.z)
 
@@ -178,8 +185,12 @@ function Lighting() {
           // very softly (a wide beam left a hard bright ring on the floor around the plinth).
           // Boards: a wider beam with a very soft edge (a hard-edged oval looked like a flat
           // patch of light pasted onto the wall or door).
-          spot.angle = aim.narrow ? 0.3 : 0.5
-          spot.penumbra = aim.narrow ? 0.9 : 0.85
+          // Exhibits: a tighter beam with a crisper edge, a pool of light like on a stage.
+          // (A wide, very soft edge: the pool of light melts into the floor.)
+          // A tight beam on the object with a soft edge: the exhibit glows, the floor
+          // around it stays dim (gallery practice).
+          spot.angle = aim.narrow ? 0.34 : 0.5
+          spot.penumbra = aim.narrow ? 0.8 : 0.85
           spotTargets[i].position.set(...aim.to)
           spotTargets[i].updateMatrixWorld()
         })
@@ -231,6 +242,10 @@ function Lighting() {
     // Its lower half: light bouncing up off this room's floor.
     bounceColour.set(here === 'rotunda' ? '#2a2219' : ROOM_THEMES[here].bounce)
     const fill = here === 'rotunda' ? ROTUNDA_FILL : ROOM_THEMES[here].fill
+    // The reflection light (scene.environment) also lights every wall evenly: in the dark
+    // galleries of CMCN 1-3 it is nearly off, so only the exhibit spotlights stand out.
+    const environment = here === 'ir1' || here === 'ir2' || here === 'ir3' ? 0.35 : here === 'ir4' ? 0.65 : 1
+    scene.environmentIntensity += (environment - scene.environmentIntensity) * Math.min(1, dt * 3)
     if (sky.current) {
       sky.current.color.lerp(skyColour, Math.min(1, dt * 3))
       sky.current.groundColor.lerp(bounceColour, Math.min(1, dt * 3))
@@ -673,6 +688,12 @@ function DropTrailingCopy({ composer }: { composer: RefObject<Composer | null> }
   return null
 }
 
+// The ending's world exists only while the ending runs (EndingScene.tsx).
+function EndingWhileRunning() {
+  const ending = useMuseumStore((state) => state.mode === 'ending')
+  return ending ? <EndingScene /> : null
+}
+
 export default function Museum() {
   const settings = GRAPHICS_LEVELS[useMuseumStore((state) => state.graphicsLevel)]
   const composer = useRef<Composer>(null)
@@ -723,6 +744,7 @@ export default function Museum() {
 
       <Player walls={COLLISION_BOXES} />
       <Interaction />
+      <EndingWhileRunning />
 
       {/* Bloom: things brighter than white (bulbs, gold rings) glow softly.
           ToneMapping turns the bright picture into screen colours (needed with effects). */}

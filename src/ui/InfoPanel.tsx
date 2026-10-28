@@ -1,9 +1,15 @@
-import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { Suspense, lazy, useEffect, useRef, useState, type CSSProperties } from 'react'
 import { useContent } from '../content/use-content'
 import { useMuseumStore } from '../state/useMuseumStore'
 import { resumeWalking } from '../world/pointer-lock'
 import { EXHIBIT_SPOTS } from '../world/layout'
 import { BOARD_FRAME, BOARD_SIZE, BOARD_THEMES } from '../world/style'
+
+// The turning 3D model beside invention boards (part of the 3D download, so loaded on first use).
+const ModelViewer = lazy(() => import('../world/ModelViewer'))
+
+// Era colour of the model viewer's background gradient (like the era numbers on the walls).
+const ERA_GLOW: Record<string, string> = { ir1: '#e0a050', ir2: '#ffd36a', ir3: '#6be08b', ir4: '#3fd0e0' }
 
 // How long the shrink-away animation plays after closing (must match index.css).
 const CLOSE_ANIMATION_MS = 220
@@ -23,6 +29,12 @@ export default function InfoPanel() {
   const openedAt = useRef(0)
   useEffect(() => {
     if (openId) openedAt.current = performance.now()
+  }, [openId])
+  // The 3D model view starts once the board has finished zooming in: a 3D view measures
+  // its size when it starts, and would otherwise keep the small size of the first frames.
+  const [modelReady, setModelReady] = useState(false)
+  useEffect(() => {
+    setModelReady(false)
   }, [openId])
 
   // After closing, remove the panel once the shrink animation has finished.
@@ -61,6 +73,7 @@ export default function InfoPanel() {
     '--muted': theme.muted,
     '--rule': theme.rule,
     '--frame-colour': theme.frame,
+    '--era-glow': ERA_GLOW[spot?.room ?? ''] ?? '#c9a25a',
   } as CSSProperties
 
   return (
@@ -74,7 +87,15 @@ export default function InfoPanel() {
         if (target === event.currentTarget || target.classList.contains('info-panel')) void resumeWalking()
       }}
     >
-      <div className="info-panel">
+      <div className="info-panel" onAnimationEnd={(event) => event.target === event.currentTarget && !closing && setModelReady(true)}>
+        <div className="board-row" style={look}>
+          {spot?.kind === 'corner' && (
+            <div className="model-viewer">
+              <Suspense fallback={null}>
+                {modelReady && <ModelViewer id={shownId} />}
+              </Suspense>
+            </div>
+          )}
         <article className={`board-zoom board-look-${theme.look}`} style={look}>
           <div className="board-frame">
             <div className="board-paper">
@@ -87,7 +108,9 @@ export default function InfoPanel() {
                   ))}
                 </ul>
               )}
-              <p className="board-body">{text.body}</p>
+                <p className="board-body" style={shownId === 'hall-credits' ? { order: 2 } : undefined}>
+                  {text.body}
+                </p>
               {text.sources.length > 0 ? (
                 <div className="board-sources">
                   {ui.infoPanel.sourcesLabel}:
@@ -112,6 +135,7 @@ export default function InfoPanel() {
             </div>
           </div>
         </article>
+        </div>
         <div className="board-actions">
           <button type="button" className="board-close" onClick={resumeWalking}>
             {ui.infoPanel.close}

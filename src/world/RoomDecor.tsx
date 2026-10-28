@@ -3,7 +3,7 @@ import { useContent } from '../content/use-content'
 import { useFrame } from '@react-three/fiber'
 import type { Group, MeshStandardMaterial } from 'three'
 import type { RoomId } from '../types'
-import { DOOR_WIDTH, HALL_PLANTS, QUIZ_BOARD as DISPLAY, QUIZ_PLATFORM, QUIZ_STAND, roomById, toWorld } from './layout'
+import { ANTE_DEPTH, DOOR_WIDTH, HALL_PLANTS, QUIZ_BOARD as DISPLAY, QUIZ_PLATFORM, QUIZ_STAND, roomById, toWorld } from './layout'
 import { ROOM_ACCENT, DARK_WOOD, GOLD } from './style'
 import Sign from './Sign'
 import EraNumeral from './EraNumeral'
@@ -30,6 +30,12 @@ interface RoomSize {
   h: number // height
 }
 
+// Era rooms: the middle of the entrance room (local z; the entrance is at +depth/2).
+// Elsewhere: the middle of the room.
+function anteZ(room: string, size: RoomSize): number {
+  return ['ir1', 'ir2', 'ir3', 'ir4'].includes(room) ? size.d / 2 - ANTE_DEPTH / 2 : 0
+}
+
 // The decorations were laid out for a 14 m room; positions are stretched by this factor so
 // they spread out evenly in rooms of any size.
 const spread = (size: RoomSize) => size.w / 14
@@ -43,10 +49,10 @@ function RoomIdentity({ room, size }: { room: ThemedRoom; size: RoomSize }) {
   const inlay = { polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }
   return (
     <>
-      {/* Era rooms: a huge decorated number above the overview board (which ends at
-          2.78 m). */}
+      {/* Era rooms: a huge decorated number high on the back wall, above the overview
+          board standing in the middle of the room. */}
       {room === 'ir1' || room === 'ir2' || room === 'ir3' || room === 'ir4' ? (
-        <group position={[0, size.h - 1.6, -size.d / 2 + 0.03]}>
+        <group position={[0, size.h / 2 + 0.2, -size.d / 2 + 0.03]}>
           <EraNumeral era={room} />
         </group>
       ) : (
@@ -58,7 +64,7 @@ function RoomIdentity({ room, size }: { room: ThemedRoom; size: RoomSize }) {
         )
       )}
       {room !== 'quiz' && (
-      <group rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.004, 0]}>
+      <group rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.004, anteZ(room, size)]}>
         <mesh>
           <ringGeometry args={[1.6, 1.75, 64]} />
           <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={0.6} metalness={0.6} roughness={0.3} {...inlay} />
@@ -73,7 +79,7 @@ function RoomIdentity({ room, size }: { room: ThemedRoom; size: RoomSize }) {
   )
 }
 
-// CMCN 1: dark wooden ceiling beams, wall lanterns, iron gears on the back wall.
+// CMCN 1: dark wooden ceiling beams and wall lanterns.
 function SteamAge({ size }: { size: RoomSize }) {
   const lanterns: [number, number, number][] = [
     [-size.w / 2 + 0.15, 2.6, -3 * spread(size)],
@@ -99,27 +105,6 @@ function SteamAge({ size }: { size: RoomSize }) {
             <boxGeometry args={[0.16, 0.24, 0.16]} />
             <Glow colour="#ffb45e" intensity={5} />
           </mesh>
-        </group>
-      ))}
-      {/* Gears on the back wall, either side of the overview board. */}
-      {[
-        [-(size.w / 2 - 2.6), 1.2],
-        [size.w / 2 - 2.6, 0.85],
-      ].map(([x, r], i) => (
-        <group key={i} position={[x, 1.9, -size.d / 2 + 0.12]}>
-          <mesh>
-            <torusGeometry args={[r, 0.12, 8, 36]} />
-            <meshStandardMaterial color="#3b3530" metalness={0.8} roughness={0.4} />
-          </mesh>
-          {Array.from({ length: 12 }, (_, k) => {
-            const a = (k / 12) * Math.PI * 2
-            return (
-              <mesh key={k} position={[Math.cos(a) * (r + 0.15), Math.sin(a) * (r + 0.15), 0]} rotation={[0, 0, a]}>
-                <boxGeometry args={[0.22, 0.14, 0.18]} />
-                <meshStandardMaterial color="#3b3530" metalness={0.8} roughness={0.4} />
-              </mesh>
-            )
-          })}
         </group>
       ))}
     </>
@@ -232,7 +217,7 @@ function DigitalAge({ size }: { size: RoomSize }) {
         <torusGeometry args={[3 * spread(size), 0.05, 8, 80]} />
         <Glow colour="#7fe9ff" intensity={1} />
       </mesh>
-      <group ref={hologram} position={[0, 2.2, 0]} userData={{ keepSeparate: true }}>
+      <group ref={hologram} position={[0, CENTRE_HEIGHT, anteZ('ir4', size)]} userData={{ keepSeparate: true }}>
         <mesh>
           <icosahedronGeometry args={[0.7, 1]} />
           <meshStandardMaterial color="#3fd0e0" emissive="#3fd0e0" emissiveIntensity={1.5} wireframe toneMapped={false} />
@@ -647,8 +632,12 @@ function QuizRoom({ size }: { size: RoomSize }) {
 // smaller, hanging on a thin cable from the ceiling above the floor medallion and turning
 // slowly. (CMCN 4 has its floating hologram instead: the futuristic one needs no cable.)
 const CENTRE_SCALE = 0.62
-const CENTRE_HEIGHT = 2.2 // the same height as the CMCN 4 hologram (leader)
+// High above the overview board standing under it (top at 2.3 m), so that from the
+// entrance the era number on the back wall shows between the two; the CMCN 4
+// hologram floats at the same height.
+const CENTRE_HEIGHT = 4.2
 function CentreSculpture({ room, size }: { room: ThemedRoom; size: RoomSize }) {
+  const z = anteZ(room, size)
   const spin = useRef<Group>(null)
   useFrame((_, delta) => {
     if (spin.current) spin.current.rotation.y += delta * 0.25
@@ -657,15 +646,15 @@ function CentreSculpture({ room, size }: { room: ThemedRoom; size: RoomSize }) {
   const top = CENTRE_HEIGHT + (room === 'ir2' ? 1.1 : 1.05) * CENTRE_SCALE
   return (
     <>
-      <mesh position={[0, (top + size.h) / 2, 0]}>
+      <mesh position={[0, (top + size.h) / 2, z]}>
         <cylinderGeometry args={[0.01, 0.01, size.h - top, 6]} />
         <meshStandardMaterial color="#2e2a26" metalness={0.6} roughness={0.5} />
       </mesh>
-      <mesh position={[0, top, 0]}>
+      <mesh position={[0, top, z]}>
         <sphereGeometry args={[0.04, 12, 8]} />
         <meshStandardMaterial color={GOLD} metalness={0.9} roughness={0.3} />
       </mesh>
-      <group ref={spin} position={[0, CENTRE_HEIGHT, 0]} scale={CENTRE_SCALE} userData={{ keepSeparate: true }}>
+      <group ref={spin} position={[0, CENTRE_HEIGHT, z]} scale={CENTRE_SCALE} userData={{ keepSeparate: true }}>
         <EraSculpture room={room} />
       </group>
     </>

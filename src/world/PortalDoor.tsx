@@ -7,8 +7,8 @@ import { GOLD } from './style'
 // THE PORTAL DOOR in the Game Room's back wall. Until the quiz is passed it is a plain,
 // closed double door in a white-and-gold frame. Once the visitor gets half or more right
 // (quizPassed), the two leaves swing open and reveal a heavenly portal of white-gold light
-// filling the doorway. Walking into it will lead to the ending screen (Phase D); for now the
-// wall behind it is still solid.
+// filling the doorway. Walking into it starts the ending (inPortal in layout.ts,
+// EndingScene.tsx).
 //
 // Local coordinates: x across the wall, y up, z out of the wall into the room.
 
@@ -227,7 +227,8 @@ export default function PortalDoor() {
             />
           </mesh>
         ))}
-        <mesh position={[0, 0.006, 0.9]} rotation={[-Math.PI / 2, 0, 0]}>
+        {/* (Above the carpet, not in it: two surfaces at one height flickered.) */}
+        <mesh position={[0, 0.03, 0.9]} rotation={[-Math.PI / 2, 0, 0]}>
           <planeGeometry args={[W * 1.6, 2]} />
           <meshBasicMaterial ref={spill} map={textures.spot} color="#ffe2a8" opacity={0} {...additive} />
         </mesh>

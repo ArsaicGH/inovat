@@ -1,4 +1,4 @@
-import { INVENTIONS, type RoomId } from '../types'
+import { ERA_ROOMS, INVENTIONS, type RoomId } from '../types'
 import type { Box } from './collision'
 
 // MUSEUM FLOOR PLAN, seen from above, in metres. x = left/right, z = up/down on the map
@@ -31,8 +31,21 @@ const ROOM_START = 17
 function roomStart(width: number): number {
   return Math.max(ROOM_START, Math.ceil((width / 2 / Math.tan(Math.PI / 6) + 0.6) * 10) / 10)
 }
-const CORNER_INSET = 3.4 // how far corner exhibits stand from the walls
+const CORNER_INSET = 4.2 // how far corner exhibits stand from the walls (nearer the middle)
 const PANEL_OFFSET = 2.3 // text panel distance from the centre of its plinth
+
+// THE SPOTLIGHT EXHIBIT: artificial intelligence, the centre of attention today, stands on a
+// larger plinth (scaled up) in the middle of CMCN 4's back wall.
+export const SPOTLIGHT_ID = 'ir4-3'
+export const SPOTLIGHT_SCALE = 1.4
+export const panelOffset = (id: string) => (id === SPOTLIGHT_ID ? 2.9 : PANEL_OFFSET)
+
+// THE ENTRANCE ROOM of each era room (leader's plan): a small room just inside the door
+// with the introduction (overview board, hanging era sculpture, floor medallion), opening
+// through a doorway into the hall that holds only the exhibits.
+export const ANTE_DEPTH = 7
+export const ANTE_WIDTH = 11
+const INNER_DOOR = 4.2 // width of the doorway from the entrance room into the hall
 
 export type DoorStyle = 'grand' | 'plain'
 const DOOR_HEIGHT: Record<DoorStyle, number> = { grand: 3.6, plain: 3 }
@@ -46,10 +59,12 @@ const DOOR_HEIGHT: Record<DoorStyle, number> = { grand: 3.6, plain: 3 }
 // more room for more inventions (INVENTIONS in types.ts), not more crowding.
 const ROOM_SPECS: { id: RoomId; side: number; width: number; depth: number; height: number; doorStyle: DoorStyle }[] = [
   { id: 'hall', side: 6, width: 12, depth: 10, height: 4.5, doorStyle: 'plain' }, // south: start
-  { id: 'ir1', side: 8, width: 18, depth: 18, height: 5.5, doorStyle: 'grand' }, // south-west
-  { id: 'ir2', side: 10, width: 18, depth: 18, height: 5.5, doorStyle: 'grand' }, // north-west
-  { id: 'ir3', side: 0, width: 21, depth: 21, height: 6.2, doorStyle: 'grand' }, // north
-  { id: 'ir4', side: 2, width: 25, depth: 25, height: 7, doorStyle: 'grand' }, // north-east
+  // (Era rooms: the depth includes the entrance room, ANTE below. CMCN 4 is the largest, for
+  // its futuristic atmosphere and its AI spotlight exhibit: leader.)
+  { id: 'ir1', side: 8, width: 18, depth: 18 + ANTE_DEPTH + T, height: 5.5, doorStyle: 'grand' }, // south-west
+  { id: 'ir2', side: 10, width: 20, depth: 20 + ANTE_DEPTH + T, height: 5.5, doorStyle: 'grand' }, // north-west
+  { id: 'ir3', side: 0, width: 18, depth: 18 + ANTE_DEPTH + T, height: 6.2, doorStyle: 'grand' }, // north
+  { id: 'ir4', side: 2, width: 22, depth: 22 + ANTE_DEPTH + T, height: 7, doorStyle: 'grand' }, // north-east
   { id: 'quiz', side: 4, width: 12, depth: 10, height: 4.5, doorStyle: 'plain' }, // south-east: end
 ]
 
@@ -104,6 +119,7 @@ export interface RoomLayout {
   height: number
   vFront: number // local v of the room's front (door) wall's inner face
   vBack: number // local v of the back wall's inner face
+  vHall: number // era rooms: local v where the exhibit hall starts (after the entrance room)
   doorStyle: DoorStyle
   doorHeight: number
   spawn: [number, number] // world x, z
@@ -114,6 +130,7 @@ export const ROOMS: RoomLayout[] = ROOM_SPECS.map((spec) => {
   const frame = frameOfSide(spec.side)
   const vFront = roomStart(spec.width) + T
   const vBack = vFront + spec.depth
+  const vHall = ERA_ROOMS.includes(spec.id) ? vFront + ANTE_DEPTH + T : vFront
   // Arrive just inside the entrance, looking into the room. The visit starts a little
   // further in, facing the INOVAT sign on the hall's back wall.
   const spawnV = spec.id === 'hall' ? vFront + 3 : vFront + 1.5
@@ -122,6 +139,7 @@ export const ROOMS: RoomLayout[] = ROOM_SPECS.map((spec) => {
     frame,
     vFront,
     vBack,
+    vHall,
     doorHeight: DOOR_HEIGHT[spec.doorStyle],
     spawn: toWorld(frame, 0, spawnV),
     spawnYaw: lookTowards(frame.nx, frame.nz),
@@ -219,6 +237,18 @@ function buildWalls(): WallPiece[] {
     pieces.push(piece(room.id, localBox(f, -halfW - T, -halfW, room.vFront, room.vBack), 0, h))
     pieces.push(piece(room.id, localBox(f, halfW, halfW + T, room.vFront, room.vBack), 0, h))
     pieces.push(piece(room.id, localBox(f, -halfW - T, halfW + T, room.vBack, room.vBack + T), 0, h))
+    if (room.vHall > room.vFront) {
+      // The entrance room: its two side walls, and the wall between it and the hall with a
+      // doorway in the middle (and a beam above the doorway).
+      const halfA = ANTE_WIDTH / 2
+      const halfI = INNER_DOOR / 2
+      const wall = room.vHall - T
+      pieces.push(piece(room.id, localBox(f, -halfA - T, -halfA, room.vFront, wall), 0, h))
+      pieces.push(piece(room.id, localBox(f, halfA, halfA + T, room.vFront, wall), 0, h))
+      pieces.push(piece(room.id, localBox(f, -halfW, -halfI, wall, room.vHall), 0, h))
+      pieces.push(piece(room.id, localBox(f, halfI, halfW, wall, room.vHall), 0, h))
+      pieces.push(piece(room.id, localBox(f, -halfI, halfI, wall, room.vHall), room.doorHeight, h, false))
+    }
   }
   return pieces
 }
@@ -279,7 +309,7 @@ export const DOORS: DoorLayout[] = ROOMS.map((room) => ({
 // corner = era-room invention (pedestal + prototype + text panel beside it)
 // wall   = intro-hall information panel on a wall
 // centre = a pedestal in the middle of a room (quiz room sign for now)
-// overview = an era's overview board on its room's back wall, under the room's name sign
+// overview = an era's overview board on a stand in the middle of its room
 export type SpotKind = 'corner' | 'wall' | 'centre' | 'overview'
 
 export interface ExhibitSpot {
@@ -306,9 +336,8 @@ function buildSpots(): ExhibitSpot[] {
       const panels: [string, number, number][] = [
         ['hall-intro', -1, room.vBack - 3],
         ['hall-overview', -1, room.vFront + 3.5],
-        ['hall-team', 1, room.vBack - 2.5],
-        ['hall-credits', 1, room.vFront + 5],
-        ['hall-sources', 1, room.vFront + 2.5],
+        ['hall-team', 1, room.vBack - 3],
+        ['hall-credits', 1, room.vFront + 3.5],
       ]
       for (const [id, sideU, v] of panels) {
         const [x, z] = at(sideU * wallU, v)
@@ -320,25 +349,25 @@ function buildSpots(): ExhibitSpot[] {
       // side walls carry decoration (RoomDecor.tsx). (The 'quiz-info' text stays in
       // exhibits.ts, ready if a board comes back.)
     } else {
-      // Overview board on the back wall (1 cm off it), facing the entrance.
-      const [ox, oz] = at(0, room.vBack - 0.01)
+      // Overview board on a stand in the middle of the room, under the hanging era
+      // sculpture, facing the entrance (leader's choice).
+      const [ox, oz] = at(0, room.vFront + ANTE_DEPTH / 2)
       spots.push({ id: `${room.id}-overview`, room: room.id, kind: 'overview', number: 0, x: ox, z: oz, yaw: faceTowards(-f.nx, -f.nz), panelSide: 1 })
 
-      // The inventions (INVENTIONS in types.ts: 4, 4, 5 and 6), numbered in walking order as
-      // seen when entering: the four corners, plus the middle of the left wall (5th) and of
-      // the right wall (6th). sv: 1 = front, 0 = middle, -1 = back.
-      const centreV = (room.vFront + room.vBack) / 2
+      // The inventions (INVENTIONS in types.ts: 4, 5, 4 and 5), numbered in walking order as
+      // seen when entering: the four corners, plus (with five) the room's headline exhibit in
+      // the middle of the hall. sv: 1 = front, 0 = middle, -1 = back.
+      const centreV = (room.vHall + room.vBack) / 2
       const places: Record<number, [number, number][]> = {
         4: [[-1, 1], [-1, -1], [1, -1], [1, 1]],
-        5: [[-1, 1], [-1, 0], [-1, -1], [1, -1], [1, 1]],
-        6: [[-1, 1], [-1, 0], [-1, -1], [1, -1], [1, 0], [1, 1]],
+        5: [[-1, 1], [-1, -1], [0, 0], [1, -1], [1, 1]],
       }
       places[INVENTIONS[room.id] ?? 4].forEach(([su, sv], i) => {
         const u = su * (room.width / 2 - CORNER_INSET)
-        const v = sv > 0 ? room.vFront + CORNER_INSET : sv < 0 ? room.vBack - CORNER_INSET : centreV
+        const v = sv > 0 ? room.vHall + CORNER_INSET : sv < 0 ? room.vBack - CORNER_INSET : centreV
         const [x, z] = at(u, v)
         const [cx, cz] = at(0, centreV)
-        const yaw = faceTowards(cx - x, cz - z)
+        const yaw = su === 0 && sv === 0 ? faceTowards(-f.nx, -f.nz) : faceTowards(cx - x, cz - z)
         // Put the text panel on the side towards the nearer side wall, away from the walkway:
         // the panel moves along the exhibit's local x axis, (cos yaw, -sin yaw).
         const sideways = Math.cos(yaw) * f.tx - Math.sin(yaw) * f.tz
@@ -355,7 +384,7 @@ export const EXHIBIT_SPOTS = buildSpots()
 // Where a spot's text panel stands (beside the pedestal, along the exhibit's local x axis).
 export function panelPosition(spot: ExhibitSpot): [number, number] {
   if (spot.kind === 'overview') return [spot.x, spot.z] // the board is the whole exhibit
-  const d = spot.panelSide * PANEL_OFFSET
+  const d = spot.panelSide * panelOffset(spot.id)
   return [spot.x + Math.cos(spot.yaw) * d, spot.z - Math.sin(spot.yaw) * d]
 }
 
@@ -384,6 +413,15 @@ function hallPlantBoxes(): Box[] {
 // quiz lectern on it (a screen on a plinth, RoomDecor.tsx). Distances in the room's own
 // coordinates: z from the middle of the room towards the entrance (negative = towards
 // the back wall). `width` is the lectern's screen width.
+// THE PORTAL in the Game Room's back wall (PortalDoor.tsx, 2.2 m wide): standing in its
+// doorway (as close to the wall as the player's body allows) starts the ending.
+export function inPortal(x: number, z: number): boolean {
+  const room = roomById('quiz')
+  if (!room) return false
+  const [u, v] = toLocal(room.frame, x, z)
+  return Math.abs(u) < 1.0 && v > room.vBack - 0.45
+}
+
 export const QUIZ_PLATFORM = { radius: 1.5, height: 0.12, z: 0 }
 export const QUIZ_STAND = { z: -0.45, width: 1.25 }
 // The quiz screen as laid out in QuizWall.tsx (drawn large, then scaled to QUIZ_STAND.width).
@@ -419,7 +457,10 @@ export const COLLISION_BOXES: Box[] = [
   makeBox(0, 0, 1.75, 1.75, Math.PI / 4),
   ...EXHIBIT_SPOTS.filter((spot) => spot.kind === 'corner' || spot.kind === 'centre').flatMap((spot) => {
     const [px, pz] = panelPosition(spot)
-    return [makeBox(spot.x, spot.z, 1.2, 1.2, spot.yaw), makeBox(px, pz, 0.75, 0.25, spot.yaw)]
+    const plinth = 1.2 * (spot.id === SPOTLIGHT_ID ? SPOTLIGHT_SCALE : 1)
+    return [makeBox(spot.x, spot.z, plinth, plinth, spot.yaw), makeBox(px, pz, 0.75, 0.25, spot.yaw)]
   }),
+  // The overview boards in the middle of the era rooms (2.4 m wide).
+  ...EXHIBIT_SPOTS.filter((spot) => spot.kind === 'overview').map((spot) => makeBox(spot.x, spot.z, 1.25, 0.25, spot.yaw)),
   ...hallPlantBoxes(),
 ]

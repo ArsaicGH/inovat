@@ -1,32 +1,25 @@
 import { useEffect, useMemo, useRef, type ReactNode } from 'react'
 import { CanvasTexture, MeshBasicMaterial, SRGBColorSpace, type Group } from 'three'
 import { useContent } from '../content/use-content'
-import { QUIZ_QUESTIONS } from '../content/quiz'
+import { gameText } from '../content/game'
 import { useMuseumStore } from '../state/useMuseumStore'
-import { resultLevel, scoreQuiz } from '../state/quiz-score'
 import { addAimTarget, removeAimTarget } from './aim-targets'
 import { drawWrappedText, paintFont, useFontsReady } from './fonts'
-import { QUIZ_COLOURS } from './style'
 import { QUIZ_BOARD } from './layout'
-import { IS_TOUCH } from '../ui/touch'
 
-// THE QUIZ STAND on the Game Room's platform. Everything is painted onto pictures (canvas
-// textures) on an ivory board in a gilded frame: the question, four answer tiles, a
-// feedback line and a button. Tiles and buttons carry `userData.exhibitId` ("quiz-answer-2",
-// "quiz-next"...), so the crosshair can aim at them and E or a click chooses them
-// (Interaction.tsx). The visitor keeps walking the whole time; nothing pops up.
+// THE TIME MACHINE CONSOLE on the Game Room's platform: an ivory board in a gilded frame
+// showing the game's title, what to do and the four power cores (lit as the visitor passes
+// each round), with one button. Aiming at the button and pressing E (or clicking) opens the
+// game itself (TimeMachineGame.tsx).
 //
 // Local coordinates: x across (0 = middle), y up, the board's back at z = 0. They are
 // laid out at a large size and the parent (RoomDecor.tsx) scales the whole stand down.
 
-const LETTERS = ['A', 'B', 'C', 'D']
 const PX = 256 // canvas pixels per metre
 
-const SCREEN = { y: 3.22, w: 10, h: 1.46 }
-const ANSWER = { y: 1.8, w: 2.3, h: 1.02, xs: [-3.6, -1.2, 1.2, 3.6] }
-const FEEDBACK = { x: -1.25, y: 0.86, w: 7.5, h: 0.62 }
-const SMALL_BUTTON = { x: 3.6, y: 0.86, w: 2.3, h: 0.62 }
-const BIG_BUTTON = { x: 0, y: 1.8, w: 3.2, h: 0.9 }
+const SCREEN = { y: 2.75, w: 10, h: 2.4 }
+const BIG_BUTTON = { x: 0, y: 0.95, w: 3.6, h: 0.9 }
+const ERA_COLOURS = ['#e0a050', '#ffd36a', '#6be08b', '#3fd0e0']
 
 // THE BOARD: ivory, in a heavy gilded frame like a painting in a palace (gold moulding, a
 // darker outer step, a raised bead and rosettes on the corners).
@@ -175,13 +168,11 @@ function Target({ id, x, y, children }: { id: string; x: number; y: number; chil
 }
 
 export default function QuizWall() {
-  const { ui, language } = useContent()
+  const { language } = useContent()
+  const g = gameText[language]
   const group = useRef<Group>(null)
-  const stage = useMuseumStore((state) => state.quizStage)
-  const index = useMuseumStore((state) => state.quizIndex)
-  const answers = useMuseumStore((state) => state.quizAnswers)
   const aimed = useMuseumStore((state) => state.aimedExhibitId)
-  const passed = useMuseumStore((state) => state.quizPassed)
+  const cores = useMuseumStore((state) => state.gameCores)
 
   useEffect(() => {
     const wall = group.current
@@ -190,140 +181,60 @@ export default function QuizWall() {
     return () => removeAimTarget(wall)
   }, [])
 
-  const total = QUIZ_QUESTIONS.length
-  const question = QUIZ_QUESTIONS[index]
-  const text = question.text[language]
-  const chosen = stage === 'question' ? (answers[index] ?? null) : null
-  const answered = chosen !== null
-  const score = scoreQuiz(QUIZ_QUESTIONS, answers)
-
-  // ---- The big screen: intro, question or results ----
-  const screenKey = `${language}|${stage}|${index}|${score}|${passed}`
+  // ---- The big screen: title, what to do, and the four power cores ----
+  const screenKey = `${language}|${cores}`
   const paintScreen: Paint = (ctx, w, h, font) => {
     paintGlass(ctx, w, h)
-    const pad = h * 0.14
+    const pad = h * 0.1
     ctx.textBaseline = 'top'
-    if (stage === 'idle') {
-      ctx.textAlign = 'center'
-      ctx.fillStyle = GOLD_INK
-      ctx.font = `700 ${h * 0.26}px ${font}`
-      ctx.fillText(ui.quiz.title, w / 2, pad, w - 2 * pad)
-      ctx.textAlign = 'left'
-      ctx.fillStyle = INK
-      fitText(ctx, ui.quiz.intro, pad * 2, pad + h * 0.36, w - 4 * pad, h * 0.13, 400, font, h - pad * 0.6)
-    } else if (stage === 'question') {
-      ctx.textAlign = 'left'
-      ctx.fillStyle = GOLD_INK
-      ctx.font = `600 ${h * 0.11}px ${font}`
-      ctx.fillText(ui.quiz.progress.replace('{n}', String(index + 1)).replace('{total}', String(total)).toUpperCase(), pad, pad * 0.8)
-      // Gold progress bar along the top.
-      ctx.fillStyle = 'rgba(201, 162, 90, 0.2)'
-      ctx.fillRect(w * 0.3, pad * 0.95, w * 0.62, h * 0.025)
-      ctx.fillStyle = '#c9a25a'
-      ctx.fillRect(w * 0.3, pad * 0.95, w * 0.62 * ((index + (answered ? 1 : 0)) / total), h * 0.025)
-      ctx.fillStyle = INK
-      fitText(ctx, text.question, pad, pad + h * 0.2, w - 2 * pad, h * 0.17, 600, font, h - pad * 0.6)
-    } else {
-      ctx.textAlign = 'center'
-      const level = resultLevel(score, total)
-      ctx.fillStyle = GOLD_INK
-      ctx.font = `700 ${h * 0.18}px ${font}`
-      ctx.fillText(ui.quiz.resultsTitle, w / 2, pad * 0.6, w - 2 * pad)
-      ctx.font = `700 ${h * 0.28}px ${font}`
-      ctx.fillText(`${score}/${total}`, w / 2, pad * 0.6 + h * 0.2)
-      ctx.fillStyle = INK
-      ctx.font = `400 ${h * 0.1}px ${font}`
-      ctx.fillText(ui.quiz.levels[level], w / 2, h * 0.68, w - 2 * pad)
-      ctx.fillStyle = GOLD_INK
-      ctx.font = `600 ${h * 0.09}px ${font}`
-      ctx.fillText(passed ? ui.quiz.doorOpen : ui.quiz.doorLocked, w / 2, h * 0.81, w - 2 * pad)
-    }
-  }
-
-  // ---- One answer tile ----
-  const paintAnswer = (i: number): Paint => (ctx, w, h, font) => {
-    const colour = QUIZ_COLOURS[i]
-    const isAimed = aimed === `quiz-answer-${i}` && !answered
-    const right = answered && i === question.answer
-    const wrong = answered && i === chosen
-    ctx.globalAlpha = answered && !right && !wrong ? 0.4 : 1
-    const r = h * 0.16
-    roundRect(ctx, 3, 3, w - 6, h - 6, r)
-    ctx.fillStyle = right ? 'rgba(214, 240, 220, 0.98)' : wrong ? 'rgba(246, 216, 212, 0.98)' : isAimed ? 'rgba(248, 232, 190, 0.98)' : 'rgba(252, 248, 238, 0.98)'
-    ctx.fill()
-    ctx.lineWidth = isAimed || right || wrong ? h * 0.05 : h * 0.025
-    ctx.strokeStyle = right ? '#2f9a5c' : wrong ? '#c2453f' : isAimed ? '#b8893d' : colour
-    ctx.stroke()
-    // Letter badge in the A-D colour.
-    const cx = h * 0.42
-    ctx.beginPath()
-    ctx.arc(cx, h / 2, h * 0.24, 0, Math.PI * 2)
-    ctx.fillStyle = colour
-    ctx.fill()
-    ctx.fillStyle = '#ffffff'
     ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.font = `700 ${h * 0.26}px ${font}`
-    ctx.fillText(LETTERS[i], cx, h / 2 + h * 0.01)
+    ctx.fillStyle = GOLD_INK
+    ctx.font = `700 ${h * 0.16}px ${font}`
+    ctx.fillText(g.title, w / 2, pad, w - 2 * pad)
     ctx.textAlign = 'left'
-    ctx.textBaseline = 'top'
     ctx.fillStyle = INK
-    fitText(ctx, text.options[i], h * 0.78, h * 0.22, w - h * 0.95, h * 0.2, 500, font, h * 0.9)
-    // Small grey key hint, like "[E]" on the next button: 1-4 choose A-D (Interaction.tsx).
-    // Not on touch screens, which have no keys.
-    if (!IS_TOUCH && !answered) {
+    fitText(ctx, cores >= 4 ? g.consoleDone : g.consoleIntro, pad * 2.4, pad + h * 0.24, w - 4.8 * pad, h * 0.085, 500, font, h * 0.62)
+    // The four cores: dark until lit, then glowing in their era's colour.
+    for (let i = 0; i < 4; i++) {
+      const cx = w / 2 + (i - 1.5) * h * 0.34
+      const cy = h * 0.8
+      const lit = i < cores
+      ctx.beginPath()
+      ctx.arc(cx, cy, h * 0.1, 0, Math.PI * 2)
+      ctx.fillStyle = lit ? ERA_COLOURS[i] : '#d8d0c0'
+      ctx.shadowColor = ERA_COLOURS[i]
+      ctx.shadowBlur = lit ? h * 0.08 : 0
+      ctx.fill()
+      ctx.shadowBlur = 0
+      ctx.lineWidth = h * 0.012
+      ctx.strokeStyle = '#9a7330'
+      ctx.stroke()
+      ctx.fillStyle = lit ? '#2b2620' : '#9a9186'
       ctx.textAlign = 'center'
-      ctx.textBaseline = 'alphabetic'
-      ctx.fillStyle = '#9a9186'
-      ctx.font = `600 ${h * 0.13}px ${font}`
-      ctx.fillText(`[${i + 1}]`, cx, h * 0.9)
+      ctx.textBaseline = 'middle'
+      ctx.font = `700 ${h * 0.07}px ${font}`
+      ctx.fillText(['I', 'II', 'III', 'IV'][i], cx, cy + h * 0.005)
+      ctx.textBaseline = 'top'
     }
-    ctx.globalAlpha = 1
-  }
-
-  // ---- Feedback line after answering ----
-  const paintFeedback: Paint = (ctx, w, h, font) => {
-    const right = chosen === question.answer
-    roundRect(ctx, 2, 2, w - 4, h - 4, h * 0.2)
-    ctx.fillStyle = right ? 'rgba(220, 242, 226, 0.97)' : 'rgba(248, 222, 218, 0.97)'
-    ctx.fill()
-    ctx.fillStyle = right ? '#2f9a5c' : '#c2453f'
-    ctx.fillRect(2, h * 0.15, h * 0.06, h * 0.7)
-    ctx.textAlign = 'left'
-    ctx.textBaseline = 'top'
-    ctx.fillStyle = right ? '#23794a' : '#a8332e'
-    ctx.font = `700 ${h * 0.26}px ${font}`
-    const label = right ? ui.quiz.correct : ui.quiz.wrong
-    ctx.fillText(label, h * 0.3, h * 0.12)
-    ctx.fillStyle = INK
-    fitText(ctx, text.explanation, h * 0.3, h * 0.48, w - h * 0.5, h * 0.17, 400, font, h * 0.96)
   }
 
   // ---- Gold button ----
   const paintButton = (label: string, isAimed: boolean): Paint => (ctx, w, h, font) => {
     roundRect(ctx, 3, 3, w - 6, h - 6, h / 2 - 3)
-    const g = ctx.createLinearGradient(0, 0, 0, h)
-    g.addColorStop(0, isAimed ? '#fff0c2' : '#e8c77e')
-    g.addColorStop(1, isAimed ? '#d9a650' : '#b8893d')
-    ctx.fillStyle = g
+    const grad = ctx.createLinearGradient(0, 0, 0, h)
+    grad.addColorStop(0, isAimed ? '#fff0c2' : '#e8c77e')
+    grad.addColorStop(1, isAimed ? '#d9a650' : '#b8893d')
+    ctx.fillStyle = grad
     ctx.fill()
     ctx.fillStyle = '#2b2620'
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
-    ctx.font = `700 ${h * 0.36}px ${font}`
+    ctx.font = `700 ${h * 0.34}px ${font}`
     ctx.fillText(label, w / 2, h / 2 + h * 0.02, w * 0.9)
   }
 
-  const button =
-    stage === 'idle'
-      ? { id: 'quiz-start', label: ui.quiz.start, at: BIG_BUTTON }
-      : stage === 'results'
-        ? { id: 'quiz-retry', label: ui.quiz.retry, at: BIG_BUTTON }
-        : answered
-          ? // [E]: pressing E anywhere in the room also goes on (Interaction.tsx).
-            { id: 'quiz-next', label: `${index === total - 1 ? ui.quiz.finish : ui.quiz.next}  [E]`, at: SMALL_BUTTON }
-          : null
-
+  const label = cores === 0 ? g.consoleStart : cores < 4 ? g.consoleContinue : null
+  const isAimed = aimed === 'quiz-start'
   return (
     <group>
       <ScreenHardware />
@@ -332,33 +243,14 @@ export default function QuizWall() {
         <group position={[0, SCREEN.y, 0.03]}>
           <Panel width={SCREEN.w} height={SCREEN.h} paint={paintScreen} paintKey={screenKey} />
         </group>
-
-        {stage === 'question' &&
-          ANSWER.xs.map((x, i) => (
-            <Target key={i} id={`quiz-answer-${i}`} x={x} y={ANSWER.y}>
-              <Panel
-                width={ANSWER.w}
-                height={ANSWER.h}
-                paint={paintAnswer(i)}
-                paintKey={`${language}|${index}|${chosen}|${aimed === `quiz-answer-${i}`}`}
-              />
-            </Target>
-          ))}
-
-        {stage === 'question' && answered && (
-          <group position={[FEEDBACK.x, FEEDBACK.y, 0.04]}>
-            <Panel width={FEEDBACK.w} height={FEEDBACK.h} paint={paintFeedback} paintKey={`${language}|${index}|${chosen}`} />
-          </group>
-        )}
-
-        {button && (
-          <Target id={button.id} x={button.at.x} y={button.at.y}>
+        {label && (
+          <Target id="quiz-start" x={BIG_BUTTON.x} y={BIG_BUTTON.y}>
             <Panel
-              width={button.at.w}
-              height={button.at.h}
-              paint={paintButton(button.label, aimed === button.id)}
-              paintKey={`${button.label}|${aimed === button.id}`}
-              glow={aimed === button.id ? 1 : 0.86}
+              width={BIG_BUTTON.w}
+              height={BIG_BUTTON.h}
+              paint={paintButton(label, isAimed)}
+              paintKey={`${label}|${isAimed}`}
+              glow={isAimed ? 1 : 0.86}
             />
           </Target>
         )}

@@ -2,8 +2,8 @@ import { useEffect, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useMuseumStore, canUse, saveProgress } from '../state/useMuseumStore'
 import { moveWithCollision, type Box } from './collision'
-import { getCanvas } from './pointer-lock'
-import { regionAt, spawnOf } from './layout'
+import { getCanvas, releasePointer } from './pointer-lock'
+import { inPortal, regionAt, spawnOf } from './layout'
 import { closedDoorBlockers } from './door-state'
 import { ERA_ROOMS, type RoomId } from '../types'
 import { debugStats } from './debug-stats'
@@ -275,7 +275,8 @@ export default function Player({ walls }: PlayerProps) {
 
     // Save progress about once a second once the visit has started.
     const now = performance.now()
-    if (store.mode !== 'start' && now - lastSave.current > 1000) {
+    // (Not during the ending: the camera is then far outside the museum.)
+    if (store.mode !== 'start' && store.mode !== 'ending' && now - lastSave.current > 1000) {
       lastSave.current = now
       saveProgress({ x: camera.position.x, z: camera.position.z, yaw: yaw.current })
     }
@@ -294,6 +295,13 @@ export default function Player({ walls }: PlayerProps) {
     }
 
     if (store.mode !== 'exploring') return
+
+    // Walked into the open portal in the Game Room's back wall: the ending begins.
+    if (store.quizPassed && inPortal(camera.position.x, camera.position.z)) {
+      store.startEnding() // the mode changes first...
+      releasePointer() // ...so releasing the mouse is not taken as a pause
+      return
+    }
 
     // Use the REAL time since the last frame, so each step matches what is on screen even
     // when frames arrive unevenly. (An averaged time made such moments look worse.)

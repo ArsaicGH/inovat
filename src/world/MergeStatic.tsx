@@ -73,6 +73,8 @@ export default function MergeStatic({ children }: { children: ReactNode }) {
       const mesh = new Mesh(joined, material)
       mesh.castShadow = meshes[0].castShadow
       mesh.receiveShadow = meshes[0].receiveShadow
+      // Keep a cheaper aiming test if the parts had one (downloaded models, inventions.tsx).
+      mesh.raycast = meshes[0].raycast
       root.add(mesh)
       merged.push(mesh)
       meshes.forEach((original) => {

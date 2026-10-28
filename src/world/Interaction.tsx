@@ -13,12 +13,6 @@ const QUIZ_AIM_DISTANCE = 6
 
 // Keys by PHYSICAL position (event.code), like the movement keys.
 const OPEN_KEY = 'KeyE'
-const ANSWER_KEYS = [
-  ['Digit1', 'Numpad1'],
-  ['Digit2', 'Numpad2'],
-  ['Digit3', 'Numpad3'],
-  ['Digit4', 'Numpad4'],
-]
 const MAP_KEY = 'KeyQ' // Q: easy to reach next to W A S D
 const SPACE = 'Space' // starts the tutorial; later shows / hides the key list
 
@@ -53,9 +47,9 @@ function activate(id: string) {
   const store = useMuseumStore.getState()
   if (store.mode !== 'exploring') return
   if (isQuizTarget(id)) {
-    if (id === 'quiz-start' || id === 'quiz-retry') store.startQuiz()
-    else if (id === 'quiz-next') store.nextQuizQuestion()
-    else store.answerQuiz(Number(id.slice('quiz-answer-'.length)))
+    // The Time Machine console's button opens the game (TimeMachineGame.tsx).
+    store.openGame() // the mode changes first...
+    releasePointer() // ...so releasing the mouse is not taken as a pause
     return
   }
   store.openExhibit(id) // sets mode "reading" first...
@@ -106,16 +100,7 @@ export default function Interaction() {
       if (event.repeat) return // holding a key must not open/close things repeatedly
       const store = useMuseumStore.getState()
       if (event.code === OPEN_KEY) {
-        // In the Game Room, after answering, E simply goes to the next question (no need
-        // to aim at the button).
-        const answered = store.quizStage === 'question' && store.quizAnswers[store.quizIndex] !== null
-        if (answered && store.mode === 'exploring' && store.currentRoom === 'quiz') store.nextQuizQuestion()
-        else openAimedExhibit()
-      }
-      // In the Game Room, 1-4 choose answer A-D without aiming (top row or number pad).
-      const answerKey = ANSWER_KEYS.findIndex((codes) => codes.includes(event.code))
-      if (answerKey >= 0 && store.mode === 'exploring' && store.currentRoom === 'quiz' && store.quizStage === 'question') {
-        store.answerQuiz(answerKey) // ignored once this question is answered
+        openAimedExhibit()
       }
       if (event.code === MAP_KEY && store.mode === 'exploring' && canUse(store.tutorial, 'map')) {
         store.setMode('map')

@@ -74,7 +74,6 @@ const vi = {
       { keys: 'W A S D', action: 'Di chuyển' },
       { keys: 'Shift', action: 'Chạy nhanh (giữ khi đi)' },
       { keys: 'E / nhấp chuột', action: 'Xem bảng thông tin (E để đóng)' },
-      { keys: '1 2 3 4', action: 'Chọn đáp án A B C D (Phòng trò chơi)' },
       { keys: 'Q', action: 'Mở / đóng bản đồ' },
       { keys: 'Esc', action: 'Tạm dừng' },
       { keys: 'Space', action: 'Hiện / ẩn danh sách phím' },
@@ -151,6 +150,22 @@ const vi = {
       good: 'Khá lắm! Hãy xem lại vài phòng trưng bày để đạt điểm tuyệt đối.',
       retry: 'Đừng nản lòng! Hãy tham quan lại các phòng trưng bày rồi thử lần nữa.',
     },
+  },
+  // THE ENDING after the portal: a flight through the four eras, then a thank-you panel.
+  ending: {
+    journey: 'Hành trình xuyên thời gian',
+    // One line for each era as the flight passes it (written to set the mood).
+    moods: [
+      'Tiếng máy hơi nước vang lên, khói than phủ kín bầu trời: lần đầu tiên, máy móc gánh vác sức lao động của con người.',
+      'Ánh đèn điện thắp sáng màn đêm, những dây chuyền không ngừng chuyển động: thế giới bước vào kỷ nguyên sản xuất hàng loạt.',
+      'Những con chip nhỏ bé mở ra thế giới số: máy tính, rô-bốt và mạng lưới nối liền con người khắp hành tinh.',
+      'Máy móc biết học hỏi, vạn vật được kết nối: và câu chuyện ấy vẫn đang được viết tiếp, bởi chính chúng ta.',
+    ],
+    skip: 'Bỏ qua',
+    title: 'Cảm ơn Quý khách đã tham quan!',
+    text: 'Quý khách vừa đi qua bốn cuộc Cách mạng Công nghiệp: từ hơi nước và máy móc cơ khí, đến điện năng, máy tính, rô-bốt và trí tuệ nhân tạo. Câu chuyện ấy vẫn đang được viết tiếp, và thế hệ hôm nay sẽ góp phần tạo nên chương tiếp theo.',
+    backToHall: 'Quay lại sảnh',
+    replay: 'Xem lại hành trình',
   },
   // On-screen buttons on phones and tablets (names read out by screen readers), and the
   // note asking to turn the device sideways.
@@ -234,7 +249,6 @@ const en: UiText = {
       { keys: 'W A S D', action: 'Walk' },
       { keys: 'Shift', action: 'Sprint (hold while walking)' },
       { keys: 'E / click', action: 'View an information board (E to close)' },
-      { keys: '1 2 3 4', action: 'Choose answer A B C D (Game Room)' },
       { keys: 'Q', action: 'Open / close the map' },
       { keys: 'Esc', action: 'Pause' },
       { keys: 'Space', action: 'Show / hide this list' },
@@ -301,6 +315,20 @@ const en: UiText = {
       good: 'Well done! Revisit a few exhibition rooms to get a perfect score.',
       retry: "Don't give up! Walk through the exhibition rooms again and have another go.",
     },
+  },
+  ending: {
+    journey: 'A journey through time',
+    moods: [
+      'The roar of steam engines, skies dark with coal smoke: for the first time, machines took on the labour of human hands.',
+      'Electric light pushed back the night and assembly lines never stopped moving: the world entered the age of mass production.',
+      'Tiny chips opened a digital world: computers, robots and networks linking people across the planet.',
+      'Machines that learn, everything connected: and the story is still being written, by all of us.',
+    ],
+    skip: 'Skip',
+    title: 'Thank you for visiting!',
+    text: 'You have just travelled through four Industrial Revolutions: from steam and mechanical machinery to electricity, computers, robots and artificial intelligence. That story is still being written, and today’s generation will help shape its next chapter.',
+    backToHall: 'Back to the hall',
+    replay: 'Replay the journey',
   },
   touch: {
     map: 'Map',

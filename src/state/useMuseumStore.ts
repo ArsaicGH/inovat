@@ -1,14 +1,12 @@
 import { create } from 'zustand'
 import { ERA_ROOMS, type RoomId } from '../types'
 import { LANGUAGES, type Language } from '../content/language'
-import { QUIZ_QUESTIONS } from '../content/quiz'
-import { resultLevel, scoreQuiz } from './quiz-score'
 import { IS_TOUCH } from '../ui/touch'
 
 // The app is always in exactly one mode (PLAN.md section 3). Only in "exploring"
 // is the mouse captured and walking allowed. (The quiz is played while exploring: it is
 // shown on the Game Room's back wall, see QuizWall.tsx.)
-export type Mode = 'start' | 'exploring' | 'paused' | 'reading' | 'map'
+export type Mode = 'start' | 'exploring' | 'paused' | 'reading' | 'map' | 'ending' | 'game'
 
 // Mouse/touchpad sensitivity is a multiplier: 1 = default speed.
 export const SENSITIVITY_MIN = 0.2
@@ -96,7 +94,6 @@ function saveLanguage(value: Language) {
   }
 }
 
-export type QuizStage = 'idle' | 'question' | 'results'
 
 // SOUND SETTINGS (M8b): volumes (0-1), remembered in this browser. Only the main volume
 // has a slider (0 = silent); effects and ambience keep their default balance.
@@ -132,7 +129,8 @@ const savedSound = loadSound()
 // changes is in Museum.tsx (GRAPHICS_LEVELS). "Automatic" uses the level measured during
 // loading (AdaptiveQuality); otherwise the visitor's own choice. Remembered in this browser.
 export type GraphicsLevel = 0 | 1 | 2 | 3 | 4
-export const GRAPHICS_LEVEL_MAX: GraphicsLevel = 4
+export const GRAPHICS_LEVEL_MIN: GraphicsLevel = 1
+export const GRAPHICS_LEVEL_MAX: GraphicsLevel = 3
 const GRAPHICS_STORAGE_KEY = 'inovat-graphics'
 
 function loadGraphics(): { auto: boolean; level: GraphicsLevel } {
@@ -158,8 +156,11 @@ const savedGraphics = loadGraphics()
 
 // The level actually drawn. Until the measurement during loading is done, always the
 // automatic one (it starts at "high", the level the measurement is made at).
+// Only low (1), medium (2) and high (3) are offered (leader): "very low" and "ultra" are
+// no longer used, so older saved choices are brought into that range.
 function drawnLevel(state: { graphicsAuto: boolean; qualityChosen: boolean; autoGraphics: GraphicsLevel; graphicsChoice: GraphicsLevel }) {
-  return state.graphicsAuto || !state.qualityChosen ? state.autoGraphics : state.graphicsChoice
+  const level = state.graphicsAuto || !state.qualityChosen ? state.autoGraphics : state.graphicsChoice
+  return Math.min(GRAPHICS_LEVEL_MAX, Math.max(GRAPHICS_LEVEL_MIN, level)) as GraphicsLevel
 }
 
 // GUIDED TUTORIAL (optional, chosen on the start screen). Each step unlocks one more control:
@@ -253,15 +254,20 @@ interface MuseumState {
   showKeyList: boolean
   toggleKeyList: () => void
 
-  // QUIZ on the Game Room's back wall. Stage: idle (start button), question, results.
-  // quizAnswers[i] = option chosen for question i (0-3), or null. An answer locks once chosen.
-  quizStage: QuizStage
-  quizIndex: number
-  quizAnswers: (number | null)[]
-  startQuiz: () => void
-  answerQuiz: (choice: number) => void
-  nextQuizQuestion: () => void // to the next question, or to the results after the last
-  quizPassed: boolean // half or more right once: the portal door in the back wall opens
+  // THE TIME MACHINE GAME (TimeMachineGame.tsx), opened from the Game Room's lectern.
+  // gameCores = power cores lit so far (0-4, one per round, in order).
+  gameCores: number
+  openGame: () => void
+  lightCore: (round: number) => void
+  quizPassed: boolean // all four cores lit: the portal door in the back wall opens
+
+  // THE ENDING (EndingScene.tsx, EndingScreen.tsx), after walking into the open portal.
+  // endingRun goes up on every start, so the flight starts again from the beginning;
+  // endingStage: 0 = before the first era, 1-4 = passing that era, 5 = arrived.
+  endingRun: number
+  endingStage: number
+  startEnding: () => void
+  setEndingStage: (stage: number) => void
 }
 
 export const useMuseumStore = create<MuseumState>((set) => ({
@@ -346,26 +352,20 @@ export const useMuseumStore = create<MuseumState>((set) => ({
   showKeyList: false,
   toggleKeyList: () => set((state) => ({ showKeyList: !state.showKeyList })),
 
-  quizStage: 'idle',
-  quizIndex: 0,
-  quizAnswers: [],
-  startQuiz: () => set({ quizStage: 'question', quizIndex: 0, quizAnswers: QUIZ_QUESTIONS.map(() => null) }),
-  answerQuiz: (choice) =>
+  gameCores: 0,
+  openGame: () => set({ mode: 'game', aimedExhibitId: null, showKeyList: false }),
+  lightCore: (round) =>
     set((state) => {
-      if (state.quizStage !== 'question' || state.quizAnswers[state.quizIndex] !== null) return state // locked
-      const quizAnswers = [...state.quizAnswers]
-      quizAnswers[state.quizIndex] = choice
-      return { quizAnswers }
+      const gameCores = Math.max(state.gameCores, round + 1)
+      return { gameCores, quizPassed: state.quizPassed || gameCores >= 4 }
     }),
-  nextQuizQuestion: () =>
-    set((state) => {
-      if (state.quizStage !== 'question' || state.quizAnswers[state.quizIndex] === null) return state // answer first
-      const next = state.quizIndex + 1
-      if (next < QUIZ_QUESTIONS.length) return { quizIndex: next }
-      const passed = resultLevel(scoreQuiz(QUIZ_QUESTIONS, state.quizAnswers), QUIZ_QUESTIONS.length) !== 'retry'
-      return { quizStage: 'results', quizPassed: state.quizPassed || passed }
-    }),
-  quizPassed: false,
+  // (Local test build only: the portal starts open, to try the ending. Never on the live site.)
+  quizPassed: import.meta.env.DEV,
+
+  endingRun: 0,
+  endingStage: 0,
+  startEnding: () => set((state) => ({ mode: 'ending', endingRun: state.endingRun + 1, endingStage: 0, aimedExhibitId: null, showKeyList: false })),
+  setEndingStage: (stage) => set({ endingStage: stage }),
 
   continueSavedVisit: () =>
     set((state) => {

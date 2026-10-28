@@ -3,155 +3,134 @@ import { CanvasTexture, MeshBasicMaterial, SRGBColorSpace } from 'three'
 import type { RoomId } from '../types'
 import { paintFont, useFontsReady } from './fonts'
 
-// THE ERA NUMBER above each era room's overview board: a huge 1, 2, 3 or 4, decorated in
-// the style of its revolution (painted on a see-through picture, so only the decoration
-// shows on the wall).
-// 1 = brass numeral on an iron cogwheel        (steam and machines)
-// 2 = white numeral on a navy enamel badge ringed with light bulbs (electricity)
-// 3 = green pixel numeral on an old computer screen   (computers)
-// 4 = glowing cyan outline numeral in a circuit ring  (digital)
+// THE ERA NUMBER on each era room's back wall: a huge 1, 2, 3 or 4 with no background,
+// only the number itself, decorated in the style of its revolution (painted on a
+// see-through picture, so only the number shows on the wall).
+// 1 = cast brass numeral with an engraved line and rivets       (steam and machines)
+// 2 = cream enamel numeral in a red rim, lined with light bulbs  (electricity)
+// 3 = glowing green pixel numeral with scan lines                (computers)
+// 4 = glowing cyan outline numeral with circuit traces inside    (digital)
 
-const SIZE = 1.6 // metres (square)
-const PIXELS = 512
+const SIZE = 3.4 // metres (square)
+const PIXELS = 768 // sharp enough at this size, at a quarter of the memory of 1024 x 1024
 
 type EraRoom = Extract<RoomId, 'ir1' | 'ir2' | 'ir3' | 'ir4'>
 
 // 5 x 7 pixel shape of the number 3 (CMCN 3's computer screen).
 const PIXEL_THREE = ['11110', '00001', '00001', '01110', '00001', '00001', '11110']
 
-function paintGear(ctx: CanvasRenderingContext2D, c: number, r: number) {
-  ctx.fillStyle = '#2f2823'
-  for (let i = 0; i < 14; i++) {
-    ctx.save()
-    ctx.translate(c, c)
-    ctx.rotate((i / 14) * Math.PI * 2)
-    ctx.fillRect(-r * 0.12, -r * 1.12, r * 0.24, r * 0.3)
-    ctx.restore()
-  }
-  ctx.beginPath()
-  ctx.arc(c, c, r, 0, Math.PI * 2)
-  ctx.fill()
-  ctx.strokeStyle = '#a87a3a'
-  ctx.lineWidth = r * 0.05
-  ctx.beginPath()
-  ctx.arc(c, c, r * 0.86, 0, Math.PI * 2)
-  ctx.stroke()
-  // Rivets around the rim.
-  ctx.fillStyle = '#d9ad66'
-  for (let i = 0; i < 16; i++) {
-    const a = (i / 16) * Math.PI * 2
-    ctx.beginPath()
-    ctx.arc(c + Math.cos(a) * r * 0.93, c + Math.sin(a) * r * 0.93, r * 0.025, 0, Math.PI * 2)
-    ctx.fill()
+// Small dots along the inside of the numeral's outline: rivets (1) or light bulbs (2).
+// Drawn by testing points of a grid against the numeral's own pixels, so they follow
+// any font.
+function dotsInside(ctx: CanvasRenderingContext2D, s: number, step: number, inset: number, draw: (x: number, y: number) => void) {
+  const data = ctx.getImageData(0, 0, s, s).data
+  const solid = (x: number, y: number) => x >= 0 && y >= 0 && x < s && y < s && data[(Math.round(y) * s + Math.round(x)) * 4 + 3] > 128
+  for (let y = step / 2; y < s; y += step) {
+    for (let x = step / 2; x < s; x += step) {
+      // Inside the numeral, and near its edge (some point a little further out is empty).
+      if (!solid(x, y)) continue
+      const nearEdge = !solid(x + inset, y) || !solid(x - inset, y) || !solid(x, y + inset) || !solid(x, y - inset)
+      const tooClose = !solid(x + inset * 0.5, y) || !solid(x - inset * 0.5, y) || !solid(x, y + inset * 0.5) || !solid(x, y - inset * 0.5)
+      if (nearEdge && !tooClose) draw(x, y)
+    }
   }
 }
 
 function paint(ctx: CanvasRenderingContext2D, era: EraRoom, font: string) {
   const s = PIXELS
   const c = s / 2
+  const y = c + s * 0.04 // the font's numbers sit a little high
   ctx.clearRect(0, 0, s, s)
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
 
   if (era === 'ir1') {
-    paintGear(ctx, c, s * 0.4)
-    const brass = ctx.createLinearGradient(0, s * 0.2, 0, s * 0.8)
-    brass.addColorStop(0, '#f6d999')
-    brass.addColorStop(0.5, '#b8843d')
+    // Cast brass: a dark iron edge, a brass gradient, an engraved inner line and rivets.
+    ctx.font = `800 ${s * 0.95}px ${font}`
+    ctx.fillStyle = '#000'
+    ctx.fillText('1', c, y)
+    ctx.globalCompositeOperation = 'source-in' // keep everything below inside the numeral
+    const brass = ctx.createLinearGradient(0, s * 0.1, s * 0.3, s * 0.9)
+    brass.addColorStop(0, '#fbe3a6')
+    brass.addColorStop(0.45, '#b8843d')
+    brass.addColorStop(0.55, '#8a5f28')
     brass.addColorStop(1, '#e9c47c')
-    ctx.font = `700 ${s * 0.55}px ${font}`
-    ctx.lineWidth = s * 0.02
-    ctx.strokeStyle = '#1e1813'
-    ctx.strokeText('1', c, c + s * 0.03)
     ctx.fillStyle = brass
-    ctx.fillText('1', c, c + s * 0.03)
-  } else if (era === 'ir2') {
-    // Navy enamel badge with a red ring and a ring of light bulbs.
-    ctx.fillStyle = '#b23a2a'
-    ctx.beginPath()
-    ctx.arc(c, c, s * 0.42, 0, Math.PI * 2)
-    ctx.fill()
-    ctx.fillStyle = '#1d2b3a'
-    ctx.beginPath()
-    ctx.arc(c, c, s * 0.37, 0, Math.PI * 2)
-    ctx.fill()
-    ctx.fillStyle = '#ffe2a0'
-    for (let i = 0; i < 20; i++) {
-      const a = (i / 20) * Math.PI * 2
+    ctx.fillRect(0, 0, s, s)
+    ctx.globalCompositeOperation = 'source-over'
+    ctx.lineWidth = s * 0.018
+    ctx.strokeStyle = '#2a1f15'
+    ctx.strokeText('1', c, y)
+    dotsInside(ctx, s, s * 0.06, s * 0.045, (x, py) => {
+      ctx.fillStyle = '#5b3d1c'
       ctx.beginPath()
-      ctx.arc(c + Math.cos(a) * s * 0.395, c + Math.sin(a) * s * 0.395, s * 0.014, 0, Math.PI * 2)
+      ctx.arc(x, py, s * 0.011, 0, Math.PI * 2)
       ctx.fill()
-    }
-    ctx.font = `700 ${s * 0.5}px ${font}`
-    ctx.fillStyle = '#f4f2ea'
-    ctx.fillText('2', c, c + s * 0.03)
-    // Small lightning bolt under the numeral.
-    ctx.fillStyle = '#f5b13f'
-    ctx.beginPath()
-    const b = s * 0.06
-    ctx.moveTo(c + b * 0.3, c + s * 0.22)
-    ctx.lineTo(c - b * 0.6, c + s * 0.3)
-    ctx.lineTo(c, c + s * 0.3)
-    ctx.lineTo(c - b * 0.3, c + s * 0.38)
-    ctx.lineTo(c + b * 0.6, c + s * 0.29)
-    ctx.lineTo(c, c + s * 0.29)
-    ctx.closePath()
-    ctx.fill()
+      ctx.fillStyle = '#ffe7b0'
+      ctx.beginPath()
+      ctx.arc(x - s * 0.003, py - s * 0.003, s * 0.005, 0, Math.PI * 2)
+      ctx.fill()
+    })
+  } else if (era === 'ir2') {
+    // A theatre-marquee number: cream enamel in a thick red rim, lined with warm bulbs.
+    ctx.font = `800 ${s * 0.95}px ${font}`
+    ctx.lineJoin = 'round'
+    ctx.lineWidth = s * 0.05
+    ctx.strokeStyle = '#b23a2a'
+    ctx.strokeText('2', c, y)
+    ctx.fillStyle = '#f4ecd6'
+    ctx.fillText('2', c, y)
+    dotsInside(ctx, s, s * 0.055, s * 0.05, (x, py) => {
+      ctx.fillStyle = '#ffd36a'
+      ctx.shadowColor = '#ffb030'
+      ctx.shadowBlur = s * 0.015
+      ctx.beginPath()
+      ctx.arc(x, py, s * 0.014, 0, Math.PI * 2)
+      ctx.fill()
+      ctx.shadowBlur = 0
+    })
   } else if (era === 'ir3') {
-    // Beige monitor case with a dark screen and a green pixel "3".
-    ctx.fillStyle = '#d9cdb0'
-    ctx.beginPath()
-    ctx.roundRect(s * 0.1, s * 0.1, s * 0.8, s * 0.74, s * 0.05)
-    ctx.fill()
-    ctx.fillStyle = '#0e1a12'
-    ctx.beginPath()
-    ctx.roundRect(s * 0.17, s * 0.16, s * 0.66, s * 0.56, s * 0.03)
-    ctx.fill()
-    const px = s * 0.06
+    // Big green pixels with a soft glow and old-monitor scan lines (no screen around it).
+    const px = s * 0.13
     const left = c - (5 * px) / 2
-    const top = s * 0.44 - (7 * px) / 2
+    const top = c - (7 * px) / 2
     ctx.fillStyle = '#6be08b'
     ctx.shadowColor = '#6be08b'
-    ctx.shadowBlur = s * 0.03
-    PIXEL_THREE.forEach((row, y) =>
+    ctx.shadowBlur = s * 0.04
+    PIXEL_THREE.forEach((row, py) =>
       [...row].forEach((on, x) => {
-        if (on === '1') ctx.fillRect(left + x * px + 1, top + y * px + 1, px - 2, px - 2)
+        if (on === '1') ctx.fillRect(left + x * px + 3, top + py * px + 3, px - 6, px - 6)
       }),
     )
     ctx.shadowBlur = 0
-    // Scan lines and the case's little stand.
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.25)'
-    for (let y = s * 0.16; y < s * 0.72; y += 4) ctx.fillRect(s * 0.17, y, s * 0.66, 1.5)
-    ctx.fillStyle = '#b9ad90'
-    ctx.fillRect(s * 0.4, s * 0.84, s * 0.2, s * 0.05)
+    ctx.globalCompositeOperation = 'source-atop' // scan lines only on the pixels
+    ctx.fillStyle = 'rgba(0, 40, 10, 0.35)'
+    for (let line = 0; line < s; line += 6) ctx.fillRect(0, line, s, 2)
+    ctx.globalCompositeOperation = 'source-over'
   } else {
-    // Glowing outline "4" inside a ring with circuit lines.
-    ctx.strokeStyle = '#3fd0e0'
-    ctx.lineWidth = s * 0.012
-    ctx.beginPath()
-    ctx.arc(c, c, s * 0.4, 0, Math.PI * 2)
-    ctx.stroke()
-    for (let i = 0; i < 8; i++) {
-      const a = (i / 8) * Math.PI * 2 + Math.PI / 8
-      const x1 = c + Math.cos(a) * s * 0.4
-      const y1 = c + Math.sin(a) * s * 0.4
-      const x2 = c + Math.cos(a) * s * 0.47
-      const y2 = c + Math.sin(a) * s * 0.47
+    // A glowing cyan outline with faint circuit traces running inside the numeral.
+    ctx.font = `800 ${s * 0.95}px ${font}`
+    ctx.fillStyle = 'rgba(63, 208, 224, 0.16)'
+    ctx.fillText('4', c, y)
+    ctx.globalCompositeOperation = 'source-atop'
+    ctx.strokeStyle = 'rgba(191, 246, 255, 0.55)'
+    ctx.lineWidth = s * 0.006
+    for (let i = 0; i < 9; i++) {
+      const ty = s * (0.12 + i * 0.09)
       ctx.beginPath()
-      ctx.moveTo(x1, y1)
-      ctx.lineTo(x2, y2)
+      ctx.moveTo(0, ty)
+      ctx.lineTo(s * (0.3 + (i % 3) * 0.12), ty)
+      ctx.lineTo(s * (0.38 + (i % 3) * 0.12), ty + s * 0.05)
+      ctx.lineTo(s, ty + s * 0.05)
       ctx.stroke()
-      ctx.beginPath()
-      ctx.arc(x2, y2, s * 0.012, 0, Math.PI * 2)
-      ctx.fillStyle = '#bff6ff'
-      ctx.fill()
     }
-    ctx.font = `700 ${s * 0.56}px ${font}`
-    ctx.lineWidth = s * 0.014
+    ctx.globalCompositeOperation = 'source-over'
+    ctx.shadowColor = '#3fd0e0'
+    ctx.shadowBlur = s * 0.03
+    ctx.lineWidth = s * 0.016
     ctx.strokeStyle = '#bff6ff'
-    ctx.strokeText('4', c, c + s * 0.03)
-    ctx.fillStyle = 'rgba(63, 208, 224, 0.18)'
-    ctx.fillText('4', c, c + s * 0.03)
+    ctx.strokeText('4', c, y)
+    ctx.shadowBlur = 0
   }
 }
 
@@ -168,11 +147,11 @@ export default function EraNumeral({ era }: { era: EraRoom }) {
   }, [era, fontsReady])
   useEffect(() => () => texture.dispose(), [texture])
 
-  // Unlit, so the colours stay as painted; CMCN 4's (and CMCN 3's screen) are brighter
-  // than white so the bloom makes them glow.
+  // Unlit, so the colours stay as painted, and brighter than white so the bloom makes the
+  // number glow (CMCN 4's most, CMCN 1's brass least).
   const material = useMemo(() => {
     const m = new MeshBasicMaterial({ map: texture, transparent: true, toneMapped: false })
-    m.color.setScalar(era === 'ir4' ? 2 : era === 'ir3' ? 1.3 : 0.95)
+    m.color.setScalar(era === 'ir4' ? 2 : era === 'ir1' ? 1.1 : 1.4)
     return m
   }, [texture, era])
   useEffect(() => () => material.dispose(), [material])

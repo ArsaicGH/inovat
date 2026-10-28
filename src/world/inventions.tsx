@@ -1,13 +1,13 @@
-import { Suspense, useMemo, useRef, type JSX, type ReactNode } from 'react'
+import { Suspense, createContext, useContext, useEffect, useMemo, useRef, type JSX, type ReactNode } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { useGLTF } from '@react-three/drei'
-import { AdditiveBlending, Box3, MeshBasicMaterial, MeshStandardMaterial, Quaternion, Vector3, type Group, type Mesh } from 'three'
+import { useAnimations, useGLTF } from '@react-three/drei'
+import { AdditiveBlending, type AnimationClip, Box3, BufferAttribute, MeshBasicMaterial, MeshStandardMaterial, Quaternion, Vector3, type Group, type Intersection, type Mesh, type Raycaster } from 'three'
 import MergeStatic from './MergeStatic'
 
 // THE 19 INVENTION PROTOTYPES on the plinths of the era rooms (one per text id in
-// src/content/exhibits.ts). Five are free low-poly models from Poly Pizza (credited in
-// src/content/credits.ts); the others are built here from simple shapes, because no free
-// model of those machines could be downloaded without an account. Each stands on the
+// src/content/exhibits.ts). Ten are free models from Sketchfab (CC BY, credited in
+// src/content/credits.ts), shrunk for the web; the other nine are built here from simple
+// shapes, because no free model of those machines was found. Each stands on the
 // plinth's top (y = 0 here), fits inside about 1 m of its centre and is at most about
 // 1.9 m tall, so it stays inside the plinth's spotlight while the exhibit turns.
 
@@ -41,6 +41,8 @@ const M = {
   ledAmber: glow('#ffb347', 2.5),
   ledWhite: glow('#fff2c8', 2.5),
   cyan: glow('#5fe3ff', 2.2),
+  brick: std('#7a3b2a', 0.85),
+  molten: glow('#ff7a2a', 3.2),
 }
 // Holograms (CMCN 4): see-through light that adds to what is behind it.
 const holo = (opacity: number) =>
@@ -103,17 +105,55 @@ function Spin({ speed, axis, at, children }: { speed: number; axis: 'x' | 'y' | 
 // ---------- Downloaded models ----------
 
 // Prepares a downloaded model's parts once: they cast shadows, and every part keeps only
-// the data the museum uses (position, normal, and colour where the material reads it).
-// These models have no textures, but some parts carry texture coordinates and others do
-// not, which would stop MergeStatic from joining them.
+// the data the museum uses: position, normal, colour where the material reads it, and
+// texture coordinates where it has a picture. (Unused extra data on some parts and not on
+// others would stop MergeStatic from joining parts that look the same.)
+const rayBox = new Box3()
+const rayHit = new Vector3()
+function boxRaycast(this: Mesh, raycaster: Raycaster, intersects: Intersection[]) {
+  if (!this.geometry.boundingBox) this.geometry.computeBoundingBox()
+  rayBox.copy(this.geometry.boundingBox!).applyMatrix4(this.matrixWorld)
+  if (!raycaster.ray.intersectBox(rayBox, rayHit)) return
+  const distance = raycaster.ray.origin.distanceTo(rayHit)
+  if (distance >= raycaster.near && distance <= raycaster.far) intersects.push({ distance, point: rayHit.clone(), object: this })
+}
+
 function prepareModel(scene: Group) {
   scene.traverse((object) => {
     const mesh = object as Mesh
     if (!mesh.isMesh) return
     mesh.castShadow = true
-    const keepColour = !Array.isArray(mesh.material) && mesh.material.vertexColors
+    // Aiming (Interaction.tsx) tests what the crosshair points at every frame; testing
+    // every one of a detailed model's thousands of triangles made the game stutter. Its
+    // bounding box is precise enough to aim at.
+    mesh.raycast = boxRaycast
+    const material = (Array.isArray(mesh.material) ? mesh.material[0] : mesh.material) as MeshStandardMaterial
+    const keepColour = material.vertexColors
+    const keepUv = Boolean(material.map || material.normalMap || material.roughnessMap || material.metalnessMap || material.emissiveMap || material.aoMap)
     for (const name of Object.keys(mesh.geometry.attributes)) {
-      if (name !== 'position' && name !== 'normal' && !(name === 'color' && keepColour)) mesh.geometry.deleteAttribute(name)
+      const keep = name === 'position' || name === 'normal' || (name === 'color' && keepColour) || (name === 'uv' && keepUv)
+      if (!keep) {
+        mesh.geometry.deleteAttribute(name)
+        continue
+      }
+      // The files store numbers compactly (small whole numbers, "quantised"). MergeStatic
+      // moves parts by rewriting their numbers, which only works with ordinary decimals.
+      const attribute = mesh.geometry.getAttribute(name) as BufferAttribute
+      if (!(attribute.array instanceof Float32Array) || attribute.normalized) {
+        const plain = new Float32Array(attribute.count * attribute.itemSize)
+        for (let i = 0; i < attribute.count; i++)
+          for (let c = 0; c < attribute.itemSize; c++) plain[i * attribute.itemSize + c] = attribute.getComponent(i, c)
+        mesh.geometry.setAttribute(name, new BufferAttribute(plain, attribute.itemSize))
+      }
+    }
+    // See-through "transmission" glass makes three.js draw the whole scene once more every
+    // frame; plain see-through glass looks almost the same at a fraction of the cost.
+    const glass = material as MeshStandardMaterial & { transmission?: number }
+    if (glass.transmission) {
+      glass.transmission = 0
+      glass.transparent = true
+      glass.opacity = 0.3
+      glass.depthWrite = false
     }
     if (!mesh.geometry.attributes.normal) mesh.geometry.computeVertexNormals()
   })
@@ -121,18 +161,41 @@ function prepareModel(scene: Group) {
 
 // Loads a .glb model, scales it so its largest side is `size` metres, and stands it on y = 0,
 // centred. Its meshes are then joined by look (MergeStatic), to keep the drawing work low.
-function GltfModel({ url, size, yaw = 0, lift = 0 }: { url: string; size: number; yaw?: number; lift?: number }) {
-  const { scene } = useGLTF(url)
+// onOrigin: keep the model's own centre point over the plinth's centre (the cobot: its base,
+// not the middle of everything its arm can reach).
+// animate: play the model's own animation instead (its moving parts must stay separate,
+// so it is not joined).
+// True inside the enlarged board's model viewer (ModelViewer.tsx): it shows a copy of each
+// downloaded model, because one model can only stand in one place, and the original
+// stays on its plinth in the museum.
+export const ModelCopy = createContext(false)
+
+function GltfModel({ url, size, yaw = 0, lift = 0, animate = false, onOrigin = false }: { url: string; size: number; yaw?: number; lift?: number; animate?: boolean; onOrigin?: boolean }) {
+  const loaded = useGLTF(url)
+  const copy = useContext(ModelCopy)
+  // (The copy shares the original's shapes and materials: cheap.)
+  const scene = useMemo(() => (copy ? (loaded.scene.clone(true) as Group) : loaded.scene), [copy, loaded.scene])
+  const animations = loaded.animations
   const fit = useMemo(() => {
     prepareModel(scene)
     scene.rotation.y = yaw
+    // Measured on its own: a model shown before is still attached to its old place in the
+    // museum, and measuring it there gave museum-wide positions (the model then circled
+    // far off its plinth as the exhibit turned).
+    const parent = scene.parent
+    scene.parent = null
+    scene.position.set(0, 0, 0)
+    scene.scale.set(1, 1, 1)
     scene.updateMatrixWorld(true)
     const box = new Box3().setFromObject(scene)
+    scene.parent = parent
     const extent = box.getSize(new Vector3())
     const scale = size / Math.max(extent.x, extent.y, extent.z)
     const centre = box.getCenter(new Vector3())
+    if (onOrigin) centre.set(0, 0, 0)
     return { scale, offset: [-centre.x * scale, -box.min.y * scale + lift, -centre.z * scale] as V3 }
-  }, [scene, size, yaw, lift])
+  }, [scene, size, yaw, lift, onOrigin])
+  if (animate) return <AnimatedModel scene={scene} animations={animations} offset={fit.offset} scale={fit.scale} />
   return (
     // keepSeparate: already joined here, so the prototype's own MergeStatic leaves it alone.
     <group position={fit.offset} scale={fit.scale} userData={{ keepSeparate: true }}>
@@ -143,87 +206,49 @@ function GltfModel({ url, size, yaw = 0, lift = 0 }: { url: string; size: number
   )
 }
 
+// A downloaded model playing its first animation on a loop (the Watt engine's beam and
+// flywheel, the cobot's pick-and-place).
+function AnimatedModel({ scene, animations, offset, scale }: { scene: Group; animations: AnimationClip[]; offset: V3; scale: number }) {
+  const root = useRef<Group>(null)
+  const { actions, names } = useAnimations(animations, root)
+  useEffect(() => {
+    const action = names[0] ? actions[names[0]] : null
+    action?.play()
+    return () => {
+      action?.stop()
+    }
+  }, [actions, names])
+  return (
+    <group ref={root} position={offset} scale={scale} userData={{ keepSeparate: true }}>
+      <primitive object={scene} />
+    </group>
+  )
+}
+
 const MODEL = {
-  locomotive: '/models/ir1/steam-locomotive.glb',
-  bulb: '/models/ir2/light-bulb.glb',
+  watt: '/models/ir1/watt-steam-engine.glb',
+  rocket: '/models/ir1/rocket-locomotive.glb',
+  bulb: '/models/ir2/edison-light-bulb.glb',
   modelT: '/models/ir2/ford-model-t.glb',
-  pc: '/models/ir3/personal-computer.glb',
+  telephone: '/models/ir2/bell-telephone-1876.glb',
+  chip: '/models/ir3/intel-4004.glb',
+  pc: '/models/ir3/ibm-5150.glb',
   printer: '/models/ir4/3d-printer.glb',
+  cobot: '/models/ir4/ur3-cobot.glb',
 }
 
 // ---------- CMCN 1 ----------
 
-// Watt's beam engine: the cylinder, the separate condenser beside it (his key improvement),
-// the rocking beam on its pillar and the flywheel.
+// Watt's steam engine: a museum model of a Watt engine (beam, cylinder, flywheel and
+// governor on a table), with its own animation of the moving parts.
 function WattEngine() {
   return (
-    <group>
-      <Box size={[1.7, 0.14, 0.9]} at={[0, 0.07, 0]} material={M.stone} />
-      {/* Cylinder and, beside it, the separate condenser. */}
-      <Rod r={0.22} length={0.85} at={[-0.55, 0.57, 0]} material={M.iron} sides={20} />
-      <Rod r={0.25} length={0.06} at={[-0.55, 1.0, 0]} material={M.brass} sides={20} />
-      <Rod r={0.12} length={0.45} at={[-0.55, 0.37, 0.36]} material={M.copper} />
-      <Rod r={0.03} length={0.3} at={[-0.55, 0.62, 0.22]} axis="z" material={M.copper} />
-      {/* Piston rod up to the beam. */}
-      <Rod r={0.025} length={0.45} at={[-0.62, 1.25, 0]} material={M.steel} />
-      {/* Pillar and rocking beam. */}
-      <Box size={[0.14, 1.3, 0.14]} at={[0, 0.79, -0.18]} material={M.darkWood} />
-      <Box size={[0.14, 1.3, 0.14]} at={[0, 0.79, 0.18]} material={M.darkWood} />
-      <Box size={[1.5, 0.1, 0.1]} at={[0, 1.48, 0]} material={M.iron} />
-      <Rod r={0.05} length={0.5} at={[0, 1.48, 0]} axis="z" material={M.brass} />
-      {/* Connecting rod down to the flywheel. */}
-      <Rod r={0.025} length={0.8} at={[0.65, 1.06, 0]} material={M.steel} />
-      <Spin speed={1.2} axis="z" at={[0.62, 0.62, 0.3]}>
-        <Wheel radius={0.46} tube={0.05} spokes={4} material={M.iron} />
-      </Spin>
-      {/* Centrifugal governor: two brass balls on a spindle. */}
-      <Rod r={0.02} length={0.4} at={[0.3, 0.34, -0.3]} material={M.brass} />
-      <Spin speed={2.5} axis="y" at={[0.3, 0.5, -0.3]}>
-        {[-1, 1].map((s) => (
-          <mesh key={s} position={[s * 0.12, 0, 0]} material={M.brass}>
-            <sphereGeometry args={[0.05, 12, 8]} />
-          </mesh>
-        ))}
-      </Spin>
-    </group>
+    <Suspense fallback={null}>
+      <GltfModel url={MODEL.watt} size={1.8} animate />
+    </Suspense>
   )
 }
 
-// Spinning Jenny: a wooden frame with a row of spindles at the back, turned by the big
-// hand wheel at the side, and the sliding bar (the carriage) that draws the threads.
-function SpinningJenny() {
-  const spindleX = Array.from({ length: 8 }, (_, i) => -0.55 + i * 0.13)
-  return (
-    <group>
-      {[-0.7, 0.55].flatMap((x) =>
-        [-0.3, 0.3].map((z) => <Box key={`${x}${z}`} size={[0.07, 0.75, 0.07]} at={[x, 0.375, z]} material={M.oak} />),
-      )}
-      <Box size={[1.4, 0.06, 0.66]} at={[-0.08, 0.75, 0]} material={M.oak} />
-      <Box size={[1.4, 0.05, 0.05]} at={[-0.08, 0.3, -0.3]} material={M.oak} />
-      {/* Spindles with their cones of thread. */}
-      {spindleX.map((x) => (
-        <group key={x} position={[x, 0.78, -0.22]}>
-          <Rod r={0.012} length={0.4} at={[0, 0.2, 0]} material={M.iron} />
-          <Rod r={0.035} r2={0.015} length={0.18} at={[0, 0.15, 0]} material={M.thread} />
-        </group>
-      ))}
-      {/* The carriage (a sliding bar) and the threads running to it. */}
-      <Box size={[1.2, 0.05, 0.06]} at={[-0.1, 1.0, 0.25]} material={M.darkWood} />
-      {spindleX.map((x) => (
-        <mesh key={x} position={[x, 1.08, 0.015]} rotation={[Math.atan2(0.47, 0.16), 0, 0]} material={M.thread}>
-          <cylinderGeometry args={[0.004, 0.004, 0.5, 4]} />
-        </mesh>
-      ))}
-      {/* Hand wheel at the side. */}
-      <Box size={[0.06, 0.5, 0.06]} at={[0.68, 1.0, 0]} material={M.oak} />
-      <Spin speed={1.5} axis="x" at={[0.75, 1.15, 0]}>
-        <group rotation={[0, Math.PI / 2, 0]}>
-          <Wheel radius={0.38} tube={0.03} spokes={3} material={M.oak} />
-        </group>
-      </Spin>
-    </group>
-  )
-}
 
 // Water Frame: a tall wooden frame with rows of rollers and bobbins, driven through a
 // shaft by a water wheel at the side.
@@ -310,66 +335,36 @@ function AssemblyLine() {
   )
 }
 
-// A wall telephone of the 1880s-1890s on a wooden post: two bells, the crank, a
-// mouthpiece and the earpiece on its hook. (Not Bell's own 1876 instrument.)
+// Bell's telephone of 1876 (a model of the instrument), on a wooden display box.
 function Telephone() {
   return (
-    // (Shown a little larger than life, so it does not look lost on the plinth.)
-    <group scale={1.2}>
-      <Rod r={0.3} length={0.06} at={[0, 0.03, 0]} material={M.darkWood} sides={24} />
-      <Box size={[0.1, 0.8, 0.1]} at={[0, 0.45, -0.05]} material={M.darkWood} />
-      <Box size={[0.5, 0.9, 0.04]} at={[0, 1.2, -0.05]} material={M.darkWood} />
-      {/* Top box with the bells. */}
-      <Box size={[0.4, 0.3, 0.2]} at={[0, 1.45, 0.07]} material={M.oak} />
-      {[-0.09, 0.09].map((x) => (
-        <mesh key={x} position={[x, 1.45, 0.18]} rotation={[Math.PI / 2, 0, 0]} material={M.brass}>
-          <sphereGeometry args={[0.07, 16, 10, 0, Math.PI * 2, 0, Math.PI / 2]} />
-        </mesh>
-      ))}
-      {/* Writing shelf and the mouthpiece arm. */}
-      <Box size={[0.4, 0.04, 0.2]} at={[0, 1.0, 0.07]} material={M.oak} />
-      <Box size={[0.32, 0.22, 0.14]} at={[0, 1.15, 0.04]} material={M.oak} />
-      <Rod r={0.02} length={0.16} at={[0, 1.2, 0.18]} axis="z" material={M.black} />
-      <Rod r={0.045} r2={0.02} length={0.08} at={[0, 1.2, 0.29]} axis="z" material={M.black} />
-      {/* Crank on the right side. */}
-      <Rod r={0.015} length={0.12} at={[0.26, 1.45, 0.07]} axis="x" material={M.steel} />
-      <Box size={[0.02, 0.12, 0.02]} at={[0.32, 1.4, 0.07]} material={M.steel} />
-      {/* Earpiece on its hook at the left, with its cord. */}
-      <Rod r={0.03} length={0.2} at={[-0.27, 1.32, 0.08]} material={M.black} />
-      <Rod r={0.045} r2={0.03} length={0.05} at={[-0.27, 1.44, 0.08]} material={M.black} />
-      <mesh position={[-0.2, 1.16, 0.06]} rotation={[0, 0, -0.4]} material={M.black}>
-        <torusGeometry args={[0.08, 0.006, 4, 16, Math.PI]} />
-      </mesh>
+    <group>
+      <Box size={[0.9, 0.5, 0.6]} at={[0, 0.25, 0]} material={M.darkWood} />
+      <Suspense fallback={null}>
+        <GltfModel url={MODEL.telephone} size={0.9} lift={0.5} />
+      </Suspense>
     </group>
   )
 }
 
 // ---------- CMCN 3 ----------
 
-// The Intel 4004: a 16-pin chip, enlarged many times and tilted towards the visitor.
+// The Intel 4004: a model of the 16-pin chip, enlarged many times and tilted towards the
+// visitor on a black stand.
 function Intel4004() {
   return (
     <group>
       <Box size={[0.5, 0.5, 0.3]} at={[0, 0.25, 0]} material={M.black} />
-      <group position={[0, 0.85, 0]} rotation={[0.5, 0, 0]}>
-        <Box size={[1.3, 0.14, 0.6]} at={[0, 0, 0]} material={M.ceramic} />
-        <Box size={[0.36, 0.02, 0.3]} at={[0, 0.075, 0]} material={M.gold} />
-        <Box size={[0.24, 0.025, 0.2]} at={[0, 0.08, 0]} material={M.black} />
-        {/* The 16 legs, eight on each side. */}
-        {[-1, 1].flatMap((side) =>
-          Array.from({ length: 8 }, (_, i) => (
-            <group key={`${side}${i}`} position={[-0.53 + i * 0.152, 0, side * 0.33]}>
-              <Box size={[0.07, 0.03, 0.08]} at={[0, 0, 0]} material={M.gold} />
-              <Box size={[0.07, 0.2, 0.03]} at={[0, -0.1, side * 0.03]} material={M.gold} />
-            </group>
-          )),
-        )}
+      <group position={[0, 0.62, 0]} rotation={[0.5, 0, 0]}>
+        <Suspense fallback={null}>
+          <GltfModel url={MODEL.chip} size={1.3} />
+        </Suspense>
       </group>
     </group>
   )
 }
 
-// The IBM 5150 (a low-poly beige PC of that era) on a small desk.
+// The IBM 5150 (a model with its monitor and keyboard) on a small desk.
 function PersonalComputer() {
   return (
     <group>
@@ -378,7 +373,7 @@ function PersonalComputer() {
         [-0.35, 0.35].map((z) => <Box key={`${x}${z}`} size={[0.05, 0.63, 0.05]} at={[x, 0.315, z]} material={M.iron} />),
       )}
       <Suspense fallback={null}>
-        <GltfModel url={MODEL.pc} size={0.95} lift={0.69} yaw={Math.PI} />
+        <GltfModel url={MODEL.pc} size={1.1} lift={0.69} />
       </Suspense>
     </group>
   )
@@ -515,103 +510,9 @@ function Plc() {
 
 // ---------- CMCN 4 ----------
 
-// AI quality inspection: products ride a conveyor under a camera, which scans each one
-// with a beam of light. One product in four is faulty (red mark) and gets flagged.
-function AiInspection() {
-  const items = useRef<Group>(null)
-  useFrame((_, delta) => {
-    const group = items.current
-    if (!group) return
-    for (const item of group.children) {
-      item.position.x += delta * 0.18
-      if (item.position.x > 0.7) item.position.x -= 1.4
-    }
-  })
-  return (
-    <group>
-      {[-0.6, 0.6].map((x) => (
-        <Box key={x} size={[0.06, 0.55, 0.45]} at={[x, 0.275, 0]} material={M.steel} />
-      ))}
-      <Box size={[1.5, 0.08, 0.5]} at={[0, 0.59, 0]} material={M.black} />
-      <group ref={items} position={[0, 0.66, 0]} userData={{ keepSeparate: true }}>
-        {[-0.7, -0.35, 0, 0.35].map((x, i) => (
-          <group key={x} position={[x, 0, 0]}>
-            <Rod r={0.1} length={0.06} at={[0, 0, 0]} material={M.steel} sides={12} />
-            {i === 1 && <Box size={[0.08, 0.01, 0.02]} at={[0, 0.035, 0]} material={M.ledRed} />}
-          </group>
-        ))}
-      </group>
-      {/* The arch with the camera, and its scanning beam. */}
-      {[-0.27, 0.27].map((z) => (
-        <Box key={z} size={[0.05, 0.75, 0.05]} at={[0, 0.98, z]} material={M.white} />
-      ))}
-      <Box size={[0.08, 0.06, 0.6]} at={[0, 1.36, 0]} material={M.white} />
-      <Box size={[0.16, 0.12, 0.14]} at={[0, 1.27, 0]} material={M.black} />
-      <Rod r={0.035} length={0.02} at={[0, 1.2, 0]} material={M.cyan} />
-      <mesh position={[0, 0.94, 0]} material={HOLO_FILL}>
-        <coneGeometry args={[0.18, 0.5, 20, 1, true]} />
-      </mesh>
-      {/* A screen beside it with its verdict lights. */}
-      <Box size={[0.03, 0.5, 0.03]} at={[0.45, 0.88, -0.22]} material={M.steel} />
-      <Box size={[0.3, 0.2, 0.02]} at={[0.45, 1.2, -0.22]} rotation={[0, -0.5, 0]} material={M.black} />
-      <Box size={[0.24, 0.05, 0.01]} at={[0.455, 1.24, -0.207]} rotation={[0, -0.5, 0]} material={M.ledGreen} />
-      <Box size={[0.24, 0.05, 0.01]} at={[0.455, 1.16, -0.207]} rotation={[0, -0.5, 0]} material={M.ledRed} />
-    </group>
-  )
-}
 
-// IIoT: a machine with sensors, each sending a stream of data (moving points of light) up
-// to a glowing hub that collects it.
-function Iiot() {
-  const sensors: V3[] = [
-    [-0.35, 0.86, 0.2],
-    [0.35, 0.86, 0.2],
-    [0, 0.86, -0.25],
-  ]
-  const hub: V3 = [0, 1.6, 0]
-  const packets = useRef<Group>(null)
-  useFrame(({ clock }) => {
-    const group = packets.current
-    if (!group) return
-    group.children.forEach((packet, i) => {
-      const sensor = sensors[i % 3]
-      const t = (clock.elapsedTime * 0.45 + i * 0.37) % 1
-      packet.position.set(sensor[0] + (hub[0] - sensor[0]) * t, sensor[1] + (hub[1] - sensor[1]) * t, sensor[2] + (hub[2] - sensor[2]) * t)
-    })
-  })
-  return (
-    <group>
-      <Box size={[1.0, 0.75, 0.7]} at={[0, 0.375, 0]} material={M.white} />
-      <Box size={[0.4, 0.25, 0.02]} at={[0, 0.45, 0.36]} material={M.black} />
-      <Box size={[0.3, 0.04, 0.01]} at={[0, 0.5, 0.371]} material={M.cyan} />
-      <Rod r={0.25} length={0.1} at={[0, 0.8, 0]} material={M.steel} sides={20} />
-      {sensors.map((at, i) => (
-        <group key={i}>
-          <Rod r={0.03} length={0.1} at={[at[0], at[1] - 0.05, at[2]]} material={M.black} />
-          <mesh position={at} material={M.cyan}>
-            <sphereGeometry args={[0.03, 10, 8]} />
-          </mesh>
-          <Link from={at} to={hub} material={HOLO_FILL} r={0.006} />
-        </group>
-      ))}
-      <mesh position={hub} rotation={[Math.PI / 2, 0, 0]} material={M.cyan}>
-        <torusGeometry args={[0.16, 0.015, 8, 32]} />
-      </mesh>
-      <mesh position={hub} material={HOLO_FILL}>
-        <sphereGeometry args={[0.13, 16, 12]} />
-      </mesh>
-      <group ref={packets} userData={{ keepSeparate: true }}>
-        {Array.from({ length: 6 }, (_, i) => (
-          <mesh key={i} material={M.cyan}>
-            <sphereGeometry args={[0.022, 8, 6]} />
-          </mesh>
-        ))}
-      </group>
-    </group>
-  )
-}
 
-// 3D printing: a low-poly desktop 3D printer.
+// 3D printing: a desktop 3D printer.
 function Printer3d() {
   return (
     <group>
@@ -656,43 +557,14 @@ function DigitalTwin() {
   )
 }
 
-// A cobot: a slim white arm with round blue joints, moving slowly back and forth between
-// picking and placing.
+// A cobot: a model of a Universal Robots UR3 arm, playing its own pick-and-place motion.
 function Cobot() {
-  const base = useRef<Group>(null)
-  const shoulder = useRef<Group>(null)
-  const elbow = useRef<Group>(null)
-  useFrame(({ clock }) => {
-    const t = clock.elapsedTime * 0.6
-    if (base.current) base.current.rotation.y = Math.sin(t) * 0.9
-    if (shoulder.current) shoulder.current.rotation.z = -0.5 + Math.sin(t * 2) * 0.15
-    if (elbow.current) elbow.current.rotation.z = 1.4 + Math.sin(t * 2 + 1) * 0.2
-  })
-  const joint = (at: V3) => <Rod r={0.08} length={0.16} at={at} axis="z" material={M.blue} sides={20} />
   return (
     <group>
-      <Rod r={0.17} length={0.12} at={[0, 0.06, 0]} material={M.white} sides={24} />
-      <group ref={base} position={[0, 0.12, 0]} userData={{ keepSeparate: true }}>
-        <Rod r={0.1} length={0.25} at={[0, 0.125, 0]} material={M.white} sides={20} />
-        <group ref={shoulder} position={[0, 0.3, 0]}>
-          {joint([0, 0, 0])}
-          <Rod r={0.06} length={0.6} at={[0, 0.3, 0]} material={M.white} />
-          <group ref={elbow} position={[0, 0.6, 0]}>
-            {joint([0, 0, 0])}
-            <Rod r={0.05} length={0.5} at={[0, 0.25, 0]} material={M.white} />
-            <group position={[0, 0.5, 0]}>
-              {joint([0, 0, 0])}
-              <Rod r={0.04} length={0.12} at={[0, 0.08, 0]} material={M.white} />
-              {[-1, 1].map((s) => (
-                <Box key={s} size={[0.02, 0.08, 0.03]} at={[s * 0.035, 0.17, 0]} material={M.black} />
-              ))}
-            </group>
-          </group>
-        </group>
-      </group>
-      {/* The part it is handling, on a small stand. */}
-      <Box size={[0.25, 0.4, 0.25]} at={[0.6, 0.2, 0.3]} material={M.black} />
-      <Box size={[0.12, 0.08, 0.12]} at={[0.6, 0.44, 0.3]} material={M.ledAmber} />
+      <Rod r={0.3} length={0.25} at={[0, 0.125, 0]} material={M.white} sides={24} />
+      <Suspense fallback={null}>
+        <GltfModel url={MODEL.cobot} size={1.9} lift={0.25} animate onOrigin />
+      </Suspense>
     </group>
   )
 }
@@ -734,31 +606,195 @@ function PredictiveMaintenance() {
   )
 }
 
-// The steam locomotive (a low-poly model of a steam engine; the real Rocket looked
-// different, with a tall chimney and sloping cylinders).
+// Stephenson's Rocket (a model of the locomotive with its tender) on a short track.
 function Locomotive() {
   return (
     <group>
-      <Box size={[1.7, 0.08, 0.5]} at={[0, 0.04, 0]} material={M.darkWood} />
+      <Box size={[1.8, 0.08, 0.5]} at={[0, 0.04, 0]} material={M.darkWood} />
       {[-0.12, 0.12].map((z) => (
-        <Box key={z} size={[1.7, 0.04, 0.04]} at={[0, 0.1, z]} material={M.steel} />
+        <Box key={z} size={[1.8, 0.04, 0.04]} at={[0, 0.1, z]} material={M.steel} />
       ))}
       <Suspense fallback={null}>
-        <GltfModel url={MODEL.locomotive} size={1.6} lift={0.12} yaw={Math.PI / 2} />
+        <GltfModel url={MODEL.rocket} size={1.8} lift={0.12} yaw={Math.PI / 2} />
       </Suspense>
     </group>
   )
 }
 
-// The light bulb (a low-poly clear bulb with its filament) on a slim stand.
+// The light bulb (a model of an Edison-style bulb with its filament) on a slim stand.
 function LightBulb() {
   return (
     <group>
       <Rod r={0.18} length={0.06} at={[0, 0.03, 0]} material={M.brass} sides={20} />
       <Rod r={0.03} length={0.6} at={[0, 0.33, 0]} material={M.brass} />
-      <Suspense fallback={null}>
-        <GltfModel url={MODEL.bulb} size={0.9} lift={0.6} />
-      </Suspense>
+      {/* The model hangs cap-up like a ceiling bulb; turned over, its screw cap sits on the stand. */}
+      <group position={[0, 1.55, 0]} rotation={[Math.PI, 0, 0]}>
+        <Suspense fallback={null}>
+          <GltfModel url={MODEL.bulb} size={0.95} />
+        </Suspense>
+      </group>
+    </group>
+  )
+}
+
+// ---------- New in the 18-exhibit plan ----------
+
+// Puddled iron: a brick puddling furnace with its chimney and a door glowing with molten
+// iron, the puddler's long rod, a glowing ball ("bloom") of iron and finished bars.
+function PuddlingFurnace() {
+  return (
+    <group>
+      <Box size={[1.1, 0.8, 0.8]} at={[-0.25, 0.4, 0]} material={M.brick} />
+      <Box size={[1.14, 0.08, 0.84]} at={[-0.25, 0.84, 0]} material={M.iron} />
+      <Rod r={0.17} r2={0.12} length={1.0} at={[-0.6, 1.38, -0.1]} material={M.brick} />
+      <Box size={[0.44, 0.34, 0.03]} at={[-0.1, 0.42, 0.405]} material={M.iron} />
+      <Box size={[0.32, 0.22, 0.02]} at={[-0.1, 0.42, 0.425]} material={M.molten} />
+      <Box size={[0.9, 0.025, 0.025]} at={[0.25, 0.45, 0.5]} rotation={[0, 0.25, -0.12]} material={M.iron} />
+      <mesh position={[0.5, 0.13, 0.25]} material={M.molten}>
+        <sphereGeometry args={[0.12, 14, 10]} />
+      </mesh>
+      {[0, 1, 2].map((i) => (
+        <Box key={i} size={[0.5, 0.06, 0.08]} at={[0.6, 0.04 + i * 0.065, -0.2 + (i % 2) * 0.1]} material={M.iron} />
+      ))}
+    </group>
+  )
+}
+
+// The Bessemer converter: the pear-shaped vessel on its pivot, tipping slowly, with a
+// flame roaring from its mouth.
+function BessemerConverter() {
+  const vessel = useRef<Group>(null)
+  useFrame(({ clock }) => {
+    if (vessel.current) vessel.current.rotation.z = -0.3 + Math.sin(clock.elapsedTime * 0.4) * 0.12
+  })
+  return (
+    <group>
+      <Box size={[1.2, 0.12, 0.9]} at={[0, 0.06, 0]} material={M.iron} />
+      {[-0.45, 0.45].map((z) => (
+        <Box key={z} size={[0.16, 0.75, 0.12]} at={[0, 0.48, z]} material={M.iron} />
+      ))}
+      <Rod r={0.05} length={0.95} at={[0, 0.82, 0]} axis="z" material={M.steel} />
+      <group ref={vessel} position={[0, 0.82, 0]} userData={{ keepSeparate: true }}>
+        <mesh position={[0, -0.02, 0]} scale={[1, 1.2, 1]} material={M.iron}>
+          <sphereGeometry args={[0.34, 24, 16]} />
+        </mesh>
+        <Rod r={0.3} r2={0.15} length={0.4} at={[0, 0.48, 0]} material={M.iron} sides={24} />
+        <mesh position={[0, 0.02, 0]} rotation={[Math.PI / 2, 0, 0]} material={M.steel}>
+          <torusGeometry args={[0.36, 0.03, 8, 32]} />
+        </mesh>
+        <Rod r={0.13} length={0.03} at={[0, 0.69, 0]} material={M.molten} />
+        <Rod r={0.03} r2={0.12} length={0.35} at={[0, 0.88, 0]} material={M.molten} />
+      </group>
+    </group>
+  )
+}
+
+// The Benz Patent-Motorwagen (1886): three large spoked wheels, a bench seat, the steering
+// tiller and, at the back, the engine with its big flywheel lying flat.
+function MotorWagen() {
+  return (
+    <group>
+      {[-0.42, 0.42].map((z) => (
+        <group key={z} position={[-0.35, 0.44, z]}>
+          <Wheel radius={0.42} tube={0.022} spokes={6} material={M.black} />
+        </group>
+      ))}
+      <Rod r={0.025} length={0.9} at={[-0.35, 0.44, 0]} axis="z" material={M.steel} />
+      <group position={[0.62, 0.28, 0]}>
+        <Wheel radius={0.27} tube={0.02} spokes={5} material={M.black} />
+      </group>
+      <Rod r={0.02} length={0.5} at={[0.62, 0.52, 0]} material={M.steel} />
+      {[-0.2, 0.2].map((z) => (
+        <Rod key={z} r={0.018} length={1.15} at={[0.1, 0.5, z]} axis="x" material={M.steel} />
+      ))}
+      <Box size={[0.42, 0.28, 0.5]} at={[-0.12, 0.66, 0]} material={M.darkWood} />
+      <Box size={[0.46, 0.08, 0.62]} at={[-0.12, 0.84, 0]} material={M.black} />
+      <Box size={[0.06, 0.28, 0.62]} at={[-0.34, 0.98, 0]} material={M.black} />
+      <Rod r={0.014} length={0.55} at={[0.3, 0.98, 0]} material={M.steel} />
+      <Box size={[0.03, 0.03, 0.22]} at={[0.3, 1.26, 0]} material={M.black} />
+      <Box size={[0.32, 0.22, 0.24]} at={[-0.6, 0.66, 0]} material={M.iron} />
+      <Rod r={0.07} length={0.3} at={[-0.62, 0.62, 0.12]} axis="x" material={M.brass} />
+      <Spin speed={2.4} axis="y" at={[-0.62, 0.82, 0]}>
+        <group rotation={[Math.PI / 2, 0, 0]}>
+          <Wheel radius={0.2} tube={0.025} spokes={4} material={M.iron} />
+        </group>
+      </Spin>
+    </group>
+  )
+}
+
+// Electric power: the light bulb, with Tesla's motor beside it.
+function ElectricPower() {
+  return (
+    <group>
+      <group position={[-0.45, 0, 0]}>
+        <LightBulb />
+      </group>
+      <group position={[0.5, 0, 0]} scale={0.55}>
+        <InductionMotor />
+      </group>
+    </group>
+  )
+}
+
+// Factory automation: the Unimate robot with a PLC cabinet behind it.
+function Automation() {
+  return (
+    <group>
+      <group position={[0.2, 0, 0.1]}>
+        <Unimate />
+      </group>
+      <group position={[-0.65, 0, -0.45]} scale={0.6}>
+        <Plc />
+      </group>
+    </group>
+  )
+}
+
+// Artificial intelligence (the spotlight exhibit): a glowing neural network floating above
+// a dark base: layers of nodes joined by links, signals pulsing through them, and a slowly
+// turning core.
+const NETWORK: number[][] = [
+  [-0.36, -0.12, 0.12, 0.36],
+  [-0.48, -0.24, 0, 0.24, 0.48],
+  [-0.36, -0.12, 0.12, 0.36],
+  [-0.12, 0.12],
+]
+function ArtificialIntelligence() {
+  const core = useRef<Group>(null)
+  const pulse = useRef<MeshBasicMaterial>(null)
+  useFrame(({ clock }, delta) => {
+    if (core.current) core.current.rotation.y += delta * 0.6
+    if (pulse.current) pulse.current.opacity = 0.25 + 0.2 * Math.sin(clock.elapsedTime * 3)
+  })
+  const layerX = (i: number) => -0.6 + i * 0.4
+  const nodes = NETWORK.flatMap((layer, i) => layer.map((y): V3 => [layerX(i), 1.15 + y, 0]))
+  return (
+    <group>
+      <Rod r={0.42} r2={0.32} length={0.18} at={[0, 0.09, 0]} material={M.black} sides={32} />
+      <Rod r={0.34} length={0.02} at={[0, 0.19, 0]} material={M.cyan} sides={32} />
+      <Rod r={0.02} length={0.5} at={[0, 0.45, 0]} material={HOLO_FILL} />
+      {NETWORK.slice(1).flatMap((layer, i) =>
+        layer.flatMap((y) =>
+          NETWORK[i].map((y0) => (
+            <Link key={`${i}-${y}-${y0}`} from={[layerX(i), 1.15 + y0, 0]} to={[layerX(i + 1), 1.15 + y, 0]} material={HOLO_FILL} r={0.005} />
+          )),
+        ),
+      )}
+      {nodes.map((at, i) => (
+        <mesh key={i} position={at} material={M.cyan}>
+          <sphereGeometry args={[0.045, 12, 8]} />
+        </mesh>
+      ))}
+      <group ref={core} position={[0, 1.15, -0.25]} userData={{ keepSeparate: true }}>
+        <mesh material={HOLO_WIRE}>
+          <icosahedronGeometry args={[0.55, 1]} />
+        </mesh>
+        <mesh>
+          <sphereGeometry args={[0.5, 24, 16]} />
+          <meshBasicMaterial ref={pulse} color="#5fe3ff" transparent opacity={0.3} blending={AdditiveBlending} depthWrite={false} toneMapped={false} />
+        </mesh>
+      </group>
     </group>
   )
 }
@@ -767,24 +803,23 @@ function LightBulb() {
 
 const PROTOTYPES: Record<string, () => JSX.Element> = {
   'ir1-1': WattEngine,
-  'ir1-2': SpinningJenny,
-  'ir1-3': WaterFrame,
+  'ir1-2': WaterFrame,
+  'ir1-3': PuddlingFurnace,
   'ir1-4': Locomotive,
-  'ir2-1': LightBulb,
-  'ir2-2': InductionMotor,
-  'ir2-3': AssemblyLine,
-  'ir2-4': Telephone,
+  'ir2-1': BessemerConverter,
+  'ir2-2': MotorWagen,
+  'ir2-3': ElectricPower,
+  'ir2-4': AssemblyLine,
+  'ir2-5': Telephone,
   'ir3-1': Intel4004,
   'ir3-2': PersonalComputer,
-  'ir3-3': Unimate,
+  'ir3-3': Automation,
   'ir3-4': Arpanet,
-  'ir3-5': Plc,
-  'ir4-1': AiInspection,
-  'ir4-2': Iiot,
-  'ir4-3': Printer3d,
+  'ir4-1': Printer3d,
+  'ir4-2': PredictiveMaintenance,
+  'ir4-3': ArtificialIntelligence,
   'ir4-4': DigitalTwin,
   'ir4-5': Cobot,
-  'ir4-6': PredictiveMaintenance,
 }
 
 // Start downloading the models straight away (they are small), so they are ready by the

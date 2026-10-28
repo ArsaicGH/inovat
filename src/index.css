@@ -255,68 +255,134 @@ body {
   align-items: center;
   gap: 14px;
 }
+/* The board, with the turning model beside it for inventions. */
+.board-row {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 18px;
+  max-width: 96vw;
+}
+.model-viewer {
+  flex: 0 0 auto;
+  width: min(30vw, 340px);
+  max-height: 80vh;
+  border-radius: 6px;
+  overflow: hidden;
+  /* Era-coloured glow behind the model, fading into the dark. */
+  background: radial-gradient(ellipse at 50% 60%, color-mix(in srgb, var(--era-glow) 55%, #0e0c12) 0%, color-mix(in srgb, var(--era-glow) 18%, #0e0c12) 55%, #0b0a0e 100%);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(201, 162, 90, 0.35);
+  cursor: grab;
+}
+.model-viewer:active {
+  cursor: grabbing;
+}
+.board-row:has(.model-viewer) .board-zoom {
+  width: min(60vw, 760px);
+}
+/* Narrow windows: the model goes above the board. */
+@media (max-width: 760px) {
+  .board-row {
+    flex-direction: column;
+    align-items: center;
+  }
+  .model-viewer {
+    width: min(92vw, 420px);
+    height: 28vh;
+  }
+  .board-row:has(.model-viewer) .board-zoom {
+    width: min(92vw, 760px);
+  }
+  /* (Model and board together must still fit the screen's height.) */
+  .board-row:has(.model-viewer) .board-frame {
+    max-height: calc(92vh - 28vh - 70px);
+  }
+}
 .board-zoom {
   container-type: inline-size;
-  /* As large as fits: 92% of the window width or 80% of its height. */
-  width: min(92vw, calc(80vh * var(--ratio)), 1000px);
+  /* Wide enough for comfortable lines; tall text scrolls inside instead of overflowing. */
+  width: min(92vw, 860px);
 }
 .board-frame {
   box-sizing: border-box;
-  aspect-ratio: var(--ratio);
+  display: flex;
+  max-height: 80vh;
   padding: var(--frame);
+  border-radius: 6px;
   background: var(--frame-colour);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(201, 162, 90, 0.35);
 }
 .board-paper {
-  --unit: clamp(13px, 5.2cqw, 24px);
+  --unit: clamp(14px, 2.3cqw, 19px);
   box-sizing: border-box;
-  height: 100%;
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
-  padding: 7.4cqw;
+  /* The padding is kept at the bottom too when scrolled (no text cut at the edge). */
+  padding: clamp(20px, 5cqw, 44px) clamp(20px, 6cqw, 52px);
+  border-radius: 3px;
   background: var(--paper);
   color: var(--ink);
   font-size: var(--unit);
-  line-height: 1.5;
+  line-height: 1.6;
   text-align: left;
+  scrollbar-width: thin;
+  scrollbar-color: var(--rule) transparent;
+}
+.board-paper > :last-child {
+  margin-bottom: 0;
 }
 .board-paper h2 {
   margin: 0;
   color: var(--title);
-  font-size: calc(var(--unit) * 1.5);
+  font-size: calc(var(--unit) * 1.75);
   font-weight: 700;
   line-height: 1.2;
+  letter-spacing: 0.01em;
 }
 .board-rule {
-  width: 30%;
-  height: calc(var(--unit) * 0.12);
-  margin: calc(var(--unit) * 0.4) 0 calc(var(--unit) * 0.8);
+  width: 72px;
+  height: 3px;
+  margin: calc(var(--unit) * 0.7) 0 calc(var(--unit) * 0.9);
+  border-radius: 2px;
   background: var(--rule);
 }
 .board-paper p {
-  margin: 0 0 calc(var(--unit) * 0.6);
+  margin: 0 0 calc(var(--unit) * 0.9);
 }
 .board-summary {
   font-weight: 600;
 }
 .board-body {
-  font-size: calc(var(--unit) * 0.9);
+  max-width: 68ch;
 }
-.board-sources {
-  color: var(--muted);
-  font-size: calc(var(--unit) * 0.75);
-}
-/* Person, year, field...: small lines under the title. */
+/* Person, year, field...: small tags under the title. */
 .board-facts {
-  margin: 0 0 calc(var(--unit) * 0.7);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+  margin: 0 0 calc(var(--unit) * 1.1);
   padding: 0;
   list-style: none;
-  color: var(--muted);
-  font-size: calc(var(--unit) * 0.78);
+  font-size: calc(var(--unit) * 0.8);
   font-weight: 500;
   line-height: 1.35;
 }
+.board-facts li {
+  padding: 4px 10px;
+  border: 1px solid color-mix(in srgb, var(--rule) 55%, transparent);
+  border-radius: 999px;
+  color: var(--muted);
+}
+.board-sources {
+  margin-top: calc(var(--unit) * 0.4);
+  padding-top: calc(var(--unit) * 0.7);
+  border-top: 1px solid color-mix(in srgb, var(--rule) 40%, transparent);
+  color: var(--muted);
+  font-size: calc(var(--unit) * 0.75);
+}
 .board-sources ul {
-  margin: calc(var(--unit) * 0.2) 0 0;
+  margin: calc(var(--unit) * 0.3) 0 0;
   padding-left: 1.2em;
 }
 .board-sources a {
@@ -347,7 +413,7 @@ body {
 }
 .board-look-enamel .board-paper {
   box-shadow: inset 0 0 0 1.7cqw var(--paper), inset 0 0 0 4.2cqw var(--title);
-  padding: 9cqw;
+  padding: clamp(20px, 5cqw, 44px) clamp(22px, 6.5cqw, 56px);
 }
 /* CMCN 3: beige computer case around a glowing green screen with scan lines. */
 .board-look-screen .board-frame {
@@ -382,17 +448,20 @@ body {
   gap: 14px;
 }
 .board-close {
-  padding: 8px 20px;
+  padding: 9px 26px;
   border: 1px solid #c9a25a;
-  border-radius: 8px;
-  background: #2b2620;
+  border-radius: 999px;
+  background: rgba(30, 24, 16, 0.75);
   color: #f3e7cf;
   font: inherit;
   font-weight: 600;
+  letter-spacing: 0.08em;
   cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
 }
 .board-close:hover {
-  background: #3b3226;
+  background: rgba(201, 162, 90, 0.22);
+  box-shadow: 0 0 20px rgba(201, 162, 90, 0.4);
 }
 
 /* ---------- Map: gold and glass, like the title screen ---------- */
@@ -1347,7 +1416,10 @@ body {
   /* Enlarged exhibit board: a little smaller, so the close button below still fits; and
      smaller text on it (a phone is held close: the laptop text size looked oversized). */
   .board-zoom {
-    width: min(92vw, calc(70vh * var(--ratio)), 1000px);
+    width: min(94vw, 860px);
+  }
+  .board-frame {
+    max-height: 72vh;
   }
   .board-paper {
     --unit: clamp(10px, 3.4cqw, 15px);
@@ -1358,4 +1430,633 @@ body {
   .hud-title h1 {
     font-size: 18px;
   }
+}
+
+/* ---------- The ending (EndingScreen.tsx) ---------- */
+.ending {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  color: #f3e7cf;
+}
+.ending button {
+  pointer-events: auto;
+}
+/* Stepping through the portal: the screen is white, then the corridor appears. */
+.ending-flash {
+  position: absolute;
+  inset: 0;
+  background: #fffaf0;
+  animation: ending-flash 1.6s ease-out forwards;
+}
+@keyframes ending-flash {
+  0%,
+  25% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.ending-journey {
+  position: absolute;
+  top: 28px;
+  width: 100%;
+  margin: 0;
+  text-align: center;
+  font-size: 14px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+.ending-caption {
+  position: absolute;
+  bottom: 14%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.8);
+  animation: ending-caption 4s ease-out both;
+}
+.ending-caption span {
+  font-size: 15px;
+  letter-spacing: 0.25em;
+  color: #c9a25a;
+}
+.ending-caption strong {
+  font-size: clamp(22px, 3.2vw, 38px);
+  font-weight: 600;
+  text-align: center;
+  padding: 0 16px;
+}
+@keyframes ending-caption {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  20%,
+  75% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0.85;
+  }
+}
+.ending-skip {
+  position: absolute;
+  right: 24px;
+  bottom: 24px;
+  padding: 8px 18px;
+  border: 1px solid rgba(201, 162, 90, 0.5);
+  border-radius: 999px;
+  background: rgba(20, 16, 12, 0.5);
+  color: #d9ccb2;
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+.ending-skip:hover {
+  background: rgba(201, 162, 90, 0.2);
+}
+/* In the lower part of the screen, below the sunrise on the horizon. */
+.ending-panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 7vh;
+  margin: 0 auto;
+  width: min(620px, calc(100vw - 32px));
+  box-sizing: border-box;
+  padding: 32px 28px;
+  border: 1px solid rgba(201, 162, 90, 0.45);
+  border-radius: 16px;
+  background: rgba(14, 12, 18, 0.62);
+  backdrop-filter: blur(6px);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  animation: title-in 1.2s ease-out both;
+}
+.ending-panel h1 {
+  margin: 0;
+  font-size: clamp(24px, 3.4vw, 36px);
+}
+.ending-panel p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #e6dccb;
+}
+.ending-panel .title-ornament {
+  width: min(360px, 70%);
+}
+
+/* ---------- The Time Machine game (TimeMachineGame.tsx) ---------- */
+.game-overlay {
+  background: radial-gradient(ellipse at center, rgba(20, 16, 12, 0.7) 0%, rgba(8, 7, 6, 0.92) 75%);
+}
+.game-panel {
+  box-sizing: border-box;
+  width: min(1040px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  padding: 22px 26px;
+  border: 1px solid rgba(201, 162, 90, 0.45);
+  border-radius: 16px;
+  background: rgba(18, 15, 20, 0.92);
+  color: #efe4cf;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6);
+  animation: title-in 0.4s ease-out both;
+  scrollbar-width: thin;
+  scrollbar-color: #c9a25a transparent;
+}
+.game-header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(201, 162, 90, 0.3);
+}
+.game-header > div:first-child {
+  flex: 1;
+}
+.game-header h2 {
+  margin: 0;
+  font-size: 24px;
+  letter-spacing: 0.06em;
+  color: #f3e7cf;
+}
+.game-round {
+  margin: 4px 0 0;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #c9a25a;
+}
+.game-round strong {
+  color: #f3e7cf;
+}
+/* The four power cores: dim until lit in their era's colour. */
+.game-cores {
+  display: flex;
+  gap: 10px;
+}
+.game-cores i {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid rgba(201, 162, 90, 0.6);
+  background: #2a2630;
+  transition: background 0.4s, box-shadow 0.4s;
+}
+.game-cores i.is-lit {
+  background: var(--era);
+  box-shadow: 0 0 14px var(--era), 0 0 4px var(--era);
+}
+.game-close,
+.game-primary {
+  padding: 9px 22px;
+  border: 1px solid #c9a25a;
+  border-radius: 999px;
+  background: rgba(30, 24, 16, 0.75);
+  color: #f3e7cf;
+  font: inherit;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s, opacity 0.2s;
+}
+.game-primary {
+  background: linear-gradient(#e8c77e, #b8893d);
+  color: #2b2620;
+}
+.game-close:hover,
+.game-primary:hover:not(:disabled) {
+  box-shadow: 0 0 20px rgba(201, 162, 90, 0.45);
+}
+.game-primary:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.game-task {
+  margin: 14px 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: #d9ccb2;
+}
+.game-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+/* Round 1: cards with era buttons. */
+.game-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+  width: 100%;
+}
+.game-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid rgba(201, 162, 90, 0.3);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+}
+.game-card-title {
+  font-weight: 600;
+  line-height: 1.35;
+}
+.game-eras {
+  display: flex;
+  gap: 6px;
+}
+.game-era {
+  flex: 1;
+  padding: 6px 0;
+  border: 1px solid color-mix(in srgb, var(--era) 60%, transparent);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--era);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.game-era.is-chosen {
+  background: var(--era);
+  color: #1a1612;
+}
+.game-era.is-answer {
+  box-shadow: 0 0 0 2px #fff;
+}
+/* Right and wrong, everywhere in the game. */
+.is-right {
+  border-color: #4fc27e !important;
+  background: rgba(79, 194, 126, 0.14);
+}
+.is-wrong {
+  border-color: #e0605a !important;
+  background: rgba(224, 96, 90, 0.14);
+}
+/* Round 2: two columns of boxes; linked pairs share a coloured dot. */
+.game-wire {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px 40px;
+  width: 100%;
+}
+.game-wire-column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.game-wire-box {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  min-height: 46px;
+  padding: 8px 14px;
+  border: 1px solid color-mix(in srgb, var(--link, #c9a25a) 70%, transparent);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.game-wire-box.is-picked {
+  box-shadow: 0 0 0 2px #c9a25a;
+}
+.game-wire-box small {
+  flex-basis: 100%;
+  color: #9fe0b6;
+}
+.game-wire-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--link);
+  box-shadow: 0 0 8px var(--link);
+}
+/* Rounds 3 and 4: one question with four choices (and the model for round 3). */
+.game-choice {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+}
+.game-visual {
+  flex: 0 0 min(34%, 320px);
+  min-height: 280px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 50% 60%, #6a5530 0%, #2a2218 55%, #0b0a0e 100%);
+}
+.game-choice-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.game-progress {
+  margin: 0;
+  font-size: 13px;
+  color: #c9a25a;
+}
+.game-prompt p {
+  margin: 0 0 6px;
+  font-size: 17px;
+  line-height: 1.5;
+}
+.game-clue {
+  color: #c9a25a;
+}
+.game-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.game-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(201, 162, 90, 0.4);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.game-option:hover:not(:disabled) {
+  background: rgba(201, 162, 90, 0.15);
+}
+.game-option b {
+  display: grid;
+  place-items: center;
+  flex: 0 0 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #c9a25a;
+  color: #1a1612;
+  font-size: 13px;
+}
+.game-option.is-dim {
+  opacity: 0.4;
+}
+.game-feedback {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  padding: 12px 14px;
+  border: 1px solid;
+  border-radius: 10px;
+}
+.game-feedback p {
+  flex: 1 1 60%;
+  margin: 0;
+  line-height: 1.5;
+}
+.game-review {
+  color: #f0b0a8;
+}
+.game-result {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  margin-top: 16px;
+  padding: 12px 16px;
+  border: 1px solid;
+  border-radius: 12px;
+}
+.game-done {
+  padding: 30px 10px 10px;
+  text-align: center;
+}
+.game-done h3 {
+  margin: 0 0 10px;
+  font-size: 26px;
+  color: #f3e7cf;
+}
+.game-done p {
+  margin: 0 auto 20px;
+  max-width: 560px;
+  line-height: 1.6;
+  color: #d9ccb2;
+}
+@media (max-width: 760px) {
+  .game-choice {
+    flex-direction: column;
+  }
+  .game-visual {
+    flex-basis: auto;
+    min-height: 200px;
+  }
+  .game-options,
+  .game-wire {
+    grid-template-columns: 1fr;
+  }
+  .game-wire {
+    gap: 10px;
+  }
+}
+
+/* The Time Machine window in the museum's white-and-gold style (leader): ivory paper, a
+   gold double frame, dark ink. (Overrides the dark first version above.) */
+.game-panel {
+  background: linear-gradient(180deg, #fbf8f0 0%, #f2e9d6 100%);
+  color: #2e261d;
+  border: 2px solid #c9a25a;
+  outline: 1px solid rgba(201, 162, 90, 0.6);
+  outline-offset: 5px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.65), inset 0 0 0 6px rgba(255, 255, 255, 0.6), inset 0 0 0 7px rgba(201, 162, 90, 0.45);
+  scrollbar-color: #b8893d transparent;
+}
+.game-header {
+  border-bottom: 1px solid rgba(154, 115, 48, 0.35);
+}
+.game-header h2 {
+  color: #7a5a24;
+  font-size: 28px;
+  letter-spacing: 0.08em;
+}
+.game-round {
+  color: #9a7330;
+}
+.game-round strong,
+.game-done h3 {
+  color: #2e261d;
+}
+.game-task,
+.game-done p {
+  color: #5a4a36;
+}
+.game-cores i {
+  border-color: #b8893d;
+  background: #e9dfca;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+.game-cores i.is-lit {
+  box-shadow: 0 0 14px var(--era), 0 0 0 2px #fff;
+}
+.game-close {
+  background: #fffaf0;
+  color: #7a5a24;
+}
+.game-card,
+.game-wire-box,
+.game-option {
+  background: #fffdf8;
+  border-color: rgba(184, 137, 61, 0.45);
+  color: #2e261d;
+  box-shadow: 0 2px 6px rgba(120, 90, 40, 0.08);
+}
+.game-option:hover:not(:disabled),
+.game-wire-box:hover:not(:disabled) {
+  background: #fbf0d8;
+}
+.game-wire-box small {
+  color: #23794a;
+}
+.game-era {
+  border-color: color-mix(in srgb, var(--era) 70%, #9a7330);
+  color: color-mix(in srgb, var(--era) 55%, #3a2a1e);
+}
+.game-era.is-chosen {
+  color: #1a1612;
+}
+.game-era.is-answer {
+  box-shadow: 0 0 0 2px #2e9a5c;
+}
+.game-option b {
+  background: linear-gradient(#e8c77e, #b8893d);
+}
+.game-progress,
+.game-clue {
+  color: #9a7330;
+}
+.game-review {
+  color: #a8332e;
+}
+.game-visual {
+  background: radial-gradient(ellipse at 50% 60%, #f7e7c0 0%, #d9bf86 55%, #8a6a35 100%);
+  border: 1px solid #c9a25a;
+}
+.game-panel .is-right {
+  background: #e3f4e8;
+  border-color: #2f9a5c !important;
+}
+.game-panel .is-wrong {
+  background: #f8e1de;
+  border-color: #c2453f !important;
+}
+.game-overlay {
+  background: radial-gradient(ellipse at center, rgba(30, 24, 16, 0.55) 0%, rgba(8, 7, 6, 0.85) 75%);
+}
+
+/* Gold frame around the Time Machine window, with corner ornaments. */
+.game-panel {
+  position: relative;
+  border: 3px double #b8893d;
+  outline: 2px solid #d9b46a;
+  outline-offset: 6px;
+  box-shadow: 0 0 0 10px rgba(201, 162, 90, 0.18), 0 30px 80px rgba(0, 0, 0, 0.65), inset 0 0 0 6px rgba(255, 255, 255, 0.6), inset 0 0 0 7px rgba(201, 162, 90, 0.5);
+}
+.game-panel::before,
+.game-panel::after {
+  content: '';
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  border: 3px solid #c9a25a;
+  pointer-events: none;
+}
+.game-panel::before {
+  top: 8px;
+  left: 8px;
+  border-right: none;
+  border-bottom: none;
+}
+.game-panel::after {
+  right: 8px;
+  bottom: 8px;
+  border-left: none;
+  border-top: none;
+}
+
+/* The ending's caption: period and narration under the era's name. */
+.ending-caption em {
+  font-style: normal;
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  color: #e8d3a8;
+}
+.ending-caption p {
+  max-width: 640px;
+  margin: 6px 16px 0;
+  font-size: clamp(15px, 1.6vw, 19px);
+  line-height: 1.55;
+  text-align: center;
+  font-style: italic;
+  color: #f3e7cf;
+}
+
+/* Line breaks in board texts (the credits list: one credit per line). */
+.board-body {
+  white-space: pre-line;
+}
+/* The references board: sources before the credits. */
+.board-paper {
+  display: flex;
+  flex-direction: column;
+}
+.board-paper .board-sources {
+  order: 1;
+}
+/* THE GOLDEN HONOUR BOARD ("Bảng vàng"): each member in a gold frame. */
+.team-board {
+  display: grid;
+  gap: 12px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.team-board li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 18px;
+  border: 2px solid #c9a25a;
+  outline: 1px solid rgba(201, 162, 90, 0.5);
+  outline-offset: 3px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #fff8e4 0%, #f3e2b6 55%, #fbf1d6 100%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.8), 0 2px 8px rgba(120, 90, 40, 0.18);
+}
+.team-board strong {
+  font-size: calc(var(--unit) * 1.15);
+  color: #6b4a14;
+  letter-spacing: 0.02em;
+}
+.team-board span {
+  font-size: calc(var(--unit) * 0.82);
+  color: #5a4a36;
+}
+.team-board .team-lead {
+  background: linear-gradient(135deg, #f7e2a6 0%, #e2bd6a 55%, #f6dc98 100%);
+  border-color: #a8782c;
 }

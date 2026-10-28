@@ -104,6 +104,7 @@ export default function PanelBoard({ exhibitId, width, height, aimed, theme }: P
       ctx.textBaseline = 'top'
       ctx.textAlign = 'left'
 
+
       let y = pad
       ctx.fillStyle = theme.title
       ctx.font = `700 ${unit * 1.5}px ${font}`
@@ -124,7 +125,8 @@ export default function PanelBoard({ exhibitId, width, height, aimed, theme }: P
       const facts = text.facts.slice(0, 2)
       const parts: [string, string, string, number][] = [
         ...facts.map((fact): [string, string, string, number] => [fact, `500 ${unit * 0.72}px ${font}`, theme.muted, 1.15]),
-        [text.summary, `500 ${unit * 0.92}px ${font}`, theme.ink, 1.3],
+        // (Line breaks in the text start new lines: the team board, one member per line.)
+        ...text.summary.split('\n').map((line): [string, string, string, number] => [line, `500 ${unit * 0.92}px ${font}`, theme.ink, 1.3]),
         ...(sources ? [[`${ui.infoPanel.sourcesLabel}: ${sources}`, `400 ${unit * 0.72}px ${font}`, theme.muted, 1.2] as [string, string, string, number]] : []),
       ]
       for (const [index, [content, partFont, colour, spacing]] of parts.entries()) {

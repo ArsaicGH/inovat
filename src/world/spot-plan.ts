@@ -1,5 +1,5 @@
 import type { RoomId } from '../types'
-import { EXHIBIT_SPOTS, roomById, toWorld } from './layout'
+import { EXHIBIT_SPOTS, SPOTLIGHT_ID, roomById, toWorld } from './layout'
 
 // MUSEUM SPOTLIGHTS: like a real museum, each room is fairly dark and the exhibits are lit
 // by warm spotlights from the ceiling. Six real spotlights follow the visitor from room
@@ -23,18 +23,28 @@ export const SPOT_COUNT = 6
 function eraRoom(id: RoomId): SpotAim[] {
   const room = roomById(id)
   if (!room) return []
-  // One lamp straight above each invention, shining down, so the pool of light is centred
-  // on the exhibit, and one on the overview board. (Not in CMCN 4: its boards are glowing
-  // holograms, and its six inventions already use all the lamps.)
-  const overview = id === 'ir4' ? undefined : EXHIBIT_SPOTS.find((spot) => spot.room === id && spot.kind === 'overview')
-  // (Further from the wall and dimmer: close to a pale wall it made a glaring patch.)
-  const [ox, oz] = toWorld(room.frame, 0, room.vBack - 3.2)
+  // One lamp for each invention (aimed at it and its board), and one on the era number.
   // Taller rooms (CMCN 3 and 4) hang the lamps higher; light fades with the square of the
   // distance, so they shine brighter to light their exhibits just as well.
   const reach = ((room.height - 0.25) / 5.25) ** 2
-  const overviewAim: SpotAim[] = overview ? [{ from: [ox, room.height - 0.25, oz], to: [overview.x, 2.1, overview.z], strength: 0.21 * reach }] : []
+  // (The overview board glows by itself; its lamp now lights the era number instead: a
+  // soft wash down the middle of the back wall.)
+  const [nx, nz] = toWorld(room.frame, 0, room.vBack - 0.05)
+  const [wx, wz] = toWorld(room.frame, 0, room.vBack - 2.8)
+  const overviewAim: SpotAim[] = [{ from: [wx, room.height - 0.25, wz], to: [nx, room.height / 2 + 0.2, nz], strength: 0.4 * reach }]
   return EXHIBIT_SPOTS.filter((spot) => spot.room === id && spot.kind === 'corner')
-    .map((spot): SpotAim => ({ from: [spot.x, room.height - 0.25, spot.z], to: [spot.x, 0, spot.z], narrow: true, strength: reach }))
+    // Like a real gallery (leader's reference photos): each lamp hangs in front of its
+    // exhibit and shines down at an angle onto it, so the light falls on the face the
+    // visitor sees and spreads into a soft pool on the floor around the plinth.
+    .map((spot): SpotAim => ({
+      from: [spot.x + Math.sin(spot.yaw) * 2.6, room.height - 0.25, spot.z + Math.cos(spot.yaw) * 2.6],
+      // Aimed at the object itself (the boards light themselves), so the light falls on
+      // the exhibit and its plinth, not in a big pool on the floor.
+      to: [spot.x, 1.3, spot.z],
+      narrow: true,
+      // AI, the spotlight exhibit, gets the strongest light of the museum.
+      strength: reach * (spot.id === SPOTLIGHT_ID ? 2.4 : 1.9),
+    }))
     .concat(overviewAim)
 }
 
@@ -42,7 +52,7 @@ function hall(): SpotAim[] {
   const room = roomById('hall')
   if (!room) return []
   // One lamp in front of each of the five information boards, shining onto it.
-  return ['hall-intro', 'hall-overview', 'hall-team', 'hall-credits', 'hall-sources'].flatMap((id) => {
+  return ['hall-intro', 'hall-overview', 'hall-team', 'hall-credits'].flatMap((id) => {
     const spot = EXHIBIT_SPOTS.find((s) => s.id === id)
     if (!spot) return []
     const fx = Math.sin(spot.yaw) // the direction the board faces
@@ -97,7 +107,9 @@ export interface KeyAim extends SpotAim {
 
 // How strong each room's wash is: the darker the room, the more the exhibits stand out.
 // (The intro hall is a bright, welcoming lobby; only the era rooms are dim.)
-const WASH: Partial<Record<RoomId, number>> = { hall: 40, ir1: 20, ir2: 16, ir3: 18, ir4: 20, quiz: 6 }
+// (The exhibit halls are kept dark, so the exhibits in their spotlights stand out like a
+// stage: leader, "cinematic and dramatic".)
+const WASH: Partial<Record<RoomId, number>> = { hall: 40, ir1: 5, ir2: 5, ir3: 3, ir4: 8, quiz: 6 }
 
 function roomKey(id: RoomId): KeyAim[] {
   const room = roomById(id)

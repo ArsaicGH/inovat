@@ -24,11 +24,13 @@ function texture(id: string, use: Record<Language, string>, file: string): Credi
   }
 }
 
-const CC_BY = { vi: 'CC BY 3.0 (ghi công tác giả)', en: 'CC BY 3.0 (attribution)' }
+// Sketchfab's "CC Attribution" licence. The models were simplified and compressed for the
+// web, which the licence allows as long as the change is mentioned.
+const CC_BY = { vi: 'CC BY 4.0 (ghi công tác giả; đã thu gọn cho web)', en: 'CC BY 4.0 (attribution; simplified for the web)' }
 
-// A 3D model downloaded from Poly Pizza (poly.pizza/m/<id>).
-function model(id: string, item: Record<Language, string>, author: string, licence: Record<Language, string>, file: string): Credit {
-  return { item, author: `${author} (Poly Pizza)`, licence, source: `https://poly.pizza/m/${id}`, files: [`models/${file}`] }
+// A 3D model downloaded from Sketchfab (sketchfab.com/3d-models/<id>).
+function model(id: string, item: Record<Language, string>, author: string, file: string): Credit {
+  return { item, author: `${author} (Sketchfab)`, licence: CC_BY, source: `https://sketchfab.com/3d-models/${id}`, files: [`models/${file}`] }
 }
 
 export const credits: Credit[] = [
@@ -54,11 +56,15 @@ export const credits: Credit[] = [
   texture('Tiles139', { vi: 'sàn gạch ô', en: 'tiled floor' }, 'tiles'),
 
   // 3D models of inventions (the other prototypes are built from shapes by the team).
-  model('WY84FHug9s', { vi: 'Mô hình đầu máy hơi nước "Locomotive Front" - CMCN 1', en: 'Steam locomotive model "Locomotive Front" - IR 1' }, 'Quaternius', CC0, 'ir1/steam-locomotive.glb'),
-  model('68BJSxSDWBg', { vi: 'Mô hình bóng đèn "Lightbulb" - CMCN 2', en: 'Light bulb model "Lightbulb" - IR 2' }, 'Poly by Google', CC_BY, 'ir2/light-bulb.glb'),
-  model('aJVM4rmsGIb', { vi: 'Mô hình ô tô "Ford Model T" - CMCN 2', en: 'Car model "Ford Model T" - IR 2' }, 'Bruno Oliveira', CC_BY, 'ir2/ford-model-t.glb'),
-  model('doMMnviJrGi', { vi: 'Mô hình máy tính "Simple computer" - CMCN 3', en: 'Computer model "Simple computer" - IR 3' }, 'Robert Schlyter', CC_BY, 'ir3/personal-computer.glb'),
-  model('9E_ItHeURbb', { vi: 'Mô hình máy in 3D "Ultimaker 3" - CMCN 4', en: '3D printer model "Ultimaker 3" - IR 4' }, 'Brian Yu', CC_BY, 'ir4/3d-printer.glb'),
+  model('36e57c231b6546b7bdd19bf4dba8063d', { vi: 'Mô hình "Model of the Watt Steam Engine with animation" - CMCN 1', en: 'Model "Model of the Watt Steam Engine with animation" - IR 1' }, 'Virtual Museums of Małopolska', 'ir1/watt-steam-engine.glb'),
+  model('1cd9aa31c6a34ab9b7023aaf5ba593f2', { vi: 'Mô hình "Stephensons Rocket Steam Engine" - CMCN 1', en: 'Model "Stephensons Rocket Steam Engine" - IR 1' }, 'Railmonsterinc', 'ir1/rocket-locomotive.glb'),
+  model('aeb0e4832f04463280510e550e2cdbd5', { vi: 'Mô hình "Edison Light Bulb" - CMCN 2', en: 'Model "Edison Light Bulb" - IR 2' }, 'Fishboe', 'ir2/edison-light-bulb.glb'),
+  model('8cb1c1243c394144837a15f4722a2867', { vi: 'Mô hình "Ford Model T Downloadable" - CMCN 2', en: 'Model "Ford Model T Downloadable" - IR 2' }, 'Libau Media', 'ir2/ford-model-t.glb'),
+  model('4d6396e8dc164f4d8da7821eb139160d', { vi: 'Mô hình "Alexander Graham Bell Telephone 1876" - CMCN 2', en: 'Model "Alexander Graham Bell Telephone 1876" - IR 2' }, 'Fabuleo8796', 'ir2/bell-telephone-1876.glb'),
+  model('815dd2ba92474299a387faeeaac83fd4', { vi: 'Mô hình "CPU Intel 4004" - CMCN 3', en: 'Model "CPU Intel 4004" - IR 3' }, 'Nadya Sarieva', 'ir3/intel-4004.glb'),
+  model('7bd123feeecc40359b70fb95f622bc41', { vi: 'Mô hình "IBM-5150" - CMCN 3', en: 'Model "IBM-5150" - IR 3' }, 'MrdT', 'ir3/ibm-5150.glb'),
+  model('0e825a8d48b14bee883a131fe029d4fc', { vi: 'Mô hình "3D Printer" - CMCN 4', en: 'Model "3D Printer" - IR 4' }, 'Gregsterius', 'ir4/3d-printer.glb'),
+  model('31968bd4ec5943f785cdf028facfba5c', { vi: 'Mô hình "Universal Robots UR3 Animated Cobot" - CMCN 4', en: 'Model "Universal Robots UR3 Animated Cobot" - IR 4' }, 'kerwink', 'ir4/ur3-cobot.glb'),
 
   // Sounds (M8b). Converted to small .ogg files; listed per source pack.
   {

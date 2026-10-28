@@ -3,6 +3,8 @@ import StartScreen from './ui/StartScreen'
 import PauseScreen from './ui/PauseScreen'
 import InfoPanel from './ui/InfoPanel'
 import MapMenu from './ui/MapMenu'
+import EndingScreen from './ui/EndingScreen'
+import TimeMachineGame from './ui/TimeMachineGame'
 import TouchControls from './ui/TouchControls'
 import { IS_TOUCH } from './ui/touch'
 import LoadingScreen from './ui/LoadingScreen'
@@ -47,6 +49,8 @@ function App() {
       {/* Always mounted: it animates in when an exhibit opens and out when it closes. */}
       <InfoPanel />
       {mode === 'map' && <MapMenu />}
+      {mode === 'ending' && <EndingScreen />}
+      {mode === 'game' && <TimeMachineGame />}
       <LoadingScreen />
       <SoundDirector />
       {/* Touch devices held upright: ask to turn them sideways (shown by index.css). */}

@@ -1,5 +1,6 @@
 import type { Language } from './language'
 import { credits } from './credits'
+import { TEAM } from './team'
 import { AUDIO_ENABLED } from '../features'
 
 // Exhibit texts, in both languages, from CONTENT.md (the group's content document, with
@@ -99,35 +100,6 @@ const ENTRIES: Record<string, Entry> = {
     },
     sources: [BRITANNICA_IR, WEF],
   },
-  'hall-team': {
-    title: { vi: 'Nhóm thực hiện', en: 'Our Team' },
-    facts: [],
-    short: {
-      vi: `Các thành viên của nhóm và vai trò của từng người. ${NOTE.vi}`,
-      en: `The members of the team and their roles. ${NOTE.en}`,
-    },
-    long: {
-      vi: `Danh sách thành viên và vai trò sẽ được nhóm bổ sung. ${NOTE.vi}`,
-      en: `The list of members and their roles will be added by the team. ${NOTE.en}`,
-    },
-    sources: [],
-    placeholder: true,
-  },
-  // Written by Claude: the general sources behind the four-era framework (CONTENT.md).
-  'hall-sources': {
-    title: { vi: 'Nguồn tham khảo', en: 'References' },
-    facts: [],
-    short: {
-      vi: 'Các nguồn chung về bốn cuộc Cách mạng Công nghiệp. Nguồn của từng hiện vật được ghi ngay trên bảng của hiện vật đó.',
-      en: 'The general sources on the four Industrial Revolutions. The sources for each exhibit are given on that exhibit’s own board.',
-    },
-    long: {
-      vi: 'Cách chia lịch sử công nghiệp thành bốn cuộc cách mạng theo các nguồn dưới đây: lần thứ nhất dùng nước và hơi nước để cơ giới hóa sản xuất, lần thứ hai dùng điện năng cho sản xuất hàng loạt, lần thứ ba dùng điện tử và công nghệ thông tin để tự động hóa, và lần thứ tư kết hợp nhiều công nghệ với nhau. Nguồn của từng hiện vật được ghi ngay trên bảng của hiện vật đó, trong mỗi phòng.',
-      en: 'The division of industrial history into four revolutions follows the sources below: the first used water and steam to mechanise production, the second used electricity for mass production, the third used electronics and information technology to automate, and the fourth brings many technologies together. The sources for each exhibit are given on that exhibit’s own board, in each room.',
-    },
-    sources: [BRITANNICA_IR, BRITANNICA_TECH, WEF],
-  },
-
   // ---------- CMCN 1 ----------
   'ir1-overview': {
     title: { vi: 'Tổng quan CMCN 1', en: 'IR 1 Overview' },
@@ -174,26 +146,6 @@ const ENTRIES: Record<string, Entry> = {
     ],
   },
   'ir1-2': {
-    title: { vi: 'Máy kéo sợi Spinning Jenny', en: 'The Spinning Jenny' },
-    facts: [
-      ['person', same('James Hargreaves')],
-      ['year', { vi: 'Khoảng 1764 (bằng sáng chế năm 1770)', en: 'About 1764 (patented in 1770)' }],
-      ['field', { vi: 'Công nghiệp dệt', en: 'Textile industry' }],
-    ],
-    short: {
-      vi: 'Máy cho phép một người kéo nhiều sợi cùng lúc, làm tăng năng suất ngành dệt. Nó góp phần chuyển sản xuất từ thủ công tại gia đình sang quy mô lớn hơn, đồng thời thay đổi công việc truyền thống của người lao động.',
-      en: 'The machine let one person spin several threads at once, raising productivity in textiles. It helped move production from hand work at home to a larger scale, and changed the traditional work of spinners.',
-    },
-    long: {
-      vi: 'Trước khi Spinning Jenny xuất hiện, việc kéo sợi chủ yếu được thực hiện bằng các công cụ thủ công và mất nhiều thời gian. Máy kéo sợi này cho phép một người vận hành nhiều cọc sợi cùng lúc, làm tăng đáng kể năng suất. Nhờ đó, ngành dệt có thể đáp ứng nhu cầu vải ngày càng lớn. Tuy nhiên, sự phát triển của máy móc cũng làm thay đổi công việc của những người thợ dệt và kéo sợi truyền thống.',
-      en: 'Before the Spinning Jenny, spinning was done mostly with hand tools and took a long time. This machine let one person work many spindles at once, greatly raising output. The textile industry could then keep up with the growing demand for cloth. But machines also changed the work of traditional weavers and spinners.',
-    },
-    sources: [
-      { name: 'Britannica', title: 'James Hargreaves', url: 'https://www.britannica.com/biography/James-Hargreaves' },
-      { name: 'Wikipedia', title: 'Spinning jenny', url: 'https://en.wikipedia.org/wiki/Spinning_jenny' },
-    ],
-  },
-  'ir1-3': {
     title: { vi: 'Máy kéo sợi Water Frame', en: 'The Water Frame' },
     facts: [
       ['person', same('Richard Arkwright')],
@@ -216,6 +168,27 @@ const ENTRIES: Record<string, Entry> = {
         url: 'https://artsandculture.google.com/asset/richard-arkwright-s-roller-spinning-patent-richard-arkwright/JQEM1h62uI09kQ',
       },
       { name: 'Wikipedia', title: 'Cromford Mill', url: 'https://en.wikipedia.org/wiki/Cromford_Mill' },
+    ],
+  },
+  'ir1-3': {
+    title: { vi: 'Luyện sắt bằng lò khuấy (puddling)', en: 'Puddled Iron' },
+    facts: [
+      ['person', same('Henry Cort')],
+      ['year', { vi: '1784 (bằng sáng chế phương pháp khuấy)', en: '1784 (patent on the puddling process)' }],
+      ['field', { vi: 'Luyện kim', en: 'Metallurgy' }],
+    ],
+    short: {
+      vi: 'Trong lò khuấy đốt bằng than đá, gang nóng chảy được khuấy liên tục để đốt bớt các-bon, tạo ra sắt rèn dẻo và bền với số lượng lớn. Sắt nhiều và rẻ hơn trở thành vật liệu cho máy móc, cầu và đường ray.',
+      en: 'In a coal-fired puddling furnace, molten pig iron was stirred to burn off carbon, producing tough wrought iron in large quantities. Cheaper, more plentiful iron became the material of machines, bridges and rails.',
+    },
+    long: {
+      vi: 'Trước đây, việc luyện sắt rèn phụ thuộc vào than củi nên sản lượng bị hạn chế. Henry Cort được cấp bằng sáng chế về cán sắt bằng trục có rãnh (1783) và phương pháp khuấy (1784). Trong lò khuấy dùng than đá, người thợ khuấy gang nóng chảy để không khí đốt bớt các-bon, tạo ra sắt rèn dẻo và bền, rồi cán thành thanh nhanh hơn nhiều so với rèn bằng búa. Nhờ đó, sắt trở thành vật liệu chủ lực để chế tạo máy móc, cầu, khung nhà xưởng và đường ray trong Cách mạng Công nghiệp lần thứ nhất.',
+      en: 'Making wrought iron had depended on charcoal, which limited how much could be produced. Henry Cort patented rolling iron between grooved rollers (1783) and the puddling process (1784). In a coal-fired puddling furnace, workers stirred molten pig iron so that air burned off the carbon, giving tough, workable wrought iron that was then rolled into bars far faster than hammering allowed. Iron became the main material for machines, bridges, factory frames and rails in the First Industrial Revolution.',
+    },
+    sources: [
+      { name: 'Britannica', title: 'Henry Cort', url: 'https://www.britannica.com/biography/Henry-Cort' },
+      { name: 'Britannica', title: 'Puddling process', url: 'https://www.britannica.com/technology/puddling-process' },
+      BRITANNICA_TECH,
     ],
   },
   'ir1-4': {
@@ -253,25 +226,65 @@ const ENTRIES: Record<string, Entry> = {
     sources: [BRITANNICA_IR, WEF],
   },
   'ir2-1': {
-    title: { vi: 'Đèn điện sợi đốt', en: 'The Incandescent Light Bulb' },
+    title: { vi: 'Luyện thép Bessemer', en: 'The Bessemer Process' },
     facts: [
-      [
-        'person',
-        {
-          vi: 'Thomas Edison và nhóm cộng sự; nhiều nhà phát minh khác cũng đóng góp vào sự phát triển đèn điện',
-          en: 'Thomas Edison and his team; many other inventors also contributed to electric lighting',
-        },
-      ],
-      ['year', { vi: '1879 (nộp đơn xin cấp bằng sáng chế; được cấp năm 1880)', en: '1879 (patent filed; granted in 1880)' }],
-      ['field', { vi: 'Điện và chiếu sáng', en: 'Electricity and lighting' }],
+      ['person', same('Henry Bessemer')],
+      ['year', { vi: '1856 (bằng sáng chế)', en: '1856 (patent)' }],
+      ['field', { vi: 'Luyện kim', en: 'Metallurgy' }],
     ],
     short: {
-      vi: 'Những cải tiến của Edison và cộng sự góp phần tạo ra đèn điện có tính ứng dụng thực tế. Đèn điện giúp chiếu sáng nhà ở, đường phố và nhà máy, đồng thời thúc đẩy sự phát triển của hệ thống cung cấp điện.',
-      en: 'Edison and his team’s improvements helped create a practical electric lamp. Electric light lit up homes, streets and factories, and drove the growth of power supply networks.',
+      vi: 'Thổi không khí qua gang nóng chảy trong lò chuyển giúp đốt cháy tạp chất chỉ trong vài phút, tạo ra thép với số lượng lớn và giá rẻ. Thép trở thành vật liệu của đường ray, cầu, tàu thủy và nhà cao tầng.',
+      en: 'Blowing air through molten pig iron in a converter burned off the impurities in minutes, making steel cheaply and in large amounts. Steel became the material of rails, bridges, ships and tall buildings.',
     },
     long: {
-      vi: 'Đèn điện sợi đốt là một trong những thành tựu tiêu biểu của quá trình phát triển hệ thống chiếu sáng bằng điện. Các thử nghiệm của Edison và cộng sự góp phần tạo ra loại đèn có tính ứng dụng thực tế cao hơn. Khi hệ thống điện được mở rộng, đèn điện giúp chiếu sáng nhà ở, đường phố và nhà máy. Nhờ đó, con người có thể làm việc và sinh hoạt thuận tiện hơn sau khi trời tối. Thành tựu này cũng góp phần thúc đẩy sự phát triển của mạng lưới cung cấp điện.',
-      en: 'The incandescent light bulb is one of the landmark achievements in the development of electric lighting. The experiments of Edison and his team helped produce a far more practical lamp. As electricity networks spread, electric light lit up homes, streets and factories, so people could work and live more easily after dark. It also helped drive the growth of the power supply network.',
+      vi: 'Trước phương pháp Bessemer, thép được sản xuất chậm, với số lượng nhỏ và giá cao. Năm 1856, Henry Bessemer được cấp bằng sáng chế cho cách thổi luồng không khí qua gang nóng chảy trong một lò chuyển hình quả lê: ô-xy trong không khí đốt cháy các-bon và các tạp chất khác, đồng thời tỏa nhiệt giữ cho kim loại nóng chảy. Nhờ đó, thép có thể được sản xuất nhanh, nhiều và rẻ hơn rất nhiều. Thép giá rẻ đã thúc đẩy xây dựng đường sắt, cầu, tàu thủy, máy móc và các tòa nhà cao tầng.',
+      en: 'Before the Bessemer process, steel was made slowly, in small amounts and at high cost. In 1856 Henry Bessemer patented a way of blowing air through molten pig iron in a pear-shaped converter: the oxygen burned off the carbon and other impurities, and the heat it released kept the metal molten. Steel could now be made quickly, in large amounts and far more cheaply. Cheap steel drove the building of railways, bridges, ships, machines and tall buildings.',
+    },
+    sources: [
+      { name: 'Britannica', title: 'Bessemer process', url: 'https://www.britannica.com/technology/Bessemer-process' },
+      { name: 'Britannica', title: 'Sir Henry Bessemer', url: 'https://www.britannica.com/biography/Henry-Bessemer' },
+    ],
+  },
+  'ir2-2': {
+    title: { vi: 'Động cơ đốt trong và ô tô', en: 'The Internal Combustion Engine and the Car' },
+    facts: [
+      ['people', same('Nikolaus Otto, Karl Benz')],
+      [
+        'year',
+        {
+          vi: '1876 (động cơ bốn kỳ của Otto); 1886 (xe Benz Patent-Motorwagen được cấp bằng sáng chế)',
+          en: '1876 (Otto’s four-stroke engine); 1886 (patent for Benz’s Motorwagen)',
+        },
+      ],
+      ['field', { vi: 'Động lực và giao thông', en: 'Engines and transport' }],
+    ],
+    short: {
+      vi: 'Động cơ đốt trong đốt nhiên liệu ngay trong xi-lanh, nên nhỏ và nhẹ hơn máy hơi nước. Động cơ bốn kỳ của Otto và chiếc xe ba bánh của Benz mở ra thời đại ô tô.',
+      en: 'An internal combustion engine burns its fuel inside the cylinder, so it is smaller and lighter than a steam engine. Otto’s four-stroke engine and Benz’s three-wheeled car opened the age of the automobile.',
+    },
+    long: {
+      vi: 'Máy hơi nước cần lò đốt và nồi hơi cồng kềnh, còn động cơ đốt trong đốt nhiên liệu ngay bên trong xi-lanh. Năm 1876, Nikolaus Otto chế tạo động cơ bốn kỳ (nạp, nén, nổ, xả), nguyên lý vẫn được dùng trong nhiều động cơ ngày nay. Năm 1886, Karl Benz được cấp bằng sáng chế cho chiếc xe ba bánh chạy bằng động cơ xăng, thường được xem là ô tô thực dụng đầu tiên (mô hình trên bệ). Động cơ nhỏ gọn đã đưa động lực đến ô tô, xe tải, máy kéo, tàu thủy và sau này là máy bay.',
+      en: 'A steam engine needs a bulky firebox and boiler; an internal combustion engine burns its fuel inside the cylinder. In 1876 Nikolaus Otto built a four-stroke engine (intake, compression, power, exhaust), a principle still used in many engines today. In 1886 Karl Benz patented a three-wheeled car driven by a petrol engine, often regarded as the first practical automobile (the model on the plinth). Compact engines brought power to cars, lorries, tractors, ships and later aircraft.',
+    },
+    sources: [
+      { name: 'Britannica', title: 'Nikolaus August Otto', url: 'https://www.britannica.com/biography/Nikolaus-August-Otto' },
+      { name: 'Britannica', title: 'Karl Benz', url: 'https://www.britannica.com/biography/Karl-Benz' },
+    ],
+  },
+  'ir2-3': {
+    title: { vi: 'Điện năng: đèn điện và động cơ điện', en: 'Electric Power: Light and Motors' },
+    facts: [
+      ['people', { vi: 'Thomas Edison và cộng sự (đèn điện); Nikola Tesla (động cơ điện xoay chiều)', en: 'Thomas Edison and his team (electric light); Nikola Tesla (AC motor)' }],
+      ['year', { vi: '1879 (đèn sợi đốt); 1888 (động cơ cảm ứng xoay chiều)', en: '1879 (incandescent lamp); 1888 (AC induction motor)' }],
+      ['field', { vi: 'Điện', en: 'Electricity' }],
+    ],
+    short: {
+      vi: 'Đèn điện sợi đốt thắp sáng nhà ở, đường phố và nhà máy; động cơ điện xoay chiều biến điện năng thành chuyển động cho máy móc. Cùng nhau, chúng đưa điện vào mọi mặt của sản xuất và đời sống.',
+      en: 'The incandescent lamp lit homes, streets and factories; the AC motor turned electricity into motion for machines. Together they brought electricity into every part of work and daily life.',
+    },
+    long: {
+      vi: 'Các thử nghiệm của Thomas Edison và cộng sự (đơn sáng chế năm 1879) góp phần tạo ra đèn sợi đốt có tính ứng dụng thực tế, giúp con người làm việc và sinh hoạt thuận tiện sau khi trời tối, đồng thời thúc đẩy xây dựng mạng lưới cung cấp điện. Năm 1888, Nikola Tesla được cấp bằng sáng chế cho động cơ cảm ứng xoay chiều, biến điện năng thành chuyển động cơ học. Thay vì phụ thuộc vào một máy hơi nước duy nhất, nhà máy có thể đặt động cơ điện ở bất cứ đâu cần đến. Ánh sáng và động lực từ điện đã thay đổi cách tổ chức nhà máy và đời sống đô thị.',
+      en: 'The experiments of Thomas Edison and his team (patent filed in 1879) helped produce a practical incandescent lamp, so people could work and live more easily after dark, and drove the building of power supply networks. In 1888 Nikola Tesla was granted patents for the AC induction motor, which turns electrical energy into mechanical motion. Instead of depending on a single steam engine, a factory could place electric motors wherever they were needed. Electric light and power changed how factories were organised and how cities lived.',
     },
     sources: [
       {
@@ -290,30 +303,6 @@ const ENTRIES: Record<string, Entry> = {
         url: 'https://americanhistory.si.edu/lighting/history/patents/ed_inc.htm',
       },
       { name: 'ETHW', title: 'Edison’s Incandescent Lamp', url: 'https://ethw.org/Edison%27s_Incandescent_Lamp' },
-    ],
-  },
-  'ir2-2': {
-    title: { vi: 'Động cơ điện cảm ứng xoay chiều', en: 'The AC Induction Motor' },
-    facts: [
-      ['person', same('Nikola Tesla')],
-      [
-        'year',
-        {
-          vi: '1888 (năm Tesla được cấp bằng sáng chế tại Hoa Kỳ cho các phát minh liên quan)',
-          en: '1888 (the year Tesla received the related US patents)',
-        },
-      ],
-      ['field', { vi: 'Kỹ thuật điện', en: 'Electrical engineering' }],
-    ],
-    short: {
-      vi: 'Động cơ biến điện năng thành chuyển động cơ học, giúp máy móc vận hành hiệu quả và linh hoạt hơn. Thành tựu này góp phần mở rộng việc sử dụng điện trong nhà máy và các hoạt động công nghiệp.',
-      en: 'The motor turns electricity into mechanical motion, so machines run more efficiently and flexibly. It helped spread the use of electricity in factories and industry.',
-    },
-    long: {
-      vi: 'Động cơ điện cảm ứng xoay chiều biến điện năng thành chuyển động cơ học. Thiết kế của Tesla góp phần quan trọng vào sự phát triển của hệ thống điện xoay chiều và ứng dụng động cơ điện trong công nghiệp. So với việc phụ thuộc hoàn toàn vào máy hơi nước, động cơ điện có thể được bố trí tại nhiều vị trí khác nhau trong nhà máy. Công nghệ này hỗ trợ vận hành máy móc, bơm nước và nhiều thiết bị sản xuất.',
-      en: 'The AC induction motor turns electrical energy into mechanical motion. Tesla’s design played an important part in the development of alternating-current power systems and of electric motors in industry. Unlike a factory that depended entirely on one steam engine, electric motors could be placed wherever they were needed. The technology powered machines, water pumps and much other production equipment.',
-    },
-    sources: [
       {
         name: 'IEEE Spectrum',
         title: 'May 1888: Tesla files his patents for electric motor',
@@ -326,7 +315,7 @@ const ENTRIES: Record<string, Entry> = {
       },
     ],
   },
-  'ir2-3': {
+  'ir2-4': {
     title: { vi: 'Dây chuyền lắp ráp', en: 'The Assembly Line' },
     facts: [
       ['company', same('Ford Motor Company')],
@@ -354,7 +343,7 @@ const ENTRIES: Record<string, Entry> = {
       },
     ],
   },
-  'ir2-4': {
+  'ir2-5': {
     title: { vi: 'Điện thoại', en: 'The Telephone' },
     facts: [
       ['person', same('Alexander Graham Bell')],
@@ -438,19 +427,19 @@ const ENTRIES: Record<string, Entry> = {
     ],
   },
   'ir3-3': {
-    title: { vi: 'Robot công nghiệp Unimate', en: 'The Unimate Industrial Robot' },
+    title: { vi: 'Tự động hóa nhà máy: robot Unimate và PLC', en: 'Factory Automation: the Unimate Robot and the PLC' },
     facts: [
-      ['people', same('George Devol, Joseph Engelberger')],
-      ['year', { vi: '1961 (đưa vào sử dụng tại nhà máy General Motors)', en: '1961 (put to work in a General Motors factory)' }],
-      ['field', { vi: 'Robot và tự động hóa', en: 'Robotics and automation' }],
+      ['people', { vi: 'George Devol, Joseph Engelberger (Unimate); nhiều nhóm kỹ sư (PLC)', en: 'George Devol, Joseph Engelberger (Unimate); many engineering teams (PLC)' }],
+      ['time', { vi: '1961 (Unimate làm việc tại nhà máy General Motors); từ cuối thập niên 1960 (PLC)', en: '1961 (Unimate at work in a General Motors factory); from the late 1960s (PLC)' }],
+      ['field', { vi: 'Robot và điều khiển tự động', en: 'Robotics and automatic control' }],
     ],
     short: {
-      vi: 'Unimate là một trong những robot công nghiệp đầu tiên được đưa vào sản xuất thực tế. Robot thực hiện các thao tác đã lập trình, hỗ trợ xử lý vật liệu nặng và công việc lặp lại, giúp tăng tính ổn định và giảm sự tiếp xúc với một số môi trường nguy hiểm.',
-      en: 'Unimate was one of the first industrial robots used in real production. It carried out programmed movements, handling heavy materials and repetitive work, which made production steadier and kept workers away from some dangerous conditions.',
+      vi: 'Unimate là một trong những robot công nghiệp đầu tiên trong sản xuất thực tế, đảm nhận việc nặng và lặp lại. PLC điều khiển máy móc bằng chương trình có thể thay đổi. Điện tử và lập trình bắt đầu tự động hóa nhà máy.',
+      en: 'Unimate was one of the first industrial robots in real production, taking on heavy, repetitive work. The PLC controls machines with a program that can be changed. Electronics and programming began to automate the factory.',
     },
     long: {
-      vi: 'Unimate là một trong những robot công nghiệp đầu tiên được sử dụng trong sản xuất thực tế. Robot có thể thực hiện các thao tác đã được lập trình, đặc biệt phù hợp với những công việc lặp lại hoặc đòi hỏi xử lý vật liệu nặng. Việc sử dụng robot giúp giảm sự tiếp xúc trực tiếp của công nhân với một số môi trường nguy hiểm và nâng cao tính ổn định của quy trình sản xuất. Đây là bước tiến quan trọng hướng đến nhà máy tự động hóa.',
-      en: 'Unimate was one of the first industrial robots used in real production. It could carry out programmed movements, and was especially suited to repetitive work or handling heavy materials. Robots reduced workers’ direct contact with some dangerous conditions and made production more consistent. It was an important step towards the automated factory.',
+      vi: 'Năm 1961, robot Unimate của George Devol và Joseph Engelberger được đưa vào làm việc tại một nhà máy General Motors. Robot thực hiện các thao tác đã lập trình, phù hợp với việc lặp lại hoặc xử lý vật liệu nặng, giúp giảm sự tiếp xúc của công nhân với môi trường nguy hiểm. Từ cuối thập niên 1960, bộ điều khiển logic khả trình (PLC) thay thế những hệ thống điều khiển bằng dây nối: khi quy trình thay đổi, kỹ sư chỉ cần sửa chương trình thay vì đi dây lại. PLC điều khiển băng chuyền, động cơ và máy đóng gói. Robot và PLC là hai trụ cột của nhà máy tự động hóa.',
+      en: 'In 1961 the Unimate robot of George Devol and Joseph Engelberger was put to work in a General Motors factory. It carried out programmed movements, suited to repetitive work and heavy materials, and kept workers away from some dangerous conditions. From the late 1960s the programmable logic controller (PLC) replaced hard-wired control systems: when a process changed, engineers edited a program instead of rewiring. PLCs run conveyors, motors and packaging machines. Robots and PLCs are the two pillars of the automated factory.',
     },
     sources: [
       {
@@ -459,6 +448,16 @@ const ENTRIES: Record<string, Entry> = {
         url: 'https://www.guinnessworldrecords.com/world-records/411563-first-industrial-production-robot',
       },
       { name: 'Wikipedia', title: 'Unimation', url: 'https://en.wikipedia.org/wiki/Unimation' },
+      {
+        name: 'Control Engineering',
+        title: 'How programmable logic controllers emerged from industry needs',
+        url: 'https://www.controleng.com/articles/how-programmable-logic-controllers-emerged-from-industry-needs/',
+      },
+      {
+        name: 'Schneider Electric',
+        title: 'The PLC: born out of a customer’s need',
+        url: 'https://blog.se.com/industry/machine-and-process-management/2018/06/15/the-plc-born-out-of-a-customers-need-to-maximize-profitability/',
+      },
     ],
   },
   'ir3-4': {
@@ -495,34 +494,6 @@ const ENTRIES: Record<string, Entry> = {
       },
     ],
   },
-  'ir3-5': {
-    title: { vi: 'Bộ điều khiển logic khả trình (PLC)', en: 'The Programmable Logic Controller (PLC)' },
-    facts: [
-      ['developedBy', { vi: 'Nhiều nhóm kỹ sư và nhà sản xuất công nghiệp', en: 'Many groups of engineers and industrial manufacturers' }],
-      ['time', { vi: 'Từ cuối thập niên 1960', en: 'From the late 1960s' }],
-      ['field', { vi: 'Điều khiển tự động', en: 'Automatic control' }],
-    ],
-    short: {
-      vi: 'PLC là thiết bị điều khiển máy móc bằng chương trình có thể thay đổi. Nó được dùng để vận hành băng chuyền, động cơ và máy đóng gói, giúp nhà máy tự động hóa quy trình và điều chỉnh sản xuất linh hoạt hơn.',
-      en: 'A PLC controls machines with a program that can be changed. It runs conveyors, motors and packaging machines, helping factories automate their processes and adjust production more flexibly.',
-    },
-    long: {
-      vi: 'PLC là thiết bị điều khiển công nghiệp có thể được lập trình để thực hiện các nhiệm vụ cụ thể. Thay vì phải thay đổi toàn bộ hệ thống điều khiển bằng dây nối khi quy trình sản xuất thay đổi, kỹ sư có thể điều chỉnh chương trình của PLC. Thiết bị này thường được dùng để điều khiển băng chuyền, động cơ, máy đóng gói và nhiều hệ thống tự động khác. PLC giúp quy trình sản xuất linh hoạt và dễ kiểm soát hơn.',
-      en: 'A PLC is an industrial controller that can be programmed for specific tasks. When a production process changes, engineers adjust the PLC’s program instead of rewiring the whole control system. PLCs commonly control conveyors, motors, packaging machines and many other automated systems. They make production more flexible and easier to control.',
-    },
-    sources: [
-      {
-        name: 'Control Engineering',
-        title: 'How programmable logic controllers emerged from industry needs',
-        url: 'https://www.controleng.com/articles/how-programmable-logic-controllers-emerged-from-industry-needs/',
-      },
-      {
-        name: 'Schneider Electric',
-        title: 'The PLC: born out of a customer’s need',
-        url: 'https://blog.se.com/industry/machine-and-process-management/2018/06/15/the-plc-born-out-of-a-customers-need-to-maximize-profitability/',
-      },
-    ],
-  },
 
   // ---------- CMCN 4 ----------
   'ir4-overview': {
@@ -535,46 +506,6 @@ const ENTRIES: Record<string, Entry> = {
     sources: [WEF],
   },
   'ir4-1': {
-    title: { vi: 'Kiểm tra chất lượng bằng AI', en: 'AI Quality Inspection' },
-    facts: [
-      ['developedBy', { vi: 'Nhiều nhóm nghiên cứu và doanh nghiệp công nghệ', en: 'Many research groups and technology companies' }],
-      ['time', { vi: 'Phát triển mạnh trong thế kỷ XXI', en: 'Grew rapidly in the 21st century' }],
-      ['field', { vi: 'AI và kiểm soát chất lượng', en: 'AI and quality control' }],
-    ],
-    short: {
-      vi: 'AI phân tích hình ảnh sản phẩm để phát hiện lỗi như vết nứt hoặc sai lệch bề mặt. Công nghệ giúp kiểm tra nhanh và nhất quán hơn, nhưng vẫn cần dữ liệu phù hợp và sự giám sát của con người.',
-      en: 'AI analyses images of products to find defects such as cracks or surface flaws. It makes inspection faster and more consistent, but still needs suitable data and human oversight.',
-    },
-    long: {
-      vi: 'Hệ thống kiểm tra chất lượng bằng AI sử dụng camera và thuật toán để phân tích hình ảnh sản phẩm. Hệ thống có thể phát hiện những dấu hiệu bất thường như vết nứt, sai lệch kích thước hoặc lỗi bề mặt. Khi được huấn luyện bằng dữ liệu phù hợp, AI hỗ trợ kiểm tra nhiều sản phẩm trong thời gian ngắn và giúp phát hiện lỗi nhất quán hơn. Tuy nhiên, kết quả vẫn cần được kiểm tra và giám sát phù hợp để tránh bỏ sót lỗi hoặc đánh giá sai.',
-      en: 'AI quality inspection uses cameras and algorithms to analyse images of products. It can spot signs of trouble such as cracks, wrong dimensions or surface defects. Trained on suitable data, AI helps check many products in a short time and find defects more consistently. But its results still need proper checking and oversight, so that no defect is missed or misjudged.',
-    },
-    sources: [
-      {
-        name: 'IEEE Access (Prunella et al., 2023)',
-        title: 'Deep Learning for Automatic Vision-Based Recognition of Industrial Surface Defects: A Survey',
-        url: 'https://doi.org/10.1109/ACCESS.2023.3271748',
-      },
-    ],
-  },
-  'ir4-2': {
-    title: { vi: 'Internet vạn vật công nghiệp (IIoT)', en: 'The Industrial Internet of Things (IIoT)' },
-    facts: [
-      ['developedBy', { vi: 'Nhiều doanh nghiệp và tổ chức công nghệ công nghiệp', en: 'Many industrial technology companies and organisations' }],
-      ['time', { vi: 'Phát triển mạnh từ cuối thế kỷ XX đến thế kỷ XXI', en: 'Grew rapidly from the late 20th into the 21st century' }],
-      ['field', { vi: 'Kết nối thiết bị và thu thập dữ liệu', en: 'Connecting devices and collecting data' }],
-    ],
-    short: {
-      vi: 'IIoT kết nối máy móc và cảm biến để thu thập, trao đổi dữ liệu. Nhờ đó, nhà máy có thể theo dõi thiết bị, sản lượng và năng lượng hiệu quả hơn, đồng thời cần chú trọng an ninh mạng.',
-      en: 'IIoT connects machines and sensors to collect and share data. Factories can then monitor equipment, output and energy more effectively, but must take cybersecurity seriously.',
-    },
-    long: {
-      vi: 'IIoT là việc kết nối máy móc, cảm biến và thiết bị công nghiệp qua mạng để thu thập và trao đổi dữ liệu. Nhờ đó, người quản lý có thể theo dõi tình trạng thiết bị, sản lượng và mức tiêu thụ năng lượng. Dữ liệu được cập nhật thường xuyên giúp nhà máy phát hiện vấn đề sớm hơn và phối hợp hoạt động giữa các bộ phận hiệu quả hơn. Tuy nhiên, hệ thống kết nối cũng cần được bảo vệ trước các nguy cơ an ninh mạng.',
-      en: 'IIoT means connecting industrial machines, sensors and equipment over a network to collect and share data. Managers can then follow the condition of equipment, output and energy use. Regularly updated data helps factories catch problems earlier and coordinate their departments better. But connected systems also need protecting against cyber threats.',
-    },
-    sources: [{ name: 'SAP', title: 'What is the Industrial Internet of Things (IIoT)?', url: 'https://www.sap.com/resources/what-is-iiot' }],
-  },
-  'ir4-3': {
     title: { vi: 'Công nghệ in 3D', en: '3D Printing' },
     facts: [
       ['pioneer', same('Chuck Hull')],
@@ -596,6 +527,62 @@ const ENTRIES: Record<string, Entry> = {
         url: 'https://www.invent.org/blog/inventors/3d-printing-chuck-hull',
       },
       { name: 'Google Patents', title: 'US 4,575,330 (1986)', url: 'https://patents.google.com/patent/US4575330A/en' },
+    ],
+  },
+  'ir4-2': {
+    title: { vi: 'Nhà máy kết nối: IIoT và bảo trì dự đoán', en: 'The Connected Factory: IIoT and Predictive Maintenance' },
+    facts: [
+      ['developedBy', { vi: 'Nhiều doanh nghiệp và tổ chức công nghệ công nghiệp', en: 'Many industrial technology companies and organisations' }],
+      ['time', { vi: 'Phát triển mạnh trong thế kỷ XXI', en: 'Grew rapidly in the 21st century' }],
+      ['field', { vi: 'Cảm biến, dữ liệu và bảo trì', en: 'Sensors, data and maintenance' }],
+    ],
+    short: {
+      vi: 'IIoT kết nối máy móc và cảm biến để thu thập dữ liệu liên tục. Từ dữ liệu đó, hệ thống có thể phát hiện sớm dấu hiệu hỏng hóc để bảo trì trước khi máy dừng, dù dự đoán vẫn có thể sai.',
+      en: 'IIoT connects machines and sensors to collect data continuously. From that data, systems can spot early signs of failure and plan maintenance before a machine stops, though predictions can still be wrong.',
+    },
+    long: {
+      vi: 'Internet vạn vật công nghiệp (IIoT) kết nối máy móc, cảm biến và thiết bị qua mạng để thu thập và trao đổi dữ liệu về tình trạng thiết bị, sản lượng và năng lượng. Một ứng dụng quan trọng là bảo trì dự đoán: thay vì chỉ sửa khi máy hỏng hoặc bảo trì theo lịch cố định, hệ thống phân tích dữ liệu cảm biến và lịch sử vận hành để báo khi nguy cơ sự cố tăng lên. Cách làm này giúp giảm thời gian dừng máy và chi phí. Tuy nhiên, dự đoán vẫn có sai số, cần kết hợp với chuyên môn của kỹ thuật viên, và hệ thống kết nối phải được bảo vệ trước nguy cơ an ninh mạng.',
+      en: 'The Industrial Internet of Things (IIoT) connects machines, sensors and equipment over a network to collect and share data on their condition, output and energy use. One key use is predictive maintenance: instead of repairing machines only after they break, or servicing them on a fixed schedule, systems analyse sensor data and operating history to warn when the risk of failure is rising. This cuts downtime and costs. But predictions still have errors and must be combined with technicians’ expertise, and connected systems must be protected against cyber threats.',
+    },
+    sources: [
+      { name: 'SAP', title: 'What is the Industrial Internet of Things (IIoT)?', url: 'https://www.sap.com/resources/what-is-iiot' },
+      {
+        name: 'US Department of Energy (FEMP)',
+        title: 'Operations & Maintenance Best Practices: A Guide to Achieving Operational Efficiency, Release 3.0 (2010)',
+        url: 'https://www.energy.gov/eere/femp/articles/operations-and-maintenance-best-practices-guide-achieving-operational-efficiency',
+      },
+    ],
+  },
+  'ir4-3': {
+    title: { vi: 'Trí tuệ nhân tạo (AI)', en: 'Artificial Intelligence (AI)' },
+    facts: [
+      ['people', { vi: 'Alan Turing, John McCarthy và nhiều thế hệ nhà khoa học', en: 'Alan Turing, John McCarthy and generations of scientists' }],
+      [
+        'time',
+        {
+          vi: '1956 (hội thảo Dartmouth đặt nền móng cho ngành AI); bùng nổ từ thập niên 2010 với học sâu; 2022 (ChatGPT ra mắt)',
+          en: '1956 (the Dartmouth workshop that founded the field); booming since the 2010s with deep learning; 2022 (ChatGPT released)',
+        },
+      ],
+      ['field', { vi: 'Khoa học máy tính', en: 'Computer science' }],
+    ],
+    short: {
+      vi: 'AI là những hệ thống máy tính có thể học từ dữ liệu để nhận dạng, dự đoán, ra quyết định và tạo nội dung. Từ kiểm tra sản phẩm trong nhà máy đến trợ lý trò chuyện, AI là trung tâm của Cách mạng Công nghiệp lần thứ tư.',
+      en: 'AI means computer systems that learn from data to recognise, predict, decide and create. From inspecting products in factories to chat assistants, AI is at the heart of the Fourth Industrial Revolution.',
+    },
+    long: {
+      vi: 'Năm 1950, Alan Turing đặt câu hỏi liệu máy móc có thể suy nghĩ hay không. Năm 1956, hội thảo tại Đại học Dartmouth do John McCarthy cùng các đồng nghiệp tổ chức đã đặt tên và nền móng cho ngành trí tuệ nhân tạo. Thay vì chỉ làm theo các quy tắc viết sẵn, AI hiện đại học từ lượng dữ liệu rất lớn. Từ thập niên 2010, học sâu (mạng nơ-ron nhiều lớp) giúp máy tính nhận dạng hình ảnh và giọng nói tốt hơn hẳn; năm 2022, ChatGPT đưa AI tạo sinh đến với hàng trăm triệu người. Trong công nghiệp, AI kiểm tra chất lượng sản phẩm, dự đoán hỏng hóc và tối ưu sản xuất. Tuy nhiên, AI có thể sai, có thể mang thiên lệch từ dữ liệu, và cần con người giám sát, sử dụng có trách nhiệm.',
+      en: 'In 1950 Alan Turing asked whether machines could think. In 1956 a workshop at Dartmouth College, organised by John McCarthy and colleagues, named the field of artificial intelligence and laid its foundations. Instead of only following rules written in advance, modern AI learns from very large amounts of data. Since the 2010s, deep learning (many-layered neural networks) has made computers far better at recognising images and speech, and in 2022 ChatGPT brought generative AI to hundreds of millions of people. In industry, AI inspects product quality, predicts breakdowns and optimises production. But AI can be wrong, can inherit bias from its data, and needs human oversight and responsible use.',
+    },
+    sources: [
+      { name: 'Britannica', title: 'Artificial intelligence', url: 'https://www.britannica.com/technology/artificial-intelligence' },
+      { name: 'Britannica', title: 'Alan Turing', url: 'https://www.britannica.com/biography/Alan-Turing' },
+      { name: 'OpenAI', title: 'Introducing ChatGPT (2022)', url: 'https://openai.com/index/chatgpt/' },
+      {
+        name: 'IEEE Access (Prunella et al., 2023)',
+        title: 'Deep Learning for Automatic Vision-Based Recognition of Industrial Surface Defects: A Survey',
+        url: 'https://doi.org/10.1109/ACCESS.2023.3271748',
+      },
     ],
   },
   'ir4-4': {
@@ -648,35 +635,6 @@ const ENTRIES: Record<string, Entry> = {
       },
     ],
   },
-  'ir4-6': {
-    title: { vi: 'Bảo trì dự đoán bằng dữ liệu', en: 'Data-Driven Predictive Maintenance' },
-    facts: [
-      ['developedBy', { vi: 'Nhiều doanh nghiệp và nhóm kỹ thuật công nghiệp', en: 'Many companies and industrial engineering teams' }],
-      [
-        'time',
-        {
-          vi: 'Được mở rộng nhờ cảm biến, phân tích dữ liệu và AI hiện đại',
-          en: 'Expanded thanks to sensors, data analysis and modern AI',
-        },
-      ],
-      ['field', { vi: 'Quản lý thiết bị và bảo trì', en: 'Equipment management and maintenance' }],
-    ],
-    short: {
-      vi: 'Hệ thống phân tích dữ liệu cảm biến để phát hiện dấu hiệu máy móc có nguy cơ hỏng hóc. Nhờ đó, doanh nghiệp có thể lên kế hoạch bảo trì sớm, giảm thời gian dừng máy và chi phí sửa chữa, dù kết quả dự đoán vẫn có thể sai lệch.',
-      en: 'The system analyses sensor data to spot signs that a machine may fail. Companies can then plan maintenance early, cutting downtime and repair costs, though predictions can still be wrong.',
-    },
-    long: {
-      vi: 'Bảo trì dự đoán sử dụng dữ liệu từ cảm biến và lịch sử vận hành để nhận biết dấu hiệu bất thường của máy móc. Thay vì chỉ sửa chữa sau khi thiết bị hỏng hoặc bảo trì theo lịch cố định, doanh nghiệp có thể lên kế hoạch kiểm tra khi dữ liệu cho thấy nguy cơ sự cố tăng lên. Phương pháp này có thể giảm thời gian dừng máy và hạn chế chi phí phát sinh. Tuy nhiên, dự đoán vẫn có sai số và cần được kết hợp với chuyên môn của kỹ thuật viên.',
-      en: 'Predictive maintenance uses sensor data and operating history to recognise signs of trouble in machines. Instead of repairing equipment only after it breaks, or servicing it on a fixed schedule, companies can plan checks when the data shows the risk of failure is rising. This can cut downtime and limit unexpected costs. But predictions still have errors, and must be combined with technicians’ expertise.',
-    },
-    sources: [
-      {
-        name: 'US Department of Energy (FEMP)',
-        title: 'Operations & Maintenance Best Practices: A Guide to Achieving Operational Efficiency, Release 3.0 (2010)',
-        url: 'https://www.energy.gov/eere/femp/articles/operations-and-maintenance-best-practices-guide-achieving-operational-efficiency',
-      },
-    ],
-  },
 
   // ---------- Game Room ----------
   // (The minigame is not finished yet: this board stays a placeholder.)
@@ -709,20 +667,32 @@ function buildTexts(lang: Language): Record<string, ExhibitText> {
     }
   }
   // Listed from credits.ts, so it is always complete.
+  // The team: one member per line.
+  texts['hall-team'] = {
+    title: lang === 'vi' ? 'Nhóm thực hiện' : 'Our Team',
+    facts: [],
+    summary: TEAM.map((m, i) => `${i + 1}. ${m.name}: ${m.role[lang]}`).join('\n'),
+    body: TEAM.map((m, i) => `${i + 1}. ${m.name}: ${m.role[lang]}`).join('\n'),
+    sources: [],
+    placeholder: false,
+  }
+  // Sources first, then the credits of every asset, one per line (from credits.ts).
   texts['hall-credits'] = {
-    title: lang === 'vi' ? 'Ghi công' : 'Credits',
+    title: lang === 'vi' ? 'Nguồn tham khảo và ghi công' : 'References and Credits',
     facts: [],
     summary:
       lang === 'vi'
-        ? 'Phông chữ, vật liệu, âm thanh và mô hình dùng trong bảo tàng, cùng tác giả và giấy phép.'
-        : 'The font, textures, sounds and models used in the museum, with their authors and licences.',
+        ? 'Các nguồn chung về bốn cuộc Cách mạng Công nghiệp (nguồn của từng hiện vật ghi trên bảng của hiện vật đó), cùng tác giả và giấy phép của phông chữ, vật liệu, âm thanh và mô hình.'
+        : 'The general sources on the four Industrial Revolutions (each exhibit’s sources are on its own board), and the authors and licences of the font, textures, sounds and models.',
     body:
+      (lang === 'vi' ? 'Ghi công:' : 'Credits:') +
+      '\n' +
       credits
         // (Sound credits only while sound is switched on, see src/features.ts.)
         .filter((c) => AUDIO_ENABLED || !c.files.every((file) => file.startsWith('sounds/')))
-        .map((c) => `${c.item[lang]} - ${c.author} (${c.licence[lang]})`)
-        .join('; ') + '.',
-    sources: [],
+        .map((c) => `• ${c.item[lang]}: ${c.author}, ${c.licence[lang]}`)
+        .join('\n'),
+    sources: [BRITANNICA_IR, BRITANNICA_TECH, WEF],
     placeholder: false,
   }
   return texts

@@ -220,7 +220,8 @@ let ambienceRoom: RoomId | null = null
 let ambienceGain: GainNode | null = null // the volume of the area's current loop
 let ambienceSource: AudioBufferSourceNode | null = null // set when that loop is unpacked
 let ambienceStream: Stream | null = null // set when that loop is streamed
-let ambienceDucked = false
+// How loud the room music plays: 1 = normal, 0 = silent (menus), in between (the game).
+let ambienceDucked = 1
 
 // Fade the current loop out and stop it once silent.
 function fadeOutAmbience(now: number) {
@@ -250,7 +251,7 @@ export function setAmbience(room: RoomId) {
   const now = context.currentTime
   fadeOutAmbience(now)
   ambienceRoom = room
-  const level = ambienceDucked ? 0 : AMBIENCE_LEVEL[room]
+  const level = AMBIENCE_LEVEL[room] * ambienceDucked
   if (streamed) {
     // Coming back while it was still fading out: just fade back in, without restarting.
     window.clearTimeout(streamed.stopTimer)
@@ -287,14 +288,24 @@ export function playWelcome() {
   if (!welcome) return
   welcomed = true
   welcome.gain.gain.value = WELCOME_LEVEL
+  welcomeGain = welcome.gain
   play(welcome.element)
 }
 
+// Walking into an exhibition room before the welcome music has ended: it fades out, so
+// the room's own music plays alone.
+let welcomeGain: GainNode | null = null
+export function stopWelcome() {
+  if (!welcomeGain || !context) return
+  welcomeGain.gain.setTargetAtTime(0, context.currentTime, 0.5)
+  welcomeGain = null
+}
+
 // While paused or in a menu, the ambience fades away; it comes back when walking again.
-export function duckAmbience(ducked: boolean) {
-  ambienceDucked = ducked
+export function duckAmbience(share: number) {
+  ambienceDucked = share
   if (!context || !ambienceGain || !ambienceRoom) return
-  ambienceGain.gain.setTargetAtTime(ducked ? 0 : AMBIENCE_LEVEL[ambienceRoom], context.currentTime, 0.4)
+  ambienceGain.gain.setTargetAtTime(AMBIENCE_LEVEL[ambienceRoom] * share, context.currentTime, 0.4)
 }
 
 // When the tab is hidden, all sound stops; it resumes when the visitor comes back.

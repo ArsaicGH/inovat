@@ -48,8 +48,9 @@ export const ROOM_THEMES: Record<Exclude<RoomId, 'rotunda'>, RoomTheme> = {
     walls: { texture: 'bricks', colour: '#e9cdb6', tile: 2.5, roughness: 0.9 },
     ceiling: '#3b2a1e',
     sky: '#ffcf96',
-    fill: 0.16,
-    accent: { colour: '#ffa04d', intensity: 16, at: [-7.4, 2.6, 0] }, // the wall lanterns
+    // (Dark like a real gallery: the spotlit exhibits carry the room. Leader.)
+    fill: 0.08,
+    accent: { colour: '#ffa04d', intensity: 5, at: [-7.4, 2.6, 0] }, // the wall lanterns
   },
   // CMCN 2: electricity and mass production. Steel, concrete, early bulbs.
   ir2: {
@@ -58,8 +59,8 @@ export const ROOM_THEMES: Record<Exclude<RoomId, 'rotunda'>, RoomTheme> = {
     walls: { texture: 'metal-plates', colour: '#a2a9b0', tile: 2, roughness: 0.5, metalness: 0.5 },
     ceiling: '#24282d',
     sky: '#e9e1d2',
-    fill: 0.12,
-    accent: { colour: '#ffc977', intensity: 16, at: [0, 2.9, 0] }, // the hanging bulbs
+    fill: 0.08,
+    accent: { colour: '#ffc977', intensity: 5, at: [0, 2.9, 0] }, // the hanging bulbs
   },
   // CMCN 3: computers. Beige panels, checkered floor, fluorescent light.
   ir3: {
@@ -69,8 +70,8 @@ export const ROOM_THEMES: Record<Exclude<RoomId, 'rotunda'>, RoomTheme> = {
     ceiling: '#6a655a',
     ceilingSurface: { painted: 'ceiling-tiles', colour: '#d9d6cc', tile: 1.2, roughness: 0.9 },
     sky: '#f2f6ff',
-    fill: 0.11,
-    accent: { colour: '#e4efff', intensity: 17, at: [0, 4.4, 0] }, // the fluorescent panels
+    fill: 0.08,
+    accent: { colour: '#e4efff', intensity: 5, at: [0, 4.4, 0] }, // the fluorescent panels
   },
   // CMCN 4: digital and smart technology. White gloss, glass, cyan light.
   ir4: {

@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import type { Group } from 'three'
 import { useMuseumStore } from '../state/useMuseumStore'
-import type { ExhibitSpot } from './layout'
+import { SPOTLIGHT_ID, SPOTLIGHT_SCALE, panelOffset, type ExhibitSpot } from './layout'
 import { addAimTarget, removeAimTarget } from './aim-targets'
 import { ROOM_ACCENT, GOLD, DARK_WOOD, BOARD_SIZE, BOARD_THEMES } from './style'
 import PanelBoard from './PanelBoard'
@@ -40,8 +40,8 @@ function Plinth({ colour }: { colour: string }) {
       </mesh>
       <mesh position={[0, 0.5, 0]} castShadow receiveShadow>
         <cylinderGeometry args={[1.0, 1.05, 0.2, 32]} />
-        {/* Matt stone, so the spotlight straight above does not blow it out to white. */}
-        <meshStandardMaterial color="#b8ae9c" roughness={0.75} />
+        {/* Dark matt stone, like gallery pedestals: the exhibit, not its stand, catches the eye. */}
+        <meshStandardMaterial color="#4e463d" roughness={0.8} />
       </mesh>
       <mesh position={[0, PLINTH_TOP + 0.005, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <ringGeometry args={[0.92, 0.98, 48]} />
@@ -75,19 +75,25 @@ export default function Exhibit({ spot }: { spot: ExhibitSpot }) {
         </group>
       )}
       {spot.kind === 'overview' && (
-        // The era's overview board on the back wall, under the room's name sign (which
-        // starts at 2.8 m); in CMCN 3 it hangs just above the desk of old computers.
-        <group position={[0, 2.08, 0.08]}>
-          <PanelBoard exhibitId={spot.id} width={BOARD_SIZE.overview[0]} height={BOARD_SIZE.overview[1]} aimed={aimed} theme={theme} />
-        </group>
+        // The era's overview board, standing in the middle of the room in the room's style.
+        <BoardStand
+          exhibitId={spot.id}
+          width={BOARD_SIZE.overview[0]}
+          height={BOARD_SIZE.overview[1]}
+          centreY={1.6}
+          aimed={aimed}
+          theme={theme}
+        />
       )}
       {(spot.kind === 'corner' || spot.kind === 'centre') && (
         <>
-          <Plinth colour={colour} />
-          <Prototype id={spot.id} />
+          <group scale={spot.id === SPOTLIGHT_ID ? SPOTLIGHT_SCALE : 1}>
+            <Plinth colour={colour} />
+            <Prototype id={spot.id} />
+          </group>
 
           {/* Readable text board beside the plinth, on a stand in the room's style. */}
-          <group position={[spot.panelSide * 2.3, 0, 0]}>
+          <group position={[spot.panelSide * panelOffset(spot.id), 0, 0]}>
             <BoardStand
               exhibitId={spot.id}
               width={BOARD_SIZE.stand[0]}
