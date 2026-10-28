@@ -96,7 +96,9 @@ export default function PanelBoard({ exhibitId, width, height, aimed, theme }: P
       const pad = w * 0.08
       const maxWidth = w - 2 * pad
       const bottom = h - pad
-      const unit = w / 18 // base text size, scales with the board
+      // Base text size: scales with the board, but no larger than on the invention boards
+      // (about 7 cm), so the big wall boards fit their text instead of a few huge lines.
+      const unit = Math.min(w / 18, PIXELS_PER_METRE * 0.071)
 
       paintPaper(ctx, theme, w, h)
       ctx.textBaseline = 'top'
@@ -111,17 +113,25 @@ export default function PanelBoard({ exhibitId, width, height, aimed, theme }: P
       ctx.fillRect(pad, y + unit * 0.3, maxWidth * 0.3, unit * 0.12)
       y += unit * 1.1
 
-      // Summary, then body, then source. If something does not fit, end with "…".
-      const parts: [string, string, string][] = [
-        [text.summary, `600 ${unit}px ${font}`, theme.ink],
-        [text.body, `400 ${unit * 0.9}px ${font}`, theme.ink],
-        [`${ui.infoPanel.sourcesLabel}: ${ui.infoPanel.sourcesPlaceholder}`, `400 ${unit * 0.75}px ${font}`, theme.muted],
+      // Facts (person, year...), the short text, then the sources (the long text is on the
+      // enlarged board). If something does not fit, end with "…".
+      const sources = text.sources.length
+        ? text.sources.map((source) => source.name).filter((name, i, all) => all.indexOf(name) === i).join('; ')
+        : text.placeholder
+          ? ui.infoPanel.sourcesPlaceholder
+          : ''
+      // (Only who and when here; the field is on the enlarged board, to leave room for the text.)
+      const facts = text.facts.slice(0, 2)
+      const parts: [string, string, string, number][] = [
+        ...facts.map((fact): [string, string, string, number] => [fact, `500 ${unit * 0.72}px ${font}`, theme.muted, 1.15]),
+        [text.summary, `500 ${unit * 0.92}px ${font}`, theme.ink, 1.3],
+        ...(sources ? [[`${ui.infoPanel.sourcesLabel}: ${sources}`, `400 ${unit * 0.72}px ${font}`, theme.muted, 1.2] as [string, string, string, number]] : []),
       ]
-      for (const [content, partFont, colour] of parts) {
+      for (const [index, [content, partFont, colour, spacing]] of parts.entries()) {
         if (y < 0) break
         ctx.font = partFont
         ctx.fillStyle = colour
-        const next = drawWrappedText(ctx, content, pad, y, maxWidth, unit * 1.35, bottom - unit * 1.4)
+        const next = drawWrappedText(ctx, content, pad, y, maxWidth, unit * spacing, bottom - unit * 1.4)
         if (next < 0) {
           ctx.font = `600 ${unit * 0.8}px ${font}`
           ctx.fillStyle = theme.rule
@@ -129,7 +139,8 @@ export default function PanelBoard({ exhibitId, width, height, aimed, theme }: P
           y = -1
           break
         }
-        y = next + unit * 0.6
+        // The facts sit close together, with a full gap after the last one.
+        y = next + (index < facts.length - 1 ? unit * 0.15 : unit * 0.6)
       }
 
       if (look === 'screen') {

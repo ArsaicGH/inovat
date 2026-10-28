@@ -7,90 +7,25 @@ import { addAimTarget, removeAimTarget } from './aim-targets'
 import { ROOM_ACCENT, GOLD, DARK_WOOD, BOARD_SIZE, BOARD_THEMES } from './style'
 import PanelBoard from './PanelBoard'
 import BoardStand from './BoardStand'
+import Invention from './inventions'
 
 const PLINTH_TOP = 0.6 // height of the plinth's top surface (metres)
 
-// PLACEHOLDER prototypes: bold "machines" built from simple shapes, one design per corner,
-// in the room's accent colour. They turn slowly like showcase pieces. Real models replace
-// them in Phase D (M11).
-function PlaceholderMachine({ number, colour }: { number: number; colour: string }) {
+// The invention's prototype (inventions.tsx) on top of the plinth. It turns slowly like a
+// showcase piece, and every part of it casts a shadow from the key light.
+function Prototype({ id }: { id: string }) {
   const ref = useRef<Group>(null)
-  // Every part of the prototype casts a shadow from the key light.
   useLayoutEffect(() => {
     ref.current?.traverse((object) => {
       object.castShadow = true
     })
-  }, [number])
+  }, [id])
   useFrame((_, delta) => {
     if (ref.current) ref.current.rotation.y += delta * 0.25
   })
-  const metal = <meshStandardMaterial color={colour} metalness={0.6} roughness={0.35} />
-  const dark = <meshStandardMaterial color="#2e2a26" metalness={0.5} roughness={0.5} />
-
   return (
     <group ref={ref} position={[0, PLINTH_TOP, 0]}>
-      {number === 1 && (
-        // Boiler with chimney and flywheel.
-        <>
-          <mesh position={[0, 0.55, 0]} rotation={[0, 0, Math.PI / 2]}>
-            <cylinderGeometry args={[0.42, 0.42, 1.3, 28]} />
-            {metal}
-          </mesh>
-          <mesh position={[0.35, 1.25, 0]}>
-            <cylinderGeometry args={[0.12, 0.15, 0.9, 16]} />
-            {dark}
-          </mesh>
-          <mesh position={[-0.8, 0.75, 0]} rotation={[0, Math.PI / 2, 0]}>
-            <torusGeometry args={[0.55, 0.07, 12, 40]} />
-            {dark}
-          </mesh>
-        </>
-      )}
-      {number === 2 && (
-        // Stepped tower with a sphere on top.
-        <>
-          <mesh position={[0, 0.35, 0]}>
-            <boxGeometry args={[1.1, 0.7, 1.1]} />
-            {dark}
-          </mesh>
-          <mesh position={[0, 1.0, 0]}>
-            <boxGeometry args={[0.75, 0.6, 0.75]} />
-            {metal}
-          </mesh>
-          <mesh position={[0, 1.65, 0]}>
-            <sphereGeometry args={[0.38, 32, 20]} />
-            {metal}
-          </mesh>
-        </>
-      )}
-      {number === 3 && (
-        // Two meshing gears on a frame.
-        <>
-          <mesh position={[0, 0.45, 0]}>
-            <boxGeometry args={[1.4, 0.9, 0.3]} />
-            {dark}
-          </mesh>
-          {[-0.4, 0.45].map((x, i) => (
-            <mesh key={i} position={[x, 1.15, 0.2]}>
-              <cylinderGeometry args={[i === 0 ? 0.5 : 0.36, i === 0 ? 0.5 : 0.36, 0.14, 14]} />
-              {metal}
-            </mesh>
-          ))}
-        </>
-      )}
-      {number >= 4 && (
-        // Abstract knot on a column.
-        <>
-          <mesh position={[0, 0.5, 0]}>
-            <cylinderGeometry args={[0.2, 0.3, 1, 20]} />
-            {dark}
-          </mesh>
-          <mesh position={[0, 1.45, 0]}>
-            <torusKnotGeometry args={[0.38, 0.11, 120, 16]} />
-            {metal}
-          </mesh>
-        </>
-      )}
+      <Invention id={id} />
     </group>
   )
 }
@@ -149,8 +84,7 @@ export default function Exhibit({ spot }: { spot: ExhibitSpot }) {
       {(spot.kind === 'corner' || spot.kind === 'centre') && (
         <>
           <Plinth colour={colour} />
-          {/* Four placeholder designs, repeated for the 5th and 6th invention. */}
-          <PlaceholderMachine number={((spot.number || 1) - 1) % 4 + 1} colour={colour} />
+          <Prototype id={spot.id} />
 
           {/* Readable text board beside the plinth, on a stand in the room's style. */}
           <group position={[spot.panelSide * 2.3, 0, 0]}>

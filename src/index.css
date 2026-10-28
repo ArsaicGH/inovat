@@ -305,6 +305,28 @@ body {
   color: var(--muted);
   font-size: calc(var(--unit) * 0.75);
 }
+/* Person, year, field...: small lines under the title. */
+.board-facts {
+  margin: 0 0 calc(var(--unit) * 0.7);
+  padding: 0;
+  list-style: none;
+  color: var(--muted);
+  font-size: calc(var(--unit) * 0.78);
+  font-weight: 500;
+  line-height: 1.35;
+}
+.board-sources ul {
+  margin: calc(var(--unit) * 0.2) 0 0;
+  padding-left: 1.2em;
+}
+.board-sources a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.board-sources a:hover {
+  color: var(--title);
+}
 
 /* Per-era looks (same as the 3D boards, PanelBoard.tsx). */
 .board-look-classic .board-frame {

@@ -24,6 +24,13 @@ function texture(id: string, use: Record<Language, string>, file: string): Credi
   }
 }
 
+const CC_BY = { vi: 'CC BY 3.0 (ghi công tác giả)', en: 'CC BY 3.0 (attribution)' }
+
+// A 3D model downloaded from Poly Pizza (poly.pizza/m/<id>).
+function model(id: string, item: Record<Language, string>, author: string, licence: Record<Language, string>, file: string): Credit {
+  return { item, author: `${author} (Poly Pizza)`, licence, source: `https://poly.pizza/m/${id}`, files: [`models/${file}`] }
+}
+
 export const credits: Credit[] = [
   {
     item: { vi: 'Phông chữ Be Vietnam Pro', en: 'Be Vietnam Pro font' },
@@ -45,6 +52,13 @@ export const credits: Credit[] = [
   texture('MetalPlates006', { vi: 'tấm kim loại', en: 'metal plates' }, 'metal-plates'),
   texture('Concrete034', { vi: 'bê tông', en: 'concrete' }, 'concrete'),
   texture('Tiles139', { vi: 'sàn gạch ô', en: 'tiled floor' }, 'tiles'),
+
+  // 3D models of inventions (the other prototypes are built from shapes by the team).
+  model('WY84FHug9s', { vi: 'Mô hình đầu máy hơi nước "Locomotive Front" - CMCN 1', en: 'Steam locomotive model "Locomotive Front" - IR 1' }, 'Quaternius', CC0, 'ir1/steam-locomotive.glb'),
+  model('68BJSxSDWBg', { vi: 'Mô hình bóng đèn "Lightbulb" - CMCN 2', en: 'Light bulb model "Lightbulb" - IR 2' }, 'Poly by Google', CC_BY, 'ir2/light-bulb.glb'),
+  model('aJVM4rmsGIb', { vi: 'Mô hình ô tô "Ford Model T" - CMCN 2', en: 'Car model "Ford Model T" - IR 2' }, 'Bruno Oliveira', CC_BY, 'ir2/ford-model-t.glb'),
+  model('doMMnviJrGi', { vi: 'Mô hình máy tính "Simple computer" - CMCN 3', en: 'Computer model "Simple computer" - IR 3' }, 'Robert Schlyter', CC_BY, 'ir3/personal-computer.glb'),
+  model('9E_ItHeURbb', { vi: 'Mô hình máy in 3D "Ultimaker 3" - CMCN 4', en: '3D printer model "Ultimaker 3" - IR 4' }, 'Brian Yu', CC_BY, 'ir4/3d-printer.glb'),
 
   // Sounds (M8b). Converted to small .ogg files; listed per source pack.
   {

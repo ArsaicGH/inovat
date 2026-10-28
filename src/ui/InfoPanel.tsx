@@ -80,11 +80,35 @@ export default function InfoPanel() {
             <div className="board-paper">
               <h2>{text.title}</h2>
               <div className="board-rule" />
-              <p className="board-summary">{text.summary}</p>
+              {text.facts.length > 0 && (
+                <ul className="board-facts">
+                  {text.facts.map((fact) => (
+                    <li key={fact}>{fact}</li>
+                  ))}
+                </ul>
+              )}
               <p className="board-body">{text.body}</p>
-              <p className="board-sources">
-                {ui.infoPanel.sourcesLabel}: {ui.infoPanel.sourcesPlaceholder}
-              </p>
+              {text.sources.length > 0 ? (
+                <div className="board-sources">
+                  {ui.infoPanel.sourcesLabel}:
+                  <ul>
+                    {text.sources.map((source) => (
+                      <li key={source.url}>
+                        {/* Opens in a new tab, so the museum stays where it was. */}
+                        <a href={source.url} target="_blank" rel="noreferrer">
+                          {source.name}, “{source.title}”
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : (
+                text.placeholder && (
+                  <p className="board-sources">
+                    {ui.infoPanel.sourcesLabel}: {ui.infoPanel.sourcesPlaceholder}
+                  </p>
+                )
+              )}
             </div>
           </div>
         </article>
