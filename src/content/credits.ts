@@ -97,10 +97,11 @@ export const credits: Credit[] = [
     files: ['sounds/music/ir2.ogg'],
   },
   {
-    item: { vi: 'Nhạc CMCN 4: "Claimed by the Void" (nhạc nền khoa học viễn tưởng)', en: 'CMCN 4 music: "Claimed by the Void" (sci-fi ambient)' },
-    author: 'vitalezzz (OpenGameArt)',
-    licence: CC0,
-    source: 'https://opengameart.org/content/claimed-by-the-void',
+    item: { vi: 'Nhạc CMCN 4: "Space Ambient" (nhạc nền không gian)', en: 'CMCN 4 music: "Space Ambient" (space ambience)' },
+    author: 'Solarflex (Pixabay)',
+    // Free to use, no credit required (we credit every asset anyway).
+    licence: { vi: 'Giấy phép nội dung Pixabay', en: 'Pixabay Content License' },
+    source: 'https://pixabay.com/music/ambient-space-ambient-569588/',
     files: ['sounds/music/ir4.ogg'],
   },
   {

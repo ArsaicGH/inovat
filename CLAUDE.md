@@ -39,4 +39,4 @@ Project: browser-based 3D virtual museum about the four Industrial Revolutions (
 ## Git rules
 - Do not commit or push unless I ask. When I do, use a short descriptive message.
 - Never commit `node_modules` or any secrets.
-- The GitHub repository is public (Vercel's free plan does not allow teammates on private repos).
+- The GitHub repository is private (leader's decision: only the leader needs access). Vercel's free plan deploys a private repository only for its owner's own pushes, so teammates cannot push to deploy.

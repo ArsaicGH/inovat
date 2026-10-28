@@ -70,7 +70,7 @@ export const ROOM_THEMES: Record<Exclude<RoomId, 'rotunda'>, RoomTheme> = {
     ceilingSurface: { painted: 'ceiling-tiles', colour: '#d9d6cc', tile: 1.2, roughness: 0.9 },
     sky: '#f2f6ff',
     fill: 0.11,
-    accent: { colour: '#e4efff', intensity: 13, at: [0, 3.9, 0] }, // the fluorescent panels
+    accent: { colour: '#e4efff', intensity: 17, at: [0, 4.4, 0] }, // the fluorescent panels
   },
   // CMCN 4: digital and smart technology. White gloss, glass, cyan light.
   ir4: {
@@ -81,7 +81,7 @@ export const ROOM_THEMES: Record<Exclude<RoomId, 'rotunda'>, RoomTheme> = {
     ceilingSurface: { painted: 'tech-ceiling', colour: '#c4ccd1', tile: 2.4, roughness: 0.5 },
     sky: '#d8f6ff',
     fill: 0.1,
-    accent: { colour: '#5fe3f2', intensity: 14, at: [0, 3.9, 0] }, // the cyan light ring
+    accent: { colour: '#5fe3f2', intensity: 22, at: [0, 5.2, 0] }, // the cyan light ring
   },
   // Game Room: a bright white-and-gold salon like the intro hall and the rotunda (white
   // marble, cream walls, gold), with a red carpet up to the quiz platform.

@@ -149,7 +149,8 @@ export default function Exhibit({ spot }: { spot: ExhibitSpot }) {
       {(spot.kind === 'corner' || spot.kind === 'centre') && (
         <>
           <Plinth colour={colour} />
-          <PlaceholderMachine number={spot.number || 1} colour={colour} />
+          {/* Four placeholder designs, repeated for the 5th and 6th invention. */}
+          <PlaceholderMachine number={((spot.number || 1) - 1) % 4 + 1} colour={colour} />
 
           {/* Readable text board beside the plinth, on a stand in the room's style. */}
           <group position={[spot.panelSide * 2.3, 0, 0]}>

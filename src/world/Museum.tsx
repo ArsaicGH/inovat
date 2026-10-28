@@ -150,7 +150,7 @@ function Lighting() {
     light.shadow.map?.dispose()
     light.shadow.map = null
   }, [graphicsLevel, get])
-  // Five spotlights that move to the room you are in (spot-plan.ts), each with the point
+  // Six spotlights that move to the room you are in (spot-plan.ts), each with the point
   // it shines at (a spotlight's target must be in the scene too).
   const spots = useRef<(SpotLight | null)[]>([])
   const spotTargets = useMemo(() => Array.from({ length: SPOT_COUNT }, () => new Object3D()), [])

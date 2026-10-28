@@ -63,8 +63,9 @@ let nextFoot = 0
 // central-hall loop is unpacked in advance, so it repeats without a gap.
 const AMBIENCE: Partial<Record<RoomId, string>> = {
   rotunda: '/sounds/ambience/rotunda.ogg',
-  // Era music: atmospheric ambient tracks (CC0, OpenGameArt), one per era, for now:
-  // "Factory ambiance", "Life in corrupted binary", "Factorio Clone Music", "Claimed by the Void".
+  // Era music: atmospheric ambient tracks, one per era (CC0 from OpenGameArt; CMCN 4 from
+  // Pixabay), for now:
+  // "Factory ambiance", "Life in corrupted binary", "Factorio Clone Music", "Space Ambient".
   ir1: '/sounds/music/ir1.ogg',
   ir2: '/sounds/music/ir2.ogg',
   ir3: '/sounds/music/ir3.ogg',

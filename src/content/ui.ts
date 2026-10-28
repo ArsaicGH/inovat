@@ -7,7 +7,7 @@ const vi = {
     button: 'Bắt đầu',
     // Under "Bắt đầu" when this tab still holds an earlier visit (e.g. after a reload).
     continue: 'Tiếp tục hành trình trước',
-    tutorialQuestion: 'Bạn có muốn xem hướng dẫn điều khiển không?',
+    tutorialQuestion: 'Quý khách có muốn xem hướng dẫn điều khiển không?',
     tutorialYes: 'Có, hướng dẫn tôi',
     tutorialNo: 'Không, vào tham quan',
   },
@@ -38,7 +38,7 @@ const vi = {
       },
       map: {
         title: 'Bản đồ',
-        text: 'Nhấn Q để mở bản đồ bảo tàng. Chọn một phòng để đi thẳng đến đó. Bạn chỉ có thể dịch chuyển đến những phòng đã tham quan.',
+        text: 'Nhấn Q để mở bản đồ bảo tàng. Chọn một phòng để đi thẳng đến đó. Quý khách chỉ có thể dịch chuyển đến những phòng đã tham quan.',
       },
       pause: {
         title: 'Tạm dừng',
@@ -51,7 +51,7 @@ const vi = {
       // Last card: closes by itself after a few seconds (TutorialCard.tsx).
       enjoy: {
         title: 'Sẵn sàng rồi!',
-        text: 'Chúc bạn tham quan bảo tàng vui vẻ!',
+        text: 'Chúc quý khách tham quan bảo tàng vui vẻ!',
       },
     },
     // Shown in the pause menu during the tutorial's "pause" step.
@@ -114,7 +114,7 @@ const vi = {
   map: {
     title: 'Bản đồ bảo tàng',
     hint: 'Chọn một phòng để đi đến đó.',
-    youAreHere: 'Bạn đang ở đây',
+    youAreHere: 'Quý khách đang ở đây',
     locked: 'Đang khóa',
     notVisited: 'Chưa tham quan',
     close: 'Đóng',
@@ -133,7 +133,7 @@ const vi = {
   quiz: {
     prompt: 'Nhấn E để chọn',
     title: 'Trò chơi câu hỏi',
-    intro: 'Câu hỏi và bốn đáp án sẽ hiện trên bảng này. Nhắm vào đáp án bạn chọn rồi nhấn E hoặc nhấp chuột, hoặc nhấn phím 1, 2, 3, 4 để chọn A, B, C, D. Trả lời đúng ít nhất một nửa để mở cánh cửa phía sau.',
+    intro: 'Câu hỏi và bốn đáp án sẽ hiện trên bảng này. Nhắm vào đáp án quý khách chọn rồi nhấn E hoặc nhấp chuột, hoặc nhấn phím 1, 2, 3, 4 để chọn A, B, C, D. Trả lời đúng ít nhất một nửa để mở cánh cửa phía sau.',
     doorOpen: 'Cánh cửa phía sau đã mở.',
     doorLocked: 'Cần đúng ít nhất một nửa để mở cánh cửa phía sau.',
     progress: 'Câu {n}/{total}',
@@ -145,9 +145,9 @@ const vi = {
     finish: 'Xem kết quả',
     retry: 'Chơi lại',
     resultsTitle: 'Kết quả',
-    score: 'Bạn trả lời đúng {score}/{total} câu',
+    score: 'Quý khách trả lời đúng {score}/{total} câu',
     levels: {
-      great: 'Xuất sắc! Bạn đã nắm rất vững bốn cuộc Cách mạng Công nghiệp.',
+      great: 'Xuất sắc! Quý khách đã nắm rất vững bốn cuộc Cách mạng Công nghiệp.',
       good: 'Khá lắm! Hãy xem lại vài phòng trưng bày để đạt điểm tuyệt đối.',
       retry: 'Đừng nản lòng! Hãy tham quan lại các phòng trưng bày rồi thử lần nữa.',
     },

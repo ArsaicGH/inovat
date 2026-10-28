@@ -5,7 +5,8 @@ Languages of the finished website: **Vietnamese and English** (leader's decision
 
 Museum name: **INOVAT** (from "innovation"; decided by the group; renamed from the earlier "INNOVA"). The GitHub repository is `inovat`; the live site is `inovat-museum.vercel.app`. Descriptive subtitle (Vietnamese): **Bảo tàng Cách mạng Công nghiệp**.
 
-Content draft: a private Google Doc kept by the project leader. The link is deliberately not stored here because this repository is public; the leader shares it each session.
+
+https://docs.google.com/document/d/166LvhmxMTOeE_N2Eq1Lw_mwbyAeNkwVs3g590sG9st0/edit?tab=t.0
 
 ---
 
@@ -38,7 +39,7 @@ Six rooms around a central rotunda (layout chosen by the leader, see section 3):
 
 Core features: first-person walking (WASD + mouse), collision with walls, clickable exhibits with info panels, a map menu to jump between rooms, a distinct atmosphere per era, a multiple-choice quiz with feedback, scoring and results, desktop-browser support, smooth performance on ordinary student computers, and a public URL.
 
-**Exhibits (leader's decision).** Each of the four era rooms shows exactly **4 inventions**, the most valuable of that revolution, one in each **corner**. Each corner has an observable prototype/demonstration (3D model on a pedestal) with a descriptive, informative text panel beside it. 4 rooms x 4 = 16 inventions.
+**Exhibits (leader's decision, revised 2026-10-28).** Each era room shows the most valuable inventions of its revolution, more for each one as the revolutions grew in scale: **4 in CMCN 1, 4 in CMCN 2, 5 in CMCN 3, 6 in CMCN 4** (19 in all, as in the group's content document). They stand in the four corners, plus the middle of the left wall (5th) and the right wall (6th). Each has an observable prototype/demonstration (3D model on a pedestal) with a descriptive, informative text panel beside it.
 
 **Introduction hall (leader's decision).** Sảnh giới thiệu is the first room and holds: a basic introduction to the museum, an overview of the four Industrial Revolutions and the route through the rooms, our team (members and roles), credits (images, models, tools) and sources (the reference list). Exact sections and wording come from the group's content document once it is polished; until then each section is a placeholder panel marked `[CẦN KIỂM TRA]`.
 
@@ -273,7 +274,7 @@ Create the Vite React + TypeScript project, push to GitHub, connect Vercel.
 - [ ] The credits screen lists every image and model with its licence.
 - [ ] **Reminder (leader's request): the credits live on the intro hall's "Ghi công" board.** Every new image, model, sound and font goes into `src/content/credits.ts` (author, licence, source, item name in both languages); the board fills itself from that file. Also write the team's own credits (who did what) for the "Nhóm thực hiện" board, and the reference list for "Nguồn tham khảo".
 
-**M11. All real content**: the 16 inventions (4 per era room) with their prototype models and texts, the intro hall sections (introduction, overview, our team, credits, sources), and the real quiz questions, replacing every placeholder.
+**M11. All real content**: the 19 inventions (4, 4, 5 and 6 per era room) with their prototype models and texts, the intro hall sections (introduction, overview, our team, credits, sources), and the real quiz questions, replacing every placeholder.
 - [ ] No placeholder or `[CẦN KIỂM TRA]` left anywhere.
 - [ ] Every question can be answered from an exhibit in the museum.
 - [ ] Total download about 30 MB or less; no single model above about 2 MB; textures 1024 px or smaller unless justified.
@@ -317,7 +318,7 @@ Testing: manual checklists (the acceptance criteria above) before every merge; `
 4. The site gets a URL like `bao-tang-cmcn.vercel.app`.
 5. Every merge to `main` redeploys; every pull request gets a preview URL. To undo a bad release, revert the commit on GitHub.
 
-**Important:** on Vercel's free Hobby plan, collaboration is not permitted for private repositories, and teammates' pushes may silently fail to deploy. **Use a public GitHub repository** (collaboration is free for public repos). The Hobby plan is for non-commercial personal use, which fits a school project. Never commit passwords or keys.
+**Important:** the repository is private (leader's decision, 2026-10-28). On Vercel's free Hobby plan a private repository deploys only from its owner's pushes (collaboration on private repositories needs a paid plan), which is fine while the leader is the only one pushing. The Hobby plan is for non-commercial personal use, which fits a school project. Never commit passwords or keys.
 
 ---
 
@@ -401,7 +402,7 @@ Plan: aim for A, keep B as a cheap fallback (only `Player.tsx` changes). Decide 
 - [x] M0: Tools and accounts (leader's computer only, by decision)
   - Windows 11: Node.js v24.22.1, npm 11.19.1, Git 2.55.0 installed with winget. Leader has GitHub, VS Code and Vercel.
 - [x] M1: "Hello, museum" live on the internet
-  - Repository (public): https://github.com/ArsaicGH/inovat
+  - Repository (private since 2026-10-28, leader): https://github.com/ArsaicGH/inovat
   - Live site: https://inovat-museum.vercel.app (every push to `main` redeploys)
 - [x] M2: First 3D scene (reviewed and pushed)
   - Added three, @react-three/fiber, @react-three/drei, @types/three. Scene in `src/world/Museum.tsx`, title overlay in `src/ui/Hud.tsx`.
@@ -474,3 +475,8 @@ Plan: aim for A, keep B as a cheap fallback (only `Player.tsx` changes). Decide 
 - Room order changed (leader): clockwise round the rotunda in visiting order, intro hall (south), CMCN 1, CMCN 2, CMCN 3 (north), CMCN 4, Game Room (south-east, next to the intro hall). Dome colours, hanging sculptures, lights and the map follow. The way round is shown on the map as a gold arrow along its ring (`MapRoute` in `MapMenu.tsx`; a floor arrow in the rotunda was tried and removed, leader). The Central Hall is greyed out on the map until the visitor has walked into it.
 - Game Room (leader): the portal door's two spotlights at a third of their old strength (brighter, they competed with the lectern) and the whole room dimmer. Keys 1-4 choose answers A-D (small grey [1]-[4] under each answer; mentioned on the panel's start screen and in the key list). Open portal: light fills the whole doorway down to the floor (the wainscot and rails now stop at the door), with drifting light rays, golden motes floating into the room and light spilling onto the carpet. Walking into it will lead to the ending screen (Phase D).
 - Leader feedback round: thumbstick only shows while held (no rings, no resting hint; drag distance sets speed, a long drag runs); no controls list on touch devices (no "?" button, the tutorial skips its key-list step). CMCN 1-3 now have their era sculpture (cog, bulb, floppy disk; shared with the rotunda in `era-sculptures.tsx`) hanging on a cable above the floor medallion; CMCN 4 keeps its floating hologram. Lighting, first pass: softer spotlight edges (no more pasted-on light patches), stronger wall washes and fill in the era rooms, light bouncing off each room's own floor colour, and a soft lectern light from the front (the panel was blown out). Six new CMCN 4 music options (cyberpunk / interstellar, all CC0) are in the local `soundtracks/ir4-digital/` folder, listed in `SOURCES.md`, for the leader to choose from.
+- Repository made private (leader, 2026-10-28); the group's content document is linked at the top of this file (it may now be committed). Invention counts changed to 4, 4, 5 and 6 (`INVENTIONS` in `src/types.ts`; CMCN 3 adds one mid-left, CMCN 4 one mid-left and one mid-right), with six museum spotlights instead of five (CMCN 4's hologram overview board needs none).
+- Rooms grow with their era (leader): CMCN 1 and 2 stay 18 x 18 m (5.5 m tall), CMCN 3 is 21 x 21 m (6.2 m), CMCN 4 25 x 25 m (7 m). Wider rooms start further from the rotunda so neighbours never overlap (`roomStart()` in `layout.ts`); lamps, washes and room lights are scaled to the taller ceilings.
+- Sources for every fact in the group's content document, researched 2026-10-28: now part of `CONTENT.md` (below). It also lists small fixes for the doc (Spinning Jenny patent year, Unimate/ARPANET/PLC dates vs. the CMCN 3 heading, "Phòng 4" twice) and the three field-type items (AI inspection, IIoT, predictive maintenance) whose sources are weakest.
+- **`CONTENT.md` (leader, 2026-10-28): everything for Phase D in one file**: the chosen welcome text ("Linh"), each room's background, all 19 inventions in both languages (short board text and long text), the corrections to the group's doc, sources for every fact, a draft quiz, and the assets still needed. Start M10 from it.
+- CMCN 4 music changed to "Space Ambient" by Solarflex (Pixabay, Pixabay Content License; credited), loudness-matched to the other rooms.

@@ -1,4 +1,4 @@
-import type { RoomId } from '../types'
+import { INVENTIONS, type RoomId } from '../types'
 import type { Box } from './collision'
 
 // MUSEUM FLOOR PLAN, seen from above, in metres. x = left/right, z = up/down on the map
@@ -23,9 +23,14 @@ export const ROTUNDA_HEIGHT = 8
 export const CHANDELIER_Y = 9.4 // height of the chandelier in the rotunda
 
 export const DOOR_WIDTH = 2.4
-// Rooms start this far from the centre. Closer, and neighbouring rooms (era rooms 18 m
-// wide, 60 degrees apart) would overlap; beyond the rotunda wall this leaves a passage.
+// Rooms start at least this far from the centre; beyond the rotunda wall this leaves a
+// passage. A room must start further out the wider it is: rooms are 60 degrees apart, so
+// a room whose half-width is more than tan(30°) = 0.577 times its start distance would
+// overlap its neighbour. roomStart() gives the distance, with a little room to spare.
 const ROOM_START = 17
+function roomStart(width: number): number {
+  return Math.max(ROOM_START, Math.ceil((width / 2 / Math.tan(Math.PI / 6) + 0.6) * 10) / 10)
+}
 const CORNER_INSET = 3.4 // how far corner exhibits stand from the walls
 const PANEL_OFFSET = 2.3 // text panel distance from the centre of its plinth
 
@@ -36,13 +41,15 @@ const DOOR_HEIGHT: Record<DoorStyle, number> = { grand: 3.6, plain: 3 }
 // The visit goes round the rotunda clockwise, in order (leader): intro hall, CMCN 1 to 4,
 // and the Game Room last, right next to the intro hall. The map shows the way round with a
 // gold arrow (MapMenu.tsx).
-// Era rooms are large and tall, to match the 24 m rotunda (leader: spacious, comfortable).
+// Era rooms are large and tall, to match the 24 m rotunda (leader: spacious, comfortable),
+// and each era is bigger than the one before, as the revolutions grew in scale (leader):
+// more room for more inventions (INVENTIONS in types.ts), not more crowding.
 const ROOM_SPECS: { id: RoomId; side: number; width: number; depth: number; height: number; doorStyle: DoorStyle }[] = [
   { id: 'hall', side: 6, width: 12, depth: 10, height: 4.5, doorStyle: 'plain' }, // south: start
   { id: 'ir1', side: 8, width: 18, depth: 18, height: 5.5, doorStyle: 'grand' }, // south-west
   { id: 'ir2', side: 10, width: 18, depth: 18, height: 5.5, doorStyle: 'grand' }, // north-west
-  { id: 'ir3', side: 0, width: 18, depth: 18, height: 5.5, doorStyle: 'grand' }, // north
-  { id: 'ir4', side: 2, width: 18, depth: 18, height: 5.5, doorStyle: 'grand' }, // north-east
+  { id: 'ir3', side: 0, width: 21, depth: 21, height: 6.2, doorStyle: 'grand' }, // north
+  { id: 'ir4', side: 2, width: 25, depth: 25, height: 7, doorStyle: 'grand' }, // north-east
   { id: 'quiz', side: 4, width: 12, depth: 10, height: 4.5, doorStyle: 'plain' }, // south-east: end
 ]
 
@@ -105,7 +112,7 @@ export interface RoomLayout {
 
 export const ROOMS: RoomLayout[] = ROOM_SPECS.map((spec) => {
   const frame = frameOfSide(spec.side)
-  const vFront = ROOM_START + T
+  const vFront = roomStart(spec.width) + T
   const vBack = vFront + spec.depth
   // Arrive just inside the entrance, looking into the room. The visit starts a little
   // further in, facing the INOVAT sign on the hall's back wall.
@@ -201,7 +208,7 @@ function buildWalls(): WallPiece[] {
   for (const room of ROOMS) {
     const f = room.frame
     const halfW = room.width / 2
-    const front = ROOM_START
+    const front = room.vFront - T
     const h = room.height
     const ph = room.doorHeight // the passage is as tall as its door
     pieces.push(piece(room.id, localBox(f, -halfDoor - T, -halfDoor, a + T, front), 0, ph))
@@ -279,7 +286,7 @@ export interface ExhibitSpot {
   id: string // matches the text id in src/content/exhibits.ts
   room: RoomId
   kind: SpotKind
-  number: number // 1-4 for corners (used to vary the placeholder shape)
+  number: number // 1-6 for inventions (used to vary the placeholder shape)
   x: number
   z: number
   yaw: number // rotation so the exhibit's front faces the visitor
@@ -317,13 +324,18 @@ function buildSpots(): ExhibitSpot[] {
       const [ox, oz] = at(0, room.vBack - 0.01)
       spots.push({ id: `${room.id}-overview`, room: room.id, kind: 'overview', number: 0, x: ox, z: oz, yaw: faceTowards(-f.nx, -f.nz), panelSide: 1 })
 
-      // Four corners, numbered in walking order: front-left, back-left, back-right, front-right
-      // (as seen when entering the room).
+      // The inventions (INVENTIONS in types.ts: 4, 4, 5 and 6), numbered in walking order as
+      // seen when entering: the four corners, plus the middle of the left wall (5th) and of
+      // the right wall (6th). sv: 1 = front, 0 = middle, -1 = back.
       const centreV = (room.vFront + room.vBack) / 2
-      const corners: [number, number][] = [[-1, 1], [-1, -1], [1, -1], [1, 1]]
-      corners.forEach(([su, sv], i) => {
+      const places: Record<number, [number, number][]> = {
+        4: [[-1, 1], [-1, -1], [1, -1], [1, 1]],
+        5: [[-1, 1], [-1, 0], [-1, -1], [1, -1], [1, 1]],
+        6: [[-1, 1], [-1, 0], [-1, -1], [1, -1], [1, 0], [1, 1]],
+      }
+      places[INVENTIONS[room.id] ?? 4].forEach(([su, sv], i) => {
         const u = su * (room.width / 2 - CORNER_INSET)
-        const v = sv > 0 ? room.vFront + CORNER_INSET : room.vBack - CORNER_INSET
+        const v = sv > 0 ? room.vFront + CORNER_INSET : sv < 0 ? room.vBack - CORNER_INSET : centreV
         const [x, z] = at(u, v)
         const [cx, cz] = at(0, centreV)
         const yaw = faceTowards(cx - x, cz - z)

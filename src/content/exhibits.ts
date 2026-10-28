@@ -1,6 +1,7 @@
 import type { Language } from './language'
 import { credits } from './credits'
 import { AUDIO_ENABLED } from '../features'
+import { INVENTIONS } from '../types'
 
 // Exhibit texts, in both languages. PLACEHOLDERS ONLY until the group's content document
 // is ready (PLAN.md Phase D). Real texts will replace these, in BOTH languages at once,
@@ -56,18 +57,18 @@ function buildTexts(lang: Language): Record<string, ExhibitText> {
 
     // Game Room: the board beside the quiz.
     'quiz-info': vi
-      ? p('Trò chơi câu hỏi', 'Câu hỏi về bốn cuộc Cách mạng Công nghiệp hiện trên bức tường cuối phòng. Nhắm vào đáp án bạn chọn rồi nhấn E.')
+      ? p('Trò chơi câu hỏi', 'Câu hỏi về bốn cuộc Cách mạng Công nghiệp hiện trên bức tường cuối phòng. Nhắm vào đáp án quý khách chọn rồi nhấn E.')
       : p('The Quiz', 'Questions about the four Industrial Revolutions appear on the back wall. Aim at the answer you choose and press E.'),
   }
 
-  // Era rooms: an overview board on the back wall ("ir1-overview" ...) and 4 inventions,
-  // one per corner ("ir1-1" ... "ir4-4").
+  // Era rooms: an overview board on the back wall ("ir1-overview" ...) and the inventions
+  // (INVENTIONS in types.ts: "ir1-1" ... "ir4-6").
   for (let era = 1; era <= 4; era++) {
     const ordinal = ORDINAL[lang][era - 1]
     texts[`ir${era}-overview`] = vi
       ? p(`Tổng quan CMCN ${era}`, `Tổng quan về cuộc Cách mạng Công nghiệp lần thứ ${ordinal}: thời gian, bối cảnh và ý nghĩa.`)
       : p(`IR ${era} Overview`, `An overview of the ${ordinal} Industrial Revolution: when it happened, its background and why it matters.`)
-    for (let slot = 1; slot <= 4; slot++) {
+    for (let slot = 1; slot <= INVENTIONS[`ir${era}`]; slot++) {
       texts[`ir${era}-${slot}`] = vi
         ? p(`Phát minh ${slot} - CMCN ${era}`, `Phát minh tiêu biểu số ${slot} của cuộc Cách mạng Công nghiệp lần thứ ${ordinal}.`)
         : p(`Invention ${slot} - IR ${era}`, `Key invention no. ${slot} of the ${ordinal} Industrial Revolution.`)
