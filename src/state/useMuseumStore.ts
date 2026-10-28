@@ -3,6 +3,7 @@ import { ERA_ROOMS, type RoomId } from '../types'
 import { LANGUAGES, type Language } from '../content/language'
 import { QUIZ_QUESTIONS } from '../content/quiz'
 import { resultLevel, scoreQuiz } from './quiz-score'
+import { IS_TOUCH } from '../ui/touch'
 
 // The app is always in exactly one mode (PLAN.md section 3). Only in "exploring"
 // is the mouse captured and walking allowed. (The quiz is played while exploring: it is
@@ -165,7 +166,10 @@ function drawnLevel(state: { graphicsAuto: boolean; qualityChosen: boolean; auto
 // intro (everything frozen) -> look -> move -> sprint -> interact -> map -> pause -> keys -> enjoy
 // (a goodbye card that closes by itself) -> done.
 export type TutorialStep = 'intro' | 'look' | 'move' | 'sprint' | 'interact' | 'map' | 'pause' | 'keys' | 'enjoy' | 'done'
-export const TUTORIAL_STEPS: TutorialStep[] = ['intro', 'look', 'move', 'sprint', 'interact', 'map', 'pause', 'keys', 'enjoy', 'done']
+// Phones and tablets skip "keys": their controls are on screen, so they have no key list.
+export const TUTORIAL_STEPS: TutorialStep[] = (['intro', 'look', 'move', 'sprint', 'interact', 'map', 'pause', 'keys', 'enjoy', 'done'] as TutorialStep[]).filter(
+  (step) => !(IS_TOUCH && step === 'keys'),
+)
 export type Control = 'look' | 'move' | 'sprint' | 'interact' | 'map' | 'keys'
 
 // May this control be used now? Always, unless the tutorial has not reached it yet.

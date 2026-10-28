@@ -5,13 +5,14 @@ import { touchInput } from './touch'
 
 // ON-SCREEN CONTROLS for phones and tablets (touch.ts), shown while walking:
 // - a DYNAMIC THUMBSTICK, like Roblox's: put a thumb down anywhere on the left side of the
-//   screen and the stick appears under it. A short drag walks (the further, the faster, up
-//   to the walking ring); pulling past the dashed sprint ring further out runs, and the
-//   ring lights up gold. Pulled further still, the stick follows the thumb, so it never
-//   runs out of room. A faint ring in the bottom-left corner shows where it is at rest;
+//   screen and the stick appears under it, only while it is held (a small mark where the
+//   thumb landed, dots, and a gold knob under the thumb). The further the drag, the faster:
+//   a short drag walks, a long one runs (the knob then glows). Pulled further still, the
+//   stick follows the thumb, so it never runs out of room;
 // - dragging a finger on the right side: look around;
 // - a quick tap anywhere: open what was tapped, or choose a quiz answer (Interaction.tsx);
-// - buttons in the top-right corner: map, pause, and "?" for the controls list.
+// - buttons in the top-right corner: map and pause. (No controls list: the controls are
+//   on screen, and the tutorial explains them.)
 // Several fingers work at once (walk with one thumb, look with the other).
 
 const STICK_SIDE = 0.45 // touches starting in this share of the screen's width (from the left) walk
@@ -159,11 +160,6 @@ export default function TouchControls() {
     store().setMode('paused')
     store().advanceTutorial('pause')
   }
-  function toggleHelp() {
-    if (!canUse(store().tutorial, 'keys')) return
-    store().toggleKeyList()
-    store().advanceTutorial('keys')
-  }
 
   // The knob under the thumb (the centre follows when the thumb goes further).
   let knobX = 0
@@ -188,15 +184,9 @@ export default function TouchControls() {
         onContextMenu={(event) => event.preventDefault()}
         aria-label={ui.touch.joystick}
       >
-        {!stick ? (
-          <div className={canUse(tutorial, 'move') ? 'stick-part stick-rest' : 'stick-part stick-rest stick-rest-off'} />
-        ) : (
+        {stick && (
           <>
-            <div
-              className={stick.sprint ? 'stick-part stick-sprint stick-sprint-on' : 'stick-part stick-sprint'}
-              style={at(stick.baseX, stick.baseY, { '--size': `${SPRINT_RADIUS * 2}px` })}
-            />
-            <div className="stick-part stick-base" style={at(stick.baseX, stick.baseY, { '--size': `${WALK_RADIUS * 2}px` })} />
+            <div className="stick-part stick-base" style={at(stick.baseX, stick.baseY)} />
             {Array.from({ length: DOTS }, (_, i) => {
               const t = (i + 1) / (DOTS + 1)
               return (
@@ -212,9 +202,6 @@ export default function TouchControls() {
         )}
       </div>
       <div className="touch-buttons">
-        <button type="button" className="touch-button" aria-label={ui.touch.help} onClick={toggleHelp} disabled={!canUse(tutorial, 'keys')}>
-          ?
-        </button>
         <button type="button" className="touch-button" aria-label={ui.touch.map} onClick={openMap} disabled={!canUse(tutorial, 'map')}>
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z M9 4v14 M15 6v14" />

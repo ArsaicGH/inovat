@@ -25,7 +25,7 @@ Project: browser-based 3D virtual museum about the four Industrial Revolutions (
 - File names: lowercase, hyphens, no spaces, no Vietnamese diacritics.
 - Read movement keys by physical key position (`event.code`), so Unikey and EVKey do not break controls.
 - Every key the game uses is listed in the key list shown with Space (`ui.keyList` in `src/content/ui.ts`). When a key is added or changed, update that list in both languages, in tutorial order (and the tutorial, if the key is important).
-- Touch devices (phones, tablets) use on-screen controls (`src/ui/TouchControls.tsx`) and touch wording (`src/content/ui-touch.ts`). Every text that mentions a key or the mouse has a touch version there; when such a text or a control changes, update its touch version too, in both languages.
+- Touch devices (phones, tablets) use on-screen controls (`src/ui/TouchControls.tsx`) and touch wording (`src/content/ui-touch.ts`). They have no key list (and skip the tutorial's key-list step). Every other text that mentions a key or the mouse has a touch version there; when such a text or a control changes, update its touch version too, in both languages.
 - Run `npm run build` before every commit.
 
 ## Content rules

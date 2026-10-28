@@ -20,6 +20,9 @@ export interface RoomTheme {
   ceiling: string
   ceilingSurface?: SurfaceStyle // a patterned ceiling instead of the plain colour
   sky: string // colour of the soft "sky" fill light while in this room
+  // Colour of the light bouncing up off the floor (the fill light's lower half): warm off
+  // wood, grey off concrete... Real rooms are lit this way, and it ties each room together.
+  bounce: string
   fill: number // how strong that fill light is (low = dark room, exhibits stand out)
   // A coloured light from the room's own lamps (lanterns, bulbs, panels, light strips),
   // so each room has its own light colour, not just white spotlights. Position in the
@@ -34,51 +37,57 @@ export const ROOM_THEMES: Record<Exclude<RoomId, 'rotunda'>, RoomTheme> = {
     walls: { texture: 'plaster', colour: '#efe4cf', tile: 3, roughness: 0.85 },
     ceiling: '#e6dccb',
     sky: '#fff1dc',
+    bounce: '#5a3e28',
     fill: 0.32,
     accent: { colour: '#ffd49a', intensity: 22, at: [0, 3.4, 0] }, // the two chandeliers
   },
   // CMCN 1: steam age. Brick, wood, warm lamplight.
   ir1: {
     floor: { texture: 'wood-floor', colour: '#d9b892', tile: 2.5, roughness: 0.6 },
+    bounce: '#5a3420',
     walls: { texture: 'bricks', colour: '#e9cdb6', tile: 2.5, roughness: 0.9 },
     ceiling: '#3b2a1e',
     sky: '#ffcf96',
-    fill: 0.13,
+    fill: 0.16,
     accent: { colour: '#ffa04d', intensity: 16, at: [-7.4, 2.6, 0] }, // the wall lanterns
   },
   // CMCN 2: electricity and mass production. Steel, concrete, early bulbs.
   ir2: {
     floor: { texture: 'concrete', colour: '#aaa69f', tile: 3, roughness: 0.75 },
+    bounce: '#45423c',
     walls: { texture: 'metal-plates', colour: '#a2a9b0', tile: 2, roughness: 0.5, metalness: 0.5 },
     ceiling: '#24282d',
     sky: '#e9e1d2',
-    fill: 0.09,
+    fill: 0.12,
     accent: { colour: '#ffc977', intensity: 16, at: [0, 2.9, 0] }, // the hanging bulbs
   },
   // CMCN 3: computers. Beige panels, checkered floor, fluorescent light.
   ir3: {
     floor: { texture: 'tiles', colour: '#d6cfc2', tile: 1.6, roughness: 0.45 },
     walls: { painted: 'office-panels', colour: '#ffffff', tile: 1.2, roughness: 0.8 },
+    bounce: '#544f45',
     ceiling: '#6a655a',
     ceilingSurface: { painted: 'ceiling-tiles', colour: '#d9d6cc', tile: 1.2, roughness: 0.9 },
     sky: '#f2f6ff',
-    fill: 0.08,
+    fill: 0.11,
     accent: { colour: '#e4efff', intensity: 13, at: [0, 3.9, 0] }, // the fluorescent panels
   },
   // CMCN 4: digital and smart technology. White gloss, glass, cyan light.
   ir4: {
     floor: { colour: '#a3acb3', tile: 1, roughness: 0.12, metalness: 0.2 },
     walls: { painted: 'tech-panels', colour: '#dfe6eb', tile: 1.5, roughness: 0.3 },
+    bounce: '#3c4c55',
     ceiling: '#535b61',
     ceilingSurface: { painted: 'tech-ceiling', colour: '#c4ccd1', tile: 2.4, roughness: 0.5 },
     sky: '#d8f6ff',
-    fill: 0.08,
+    fill: 0.1,
     accent: { colour: '#5fe3f2', intensity: 14, at: [0, 3.9, 0] }, // the cyan light ring
   },
   // Game Room: a bright white-and-gold salon like the intro hall and the rotunda (white
   // marble, cream walls, gold), with a red carpet up to the quiz platform.
   quiz: {
     floor: { texture: 'marble', colour: '#f4efe6', tile: 3, roughness: 0.18 },
+    bounce: '#5e5246',
     walls: { texture: 'plaster', colour: '#efe4cf', tile: 3, roughness: 0.85 },
     ceiling: '#e6dccb',
     sky: '#fff1dc',

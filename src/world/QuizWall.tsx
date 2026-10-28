@@ -92,7 +92,7 @@ function ScreenHardware() {
       {/* The board itself (ivory on all sides, so it also looks right from behind). */}
       <mesh position={[0, 0, DISPLAY.depth / 2]} castShadow>
         <boxGeometry args={[outerW, outerH, DISPLAY.depth]} />
-        <meshStandardMaterial color="#f3ecdf" roughness={0.45} />
+        <meshStandardMaterial color="#e6ddcc" roughness={0.65} />
       </mesh>
     </group>
   )

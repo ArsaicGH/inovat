@@ -10,6 +10,7 @@ import EraNumeral from './EraNumeral'
 import QuizWall from './QuizWall'
 import MergeStatic from './MergeStatic'
 import PortalDoor from './PortalDoor'
+import EraSculpture from './era-sculptures'
 import { useMuseumStore } from '../state/useMuseumStore'
 
 // DECORATION OF EACH ROOM (M6), built from simple shapes. Inside each room the local axes
@@ -642,6 +643,35 @@ function QuizRoom({ size }: { size: RoomSize }) {
   )
 }
 
+// CMCN 1-3: the room's era sculpture (era-sculptures.tsx, also hanging in the rotunda),
+// smaller, hanging on a thin cable from the ceiling above the floor medallion and turning
+// slowly. (CMCN 4 has its floating hologram instead: the futuristic one needs no cable.)
+const CENTRE_SCALE = 0.62
+const CENTRE_HEIGHT = 3.6 // high enough not to hide the overview board on the back wall from the door
+function CentreSculpture({ room, size }: { room: ThemedRoom; size: RoomSize }) {
+  const spin = useRef<Group>(null)
+  useFrame((_, delta) => {
+    if (spin.current) spin.current.rotation.y += delta * 0.25
+  })
+  // The cable runs from just above the sculpture (the bulb's cap is taller) to the ceiling.
+  const top = CENTRE_HEIGHT + (room === 'ir2' ? 1.1 : 1.05) * CENTRE_SCALE
+  return (
+    <>
+      <mesh position={[0, (top + size.h) / 2, 0]}>
+        <cylinderGeometry args={[0.01, 0.01, size.h - top, 6]} />
+        <meshStandardMaterial color="#2e2a26" metalness={0.6} roughness={0.5} />
+      </mesh>
+      <mesh position={[0, top, 0]}>
+        <sphereGeometry args={[0.04, 12, 8]} />
+        <meshStandardMaterial color={GOLD} metalness={0.9} roughness={0.3} />
+      </mesh>
+      <group ref={spin} position={[0, CENTRE_HEIGHT, 0]} scale={CENTRE_SCALE} userData={{ keepSeparate: true }}>
+        <EraSculpture room={room} />
+      </group>
+    </>
+  )
+}
+
 const DECOR: Partial<Record<ThemedRoom, (props: { size: RoomSize }) => ReactNode>> = {
   hall: IntroHall,
   ir1: SteamAge,
@@ -666,6 +696,7 @@ export default function RoomDecor({ room }: { room: ThemedRoom }) {
         {/* The hall shows the museum's own name instead (IntroHall). */}
         {room !== 'hall' && <RoomIdentity room={room} size={size} />}
         {Decor && <Decor size={size} />}
+        {(room === 'ir1' || room === 'ir2' || room === 'ir3') && <CentreSculpture room={room} size={size} />}
       </MergeStatic>
     </group>
   )

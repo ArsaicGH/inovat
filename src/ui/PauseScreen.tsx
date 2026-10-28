@@ -1,5 +1,5 @@
 import { useContent } from '../content/use-content'
-import { useMuseumStore } from '../state/useMuseumStore'
+import { useMuseumStore, TUTORIAL_STEPS } from '../state/useMuseumStore'
 import { requestPointerLock } from '../world/pointer-lock'
 import LockButton from './LockButton'
 import SensitivitySlider from './SensitivitySlider'
@@ -11,7 +11,8 @@ import GraphicsSlider from './GraphicsSlider'
 export default function PauseScreen() {
   const { ui } = useContent()
   // During the tutorial's last steps the menu explains itself.
-  const tutorialHere = useMuseumStore((state) => state.tutorial === 'keys')
+  // (The step after "pause", which the menu's opening completes.)
+  const tutorialHere = useMuseumStore((state) => state.tutorial === TUTORIAL_STEPS[TUTORIAL_STEPS.indexOf('pause') + 1])
 
   return (
     // A click on the dark area around the card also continues (a click is the only way

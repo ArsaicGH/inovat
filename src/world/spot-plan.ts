@@ -63,9 +63,12 @@ function quiz(): SpotAim[] {
     const [fx, fz] = toWorld(room.frame, side * (room.width / 2 - 2.2), v)
     aims.push({ from: [fx, room.height - 0.25, fz], to: [tx, 2.3, tz], strength: 0.2 })
   }
-  // ...and by far the strongest, a tight beam on the quiz lectern: the centre of attention.
+  // ...and the strongest, on the quiz lectern: the centre of attention. A soft, wide beam
+  // from a little in front, aimed at the foot of the stand, so it lights the platform and
+  // the stand without glaring off the panel's face (straight above, it blinded the screen).
   const [cx, cz] = toWorld(room.frame, 0, v + 0.45)
-  aims.push({ from: [cx, room.height - 0.25, cz], to: [cx, 0.9, cz], narrow: true, strength: 1.1 })
+  const [lx, lz] = toWorld(room.frame, 0, v - 1.6)
+  aims.push({ from: [lx, room.height - 0.25, lz], to: [cx, 0, cz], strength: 0.55 })
   return aims
 }
 
@@ -88,7 +91,7 @@ export interface KeyAim extends SpotAim {
 
 // How strong each room's wash is: the darker the room, the more the exhibits stand out.
 // (The intro hall is a bright, welcoming lobby; only the era rooms are dim.)
-const WASH: Partial<Record<RoomId, number>> = { hall: 40, ir1: 12, ir2: 9, ir3: 7, ir4: 7, quiz: 6 }
+const WASH: Partial<Record<RoomId, number>> = { hall: 40, ir1: 20, ir2: 16, ir3: 14, ir4: 12, quiz: 6 }
 
 function roomKey(id: RoomId): KeyAim[] {
   const room = roomById(id)

@@ -157,6 +157,7 @@ function Lighting() {
   const lit = useRef<RoomId | null>(null) // the room the lights are in now
   const level = useRef(0) // 0-1: the lights fade between rooms
   const skyColour = useMemo(() => new Color(), [])
+  const bounceColour = useMemo(() => new Color(), [])
 
   useFrame(({ camera, gl }, delta) => {
     const here = useMuseumStore.getState().currentRoom
@@ -175,8 +176,10 @@ function Lighting() {
           spot.position.set(...aim.from)
           // Exhibits: a tight beam that just covers the object and its plinth, fading out
           // very softly (a wide beam left a hard bright ring on the floor around the plinth).
-          spot.angle = aim.narrow ? 0.3 : 0.42
-          spot.penumbra = aim.narrow ? 0.9 : 0.5
+          // Boards: a wider beam with a very soft edge (a hard-edged oval looked like a flat
+          // patch of light pasted onto the wall or door).
+          spot.angle = aim.narrow ? 0.3 : 0.5
+          spot.penumbra = aim.narrow ? 0.9 : 0.85
           spotTargets[i].position.set(...aim.to)
           spotTargets[i].updateMatrixWorld()
         })
@@ -225,9 +228,12 @@ function Lighting() {
 
     // The soft "sky" light takes the colour of where you are, gradually.
     skyColour.set(here === 'rotunda' ? '#fff1dc' : ROOM_THEMES[here].sky)
+    // Its lower half: light bouncing up off this room's floor.
+    bounceColour.set(here === 'rotunda' ? '#2a2219' : ROOM_THEMES[here].bounce)
     const fill = here === 'rotunda' ? ROTUNDA_FILL : ROOM_THEMES[here].fill
     if (sky.current) {
       sky.current.color.lerp(skyColour, Math.min(1, dt * 3))
+      sky.current.groundColor.lerp(bounceColour, Math.min(1, dt * 3))
       sky.current.intensity += (fill - sky.current.intensity) * Math.min(1, dt * 3)
     }
   })

@@ -1107,39 +1107,14 @@ body {
   border-radius: 50%;
   pointer-events: none;
 }
-/* While not touched: a faint ring in the bottom-left corner shows where to put a thumb. */
-.stick-rest {
-  left: max(96px, calc(env(safe-area-inset-left) + 68px));
-  top: auto;
-  bottom: max(36px, env(safe-area-inset-bottom));
-  transform: translate(-50%, 0);
-  width: 112px;
-  height: 112px;
-  border: 2px solid rgba(232, 199, 126, 0.3);
-  background: rgba(20, 17, 13, 0.2);
-}
-.stick-rest-off {
-  opacity: 0.35;
-}
-/* Where the thumb landed: the walking ring (pushed to its edge = full walking speed). */
+/* Where the thumb landed: a small faint mark (the stick only shows while it is held). */
 .stick-base {
-  width: var(--size);
-  height: var(--size);
-  border: 2px solid rgba(232, 199, 126, 0.55);
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid rgba(232, 199, 126, 0.5);
   background: rgba(20, 17, 13, 0.3);
 }
-/* The sprint ring, further out: pull the thumb past it to run. Faint until reached. */
-.stick-sprint {
-  width: var(--size);
-  height: var(--size);
-  border: 1.5px dashed rgba(232, 199, 126, 0.3);
-  transition: border-color 0.15s, box-shadow 0.15s;
-}
-.stick-sprint-on {
-  border: 2px solid rgba(255, 214, 130, 0.95);
-  box-shadow: 0 0 18px rgba(255, 200, 110, 0.55), inset 0 0 18px rgba(255, 200, 110, 0.3);
-}
-/* Small dots from the ring to the thumb, fading out towards it. */
+/* Small dots from that mark to the thumb, fading out towards it. */
 .stick-dot {
   width: 9px;
   height: 9px;
