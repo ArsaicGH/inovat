@@ -83,12 +83,12 @@ export const ROOM_THEMES: Record<Exclude<RoomId, 'rotunda'>, RoomTheme> = {
     ceilingSurface: { texture: 'wood-floor', colour: '#a4825f', tile: 2.5, roughness: 0.85 },
     sky: '#ffcf96',
     // (Dark like a real gallery: the spotlit exhibits carry the room. Leader.)
-    fill: 0.13,
+    fill: 0.17,
     accent: { colour: '#ffa04d', intensity: 5, at: [-7.4, 2.6, 0] }, // the wall lanterns
     // Warm and low, like firelight: one continuous warm wash along the brick, the timber
     // ceiling glowing faintly; the Watt engine is the room's focus.
     lighting: {
-      environment: 0.42,
+      environment: 0.5,
       spotColour: '#ffd3a2',
       keyColour: '#ffc68c',
       wash: 5,
@@ -106,7 +106,7 @@ export const ROOM_THEMES: Record<Exclude<RoomId, 'rotunda'>, RoomTheme> = {
     // A concrete slab overhead.
     ceilingSurface: { texture: 'concrete', colour: '#a19d96', tile: 3, roughness: 0.9 },
     sky: '#e9e1d2',
-    fill: 0.13,
+    fill: 0.17,
     accent: { colour: '#ffc977', intensity: 5, at: [0, 2.9, 0] }, // the hanging bulbs
     // Neutral-warm and ordered: wall-washers in a regular row (the rhythm of a factory
     // hall), a little brighter than CMCN 1; electric power, in the middle, is the focus.
@@ -128,12 +128,12 @@ export const ROOM_THEMES: Record<Exclude<RoomId, 'rotunda'>, RoomTheme> = {
     ceiling: '#6a655a',
     ceilingSurface: { painted: 'ceiling-tiles', colour: '#d9d6cc', tile: 1.2, roughness: 0.9 },
     sky: '#f2f6ff',
-    fill: 0.13,
+    fill: 0.17,
     accent: { colour: '#e4efff', intensity: 5, at: [0, 4.4, 0] }, // the fluorescent panels
     // Neutral white, clean and even: a precise continuous wash and a lit tile ceiling; the
     // microprocessor is the focus.
     lighting: {
-      environment: 0.55,
+      environment: 0.62,
       spotColour: '#fff3e6',
       keyColour: '#f3f6ff',
       wash: 3,

@@ -54,7 +54,7 @@ function eraRoom(id: RoomId): SpotAim[] {
       // A hierarchy, as in a curated gallery: AI, the spotlight exhibit, gets the strongest
       // light of the museum, each room's main exhibit (room-themes.ts) the next, the others
       // a little less, so not every exhibit shouts equally.
-      strength: reach * (spot.id === SPOTLIGHT_ID ? 2.5 : spot.id === primary ? 2.15 : 1.75),
+      strength: reach * (spot.id === SPOTLIGHT_ID ? 1.9 : spot.id === primary ? 1.6 : 1.3),
     }))
     .concat(overviewAim)
 }
