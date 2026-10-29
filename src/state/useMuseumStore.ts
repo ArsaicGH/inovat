@@ -263,7 +263,7 @@ interface MuseumState {
 
   // THE ENDING (EndingScene.tsx, EndingScreen.tsx), after walking into the open portal.
   // endingRun goes up on every start, so the flight starts again from the beginning;
-  // endingStage: 0 = before the first era, 1-4 = passing that era, 5 = arrived.
+  // endingStage: 0 = before the film, 1-4 = that era's act, 5 = the finale, 6 = the closing title.
   endingRun: number
   endingStage: number
   startEnding: () => void

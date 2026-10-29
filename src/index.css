@@ -2060,3 +2060,144 @@ body {
   background: linear-gradient(135deg, #f7e2a6 0%, #e2bd6a 55%, #f6dc98 100%);
   border-color: #a8782c;
 }
+
+/* THE ENDING FILM: black bars like a cinema screen, the veil for dips and flashes, the
+   era captions above the lower bar, and the closing title. */
+.ending-bars::before,
+.ending-bars::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 8vh;
+  background: #000;
+  animation: ending-bars 1.6s ease-out both;
+}
+.ending-bars::before {
+  top: 0;
+}
+.ending-bars::after {
+  bottom: 0;
+}
+@keyframes ending-bars {
+  from {
+    height: 0;
+  }
+}
+.ending-veil {
+  position: absolute;
+  inset: 0;
+  opacity: 1;
+  background: #000;
+}
+.ending .ending-caption {
+  bottom: calc(8vh + 28px);
+  animation: ending-caption-film 8s ease-out both;
+}
+@keyframes ending-caption-film {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  12%,
+  70% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.ending .ending-journey {
+  top: calc(8vh + 18px);
+}
+.ending .ending-skip {
+  bottom: calc(8vh + 16px);
+}
+.ending-title {
+  position: absolute;
+  inset: 8vh 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.85);
+}
+.ending-title h1 {
+  margin: 0;
+  font-size: clamp(44px, 8vw, 104px);
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  padding-left: 0.32em; /* (the spacing after the last letter, so it stays centred) */
+  color: #f6ead2;
+  animation: ending-title-in 2.6s ease-out both;
+}
+.ending-title .title-ornament {
+  width: min(360px, 70%);
+  animation: ending-fade-in 1.6s ease-out 0.8s both;
+}
+.ending-tagline {
+  margin: 0;
+  font-size: clamp(15px, 1.8vw, 22px);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #e8d3a8;
+  animation: ending-fade-in 1.6s ease-out 1.2s both;
+}
+.ending-subtitle {
+  margin: 0;
+  font-size: clamp(14px, 1.4vw, 18px);
+  font-style: italic;
+  color: #d9ccb2;
+  animation: ending-fade-in 1.6s ease-out 2s both;
+}
+/* The thank-you and the buttons come only once the title has been seen. */
+.ending-after {
+  margin-top: 22px;
+  width: min(620px, 100%);
+  box-sizing: border-box;
+  padding: 20px 24px;
+  border: 1px solid rgba(201, 162, 90, 0.4);
+  border-radius: 14px;
+  background: rgba(10, 10, 14, 0.55);
+  backdrop-filter: blur(6px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  animation: ending-fade-in 1.2s ease-out 4.5s both;
+}
+.ending-after h2 {
+  margin: 0;
+  font-size: clamp(18px, 2vw, 24px);
+}
+.ending-after p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #e6dccb;
+}
+@keyframes ending-title-in {
+  from {
+    opacity: 0;
+    letter-spacing: 0.6em;
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    letter-spacing: 0.32em;
+    filter: none;
+  }
+}
+@keyframes ending-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

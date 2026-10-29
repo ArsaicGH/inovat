@@ -40,7 +40,7 @@ export default function SoundDirector() {
         if (state.mode === 'ending') playEffect('teleport')
         // The room sound fades away in menus and comes back when walking.
         // (Softer, not silent, while playing the Time Machine game.)
-        duckAmbience(state.mode === 'exploring' ? 1 : state.mode === 'game' ? 0.45 : 0)
+        duckAmbience(state.mode === 'exploring' || state.mode === 'ending' ? 1 : state.mode === 'game' ? 0.45 : 0)
       }
       if (state.teleport.count !== before.teleport.count && before.teleport.count > 0) playEffect('teleport')
 

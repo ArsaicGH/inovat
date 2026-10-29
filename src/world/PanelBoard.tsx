@@ -166,12 +166,13 @@ export default function PanelBoard({ exhibitId, width, height, aimed, theme }: P
     return new MeshBasicMaterial({ map: texture, transparent: true, depthWrite: false, side: DoubleSide, toneMapped: false })
   }, [look, texture])
   useEffect(() => {
-    if (glass) glass.color.setScalar(aimed ? 2.3 : 1.7)
+    // (Restrained: a brighter glow made the letters bleed and harder to read.)
+    if (glass) glass.color.setScalar(aimed ? 1.7 : 1.3)
   }, [glass, aimed])
   useEffect(() => () => glass?.dispose(), [glass])
 
   if (glass) {
-    const edge = <meshStandardMaterial color={theme.rule} emissive={theme.rule} emissiveIntensity={aimed ? 5 : 3} toneMapped={false} />
+    const edge = <meshStandardMaterial color={theme.rule} emissive={theme.rule} emissiveIntensity={aimed ? 2.6 : 1.4} toneMapped={false} />
     return (
       <group>
         <mesh material={glass}>

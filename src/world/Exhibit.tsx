@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
-import type { Group } from 'three'
+import { CanvasTexture, type Group } from 'three'
 import { useMuseumStore } from '../state/useMuseumStore'
 import { SPOTLIGHT_ID, SPOTLIGHT_SCALE, panelOffset, type ExhibitSpot } from './layout'
 import { addAimTarget, removeAimTarget } from './aim-targets'
@@ -30,10 +30,41 @@ function Prototype({ id }: { id: string }) {
   )
 }
 
-// A round plinth with a softly glowing gold ring (the glow is picked up by the bloom effect).
+// CONTACT SHADOW: where something stands, less of the room's light reaches the surface
+// around its foot, a soft darkening that makes it sit on the surface instead of floating.
+// (The ambient-occlusion effect does this too, but only at the high graphics level.)
+// One soft round picture, painted once and shared.
+let contactShadowPicture: CanvasTexture | null = null
+function contactShadowTexture(): CanvasTexture {
+  if (contactShadowPicture) return contactShadowPicture
+  const canvas = document.createElement('canvas')
+  canvas.width = canvas.height = 128
+  const ctx = canvas.getContext('2d')!
+  const g = ctx.createRadialGradient(64, 64, 0, 64, 64, 64)
+  g.addColorStop(0, 'rgba(0, 0, 0, 0.8)')
+  g.addColorStop(0.6, 'rgba(0, 0, 0, 0.45)')
+  g.addColorStop(1, 'rgba(0, 0, 0, 0)')
+  ctx.fillStyle = g
+  ctx.fillRect(0, 0, 128, 128)
+  contactShadowPicture = new CanvasTexture(canvas)
+  return contactShadowPicture
+}
+function ContactShadow({ radius, y, opacity }: { radius: number; y: number; opacity: number }) {
+  return (
+    <mesh position={[0, y, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <planeGeometry args={[radius * 2, radius * 2]} />
+      <meshBasicMaterial map={contactShadowTexture()} transparent opacity={opacity} depthWrite={false} polygonOffset polygonOffsetFactor={-2} />
+    </mesh>
+  )
+}
+
+// A round plinth with a thin brass inlay ring. (It glowed before; a museum plinth should
+// not compete with its exhibit, so the brass only catches the spotlight.)
 function Plinth({ colour }: { colour: string }) {
   return (
     <group>
+      <ContactShadow radius={1.85} y={0.006} opacity={0.75} />
+      <ContactShadow radius={0.8} y={PLINTH_TOP + 0.003} opacity={0.55} />
       <mesh position={[0, 0.2, 0]} castShadow receiveShadow>
         <cylinderGeometry args={[1.15, 1.25, 0.4, 32]} />
         <meshStandardMaterial color={DARK_WOOD} roughness={0.55} />
@@ -45,7 +76,7 @@ function Plinth({ colour }: { colour: string }) {
       </mesh>
       <mesh position={[0, PLINTH_TOP + 0.005, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <ringGeometry args={[0.92, 0.98, 48]} />
-        <meshStandardMaterial color={GOLD} emissive={colour} emissiveIntensity={1.6} toneMapped={false} />
+        <meshStandardMaterial color={GOLD} metalness={0.9} roughness={0.35} emissive={colour} emissiveIntensity={0.08} />
       </mesh>
     </group>
   )

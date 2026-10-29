@@ -3,11 +3,15 @@ import { SURFACES } from './layout'
 import { ROOM_THEMES } from './room-themes'
 import SurfaceMaterial from './SurfaceMaterial'
 import RoomDecor from './RoomDecor'
+import { ceilingGlowMap } from './light-maps'
 
 // Floor, ceiling and decoration of one room and its entry passage, in the room's theme.
 // The walls are drawn by Walls.tsx.
 export default function Room({ room }: { room: Exclude<RoomId, 'rotunda'> }) {
   const theme = ROOM_THEMES[room]
+  const { ceilingGlow } = theme.lighting
+  // Light bounced onto the ceiling (light-maps.ts), so it reads as a ceiling, not a void.
+  const glow = ceilingGlow.strength > 0 ? ceilingGlowMap(room) : null
   return (
     <>
       {SURFACES.filter((s) => s.group === room).map(({ box, ceilingHeight }, i) => (
@@ -20,9 +24,15 @@ export default function Room({ room }: { room: Exclude<RoomId, 'rotunda'> }) {
           <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, ceilingHeight, 0]}>
             <planeGeometry args={[box.hx * 2, box.hz * 2]} />
             {theme.ceilingSurface ? (
-              <SurfaceMaterial style={theme.ceilingSurface} width={box.hx * 2} height={box.hz * 2} />
+              <SurfaceMaterial
+                style={theme.ceilingSurface}
+                width={box.hx * 2}
+                height={box.hz * 2}
+                lightMap={glow}
+                lightMapIntensity={ceilingGlow.strength}
+              />
             ) : (
-              <meshStandardMaterial color={theme.ceiling} roughness={0.8} />
+              <meshStandardMaterial color={theme.ceiling} roughness={0.8} lightMap={glow} lightMapIntensity={ceilingGlow.strength} />
             )}
           </mesh>
         </group>

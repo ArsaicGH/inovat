@@ -151,9 +151,13 @@ const vi = {
       retry: 'Đừng nản lòng! Hãy tham quan lại các phòng trưng bày rồi thử lần nữa.',
     },
   },
-  // THE ENDING after the portal: a flight through the four eras, then a thank-you panel.
+  // THE ENDING after the portal: a film through the four eras, the closing title, then a
+  // thank-you panel.
   ending: {
     journey: 'Hành trình xuyên thời gian',
+    brand: 'INOVAT',
+    tagline: 'Bốn cuộc cách mạng. Một hành trình.',
+    subtitle: 'Từ cơ giới hóa đến công nghiệp thông minh.',
     // One line for each era as the flight passes it (written to set the mood).
     moods: [
       'Tiếng máy hơi nước vang lên, khói than phủ kín bầu trời: lần đầu tiên, máy móc gánh vác sức lao động của con người.',
@@ -318,6 +322,9 @@ const en: UiText = {
   },
   ending: {
     journey: 'A journey through time',
+    brand: 'INOVAT',
+    tagline: 'Four revolutions. One journey.',
+    subtitle: 'From mechanization to intelligent industry.',
     moods: [
       'The roar of steam engines, skies dark with coal smoke: for the first time, machines took on the labour of human hands.',
       'Electric light pushed back the night and assembly lines never stopped moving: the world entered the age of mass production.',

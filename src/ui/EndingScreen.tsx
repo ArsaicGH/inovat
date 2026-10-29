@@ -1,10 +1,12 @@
 import { useContent } from '../content/use-content'
 import { useMuseumStore } from '../state/useMuseumStore'
 import { resumeWalking } from '../world/pointer-lock'
+import { filmVeil } from '../world/ending-shots'
 
-// THE ENDING's interface, over the flight through time (EndingScene.tsx): a white flash
-// as the visitor steps through the portal, the name of each era as it passes, a "Skip"
-// button, and on arrival the thank-you panel.
+// THE ENDING's interface, over the film through time (EndingScene.tsx): a white flash as
+// the visitor steps through the portal, cinema bars, the veil for the film's dips and
+// flashes, the name of each era as its act begins, a "Skip" button, and at the end the
+// closing title, then the thank-you panel.
 
 const ERAS = ['ir1', 'ir2', 'ir3', 'ir4'] as const
 
@@ -24,10 +26,18 @@ export default function EndingScreen() {
   }
 
   return (
-    <div className="ending">
+    <div className="ending ending-bars">
+      {/* The film's dips to black and flashes of light (set by EndingScene every frame). */}
+      <div
+        ref={(element) => {
+          filmVeil.element = element
+        }}
+        className="ending-veil"
+        aria-hidden="true"
+      />
       {/* key: a new run restarts the flash. */}
       <div key={run} className="ending-flash" aria-hidden="true" />
-      {stage < 5 ? (
+      {stage < 6 ? (
         <>
           <p className="ending-journey">{ui.ending.journey}</p>
           {era && (
@@ -40,26 +50,31 @@ export default function EndingScreen() {
               <p>{ui.ending.moods[stage - 1]}</p>
             </div>
           )}
-          <button className="ending-skip" onClick={() => useMuseumStore.getState().setEndingStage(5)}>
+          <button className="ending-skip" onClick={() => useMuseumStore.getState().setEndingStage(6)}>
             {ui.ending.skip}
           </button>
         </>
       ) : (
-        <div className="ending-panel">
-          <h1>{ui.ending.title}</h1>
+        <div className="ending-title">
+          <h1>{ui.ending.brand}</h1>
           <div className="title-ornament" aria-hidden="true">
             <span />
             <i />
             <span />
           </div>
-          <p>{ui.ending.text}</p>
-          <div className="button-row">
-            <button className="start-button" onClick={backToHall}>
-              {ui.ending.backToHall}
-            </button>
-            <button className="start-button start-button-quiet" onClick={() => useMuseumStore.getState().startEnding()}>
-              {ui.ending.replay}
-            </button>
+          <p className="ending-tagline">{ui.ending.tagline}</p>
+          <p className="ending-subtitle">{ui.ending.subtitle}</p>
+          <div className="ending-after">
+            <h2>{ui.ending.title}</h2>
+            <p>{ui.ending.text}</p>
+            <div className="button-row">
+              <button className="start-button" onClick={backToHall}>
+                {ui.ending.backToHall}
+              </button>
+              <button className="start-button start-button-quiet" onClick={() => useMuseumStore.getState().startEnding()}>
+                {ui.ending.replay}
+              </button>
+            </div>
           </div>
         </div>
       )}

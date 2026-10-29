@@ -28,6 +28,7 @@ import { isPartVisible } from './door-state'
 import { ROOM_THEMES } from './room-themes'
 import { CANVAS_WRAPPER_ID } from './pointer-lock'
 import { KEY_PLANS, SPOT_COUNT, SPOT_PLANS } from './spot-plan'
+import { borrowedLights } from './ending-shots'
 import SpotFixtures from './SpotFixtures'
 import EndingScene from './EndingScene'
 import { useFontsReady } from './fonts'
@@ -111,6 +112,9 @@ const ROTUNDA_FILL = 0.3
 
 // Brightness of one museum spotlight (spot-plan.ts).
 const SPOT_INTENSITY = 120
+// How far the key light's shadows reach: in the museum, and in the ending film's larger sets.
+const KEY_SHADOW_FAR = 30
+const FILM_SHADOW_FAR = 200
 
 // LIGHTING, in the style of a real museum: the rooms themselves are fairly dim (low soft
 // light, a gentle room light) and warm spotlights pick out the exhibits, which gives the
@@ -167,6 +171,50 @@ function Lighting() {
   const bounceColour = useMemo(() => new Color(), [])
 
   useFrame(({ camera, gl, scene }, delta) => {
+    // THE ENDING FILM borrows these lights (ending-shots.ts): each shot places them.
+    if (borrowedLights.active) {
+      const film = borrowedLights
+      spots.current.forEach((spot, i) => {
+        if (!spot) return
+        const light = film.spots[i]
+        spot.intensity = light ? light.intensity : 0
+        if (!light) return
+        spot.position.copy(light.from)
+        spot.color.copy(light.colour)
+        spot.angle = light.angle
+        spot.penumbra = 0.7
+        spotTargets[i].position.copy(light.to)
+        spotTargets[i].updateMatrixWorld()
+      })
+      const key = keyLight.current
+      if (key && film.key) {
+        if (!key.position.equals(film.key.from)) gl.shadowMap.needsUpdate = true
+        key.position.copy(film.key.from)
+        key.color.copy(film.key.colour)
+        key.intensity = film.key.intensity
+        key.angle = film.key.angle
+        keyTarget.position.copy(film.key.to)
+        keyTarget.updateMatrixWorld()
+        if (key.shadow.camera.far !== FILM_SHADOW_FAR) {
+          key.shadow.camera.far = FILM_SHADOW_FAR
+          key.shadow.camera.updateProjectionMatrix()
+        }
+      }
+      if (accent.current) accent.current.intensity = 0
+      if (sky.current) {
+        sky.current.color.copy(film.sky)
+        sky.current.groundColor.copy(film.ground)
+        sky.current.intensity = film.fill
+      }
+      scene.environmentIntensity = film.environment
+      // Afterwards the lights go straight back to the museum and fade in there.
+      lit.current = null
+      keyArea.current = null
+      level.current = 0
+      keyLevel.current = 0
+      return
+    }
+
     const here = useMuseumStore.getState().currentRoom
     const want = litRoom(here, camera.position.x, camera.position.z)
 
@@ -189,8 +237,10 @@ function Lighting() {
           // (A wide, very soft edge: the pool of light melts into the floor.)
           // A tight beam on the object with a soft edge: the exhibit glows, the floor
           // around it stays dim (gallery practice).
-          spot.angle = aim.narrow ? 0.34 : 0.5
+          spot.angle = aim.narrow ? 0.48 : 0.5
           spot.penumbra = aim.narrow ? 0.8 : 0.85
+          // The room's colour temperature (room-themes.ts): amber in CMCN 1 to cool white in CMCN 4.
+          spot.color.set(want === 'rotunda' ? '#ffe6c4' : ROOM_THEMES[want].lighting.spotColour)
           spotTargets[i].position.set(...aim.to)
           spotTargets[i].updateMatrixWorld()
         })
@@ -226,6 +276,11 @@ function Lighting() {
         if ((keyLevel.current === 0 || keyArea.current === null) && plan) {
           keyArea.current = here
           key.position.set(...plan.from)
+          key.color.set(here === 'rotunda' ? '#ffe9cf' : ROOM_THEMES[here].lighting.keyColour)
+          if (key.shadow.camera.far !== KEY_SHADOW_FAR) {
+            key.shadow.camera.far = KEY_SHADOW_FAR
+            key.shadow.camera.updateProjectionMatrix()
+          }
           gl.shadowMap.needsUpdate = true // the key light moved: redraw its shadows
           key.angle = plan.angle
           keyTarget.position.set(...plan.to)
@@ -242,9 +297,9 @@ function Lighting() {
     // Its lower half: light bouncing up off this room's floor.
     bounceColour.set(here === 'rotunda' ? '#2a2219' : ROOM_THEMES[here].bounce)
     const fill = here === 'rotunda' ? ROTUNDA_FILL : ROOM_THEMES[here].fill
-    // The reflection light (scene.environment) also lights every wall evenly: in the dark
-    // galleries of CMCN 1-3 it is nearly off, so only the exhibit spotlights stand out.
-    const environment = here === 'ir1' || here === 'ir2' || here === 'ir3' ? 0.35 : here === 'ir4' ? 0.65 : 1
+    // The reflection light (scene.environment) also lights every wall evenly: lower in the
+    // darker galleries, so the exhibit spotlights stand out (room-themes.ts).
+    const environment = here === 'rotunda' ? 1 : ROOM_THEMES[here].lighting.environment
     scene.environmentIntensity += (environment - scene.environmentIntensity) * Math.min(1, dt * 3)
     if (sky.current) {
       sky.current.color.lerp(skyColour, Math.min(1, dt * 3))
@@ -302,7 +357,7 @@ function Lighting() {
         shadow-bias={-0.0004}
         shadow-normalBias={0.03}
         shadow-camera-near={0.5}
-        shadow-camera-far={30}
+        shadow-camera-far={KEY_SHADOW_FAR}
       />
       {/* Reflections: a small "light map" of glowing shapes, made once at start (no
           download). Shiny surfaces such as marble and gold reflect it. */}

@@ -1,5 +1,6 @@
 import type { RoomId } from '../types'
-import { EXHIBIT_SPOTS, SPOTLIGHT_ID, roomById, toWorld } from './layout'
+import { EXHIBIT_SPOTS, SPOTLIGHT_ID, panelOffset, roomById, toWorld } from './layout'
+import { ROOM_THEMES } from './room-themes'
 
 // MUSEUM SPOTLIGHTS: like a real museum, each room is fairly dark and the exhibits are lit
 // by warm spotlights from the ceiling. Six real spotlights follow the visitor from room
@@ -20,6 +21,12 @@ export interface SpotAim {
 // lamp costs a little drawing work for each pixel, so not more than the busiest room needs.)
 export const SPOT_COUNT = 6
 
+// The point halfway between an exhibit and its text board.
+const mid = (spot: (typeof EXHIBIT_SPOTS)[number]): [number, number] => {
+  const d = (spot.panelSide * panelOffset(spot.id)) / 2
+  return [spot.x + Math.cos(spot.yaw) * d, spot.z - Math.sin(spot.yaw) * d]
+}
+
 function eraRoom(id: RoomId): SpotAim[] {
   const room = roomById(id)
   if (!room) return []
@@ -32,18 +39,22 @@ function eraRoom(id: RoomId): SpotAim[] {
   const [nx, nz] = toWorld(room.frame, 0, room.vBack - 0.05)
   const [wx, wz] = toWorld(room.frame, 0, room.vBack - 2.8)
   const overviewAim: SpotAim[] = [{ from: [wx, room.height - 0.25, wz], to: [nx, room.height / 2 + 0.2, nz], strength: 0.4 * reach }]
+  const { primary } = ROOM_THEMES[id as Exclude<RoomId, 'rotunda'>].lighting
   return EXHIBIT_SPOTS.filter((spot) => spot.room === id && spot.kind === 'corner')
     // Like a real gallery (leader's reference photos): each lamp hangs in front of its
     // exhibit and shines down at an angle onto it, so the light falls on the face the
     // visitor sees and spreads into a soft pool on the floor around the plinth.
+    // The lamp is turned about 30 degrees to one side (towards the exhibit's board): lit
+    // from straight ahead an object looks flat, from the side its shape shows in light and
+    // shade (the room's soft fill keeps the shadow side readable).
     .map((spot): SpotAim => ({
-      from: [spot.x + Math.sin(spot.yaw) * 2.6, room.height - 0.25, spot.z + Math.cos(spot.yaw) * 2.6],
-      // Aimed at the object itself (the boards light themselves), so the light falls on
-      // the exhibit and its plinth, not in a big pool on the floor.
-      to: [spot.x, 1.3, spot.z],
-      narrow: true,
-      // AI, the spotlight exhibit, gets the strongest light of the museum.
-      strength: reach * (spot.id === SPOTLIGHT_ID ? 2.4 : 1.9),
+      // Centred between the exhibit and its board, so one pool of light covers both.
+      from: [mid(spot)[0] + Math.sin(spot.yaw) * 2.8, room.height - 0.25, mid(spot)[1] + Math.cos(spot.yaw) * 2.8],
+      to: [mid(spot)[0], 1.2, mid(spot)[1]],
+      // A hierarchy, as in a curated gallery: AI, the spotlight exhibit, gets the strongest
+      // light of the museum, each room's main exhibit (room-themes.ts) the next, the others
+      // a little less, so not every exhibit shouts equally.
+      strength: reach * (spot.id === SPOTLIGHT_ID ? 1.8 : spot.id === primary ? 1.55 : 1.25),
     }))
     .concat(overviewAim)
 }
@@ -109,7 +120,7 @@ export interface KeyAim extends SpotAim {
 // (The intro hall is a bright, welcoming lobby; only the era rooms are dim.)
 // (The exhibit halls are kept dark, so the exhibits in their spotlights stand out like a
 // stage: leader, "cinematic and dramatic".)
-const WASH: Partial<Record<RoomId, number>> = { hall: 40, ir1: 5, ir2: 5, ir3: 3, ir4: 8, quiz: 6 }
+// (Now set per room in room-themes.ts, lighting.wash.)
 
 function roomKey(id: RoomId): KeyAim[] {
   const room = roomById(id)
@@ -120,7 +131,7 @@ function roomKey(id: RoomId): KeyAim[] {
   const [fx, fz] = toWorld(room.frame, 0, room.vFront + depth * 0.3)
   const [tx, tz] = toWorld(room.frame, 0, room.vBack - depth * 0.25)
   // Only a faint wash: the room stays dim so the exhibit spotlights stand out.
-  return [{ from: [fx, room.height - 0.15, fz], to: [tx, 0, tz], angle: 1.05, intensity: WASH[id] ?? 10 }]
+  return [{ from: [fx, room.height - 0.15, fz], to: [tx, 0, tz], angle: 1.05, intensity: ROOM_THEMES[id as Exclude<RoomId, 'rotunda'>].lighting.wash }]
 }
 
 export const KEY_PLANS = new Map<RoomId, KeyAim>(
