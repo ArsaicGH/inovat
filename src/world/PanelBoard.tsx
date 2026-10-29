@@ -98,7 +98,8 @@ export default function PanelBoard({ exhibitId, width, height, aimed, theme }: P
       const bottom = h - pad
       // Base text size: scales with the board, but no larger than on the invention boards
       // (about 7 cm), so the big wall boards fit their text instead of a few huge lines.
-      const unit = Math.min(w / 18, PIXELS_PER_METRE * 0.071)
+      // (The team board uses smaller letters, so every member fits.)
+      const unit = Math.min(w / 18, PIXELS_PER_METRE * 0.071) * (exhibitId === 'hall-team' ? 0.78 : 1)
 
       paintPaper(ctx, theme, w, h)
       ctx.textBaseline = 'top'
