@@ -12,6 +12,7 @@ export interface Credit {
 }
 
 const AMBIENTCG = 'ambientCG (Lennart Demes)'
+const PUBLIC_DOMAIN = { vi: 'Phạm vi công cộng (Public Domain Mark)', en: 'Public domain (Public Domain Mark)' }
 const CC0 = { vi: 'CC0 1.0 (phạm vi công cộng)', en: 'CC0 1.0 (public domain)' }
 
 function texture(id: string, use: Record<Language, string>, file: string): Credit {
@@ -89,10 +90,10 @@ export const credits: Credit[] = [
     files: ['sounds/ui/results.ogg'],
   },
   {
-    item: { vi: 'Nhạc sảnh trung tâm: Minuet cung Sol trưởng, BWV Anh. 114 (Christian Petzold), bản thu PLATO GSW', en: 'Central Hall music: Minuet in G major, BWV Anh. 114 (Christian Petzold), PLATO GSW recording' },
-    author: 'Morn (Wikimedia Commons)',
-    licence: CC0,
-    source: 'https://commons.wikimedia.org/wiki/File:Minuet_in_G_major,_BWV_Anh._114_(played_by_PLATO_GSW).flac',
+    item: { vi: 'Nhạc sảnh trung tâm: Minuet cung Sol trưởng, BWV Anh. 114 (Christian Petzold), bản thu piano của Musopen', en: 'Central Hall music: Minuet in G major, BWV Anh. 114 (Christian Petzold), Musopen piano recording' },
+    author: 'Aaron Dunn (Musopen), via Wikimedia Commons',
+    licence: PUBLIC_DOMAIN,
+    source: 'https://commons.wikimedia.org/wiki/File:Minuet_in_G_major,_Anh._114_-_Notebook_for_Anna_Magdalena_Bach.ogg',
     files: ['sounds/music/rotunda.ogg'],
   },
   {
