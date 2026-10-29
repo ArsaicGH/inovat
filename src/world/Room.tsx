@@ -21,7 +21,8 @@ export default function Room({ room }: { room: Exclude<RoomId, 'rotunda'> }) {
             <SurfaceMaterial style={theme.floor} width={box.hx * 2} height={box.hz * 2} />
           </mesh>
           {/* The ceiling faces down and casts no shadow, so the light still reaches inside. */}
-          <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, ceilingHeight, 0]}>
+          <mesh rotation={[Math.PI / 2, 0, 0]} // (2 cm below the walls' edge: level with the lintel over the doorway it flickered.)
+            position={[0, ceilingHeight - 0.02, 0]}>
             <planeGeometry args={[box.hx * 2, box.hz * 2]} />
             {theme.ceilingSurface ? (
               <SurfaceMaterial
