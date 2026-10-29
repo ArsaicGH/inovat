@@ -261,6 +261,7 @@ function makePalette() {
     daylight: glow('#e8f4ff', 1.25),
     tube: glow('#f2f6ff', 1.6),
     headlamp: glow('#fff1cf', 4),
+    bulb: glow('#ffd590', 3),
     led: glow('#ff4030', 2.2),
     cyan: glow('#56dff0', 1.6),
     nozzle: glow('#ffb347', 2.5),
@@ -1750,12 +1751,19 @@ function Land({ era }: { era: number }) {
   const { m } = usePalette()
   const back = useMemo(() => {
     const [light, mid, deep] = LAND_SHADES[era]
-    const texture = paint(8, 256, (c, w, h) => {
+    const texture = paint(512, 1024, (c, w, h) => {
       const g = c.createLinearGradient(0, 0, 0, h)
       g.addColorStop(0, light)
       g.addColorStop(0.45, mid)
       g.addColorStop(1, deep)
       c.fillStyle = g
+      c.fillRect(0, 0, w, h)
+      paintLandPattern(c, w, h, era)
+      // Darker towards the edges, so the column has depth.
+      const v = c.createRadialGradient(w / 2, h * 0.45, w * 0.2, w / 2, h * 0.45, h * 0.75)
+      v.addColorStop(0, 'rgba(0,0,0,0)')
+      v.addColorStop(1, 'rgba(0,0,0,0.5)')
+      c.fillStyle = v
       c.fillRect(0, 0, w, h)
     })
     const material = new MeshBasicMaterial({ map: texture })
@@ -1785,7 +1793,7 @@ function Land({ era }: { era: number }) {
         const y = 1 + i * (30 / items.length)
         return (
           <group key={id} position={[x, y, 0]}>
-            <Box size={[6.5, 0.4, 5]} at={[0, -0.2, 0]} m={m.plinth} />
+            <Box size={[6.5, 0.4, 5]} at={[0, -0.2, 0]} m={[m.timber, m.iron, m.grey, m.white][era]} />
             <Box size={[6.5, 0.06, 0.1]} at={[0, 0.02, 2.5]} m={m.gold} />
             <group scale={1.25}>
               <Invention id={id} />
@@ -1793,10 +1801,165 @@ function Land({ era }: { era: number }) {
           </group>
         )
       })}
+      <LandDeco era={era} />
       <group position={[0, LAND_HEIGHT - 4.5, -2.4]} scale={1.4}>
         <EraNumeral era={(['ir1', 'ir2', 'ir3', 'ir4'] as const)[era]} />
       </group>
     </group>
+  )
+}
+
+// Each column's wall, painted in its era's style: brickwork and gears (steam), riveted steel
+// plates and an Art Deco sunburst (electricity), circuit tracks and pixels (digital), a
+// hexagon grid and a network of nodes (connected).
+function paintLandPattern(c: CanvasRenderingContext2D, w: number, h: number, era: number) {
+  const r = seeded(41 + era)
+  c.save()
+  if (era === 0) {
+    c.strokeStyle = 'rgba(40, 20, 8, 0.35)'
+    c.lineWidth = 2
+    for (let y = 0; y < h; y += 24) {
+      c.beginPath()
+      c.moveTo(0, y)
+      c.lineTo(w, y)
+      c.stroke()
+      for (let x = (y / 24) % 2 ? 0 : 32; x < w; x += 64) {
+        c.beginPath()
+        c.moveTo(x, y)
+        c.lineTo(x, y + 24)
+        c.stroke()
+      }
+    }
+    c.strokeStyle = 'rgba(255, 220, 160, 0.16)'
+    c.lineWidth = 10
+    for (const [x, y, rad] of [[90, 260, 70], [420, 520, 110], [120, 800, 90]]) {
+      c.beginPath()
+      c.arc(x, y, rad, 0, Math.PI * 2)
+      c.stroke()
+      for (let k = 0; k < 12; k++) {
+        const a = (k / 12) * Math.PI * 2
+        c.fillStyle = 'rgba(255, 220, 160, 0.16)'
+        c.fillRect(x + Math.cos(a) * rad - 8, y + Math.sin(a) * rad - 8, 16, 16)
+      }
+    }
+  } else if (era === 1) {
+    c.strokeStyle = 'rgba(255, 230, 180, 0.18)'
+    c.lineWidth = 3
+    for (let k = 0; k < 24; k++) {
+      const a = Math.PI + (k / 23) * Math.PI
+      c.beginPath()
+      c.moveTo(w / 2, h)
+      c.lineTo(w / 2 + Math.cos(a) * h, h + Math.sin(a) * h)
+      c.stroke()
+    }
+    c.strokeStyle = 'rgba(0, 0, 0, 0.3)'
+    c.fillStyle = 'rgba(220, 220, 230, 0.25)'
+    for (let y = 0; y < h; y += 128)
+      for (let x = 0; x < w; x += 128) {
+        c.strokeRect(x, y, 128, 128)
+        for (const [dx, dy] of [[10, 10], [118, 10], [10, 118], [118, 118]]) c.fillRect(x + dx - 3, y + dy - 3, 6, 6)
+      }
+  } else if (era === 2) {
+    c.strokeStyle = 'rgba(150, 255, 180, 0.22)'
+    c.lineWidth = 3
+    for (let i = 0; i < 70; i++) {
+      let x = Math.floor(r() * 16) * 32
+      let y = Math.floor(r() * 32) * 32
+      c.beginPath()
+      c.moveTo(x, y)
+      for (let k = 0; k < 4; k++) {
+        if (r() < 0.5) x += (r() < 0.5 ? -1 : 1) * 64
+        else y += (r() < 0.5 ? -1 : 1) * 64
+        c.lineTo(x, y)
+      }
+      c.stroke()
+      c.fillStyle = 'rgba(150, 255, 180, 0.35)'
+      c.fillRect(x - 5, y - 5, 10, 10)
+    }
+  } else {
+    c.strokeStyle = 'rgba(160, 240, 255, 0.16)'
+    c.lineWidth = 2
+    const R = 30
+    for (let row = 0; row < h / (R * 1.5) + 1; row++)
+      for (let col = 0; col < w / (R * 1.73) + 1; col++) {
+        const cx = col * R * 1.73 + (row % 2) * R * 0.87
+        const cy = row * R * 1.5
+        c.beginPath()
+        for (let k = 0; k <= 6; k++) c.lineTo(cx + R * Math.cos((k * Math.PI) / 3 + Math.PI / 6), cy + R * Math.sin((k * Math.PI) / 3 + Math.PI / 6))
+        c.stroke()
+      }
+    const nodes = Array.from({ length: 14 }, () => [r() * w, r() * h])
+    c.strokeStyle = 'rgba(180, 250, 255, 0.3)'
+    nodes.forEach(([x, y], i) => {
+      const [nx, ny] = nodes[(i + 3) % nodes.length]
+      c.beginPath()
+      c.moveTo(x, y)
+      c.lineTo(nx, ny)
+      c.stroke()
+      c.fillStyle = 'rgba(200, 250, 255, 0.6)'
+      c.beginPath()
+      c.arc(x, y, 6, 0, Math.PI * 2)
+      c.fill()
+    })
+  }
+  c.restore()
+}
+
+// Era decorations on each column: turning gears (steam), a row of glowing bulbs (electricity),
+// small green screens (digital), slowly turning rings of light (connected).
+function LandDeco({ era }: { era: number }) {
+  const { m, shape } = usePalette()
+  const side = (i: number) => (i % 2 ? -1 : 1) * 7.6
+  if (era === 0)
+    return (
+      <>
+        {[[7.2, 8, 1.6, 1], [-7.3, 15, 1.2, -1.4], [7.4, 23, 2, 0.8], [-7, 31, 1.4, -1]].map(([x, y, r, sp], i) => (
+          <Spin key={i} at={[x, y, -2.3]} speed={sp * 0.5}>
+            <mesh geometry={shape(`landGear${i}`, () => gearShape(r, Math.round(r * 10), 0.25))} material={m.brass} />
+          </Spin>
+        ))}
+      </>
+    )
+  if (era === 1)
+    return (
+      <>
+        {Array.from({ length: 8 }, (_, i) => (
+          <group key={i} position={[-7.7 + i * 2.2, LAND_HEIGHT - 1.2, -1.6]}>
+            <Rod a={[0, 0, 0]} b={[0, 1.2, 0]} r={0.02} m={m.darkIron} />
+            <mesh material={m.bulb}>
+              <sphereGeometry args={[0.18, 12, 8]} />
+            </mesh>
+          </group>
+        ))}
+        {[6, 14, 22, 30].map((y, i) => (
+          <Box key={y} size={[0.4, 4, 0.2]} at={[side(i), y, -2.4]} m={m.brass} />
+        ))}
+      </>
+    )
+  if (era === 2)
+    return (
+      <>
+        {[5, 11, 17, 23, 29].map((y, i) => (
+          <group key={y} position={[side(i), y, -2.3]}>
+            <Box size={[2.2, 1.6, 0.3]} at={[0, 0, 0]} m={m.cream} />
+            <Panel size={[1.8, 1.2]} at={[0, 0, 0.16]} m={m.crt} />
+          </group>
+        ))}
+      </>
+    )
+  return (
+    <>
+      {[7, 16, 25, 33].map((y, i) => (
+        <Spin key={y} at={[side(i), y, -2.2]} speed={(i % 2 ? 1 : -1) * 0.3}>
+          <mesh material={m.cyan}>
+            <torusGeometry args={[1.4, 0.06, 6, 6]} />
+          </mesh>
+          <mesh material={m.cyan} scale={0.6}>
+            <torusGeometry args={[1.4, 0.05, 6, 6]} />
+          </mesh>
+        </Spin>
+      ))}
+    </>
   )
 }
 

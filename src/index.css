@@ -2228,11 +2228,27 @@ body {
    film dimmed behind them so the text stands out. */
 .ending-title {
   justify-content: flex-start;
-  padding-top: 2vh;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.2) 45%, rgba(0, 0, 0, 0.5) 100%);
+  /* (Low enough that the era numbers at the top of the columns stay visible.) */
+  padding-top: 16vh;
+  /* A dark pool behind the title block, so the gold stands out from the columns. */
+  background: radial-gradient(ellipse 48% 26% at 50% 36%, rgba(0, 0, 0, 0.72) 0%, rgba(0, 0, 0, 0.45) 55%, rgba(0, 0, 0, 0) 100%), linear-gradient(180deg, rgba(0, 0, 0, 0) 60%, rgba(0, 0, 0, 0.5) 100%);
   animation: ending-fade-in 2s ease-out both;
 }
 .ending-title .ending-after {
   margin-top: auto;
   margin-bottom: 1vh;
+}
+
+/* Once the title is up, the film behind it softly goes out of focus, like a camera
+   focusing on the text. */
+.ending-title {
+  animation: ending-fade-in 2s ease-out both, ending-defocus 2.5s ease-in-out 0.8s both;
+}
+@keyframes ending-defocus {
+  from {
+    backdrop-filter: blur(0);
+  }
+  to {
+    backdrop-filter: blur(2.5px);
+  }
 }
