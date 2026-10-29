@@ -18,7 +18,7 @@ const vi = {
       intro: {
         title: 'Chào mừng đến INOVAT',
         text: 'Hướng dẫn sẽ giới thiệu từng thao tác. Nhấn phím cách (Space) để bắt đầu.',
-        tip: 'Mẹo: nhấn F11 để chơi toàn màn hình, cho trải nghiệm tốt nhất.',
+        tip: 'Mẹo: nhấn F11 để chơi toàn màn hình, và đeo tai nghe để có trải nghiệm tốt nhất.',
       },
       look: {
         title: 'Nhìn xung quanh',
@@ -203,7 +203,7 @@ const en: UiText = {
       intro: {
         title: 'Welcome to INOVAT',
         text: 'This guide introduces the controls one at a time. Press Space to begin.',
-        tip: 'Tip: press F11 to play in full screen for the best experience.',
+        tip: 'Tip: press F11 to use full screen, and wear headphones for the best experience.',
       },
       look: {
         title: 'Look around',

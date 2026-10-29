@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { AUDIO_ENABLED } from '../features'
 import { useMuseumStore } from '../state/useMuseumStore'
 import { ERA_ROOMS } from '../types'
-import { duckAmbience, loadSounds, playEffect, playWelcome, setAmbience, setVolumes, stopWelcome, unlockAudio } from './sound'
+import { duckAmbience, loadSounds, playEffect, playWelcome, setAmbience, setSilenced, setVolumes, stopWelcome, unlockAudio } from './sound'
 
 // Listens to what happens in the game (the shared store) and plays the matching sound.
 // Footsteps and doors are played from Player.tsx and Doors.tsx, where they happen.
@@ -27,6 +27,11 @@ export default function SoundDirector() {
 
     const unsubscribe = useMuseumStore.subscribe((state, before) => {
       if (state.volumes !== before.volumes) apply()
+      // Sound only once loading has finished (see setSilenced); then the area's own music.
+      if (state.qualityChosen && !before.qualityChosen) {
+        setSilenced(false)
+        setAmbience(state.currentRoom)
+      }
 
       // Menus and panels.
       if (state.mode !== before.mode) {

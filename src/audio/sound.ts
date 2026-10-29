@@ -207,11 +207,20 @@ function playBuffer(url: string, volume: number, rate = 1) {
   source.start()
 }
 
+// Silent while the game is still loading: the loading measures speed by moving the camera
+// through the central hall and back, which would otherwise play its music and sounds.
+let silenced = true
+export function setSilenced(on: boolean) {
+  silenced = on
+}
+
 export function playEffect(name: EffectName, volume = 0.6) {
+  if (silenced) return
   playBuffer(EFFECTS[name], volume, PITCH[name] ?? 1)
 }
 
 export function playStep(volume = 0.3) {
+  if (silenced) return
   playBuffer(STEP_FILES[nextFoot], volume)
   nextFoot = 1 - nextFoot
 }
@@ -244,6 +253,7 @@ function fadeOutAmbience(now: number) {
 // Play the loop of `room` (cross-fading from the previous one), or fade to silence in an
 // area without a loop.
 export function setAmbience(room: RoomId) {
+  if (silenced) return
   if (!context || !ambienceBus || room === ambienceRoom) return
   const url = AMBIENCE[room]
   const buffer = url && !isMusic(url) ? buffers.get(url) : undefined

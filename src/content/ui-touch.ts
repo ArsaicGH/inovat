@@ -25,7 +25,7 @@ const vi: TouchText = {
   steps: {
     intro: {
       text: 'Hướng dẫn sẽ giới thiệu từng thao tác. Chạm vào màn hình để bắt đầu.',
-      tip: 'Mẹo: xoay ngang thiết bị để có trải nghiệm tốt nhất.',
+      tip: 'Mẹo: xoay ngang thiết bị và đeo tai nghe để có trải nghiệm tốt nhất.',
     },
     look: { text: 'Kéo ngón tay ở nửa bên phải màn hình để xoay góc nhìn.' },
     move: { text: 'Đặt ngón cái xuống bất kỳ đâu ở nửa bên trái màn hình rồi kéo nhẹ để đi lại.' },
@@ -47,7 +47,7 @@ const en: TouchText = {
   steps: {
     intro: {
       text: 'This guide introduces the controls one at a time. Tap the screen to begin.',
-      tip: 'Tip: turn your device sideways for the best experience.',
+      tip: 'Tip: turn your device sideways and wear headphones for the best experience.',
     },
     look: { text: 'Drag a finger on the right half of the screen to turn the camera.' },
     move: { text: 'Put your thumb down anywhere on the left half of the screen and drag a little to walk.' },
