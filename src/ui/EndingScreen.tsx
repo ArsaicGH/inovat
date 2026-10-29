@@ -56,7 +56,7 @@ export default function EndingScreen() {
         </>
       ) : (
         <div className="ending-title">
-          <h1>{ui.ending.brand}</h1>
+          <h1 className="game-title ending-brand">{ui.ending.brand}</h1>
           <div className="title-ornament" aria-hidden="true">
             <span />
             <i />

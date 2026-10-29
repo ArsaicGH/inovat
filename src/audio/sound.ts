@@ -62,7 +62,8 @@ let nextFoot = 0
 // (No entry = no loop in that area.) Music tracks (in /music/) are streamed; the short
 // central-hall loop is unpacked in advance, so it repeats without a gap.
 const AMBIENCE: Partial<Record<RoomId, string>> = {
-  rotunda: '/sounds/ambience/rotunda.ogg',
+  // Central hall: Minuet in G major (Petzold, once attributed to Bach), streamed.
+  rotunda: '/sounds/music/rotunda.ogg',
   // Era music: atmospheric ambient tracks, one per era (CC0 from OpenGameArt; CMCN 4 from
   // Pixabay), for now:
   // "Factory ambiance", "Life in corrupted binary", "Factorio Clone Music", "Space Ambient".

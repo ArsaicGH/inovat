@@ -89,11 +89,11 @@ export const credits: Credit[] = [
     files: ['sounds/ui/results.ogg'],
   },
   {
-    item: { vi: 'Âm thanh nền sảnh trung tâm - bộ 30 CC0 SFX loops', en: 'Central Hall background sound - 30 CC0 SFX loops pack' },
-    author: 'rubberduck (OpenGameArt)',
+    item: { vi: 'Nhạc sảnh trung tâm: Minuet cung Sol trưởng, BWV Anh. 114 (Christian Petzold), bản thu PLATO GSW', en: 'Central Hall music: Minuet in G major, BWV Anh. 114 (Christian Petzold), PLATO GSW recording' },
+    author: 'Morn (Wikimedia Commons)',
     licence: CC0,
-    source: 'https://opengameart.org/content/30-cc0-sfx-loops',
-    files: ['sounds/ambience/rotunda.ogg'],
+    source: 'https://commons.wikimedia.org/wiki/File:Minuet_in_G_major,_BWV_Anh._114_(played_by_PLATO_GSW).flac',
+    files: ['sounds/music/rotunda.ogg'],
   },
   {
     item: { vi: 'Nhạc CMCN 1: "Factory ambiance" (nhạc nền không khí nhà máy)', en: 'CMCN 1 music: "Factory ambiance" (atmospheric factory ambience)' },

@@ -32,6 +32,7 @@ export default function EndingScene() {
   const run = useMuseumStore((state) => state.endingRun)
   const get = useThree((state) => state.get)
   const group = useRef<Group>(null)
+  const sets = useRef<(Group | null)[]>([])
   const playing = useRef({ ready: false, shot: -1, act: 0 })
   const haze = useMemo(() => new Fog('#000000', 10, 60), [])
   const temp = useMemo(
@@ -127,6 +128,7 @@ export default function EndingScene() {
     camera.position.set(ORIGIN[0] + ox + at[0], ORIGIN[1] + at[1] + Math.sin(film.t * 0.8) * 0.01, ORIGIN[2] + at[2])
     camera.lookAt(temp.look.set(ORIGIN[0] + ox + look[0], ORIGIN[1] + look[1], ORIGIN[2] + look[2]))
 
+    sets.current.forEach((set) => set && (set.visible = film.t < START.timeline))
     // The lights, the sky and the haze of this shot.
     const rig = RIGS[shot.rig]
     const lightsAt = shot.set >= 0 ? ox : 0
@@ -173,8 +175,9 @@ export default function EndingScene() {
   return (
     <group ref={group} position={ORIGIN}>
       <Suspense fallback={null}>
+        {/* (The sets leave before the finale: it shows only the line of time and the four era numbers.) */}
         {[SteamSet, ElectricSet, DigitalSet, SmartSet].map((Set, i) => (
-          <group key={i} position={[SET_X[i], 0, 0]}>
+          <group key={i} position={[SET_X[i], 0, 0]} ref={(g) => void (sets.current[i] = g)}>
             <Set />
           </group>
         ))}

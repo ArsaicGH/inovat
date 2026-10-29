@@ -35,7 +35,8 @@ function saveSensitivity(value: number) {
 
 // PROGRESS SAVING. If the page reloads (the browser put the tab to sleep, the connection
 // to the development server dropped, F5...), the title screen offers to continue the
-// earlier visit: rooms visited, tutorial step, position. Kept in sessionStorage, which
+// earlier visit: rooms visited, tutorial step, position, and the Time Machine game's lit
+// cores (so a finished game keeps the portal open). Kept in sessionStorage, which
 // belongs to this tab only, so a new visit in a new tab starts fresh.
 const PROGRESS_STORAGE_KEY = 'inovat-progress'
 
@@ -49,6 +50,8 @@ interface SavedProgress {
   visitedRooms: RoomId[]
   tutorial: TutorialStep | null
   pose: Pose
+  gameCores?: number
+  quizPassed?: boolean
 }
 
 function loadProgress(): SavedProgress | null {
@@ -62,16 +65,16 @@ function loadProgress(): SavedProgress | null {
 }
 
 export function saveProgress(pose: Pose) {
-  const { visitedRooms, tutorial } = useMuseumStore.getState()
+  const { visitedRooms, tutorial, gameCores, quizPassed } = useMuseumStore.getState()
   try {
-    sessionStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify({ visitedRooms, tutorial, pose }))
+    sessionStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify({ visitedRooms, tutorial, pose, gameCores, quizPassed }))
   } catch {
     // ignore: storage blocked, progress is simply not kept
   }
 }
 
-const savedProgress = loadProgress()
-export const hasSavedProgress = savedProgress !== null
+// (Read again each time: after "Back to the title screen" the visit just left can be continued.)
+export const hasSavedProgress = () => loadProgress() !== null
 
 // Language of every text in the game, remembered in this browser (Vietnamese by default).
 const LANGUAGE_STORAGE_KEY = 'inovat-language'
@@ -244,6 +247,8 @@ interface MuseumState {
 
   // Title screen "continue": bring back the visit saved before the reload.
   continueSavedVisit: () => void
+  // Back to the title screen from the pause menu, ready for a new visit (or to continue).
+  backToTitle: () => void
 
   // Is the mouse captured? (Walking also works without it, keyboard only, e.g. after
   // resuming with Esc, which browsers do not accept for capturing the mouse.)
@@ -369,13 +374,30 @@ export const useMuseumStore = create<MuseumState>((set) => ({
 
   continueSavedVisit: () =>
     set((state) => {
+      const savedProgress = loadProgress()
       if (!savedProgress) return state
+      const gameCores = Math.max(state.gameCores, savedProgress.gameCores ?? 0)
       return {
         visitedRooms: savedProgress.visitedRooms,
         tutorial: savedProgress.tutorial,
+        gameCores,
+        quizPassed: state.quizPassed || savedProgress.quizPassed === true || gameCores >= 4,
         teleport: { roomId: state.teleport.roomId, pose: savedProgress.pose, count: state.teleport.count + 1 },
       }
     }),
+  // A fresh visit from the hall: no rooms visited, no cores lit, portal closed (open in the
+  // development build). The visit just left stays saved, so "Continue" can bring it back.
+  backToTitle: () =>
+    set((state) => ({
+      mode: 'start',
+      visitedRooms: [],
+      tutorial: null,
+      gameCores: 0,
+      quizPassed: import.meta.env.DEV,
+      aimedExhibitId: null,
+      showKeyList: false,
+      teleport: { roomId: 'hall', pose: undefined, count: state.teleport.count + 1 },
+    })),
 }))
 
 // How many era rooms have been visited, and whether the quiz room is open.

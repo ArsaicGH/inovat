@@ -1692,12 +1692,12 @@ export function Timeline() {
   useFrame(() => {
     const t = film.t - START.timeline
     if (group.current) group.current.visible = t >= 0
-    m.ribbon.opacity = 0.85 * smooth(0, 3, t)
+    m.ribbon.opacity = smooth(0, 3, t)
   })
   return (
     <group ref={group} visible={false}>
       <mesh position={[0, 0.05, -32]} rotation={[-Math.PI / 2, 0, 0]} material={m.ribbon}>
-        <planeGeometry args={[200, 0.9]} />
+        <planeGeometry args={[200, 1.6]} />
       </mesh>
       {(['ir1', 'ir2', 'ir3', 'ir4'] as const).map((era, i) => (
         <group key={era} position={[SET_X[i], 10, -32]} scale={1.8}>

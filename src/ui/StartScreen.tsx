@@ -36,7 +36,7 @@ export default function StartScreen() {
               {ui.start.button}
             </button>
             {/* Only when this tab holds an earlier visit (e.g. after a reload). */}
-            {hasSavedProgress && (
+            {hasSavedProgress() && (
               <LockButton label={ui.start.continue} className="start-button start-button-quiet" onBeforeLock={continueSavedVisit} />
             )}
           </div>

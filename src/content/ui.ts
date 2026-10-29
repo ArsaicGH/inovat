@@ -60,6 +60,7 @@ const vi = {
   pause: {
     title: 'Tạm dừng',
     resume: 'Tiếp tục',
+    toTitle: 'Về màn hình chính',
     clickHint: 'Nhấp vào khoảng trống hoặc nhấn Tiếp tục',
   },
   // While walking without the mouse captured (e.g. after resuming with Esc).
@@ -242,6 +243,7 @@ const en: UiText = {
   pause: {
     title: 'Paused',
     resume: 'Continue',
+    toTitle: 'Back to the title screen',
     clickHint: 'Click on blank space or press Continue',
   },
   clickToLook: 'Click to look around with the mouse',

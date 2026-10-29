@@ -246,13 +246,13 @@ export const RIGS = {
   // The finale: all four sets in a row at dusk, each in its era's light.
   timeline: {
     key: L([0, 90, 70], [0, 0, -6], '#fff0dc', 1.6, 1.0),
-    spots: SET_X.map((x, i) => L([x, 30, 26], [x, 0, -8], ['#ffb46e', '#ffd9a8', '#f2f4ff', '#e2f4ff'][i], 3.2, 0.55)),
+    spots: SET_X.map((x, i) => L([x, 24, -12], [x, 9, -32], ['#ffb46e', '#ffd9a8', '#f2f4ff', '#e2f4ff'][i], 3.2, 0.55)),
     sky: '#56648a',
     ground: '#1a1a22',
     fill: 0.32,
     environment: 0.4,
-    background: '#121826',
-    haze: [90, 340],
+    background: '#0b0906',
+    haze: [120, 400],
   },
 } satisfies Record<string, Rig>
 
@@ -322,8 +322,8 @@ export const SHOTS: Shot[] = [
   { id: 'echo3', act: 5, set: 2, duration: 1.6, rig: 'robots', from: [[9.6, 2.4, -6.4], [8, 1.4, -9]], to: [[9.3, 2.3, -6.7], [8, 1.4, -9]] },
   { id: 'echo4', act: 5, set: 3, duration: 1.6, rig: 'smart', from: [[-7.6, 1.75, -8.3], [-9, 1.25, -10]], to: [[-7.9, 1.65, -8.6], [-9, 1.25, -10]] },
   // ...then the camera pulls far back: the four eras side by side, one timeline.
-  { id: 'timeline', act: 5, set: -1, duration: 11, rig: 'timeline', into: 'dip', from: [[66, 14, 12], [66, 2, -8]], to: [[0, 58, 112], [0, 3, -12]] },
-  { id: 'hold', act: 5, set: -1, duration: 600, rig: 'timeline', from: [[0, 58, 112], [0, 3, -12]], to: [[0, 40, 70], [0, 3, -12]] },
+  { id: 'timeline', act: 5, set: -1, duration: 11, rig: 'timeline', into: 'dip', from: [[-92, 7, -14], [-66, 10, -32]], to: [[0, 13, 62], [0, 10, -32]] },
+  { id: 'hold', act: 5, set: -1, duration: 600, rig: 'timeline', from: [[0, 13, 62], [0, 10, -32]], to: [[0, 11, 40], [0, 10, -32]] },
 ]
 
 // Which shot is playing at film time t, and whose set it is in.

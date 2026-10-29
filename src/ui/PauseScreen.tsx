@@ -39,6 +39,9 @@ export default function PauseScreen() {
         <LanguageSwitch label={ui.language.label} />
         <div className="button-row">
           <LockButton label={ui.pause.resume} className="start-button" />
+          <button type="button" className="start-button start-button-quiet" onClick={() => useMuseumStore.getState().backToTitle()}>
+            {ui.pause.toTitle}
+          </button>
         </div>
         <p className="map-hint pause-hint">{ui.pause.clickHint}</p>
       </div>
