@@ -99,10 +99,11 @@ export const ROOM_THEMES: Record<Exclude<RoomId, 'rotunda'>, RoomTheme> = {
   },
   // CMCN 2: electricity and mass production. Steel, concrete, early bulbs.
   ir2: {
-    floor: { texture: 'concrete', colour: '#aaa69f', tile: 3, roughness: 0.75 },
+    // Cool grey polished concrete, to go with the navy walls.
+    floor: { texture: 'concrete', colour: '#7f8796', tile: 3, roughness: 0.5 },
     bounce: '#45423c',
     // Dark navy steel plates (the central hall ceiling's CMCN 2 blue; bare metal read as black).
-    walls: { texture: 'metal-plates', colour: '#5b6f9c', tile: 2, roughness: 0.6, metalness: 0.2 },
+    walls: { texture: 'metal-plates', colour: '#5a78c4', tile: 2, roughness: 0.6, metalness: 0.15 },
     ceiling: '#24282d',
     // A concrete slab overhead.
     ceilingSurface: { texture: 'concrete', colour: '#a19d96', tile: 3, roughness: 0.9 },
@@ -116,15 +117,17 @@ export const ROOM_THEMES: Record<Exclude<RoomId, 'rotunda'>, RoomTheme> = {
       spotColour: '#ffe5c4',
       keyColour: '#ffead2',
       wash: 5,
-      wallWash: { colour: '#ffe1bb', strength: 5, rhythm: 2.4, floor: 0 },
+      wallWash: { colour: '#d4e0ff', strength: 5, rhythm: 2.4, floor: 0 },
       ceilingGlow: { colour: '#ffe6c8', strength: 2.4 },
       primary: 'ir2-3',
     },
   },
   // CMCN 3: computers. Beige panels, checkered floor, fluorescent light.
   ir3: {
-    floor: { texture: 'tiles', colour: '#d6cfc2', tile: 1.6, roughness: 0.45 },
-    walls: { painted: 'office-panels', colour: '#ffffff', tile: 1.2, roughness: 0.8 },
+    // Charcoal-green tiles, to go with the dark green walls.
+    floor: { texture: 'tiles', colour: '#5d6b62', tile: 1.6, roughness: 0.4 },
+    // Dark green panels (the central hall ceiling's CMCN 3 green), lit by neon-green lines.
+    walls: { painted: 'office-panels', colour: '#3b5a48', tile: 1.2, roughness: 0.7 },
     bounce: '#544f45',
     ceiling: '#6a655a',
     ceilingSurface: { painted: 'ceiling-tiles', colour: '#d9d6cc', tile: 1.2, roughness: 0.9 },
@@ -138,7 +141,7 @@ export const ROOM_THEMES: Record<Exclude<RoomId, 'rotunda'>, RoomTheme> = {
       spotColour: '#fff3e6',
       keyColour: '#f3f6ff',
       wash: 3,
-      wallWash: { colour: '#eef3ff', strength: 3.5, rhythm: 0, floor: 0 },
+      wallWash: { colour: '#7fd6a0', strength: 3.5, rhythm: 0, floor: 0.9 },
       ceilingGlow: { colour: '#eef3ff', strength: 3.0 },
       primary: 'ir3-1',
     },

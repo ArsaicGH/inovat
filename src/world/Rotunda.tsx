@@ -2,6 +2,7 @@ import Centrepiece from './Centrepiece'
 import MergeStatic from './MergeStatic'
 import HangingSculptures from './HangingSculptures'
 import { paintCrown, paintDome } from './dome-painting'
+import { paintHallPanel } from './hall-paintings'
 import { useEffect, useMemo } from 'react'
 import { BackSide } from 'three'
 import {
@@ -98,7 +99,7 @@ function WallDecor() {
                 </mesh>
               </group>
             ))}
-            {!hasDoor && <DamaskPanel halfSide={halfSide} />}
+            {!hasDoor && <DamaskPanel halfSide={halfSide} index={PANEL_EMBLEMS[(side - 1) / 2]} />}
           </group>
         )
       })}
@@ -106,18 +107,26 @@ function WallDecor() {
   )
 }
 
+// Which emblem hangs on each blank wall (hall-paintings.ts), going round the hall: each era's
+// emblem just after its own door; the four linked rings between the Game Room and the intro
+// hall, the laurel wreath between the intro hall and CMCN 1.
+const PANEL_EMBLEMS = [2, 3, 5, 4, 0, 1]
+
 // Blank-wall decoration: a gold-framed fabric panel between two glowing wall lamps.
-function DamaskPanel({ halfSide }: { halfSide: number }) {
+function DamaskPanel({ halfSide, index }: { halfSide: number; index: number }) {
   // Sized from the wall, with room for the wall lamps on either side.
   const w = halfSide * 0.9
   const h = 3.4
   const y = 3.9
   const t = 0.12 // frame thickness
+  // The hanging's painting: deep red damask with a gold emblem (hall-paintings.ts).
+  const picture = useMemo(() => paintHallPanel(index, w / h), [index, w])
+  useEffect(() => () => picture.dispose(), [picture])
   return (
     <group>
       <mesh position={[0, y, 0.01]}>
         <planeGeometry args={[w, h]} />
-        <meshStandardMaterial color="#5c1f27" roughness={0.85} />
+        <meshStandardMaterial map={picture} roughness={0.85} />
       </mesh>
       {[
         [0, y + h / 2, w + t, t],

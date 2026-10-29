@@ -161,12 +161,6 @@ function ComputerAge({ size }: { size: RoomSize }) {
           </mesh>
         )),
       )}
-      {[-1, 1].map((s) => (
-        <mesh key={s} position={[s * (size.w / 2 - 0.02), 1.15, 0]} rotation={[0, -s * Math.PI / 2, 0]}>
-          <planeGeometry args={[size.d, 0.18]} />
-          <meshStandardMaterial color="#c4682f" roughness={0.6} />
-        </mesh>
-      ))}
     </>
   )
 }
