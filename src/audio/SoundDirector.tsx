@@ -46,7 +46,7 @@ export default function SoundDirector() {
 
       // Ambience of the area you are in (also starts it once the world is ready).
       if (state.currentRoom !== before.currentRoom || (state.worldReady && !before.worldReady)) setAmbience(state.currentRoom)
-      if (state.currentRoom !== before.currentRoom && state.currentRoom !== 'hall' && state.currentRoom !== 'rotunda') stopWelcome()
+      if (state.currentRoom !== before.currentRoom && state.currentRoom !== 'hall') stopWelcome()
 
       // Tutorial: each step completed.
       if (state.tutorial !== before.tutorial && before.tutorial && state.tutorial) playEffect('stepDone', 0.5)

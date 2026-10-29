@@ -76,17 +76,17 @@ const AMBIENCE: Partial<Record<RoomId, string>> = {
 }
 // Played once, when the visitor leaves the start screen (after the tutorial question).
 const WELCOME = '/sounds/music/welcome.ogg'
-const WELCOME_LEVEL = 0.6
-// How loud each area's loop is (they were recorded at very different levels).
+const WELCOME_LEVEL = 0.5
+// How loud each area's music is. Every sound file is loudness-normalized (to -18 LUFS)
+// when converted, so all the music shares one level.
 const AMBIENCE_LEVEL: Record<RoomId, number> = {
-  rotunda: 0.55,
+  rotunda: 0.5,
   hall: 0,
-  // The four era tracks are level-matched when converted, so they share one level.
   ir1: 0.5,
   ir2: 0.5,
   ir3: 0.5,
   ir4: 0.5,
-  quiz: 0.45,
+  quiz: 0.5,
 }
 const AMBIENCE_FADE = 1.5 // seconds to cross-fade between areas
 
