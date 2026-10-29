@@ -27,6 +27,8 @@ const mid = (spot: (typeof EXHIBIT_SPOTS)[number]): [number, number] => {
   return [spot.x + Math.cos(spot.yaw) * d, spot.z - Math.sin(spot.yaw) * d]
 }
 
+const SPOT_BALANCE: Partial<Record<RoomId, number>> = { ir1: 0.9, ir2: 0.72, ir3: 1, ir4: 0.8 }
+
 function eraRoom(id: RoomId): SpotAim[] {
   const room = roomById(id)
   if (!room) return []
@@ -54,8 +56,8 @@ function eraRoom(id: RoomId): SpotAim[] {
       // A hierarchy, as in a curated gallery: AI, the spotlight exhibit, gets the strongest
       // light of the museum, each room's main exhibit (room-themes.ts) the next, the others
       // a little less, so not every exhibit shouts equally.
-      // (CMCN 2, the brightest-walled era room, a little softer still.)
-      strength: reach * (spot.id === SPOTLIGHT_ID ? 1.2 : spot.id === primary ? 1.0 : 0.8) * (id === 'ir2' ? 0.85 : 1),
+      // Each room's own balance against its lighter walls (leader's tuning).
+      strength: reach * (spot.id === SPOTLIGHT_ID ? 1.2 : spot.id === primary ? 1.0 : 0.8) * (SPOT_BALANCE[id] ?? 1),
     }))
     .concat(overviewAim)
 }
