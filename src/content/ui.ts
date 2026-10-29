@@ -7,6 +7,8 @@ const vi = {
     button: 'Bắt đầu',
     // Under "Bắt đầu" when this tab still holds an earlier visit (e.g. after a reload).
     continue: 'Tiếp tục hành trình trước',
+    // (Instead of the plain start button, when an earlier visit can be continued.)
+    newJourney: 'Bắt đầu hành trình mới',
     tutorialQuestion: 'Quý khách có muốn xem hướng dẫn điều khiển không?',
     tutorialYes: 'Có, hướng dẫn tôi',
     tutorialNo: 'Không, vào tham quan',
@@ -158,7 +160,6 @@ const vi = {
     journey: 'Hành trình xuyên thời gian',
     brand: 'INOVAT',
     tagline: 'Bốn cuộc cách mạng. Một hành trình.',
-    subtitle: 'Từ cơ giới hóa đến công nghiệp thông minh.',
     // One line for each era as the flight passes it (written to set the mood).
     moods: [
       'Tiếng máy hơi nước vang lên, khói than phủ kín bầu trời: lần đầu tiên, máy móc gánh vác sức lao động của con người.',
@@ -169,8 +170,8 @@ const vi = {
     skip: 'Bỏ qua',
     title: 'Cảm ơn Quý khách đã tham quan!',
     text: 'Quý khách vừa đi qua bốn cuộc Cách mạng Công nghiệp: từ hơi nước và máy móc cơ khí, đến điện năng, máy tính, rô-bốt và trí tuệ nhân tạo. Câu chuyện ấy vẫn đang được viết tiếp, và thế hệ hôm nay sẽ góp phần tạo nên chương tiếp theo.',
-    backToHall: 'Quay lại sảnh',
     replay: 'Xem lại hành trình',
+    toTitle: 'Về màn hình chính',
   },
   // On-screen buttons on phones and tablets (names read out by screen readers), and the
   // note asking to turn the device sideways.
@@ -193,6 +194,7 @@ const en: UiText = {
   start: {
     button: 'Start',
     continue: 'Continue previous visit',
+    newJourney: 'Start a new journey',
     tutorialQuestion: 'Would you like a quick guide to the controls?',
     tutorialYes: 'Yes, show me',
     tutorialNo: 'No, start exploring',
@@ -326,7 +328,6 @@ const en: UiText = {
     journey: 'A journey through time',
     brand: 'INOVAT',
     tagline: 'Four revolutions. One journey.',
-    subtitle: 'From mechanization to intelligent industry.',
     moods: [
       'The roar of steam engines, skies dark with coal smoke: for the first time, machines took on the labour of human hands.',
       'Electric light pushed back the night and assembly lines never stopped moving: the world entered the age of mass production.',
@@ -336,8 +337,8 @@ const en: UiText = {
     skip: 'Skip',
     title: 'Thank you for visiting!',
     text: 'You have just travelled through four Industrial Revolutions: from steam and mechanical machinery to electricity, computers, robots and artificial intelligence. That story is still being written, and today’s generation will help shape its next chapter.',
-    backToHall: 'Back to the hall',
     replay: 'Replay the journey',
+    toTitle: 'Back to the title screen',
   },
   touch: {
     map: 'Map',

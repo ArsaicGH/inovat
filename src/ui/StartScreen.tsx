@@ -33,7 +33,7 @@ export default function StartScreen() {
         {!asking ? (
           <div className="start-buttons">
             <button type="button" className="start-button" onClick={() => setAsking(true)}>
-              {ui.start.button}
+              {hasSavedProgress() ? ui.start.newJourney : ui.start.button}
             </button>
             {/* Only when this tab holds an earlier visit (e.g. after a reload). */}
             {hasSavedProgress() && (

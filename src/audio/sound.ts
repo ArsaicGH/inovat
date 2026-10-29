@@ -332,3 +332,33 @@ document.addEventListener('visibilitychange', () => {
     if (current) play(current)
   }
 })
+
+// THE ENDING'S MUSIC ("Flight Hymn" by Ross Bugden), from the moment the visitor steps
+// into the portal. The file is cut so that its climax (3:42 in the full piece) falls exactly
+// where the closing title appears; the film follows the music's clock (EndingScene.tsx).
+const ENDING_MUSIC = '/sounds/music/ending.ogg'
+const ENDING_LEVEL = 0.5 // the same level as the other music (all files are normalized)
+export function playEndingMusic(at = 0) {
+  if (!context) return
+  const music = stream(ENDING_MUSIC, false)
+  if (!music) return
+  const now = context.currentTime
+  fadeOutAmbience(now)
+  ambienceRoom = null // so the room's own music starts again afterwards
+  window.clearTimeout(music.stopTimer)
+  music.element.currentTime = at
+  music.gain.gain.cancelScheduledValues(now)
+  music.gain.gain.setValueAtTime(ENDING_LEVEL, now)
+  play(music.element)
+}
+export function stopEndingMusic() {
+  const music = streams.get(ENDING_MUSIC)
+  if (!music || !context) return
+  music.gain.gain.setTargetAtTime(0, context.currentTime, 0.4)
+  music.stopTimer = window.setTimeout(() => music.element.pause(), 2000)
+}
+// Seconds into the ending's music, or null while it is not playing.
+export function endingMusicTime(): number | null {
+  const music = streams.get(ENDING_MUSIC)
+  return music && !music.element.paused ? music.element.currentTime : null
+}

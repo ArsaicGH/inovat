@@ -237,8 +237,9 @@ function Lighting() {
           // (A wide, very soft edge: the pool of light melts into the floor.)
           // A tight beam on the object with a soft edge: the exhibit glows, the floor
           // around it stays dim (gallery practice).
-          spot.angle = aim.narrow ? 0.48 : 0.5
-          spot.penumbra = aim.narrow ? 0.8 : 0.85
+          spot.angle = aim.narrow ? 0.6 : 0.5
+          // (A wide, fully soft edge: the pool melts into the room instead of ending in a ring.)
+          spot.penumbra = aim.narrow ? 1 : 0.85
           // The room's colour temperature (room-themes.ts): amber in CMCN 1 to cool white in CMCN 4.
           spot.color.set(want === 'rotunda' ? '#ffe6c4' : ROOM_THEMES[want].lighting.spotColour)
           spotTargets[i].position.set(...aim.to)

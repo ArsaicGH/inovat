@@ -1,6 +1,5 @@
 import { useContent } from '../content/use-content'
 import { useMuseumStore } from '../state/useMuseumStore'
-import { resumeWalking } from '../world/pointer-lock'
 import { filmVeil } from '../world/ending-shots'
 
 // THE ENDING's interface, over the film through time (EndingScene.tsx): a white flash as
@@ -16,14 +15,6 @@ export default function EndingScreen() {
   const run = useMuseumStore((state) => state.endingRun)
   const era = stage >= 1 && stage <= 4 ? roomNames[ERAS[stage - 1]] : null
 
-  function backToHall() {
-    const store = useMuseumStore.getState()
-    // The ending closes first (it would otherwise keep holding the camera far outside the
-    // museum: a grey screen), then the visitor goes to the hall.
-    store.setMode('paused')
-    store.requestTeleport('hall')
-    void resumeWalking() // the click lets the browser capture the mouse again
-  }
 
   return (
     <div className="ending ending-bars">
@@ -63,16 +54,17 @@ export default function EndingScreen() {
             <span />
           </div>
           <p className="ending-tagline">{ui.ending.tagline}</p>
-          <p className="ending-subtitle">{ui.ending.subtitle}</p>
           <div className="ending-after">
             <h2>{ui.ending.title}</h2>
             <p>{ui.ending.text}</p>
             <div className="button-row">
-              <button className="start-button" onClick={backToHall}>
-                {ui.ending.backToHall}
-              </button>
+              {/* The visit is saved as completed: "Continue" on the title screen brings the
+                  visitor back in front of the portal with the map open. */}
               <button className="start-button start-button-quiet" onClick={() => useMuseumStore.getState().startEnding()}>
                 {ui.ending.replay}
+              </button>
+              <button className="start-button" onClick={() => useMuseumStore.getState().finishVisit()}>
+                {ui.ending.toTitle}
               </button>
             </div>
           </div>

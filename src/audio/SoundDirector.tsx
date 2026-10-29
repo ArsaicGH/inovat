@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { AUDIO_ENABLED } from '../features'
 import { useMuseumStore } from '../state/useMuseumStore'
 import { ERA_ROOMS } from '../types'
-import { duckAmbience, loadSounds, playEffect, playWelcome, setAmbience, setSilenced, setVolumes, stopWelcome, unlockAudio } from './sound'
+import { playEndingMusic, stopEndingMusic, duckAmbience, loadSounds, playEffect, playWelcome, setAmbience, setSilenced, setVolumes, stopWelcome, unlockAudio } from './sound'
 
 // Listens to what happens in the game (the shared store) and plays the matching sound.
 // Footsteps and doors are played from Player.tsx and Doors.tsx, where they happen.
@@ -43,10 +43,13 @@ export default function SoundDirector() {
         if (state.mode === 'map') playEffect('mapOpen')
         if (before.mode === 'map') playEffect('mapClose')
         if (state.mode === 'ending') playEffect('teleport')
+        if (before.mode === 'ending') stopEndingMusic()
         // The room sound fades away in menus and comes back when walking.
         // (Softer, not silent, while playing the Time Machine game.)
         duckAmbience(state.mode === 'exploring' || state.mode === 'ending' ? 1 : state.mode === 'game' ? 0.45 : 0)
       }
+      // The ending's music starts as the visitor steps into the portal (and again on "Replay").
+      if (state.mode === 'ending' && state.endingRun !== before.endingRun) playEndingMusic(0)
       if (state.teleport.count !== before.teleport.count && before.teleport.count > 0) playEffect('teleport')
 
       // Ambience of the area you are in (also starts it once the world is ready).

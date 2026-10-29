@@ -1,9 +1,8 @@
 import { Suspense, useEffect, useMemo, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { Color, Fog, Vector3, type Group, type PerspectiveCamera } from 'three'
-import type { RoomId } from '../types'
 import { useMuseumStore } from '../state/useMuseumStore'
-import { setAmbience } from '../audio/sound'
+import { endingMusicTime, playEndingMusic } from '../audio/sound'
 import { ORIGIN, RIGS, SET_X, SHOTS, START, TITLE_AT, borrowedLights, film, filmVeil, mixPose, shotIndexAt, type PlacedLight, type StageLight } from './ending-shots'
 import { DigitalSet, ElectricSet, SmartSet, SteamSet, FinaleLands, disposePalette } from './ending-sets'
 
@@ -19,8 +18,6 @@ import { DigitalSet, ElectricSet, SmartSet, SteamSet, FinaleLands, disposePalett
 const MUSEUM_SKY = '#1b1d24' // the museum's own background (Museum.tsx)
 const VIEW_DISTANCE = 420 // the camera sees further during the film (the museum's is 120 m)
 const FOV = 45 // a narrower, more cinematic lens than the museum's 70 degrees
-// Each act plays its era room's music; the finale returns to the grand Game Room piece.
-const ACT_MUSIC: RoomId[] = ['ir1', 'ir2', 'ir3', 'ir4', 'quiz']
 const DIP = 0.45 // seconds of each half of a dip to black
 const FLASH_IN = 0.6 // seconds a flash of light builds before a cut...
 const FLASH_OUT = 1.0 // ...and fades after it
@@ -107,9 +104,15 @@ export default function EndingScene() {
 
     // Black until everything is prepared.
     if (state.ready) {
-      // "Skip" (EndingScreen) jumps to the closing title.
-      if (store.endingStage === 6 && film.t < TITLE_AT) film.t = TITLE_AT
-      film.t += Math.min(delta, 0.1)
+      // "Skip" (EndingScreen) jumps to the closing title, and the music with it.
+      if (store.endingStage === 6 && film.t < TITLE_AT) {
+        film.t = TITLE_AT
+        playEndingMusic(TITLE_AT)
+      }
+      // The film follows the music's clock, so the title lands on its climax. (Without
+      // sound, or while it is still loading, the film keeps its own time.)
+      const music = endingMusicTime()
+      film.t = music !== null ? Math.max(music, film.t) : film.t + Math.min(delta, 0.1)
     }
     const index = shotIndexAt(film.t)
     const shot = SHOTS[index]
@@ -165,10 +168,6 @@ export default function EndingScene() {
     // The captions follow the acts; the closing title comes as the last shot settles.
     const stage = film.t >= TITLE_AT ? 6 : shot.act
     if (stage !== store.endingStage) store.setEndingStage(stage)
-    if (shot.act !== state.act) {
-      state.act = shot.act
-      setAmbience(ACT_MUSIC[shot.act - 1])
-    }
   }, -1)
 
   return (

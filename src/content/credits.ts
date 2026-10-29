@@ -90,6 +90,13 @@ export const credits: Credit[] = [
     files: ['sounds/ui/results.ogg'],
   },
   {
+    item: { vi: 'Nhạc cảnh kết: "Flight Hymn" (đã cắt ngắn)', en: 'Ending music: "Flight Hymn" (shortened)' },
+    author: 'Ross Bugden',
+    licence: { vi: 'Miễn phí bản quyền, có ghi công tác giả', en: 'Royalty free, with credit to the author' },
+    source: 'https://youtu.be/XCr0bsng60Y',
+    files: ['sounds/music/ending.ogg', 'sounds/music/ending.m4a'],
+  },
+  {
     item: { vi: 'Nhạc sảnh trung tâm: Minuet cung Sol trưởng, BWV Anh. 114 (Christian Petzold), bản thu piano của Musopen', en: 'Central Hall music: Minuet in G major, BWV Anh. 114 (Christian Petzold), Musopen piano recording' },
     author: 'Aaron Dunn (Musopen), via Wikimedia Commons',
     licence: PUBLIC_DOMAIN,

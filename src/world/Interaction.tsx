@@ -90,6 +90,22 @@ export default function Interaction() {
     if (aimed !== store.aimedExhibitId) store.setAimedExhibit(aimed)
   })
 
+  // A completed visit continued from the title screen: once walking, the map opens to invite
+  // another tour of any room (useMuseumStore, finishVisit).
+  useEffect(
+    () =>
+      useMuseumStore.subscribe((state) => {
+        if (!state.mapOnContinue || state.mode !== 'exploring') return
+        useMuseumStore.setState({ mapOnContinue: false })
+        window.setTimeout(() => {
+          if (useMuseumStore.getState().mode !== 'exploring') return
+          useMuseumStore.getState().setMode('map')
+          releasePointer()
+        }, 400)
+      }),
+    [],
+  )
+
   useEffect(() => {
     function openAimedExhibit() {
       const id = useMuseumStore.getState().aimedExhibitId

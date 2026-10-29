@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { roomById, toWorld } from '../world/layout'
 import { ERA_ROOMS, type RoomId } from '../types'
 import { LANGUAGES, type Language } from '../content/language'
 import { IS_TOUCH } from '../ui/touch'
@@ -55,6 +56,7 @@ interface SavedProgress {
   pose: Pose
   gameCores?: number
   quizPassed?: boolean
+  finished?: boolean // the ending was seen: continuing opens the map
 }
 
 function loadProgress(): SavedProgress | null {
@@ -67,10 +69,10 @@ function loadProgress(): SavedProgress | null {
   return null
 }
 
-export function saveProgress(pose: Pose) {
+export function saveProgress(pose: Pose, finished = false) {
   const { visitedRooms, tutorial, gameCores, quizPassed } = useMuseumStore.getState()
   try {
-    sessionStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify({ visitedRooms, tutorial, pose, gameCores, quizPassed }))
+    sessionStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify({ visitedRooms, tutorial, pose, gameCores, quizPassed, finished }))
   } catch {
     // ignore: storage blocked, progress is simply not kept
   }
@@ -252,6 +254,11 @@ interface MuseumState {
   continueSavedVisit: () => void
   // Back to the title screen from the pause menu, ready for a new visit (or to continue).
   backToTitle: () => void
+  // After the ending: the visit is saved as completed (every room, all cores, the portal
+  // open), standing in front of the portal, and the title screen shows.
+  finishVisit: () => void
+  // Set when a completed visit is continued: the map opens, to invite another tour.
+  mapOnContinue: boolean
 
   // Is the mouse captured? (Walking also works without it, keyboard only, e.g. after
   // resuming with Esc, which browsers do not accept for capturing the mouse.)
@@ -278,7 +285,7 @@ interface MuseumState {
   setEndingStage: (stage: number) => void
 }
 
-export const useMuseumStore = create<MuseumState>((set) => ({
+export const useMuseumStore = create<MuseumState>((set, get) => ({
   mode: 'start',
   setMode: (mode) => set({ mode }),
   partsPrepared: 0,
@@ -385,11 +392,24 @@ export const useMuseumStore = create<MuseumState>((set) => ({
         tutorial: savedProgress.tutorial,
         gameCores,
         quizPassed: state.quizPassed || savedProgress.quizPassed === true || gameCores >= 4,
+        mapOnContinue: savedProgress.finished === true,
         teleport: { roomId: state.teleport.roomId, pose: savedProgress.pose, count: state.teleport.count + 1 },
       }
     }),
   // A fresh visit from the hall: no rooms visited, no cores lit, portal closed (open in the
   // development build). The visit just left stays saved, so "Continue" can bring it back.
+  mapOnContinue: false,
+  finishVisit: () => {
+    set({ visitedRooms: ['hall', 'rotunda', 'ir1', 'ir2', 'ir3', 'ir4', 'quiz'], gameCores: 4, quizPassed: true, tutorial: null })
+    // A few steps in front of the portal, facing it.
+    const room = roomById('quiz')
+    if (room) {
+      const [x, z] = toWorld(room.frame, 0, room.vBack - 3.5)
+      const [dx, dz] = toWorld(room.frame, 0, room.vBack)
+      saveProgress({ x, z, yaw: Math.atan2(-(dx - x), -(dz - z)) }, true)
+    }
+    get().backToTitle()
+  },
   backToTitle: () =>
     set((state) => ({
       mode: 'start',
