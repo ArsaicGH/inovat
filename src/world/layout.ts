@@ -63,7 +63,7 @@ const ROOM_SPECS: { id: RoomId; side: number; width: number; depth: number; heig
   // its futuristic atmosphere and its AI spotlight exhibit: leader.)
   { id: 'ir1', side: 8, width: 18, depth: 18 + ANTE_DEPTH + T, height: 5.5, doorStyle: 'grand' }, // south-west
   { id: 'ir2', side: 10, width: 20, depth: 20 + ANTE_DEPTH + T, height: 5.5, doorStyle: 'grand' }, // north-west
-  { id: 'ir3', side: 0, width: 18, depth: 18 + ANTE_DEPTH + T, height: 6.2, doorStyle: 'grand' }, // north
+  { id: 'ir3', side: 0, width: 18, depth: 18 + ANTE_DEPTH + T, height: 5.5, doorStyle: 'grand' }, // north
   { id: 'ir4', side: 2, width: 22, depth: 22 + ANTE_DEPTH + T, height: 7, doorStyle: 'grand' }, // north-east
   { id: 'quiz', side: 4, width: 12, depth: 10, height: 4.5, doorStyle: 'plain' }, // south-east: end
 ]

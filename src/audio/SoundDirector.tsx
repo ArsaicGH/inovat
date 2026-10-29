@@ -46,7 +46,7 @@ export default function SoundDirector() {
         if (before.mode === 'ending') stopEndingMusic()
         // The room sound fades away in menus and comes back when walking.
         // (Softer, not silent, while playing the Time Machine game.)
-        duckAmbience(state.mode === 'exploring' || state.mode === 'ending' ? 1 : state.mode === 'game' ? 0.45 : 0)
+        duckAmbience(state.mode === 'exploring' || state.mode === 'ending' ? 1 : state.mode === 'reading' ? 0.7 : state.mode === 'game' ? 0.45 : 0)
       }
       // The ending's music starts as the visitor steps into the portal (and again on "Replay").
       if (state.mode === 'ending' && state.endingRun !== before.endingRun) playEndingMusic(0)

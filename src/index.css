@@ -2300,3 +2300,36 @@ body {
     font-size: 20px;
   }
 }
+
+/* The turning model beside an enlarged board: a square, large enough for wide and tall
+   exhibits alike (it was a narrow tall strip). */
+.board-row:has(.model-viewer) {
+  align-items: center;
+}
+.model-viewer {
+  width: min(36vw, 76vh, 520px);
+  height: auto;
+  aspect-ratio: 1;
+  max-height: none;
+}
+.board-row:has(.model-viewer) .board-zoom {
+  width: min(54vw, 760px);
+}
+@media (max-width: 760px) {
+  .model-viewer {
+    width: min(80vw, 32vh);
+    height: auto;
+  }
+  .board-row:has(.model-viewer) .board-zoom {
+    width: min(92vw, 760px);
+  }
+  .board-row:has(.model-viewer) .board-frame {
+    max-height: calc(92vh - 32vh - 70px);
+  }
+}
+/* Phones held sideways: side by side, the square fits the short screen. */
+@media (max-height: 520px) and (min-width: 761px) {
+  .model-viewer {
+    width: min(40vw, 78vh);
+  }
+}

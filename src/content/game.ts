@@ -31,6 +31,7 @@ export const MAKERS: { id: string; who: Both }[] = [
   { id: 'ir3-1', who: { vi: 'Intel', en: 'Intel' } },
   { id: 'ir3-2', who: { vi: 'IBM', en: 'IBM' } },
   { id: 'ir3-3', who: { vi: 'George Devol và Joseph Engelberger', en: 'George Devol and Joseph Engelberger' } },
+  { id: 'ir3-4', who: { vi: 'ARPA (Bộ Quốc phòng Hoa Kỳ)', en: 'ARPA (US Department of Defense)' } },
   { id: 'ir4-1', who: { vi: 'Chuck Hull', en: 'Chuck Hull' } },
   { id: 'ir4-3', who: { vi: 'John McCarthy và Alan Turing', en: 'John McCarthy and Alan Turing' } },
 ]
@@ -161,6 +162,128 @@ export const CHALLENGES: Challenge[] = [
     why: {
       vi: 'In 3D tạo vật thể từ mô hình số bằng cách đắp từng lớp vật liệu, rất hợp để làm nhanh mẫu thử có hình dạng phức tạp.',
       en: '3D printing builds objects layer by layer from a digital model, ideal for quick prototypes with complex shapes.',
+    },
+  },
+  // (More situations so that each new attempt draws a different set. Written by Claude from
+  // the exhibits' own texts: [CẦN KIỂM TRA] / [NEEDS CHECKING] by the content team.)
+  {
+    situation: {
+      vi: 'Một xưởng dệt muốn kéo sợi bông chắc và đều bằng máy, chạy bằng sức nước thay cho tay người. Phát minh nào phù hợp?',
+      en: 'A textile workshop wants to spin strong, even cotton thread by machine, driven by water power instead of hands. Which invention fits?',
+    },
+    answer: 'ir1-2',
+    options: ['ir1-2', 'ir2-4', 'ir3-1', 'ir4-1'],
+    why: {
+      vi: 'Máy kéo sợi Water Frame chạy bằng sức nước, kéo được sợi bông chắc, mở đường cho các nhà máy dệt.',
+      en: 'The water frame, driven by water power, spun strong cotton thread and opened the way to textile mills.',
+    },
+  },
+  {
+    situation: {
+      vi: 'Các xưởng rèn cần rất nhiều sắt rèn tốt hơn để làm máy móc, nhưng cách làm cũ chậm và tốn kém. Phát minh nào giúp họ?',
+      en: 'Forges need far more good wrought iron for machines, but the old methods are slow and costly. Which invention helps them?',
+    },
+    answer: 'ir1-3',
+    options: ['ir1-3', 'ir2-5', 'ir3-2', 'ir4-2'],
+    why: {
+      vi: 'Luyện sắt bằng lò khuấy (puddling) biến gang thành sắt rèn với số lượng lớn hơn, dùng than đá làm nhiên liệu.',
+      en: 'Puddling turned pig iron into wrought iron in larger quantities, using coal as fuel.',
+    },
+  },
+  {
+    situation: {
+      vi: 'Một nhà máy muốn có nguồn động lực mạnh và ổn định, không phụ thuộc vào dòng sông hay sức gió. Họ nên dùng gì?',
+      en: 'A factory wants a strong, steady source of power that does not depend on a river or the wind. What should it use?',
+    },
+    answer: 'ir1-1',
+    options: ['ir1-1', 'ir1-2', 'ir3-3', 'ir4-4'],
+    why: {
+      vi: 'Động cơ hơi nước của James Watt cho phép đặt nhà máy ở bất cứ đâu có than, không cần gần sông.',
+      en: 'James Watt’s steam engine let factories be built wherever there was coal, not only beside rivers.',
+    },
+  },
+  {
+    situation: {
+      vi: 'Ngành đường sắt cần một lượng lớn thép rẻ và bền để làm đường ray. Quy trình nào giúp sản xuất thép hàng loạt?',
+      en: 'The railways need large amounts of cheap, strong steel for rails. Which process made mass-produced steel possible?',
+    },
+    answer: 'ir2-1',
+    options: ['ir2-1', 'ir1-3', 'ir3-1', 'ir4-5'],
+    why: {
+      vi: 'Quy trình Bessemer thổi không khí qua gang nóng chảy để luyện thép nhanh và rẻ hơn nhiều so với trước.',
+      en: 'The Bessemer process blew air through molten iron to make steel far faster and more cheaply than before.',
+    },
+  },
+  {
+    situation: {
+      vi: 'Cuối thế kỷ XIX, một thương nhân muốn nói chuyện trực tiếp bằng giọng nói với đối tác ở thành phố khác. Phát minh nào giúp ông?',
+      en: 'In the late 19th century a merchant wants to speak directly, by voice, with a partner in another city. Which invention helps him?',
+    },
+    answer: 'ir2-5',
+    options: ['ir2-5', 'ir3-4', 'ir1-4', 'ir4-3'],
+    why: {
+      vi: 'Điện thoại truyền giọng nói qua dây điện, cho phép trò chuyện tức thì ở khoảng cách xa.',
+      en: 'The telephone carried the voice along wires, allowing instant conversation over long distances.',
+    },
+  },
+  {
+    situation: {
+      vi: 'Một nhà máy muốn làm việc cả ban đêm và chạy từng máy bằng động cơ riêng thay cho dây curoa chung. Họ cần gì?',
+      en: 'A factory wants to work at night too, and run each machine with its own motor instead of shared belts. What does it need?',
+    },
+    answer: 'ir2-3',
+    options: ['ir2-3', 'ir1-1', 'ir3-2', 'ir4-1'],
+    why: {
+      vi: 'Điện năng mang đến đèn điện để thắp sáng và động cơ điện để chạy từng máy riêng lẻ.',
+      en: 'Electric power brought electric light for the night and electric motors to drive each machine on its own.',
+    },
+  },
+  {
+    situation: {
+      vi: 'Một hãng máy tính bỏ túi muốn đặt toàn bộ bộ xử lý của máy lên một con chip nhỏ duy nhất. Phát minh nào làm được điều đó?',
+      en: 'A calculator maker wants to put the whole processor of its machine onto one small chip. Which invention made that possible?',
+    },
+    answer: 'ir3-1',
+    options: ['ir3-1', 'ir3-2', 'ir2-3', 'ir4-4'],
+    why: {
+      vi: 'Bộ vi xử lý như Intel 4004 gom bộ xử lý trung tâm vào một con chip duy nhất.',
+      en: 'A microprocessor such as the Intel 4004 put the central processing unit onto a single chip.',
+    },
+  },
+  {
+    situation: {
+      vi: 'Một nhân viên văn phòng muốn có máy tính riêng trên bàn làm việc để soạn văn bản và tính bảng số liệu. Phát minh nào phù hợp?',
+      en: 'An office worker wants a computer of their own on the desk, to write documents and work on spreadsheets. Which invention fits?',
+    },
+    answer: 'ir3-2',
+    options: ['ir3-2', 'ir3-1', 'ir2-5', 'ir4-3'],
+    why: {
+      vi: 'Máy tính cá nhân như IBM 5150 đưa máy tính đến từng bàn làm việc trong văn phòng.',
+      en: 'Personal computers such as the IBM 5150 brought computers to individual office desks.',
+    },
+  },
+  {
+    situation: {
+      vi: 'Các nhà nghiên cứu ở những trường đại học cách xa nhau muốn kết nối máy tính để trao đổi dữ liệu. Phát minh nào giúp họ?',
+      en: 'Researchers at universities far apart want to connect their computers to exchange data. Which invention helps them?',
+    },
+    answer: 'ir3-4',
+    options: ['ir3-4', 'ir2-5', 'ir3-1', 'ir4-2'],
+    why: {
+      vi: 'Mạng ARPANET kết nối máy tính ở các cơ sở nghiên cứu, một nền tảng quan trọng của Internet.',
+      en: 'ARPANET connected computers at research sites, an important foundation of the Internet.',
+    },
+  },
+  {
+    situation: {
+      vi: 'Một nhà máy muốn tự động phát hiện sản phẩm lỗi trong hàng nghìn bức ảnh chụp mỗi ngày. Công nghệ nào phù hợp nhất?',
+      en: 'A factory wants to spot faulty products automatically in thousands of photos taken every day. Which technology fits best?',
+    },
+    answer: 'ir4-3',
+    options: ['ir4-3', 'ir4-4', 'ir3-3', 'ir2-4'],
+    why: {
+      vi: 'Trí tuệ nhân tạo có thể học cách nhận ra lỗi trong ảnh, xử lý khối lượng lớn nhanh hơn con người.',
+      en: 'Artificial intelligence can learn to recognise defects in images, handling large volumes faster than people.',
     },
   },
 ]
