@@ -75,24 +75,24 @@ export const ROOM_THEMES: Record<Exclude<RoomId, 'rotunda'>, RoomTheme> = {
   },
   // CMCN 1: steam age. Brick, wood, warm lamplight.
   ir1: {
-    floor: { texture: 'wood-floor', colour: '#d9b892', tile: 2.5, roughness: 0.6 },
+    floor: { texture: 'wood-floor', colour: '#8c6a4c', tile: 2.5, roughness: 0.6 },
     bounce: '#5a3420',
-    walls: { texture: 'bricks', colour: '#e9cdb6', tile: 2.5, roughness: 0.9 },
+    walls: { texture: 'bricks', colour: '#a6866a', tile: 2.5, roughness: 0.9 },
     ceiling: '#3b2a1e',
     // Timber boards overhead (a plain dark colour read as a black hole).
-    ceilingSurface: { texture: 'wood-floor', colour: '#a4825f', tile: 2.5, roughness: 0.85 },
+    ceilingSurface: { texture: 'wood-floor', colour: '#6e5640', tile: 2.5, roughness: 0.85 },
     sky: '#ffcf96',
     // (Dark like a real gallery: the spotlit exhibits carry the room. Leader.)
-    fill: 0.31,
+    fill: 0.24,
     accent: { colour: '#ffa04d', intensity: 5, at: [-7.4, 2.6, 0] }, // the wall lanterns
     // Warm and low, like firelight: one continuous warm wash along the brick, the timber
     // ceiling glowing faintly; the Watt engine is the room's focus.
     lighting: {
-      environment: 0.74,
+      environment: 0.6,
       spotColour: '#ffd3a2',
       keyColour: '#ffc68c',
       wash: 5,
-      wallWash: { colour: '#ffb36c', strength: 5, rhythm: 0, floor: 0 },
+      wallWash: { colour: '#d9965a', strength: 3.5, rhythm: 0, floor: 0 },
       ceilingGlow: { colour: '#ffb47a', strength: 3.3 },
       primary: 'ir1-1',
     },
