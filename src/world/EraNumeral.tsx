@@ -102,6 +102,16 @@ function paint(ctx: CanvasRenderingContext2D, era: EraRoom, font: string) {
         if (on === '1') ctx.fillRect(left + x * px + 3, top + py * px + 3, px - 6, px - 6)
       }),
     )
+    // A thin, darker green neon outline round each pixel, so the number stands out from the pale wall.
+    ctx.shadowColor = '#1d7a3e'
+    ctx.shadowBlur = s * 0.012
+    ctx.strokeStyle = '#1f8a45'
+    ctx.lineWidth = s * 0.005
+    PIXEL_THREE.forEach((row, py) =>
+      [...row].forEach((on, x) => {
+        if (on === '1') ctx.strokeRect(left + x * px + 3, top + py * px + 3, px - 6, px - 6)
+      }),
+    )
     ctx.shadowBlur = 0
     ctx.globalCompositeOperation = 'source-atop' // scan lines only on the pixels
     ctx.fillStyle = 'rgba(0, 40, 10, 0.35)'

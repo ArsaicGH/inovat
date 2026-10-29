@@ -52,7 +52,8 @@ function RoomIdentity({ room, size }: { room: ThemedRoom; size: RoomSize }) {
       {/* Era rooms: a huge decorated number high on the back wall, above the overview
           board standing in the middle of the room. */}
       {room === 'ir1' || room === 'ir2' || room === 'ir3' || room === 'ir4' ? (
-        <group position={[0, size.h / 2 + 0.2, -size.d / 2 + 0.03]}>
+        // (CMCN 4's outline number reads smaller than the solid ones: drawn larger.)
+        <group position={[0, size.h / 2 + 0.2, -size.d / 2 + 0.03]} scale={room === 'ir4' ? 1.4 : 1}>
           <EraNumeral era={room} />
         </group>
       ) : (
@@ -150,7 +151,6 @@ function ElectricAge({ size }: { size: RoomSize }) {
 
 // CMCN 3: fluorescent ceiling panels, a coloured wall stripe and a desk of vintage computers.
 function ComputerAge({ size }: { size: RoomSize }) {
-  const beige = <meshStandardMaterial color="#e3d6b6" roughness={0.6} />
   return (
     <>
       {[-3.5, 0, 3.5].map((x) => x * spread(size)).flatMap((x) =>
@@ -167,24 +167,6 @@ function ComputerAge({ size }: { size: RoomSize }) {
           <meshStandardMaterial color="#c4682f" roughness={0.6} />
         </mesh>
       ))}
-      <group position={[0, 0, -size.d / 2 + 0.7]}>
-        <mesh position={[0, 0.75, 0]}>
-          <boxGeometry args={[4.4, 0.06, 0.9]} />
-          {beige}
-        </mesh>
-        {[-1.6, -0.55, 0.55, 1.6].map((x) => (
-          <group key={x} position={[x, 0.78, 0]}>
-            <mesh position={[0, 0.25, 0]}>
-              <boxGeometry args={[0.55, 0.45, 0.45]} />
-              {beige}
-            </mesh>
-            <mesh position={[0, 0.27, 0.231]}>
-              <planeGeometry args={[0.42, 0.3]} />
-              <Glow colour="#57e08a" intensity={1.6} />
-            </mesh>
-          </group>
-        ))}
-      </group>
     </>
   )
 }

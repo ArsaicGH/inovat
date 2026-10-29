@@ -103,8 +103,9 @@ export default function MapMenu() {
           {MAP_ROOMS.map((room) => {
             // Only rooms already visited can be travelled to: the era rooms and the Central
             // Hall once walked into (the intro hall, where the visit starts, is always open;
-            // the Game Room opens once all four era rooms are visited).
-            const unvisited = (ERA_ROOMS.includes(room) || room === 'rotunda') && !visited.includes(room) && room !== currentRoom
+            // the Game Room opens once all four era rooms are visited, and can be travelled to once
+            // walked into, like the others).
+            const unvisited = (ERA_ROOMS.includes(room) || room === 'rotunda' || room === 'quiz') && !visited.includes(room) && room !== currentRoom
             const locked = (room === 'quiz' && !quizOpen) || unvisited
             const classes = ['map-room', `map-${room}`]
             if (room === currentRoom) classes.push('map-room-current')
@@ -122,7 +123,7 @@ export default function MapMenu() {
                 )}
                 {room === currentRoom && <span className="map-here">{ui.map.youAreHere}</span>}
                 {room === 'quiz' && !quizOpen && <span className="map-visited">{ui.map.locked}</span>}
-                {unvisited && <span className="map-visited">{ui.map.notVisited}</span>}
+                {unvisited && (room !== 'quiz' || quizOpen) && <span className="map-visited">{ui.map.notVisited}</span>}
               </button>
             )
           })}
