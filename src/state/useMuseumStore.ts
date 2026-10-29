@@ -38,6 +38,9 @@ function saveSensitivity(value: number) {
 // earlier visit: rooms visited, tutorial step, position, and the Time Machine game's lit
 // cores (so a finished game keeps the portal open). Kept in sessionStorage, which
 // belongs to this tab only, so a new visit in a new tab starts fresh.
+// Development build only: every room counts as visited, so the map can reach all of them
+// (the portal is open too, see quizPassed) for testing.
+const DEV_VISITED: RoomId[] = import.meta.env.DEV ? ['hall', 'rotunda', 'ir1', 'ir2', 'ir3', 'ir4', 'quiz'] : []
 const PROGRESS_STORAGE_KEY = 'inovat-progress'
 
 export interface Pose {
@@ -334,7 +337,7 @@ export const useMuseumStore = create<MuseumState>((set) => ({
   currentRoom: 'hall',
   setCurrentRoom: (room) => set({ currentRoom: room }),
 
-  visitedRooms: [],
+  visitedRooms: DEV_VISITED,
   markVisited: (room) =>
     set((state) => (state.visitedRooms.includes(room) ? state : { visitedRooms: [...state.visitedRooms, room] })),
   nearLockedDoor: false,
@@ -390,7 +393,7 @@ export const useMuseumStore = create<MuseumState>((set) => ({
   backToTitle: () =>
     set((state) => ({
       mode: 'start',
-      visitedRooms: [],
+      visitedRooms: DEV_VISITED,
       tutorial: null,
       gameCores: 0,
       quizPassed: import.meta.env.DEV,

@@ -245,14 +245,14 @@ export const RIGS = {
   },
   // The finale: all four sets in a row at dusk, each in its era's light.
   timeline: {
-    key: L([0, 90, 70], [0, 0, -6], '#fff0dc', 1.6, 1.0),
-    spots: SET_X.map((x, i) => L([x, 24, -12], [x, 9, -32], ['#ffb46e', '#ffd9a8', '#f2f4ff', '#e2f4ff'][i], 3.2, 0.55)),
+    key: L([0, 270, 90], [0, 218, 0], '#fff0dc', 2.2, 0.6),
+    spots: [-30, -10, 10, 30].map((x, i) => L([x, 262, 40], [x, 216, 0], ['#ffc890', '#ffe2c0', '#f2f4ff', '#e6f4ff'][i], 5, 0.42)),
     sky: '#56648a',
     ground: '#1a1a22',
     fill: 0.32,
     environment: 0.4,
-    background: '#0b0906',
-    haze: [120, 400],
+    background: '#06070b',
+    haze: [70, 300],
   },
 } satisfies Record<string, Rig>
 
@@ -280,6 +280,15 @@ function locoPath(s: number): Pose {
   const track: Pose = [[x + 3.6, 1.7, 7.0], [x + 0.4, 1.8, RAIL_Z]]
   const wheel: Pose = [[x + 1.4, RAIL_TOP + 0.8, RAIL_Z - 1.9], [x + 1.4, RAIL_TOP + 0.78, RAIL_Z - 0.7]]
   return mixPose(mixPose(watch, track, smooth(2.6, 3.6, s)), wheel, smooth(5.2, 6.2, s))
+}
+// The time tunnel (ending-sets.tsx, 200 m up, 160 m long): speeding up, swaying gently, slowing at the end.
+// The finale (FinaleLands in ending-sets.tsx, 200 m up): close on CMCN 1's column, up along
+// it, then a long pull-back until all four columns fill the screen.
+const FINAL: Pose = [[0, 220, 37], [0, 220, 0]]
+function landsPath(s: number): Pose {
+  const close: Pose = [[-34, 203, 9], [-30, 203.5, 0]]
+  const up: Pose = [[-27, 224, 14], [-30, 222, 0]]
+  return mixPose(mixPose(close, up, smooth(0, 5, s)), FINAL, smooth(4, 11, s))
 }
 // The motor car: a low camera at the end of the street.
 const carPath = (s: number): Pose => [[-13 + s * 0.15, 0.8, ROAD_Z + 0.7], [carX(s) - 1.6, 1.0, ROAD_Z + 0.2]]
@@ -321,9 +330,9 @@ export const SHOTS: Shot[] = [
   { id: 'echo2', act: 5, set: 1, duration: 1.6, rig: 'line', from: [[11.4, 1.1, -16.8], [10.8, 0.6, -18.85]], to: [[11.2, 1.0, -17.3], [10.8, 0.6, -18.85]] },
   { id: 'echo3', act: 5, set: 2, duration: 1.6, rig: 'robots', from: [[9.6, 2.4, -6.4], [8, 1.4, -9]], to: [[9.3, 2.3, -6.7], [8, 1.4, -9]] },
   { id: 'echo4', act: 5, set: 3, duration: 1.6, rig: 'smart', from: [[-7.6, 1.75, -8.3], [-9, 1.25, -10]], to: [[-7.9, 1.65, -8.6], [-9, 1.25, -10]] },
-  // ...then the camera pulls far back: the four eras side by side, one timeline.
-  { id: 'timeline', act: 5, set: -1, duration: 11, rig: 'timeline', into: 'dip', from: [[-92, 7, -14], [-66, 10, -32]], to: [[0, 13, 62], [0, 10, -32]] },
-  { id: 'hold', act: 5, set: -1, duration: 600, rig: 'timeline', from: [[0, 13, 62], [0, 10, -32]], to: [[0, 11, 40], [0, 10, -32]] },
+  // ...then the time machine flies home through all four eras, down a tunnel of light.
+  { id: 'timeline', act: 5, set: -1, duration: 12, rig: 'timeline', into: 'dip', path: landsPath, fov: 62 },
+  { id: 'hold', act: 5, set: -1, duration: 600, rig: 'timeline', from: FINAL, to: FINAL, fov: 62 },
 ]
 
 // Which shot is playing at film time t, and whose set it is in.
@@ -341,7 +350,7 @@ SHOTS.reduce((t, shot) => {
   return t + shot.duration
 }, 0)
 // The closing title appears as the last shot settles (EndingScreen.tsx); "Skip" jumps here.
-export const TITLE_AT = START.timeline + 6.5
+export const TITLE_AT = START.timeline + 10
 
 // ---------- What the film asks of the museum's lights this frame ----------
 // (EndingScene writes it, Lighting in Museum.tsx obeys while `active`.)

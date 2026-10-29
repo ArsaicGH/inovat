@@ -5,7 +5,7 @@ import type { RoomId } from '../types'
 import { useMuseumStore } from '../state/useMuseumStore'
 import { setAmbience } from '../audio/sound'
 import { ORIGIN, RIGS, SET_X, SHOTS, START, TITLE_AT, borrowedLights, film, filmVeil, mixPose, shotIndexAt, type PlacedLight, type StageLight } from './ending-shots'
-import { DigitalSet, ElectricSet, SmartSet, SteamSet, Timeline, disposePalette } from './ending-sets'
+import { DigitalSet, ElectricSet, SmartSet, SteamSet, FinaleLands, disposePalette } from './ending-sets'
 
 // THE ENDING: after the Game Room's portal, a short film through the four Industrial
 // Revolutions, shot by shot (the script is in ending-shots.ts, the sets in ending-sets.tsx),
@@ -128,7 +128,6 @@ export default function EndingScene() {
     camera.position.set(ORIGIN[0] + ox + at[0], ORIGIN[1] + at[1] + Math.sin(film.t * 0.8) * 0.01, ORIGIN[2] + at[2])
     camera.lookAt(temp.look.set(ORIGIN[0] + ox + look[0], ORIGIN[1] + look[1], ORIGIN[2] + look[2]))
 
-    sets.current.forEach((set) => set && (set.visible = film.t < START.timeline))
     // The lights, the sky and the haze of this shot.
     const rig = RIGS[shot.rig]
     const lightsAt = shot.set >= 0 ? ox : 0
@@ -181,7 +180,7 @@ export default function EndingScene() {
             <Set />
           </group>
         ))}
-        <Timeline />
+        <FinaleLands />
       </Suspense>
     </group>
   )

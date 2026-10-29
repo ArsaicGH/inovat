@@ -30,7 +30,8 @@ import {
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { repeated, useSurfaceTextures, type SurfaceName } from './textures'
 import EraNumeral from './EraNumeral'
-import { RAIL_TOP, RAIL_Z, ROAD_Z, SET_X, carX, film, filmSet, fireLevel, lineLamp, locoX, printed, since, smooth, START, streetLamp, streetWindows, welding } from './ending-shots'
+import Invention, { ModelCopy } from './inventions'
+import { RAIL_TOP, RAIL_Z, ROAD_Z, carX, film, filmSet, fireLevel, lineLamp, locoX, printed, since, smooth, START, streetLamp, streetWindows, welding } from './ending-shots'
 
 // THE ENDING FILM'S SETS (script in ending-shots.ts, played by EndingScene.tsx): one set per
 // era, built from simple shapes, with working machines and people, lit by the film's
@@ -250,6 +251,7 @@ function makePalette() {
     ceramic: std('#e9e4da', 0.45),
     gold: std('#d4a84a', 0.3, 1),
     solar: std('#1d2c46', 0.25, 0.5),
+    plinth: std('#16130f', 0.35, 0.2),
     blackGloss: std('#0c0d10', 0.25, 0.4),
     glass: keep(new MeshStandardMaterial({ color: '#b8d4e0', roughness: 0.05, transparent: true, opacity: 0.16, depthWrite: false })),
     skin: std('#c3926e', 0.8),
@@ -280,6 +282,13 @@ function makePalette() {
     pulse: glow('#9ff4ff', 2.2),
     link: keep(new MeshBasicMaterial({ color: '#56dff0', transparent: true, opacity: 0.35, blending: AdditiveBlending, depthWrite: false })),
     ribbon: keep(new MeshBasicMaterial({ map: tex.ribbon, transparent: true, opacity: 0, blending: AdditiveBlending, depthWrite: false, toneMapped: false })),
+  }
+  // Flat panels lie just in front of walls and cases: pulled towards the camera when drawn,
+  // so they never flicker against the surface behind them (seen from far away in the finale).
+  for (const panel of [m.window, m.dusk, m.daylight, m.fire, m.crt, m.amberScreen, m.gui, m.dash, m.graph, m.leds, m.tube, m.die, m.diePulse]) {
+    panel.polygonOffset = true
+    panel.polygonOffsetFactor = -4
+    panel.polygonOffsetUnits = -40
   }
   m.diePulse.color.multiplyScalar(1.6)
   m.ribbon.color.multiplyScalar(1.6)
@@ -407,14 +416,35 @@ function Surface({ name, size, at, tint, tile, roughness = 0.85, wall }: { name:
 
 // Each set stands on its own patch of ground (they never overlap, so the last shot shows
 // four separate sets side by side)...
+// In the finale each set reads as a museum model on its plinth: a dark stone base with a
+// thin gold edge, the set's own ground on top.
 function Island({ colour }: { colour: string }) {
+  const { m } = usePalette()
   const material = useMemo(() => new MeshStandardMaterial({ color: colour, roughness: 0.95 }), [colour])
   useEffect(() => () => material.dispose(), [material])
   return (
-    <mesh position={[0, -0.04, -5]} rotation={[-Math.PI / 2, 0, 0]} material={material} receiveShadow>
-      <planeGeometry args={[42, 48]} />
-    </mesh>
+    <group position={[0, 0, -5]}>
+      <mesh position={[0, -0.03, 0]} rotation={[-Math.PI / 2, 0, 0]} material={material} receiveShadow>
+        <planeGeometry args={[42, 48]} />
+      </mesh>
+      <Box size={[42.6, 1.2, 48.6]} at={[0, -0.66, 0]} m={m.plinth} />
+      {[-1, 1].map((s) => (
+        <group key={s}>
+          <Box size={[42.8, 0.08, 0.12]} at={[0, -0.02, s * 24.3]} m={m.gold} />
+          <Box size={[0.12, 0.08, 48.8]} at={[s * 21.3, -0.02, 0]} m={m.gold} />
+        </group>
+      ))}
+    </group>
   )
+}
+// Working parts of a set that only make sense inside its scene (light shafts, the open
+// roof frame): taken away for the finale's overview, so the sets look finished from above.
+function SceneOnly({ children }: { children: ReactNode }) {
+  const ref = useRef<Group>(null)
+  useFrame(() => {
+    if (ref.current) ref.current.visible = film.t < START.timeline
+  })
+  return <group ref={ref}>{children}</group>
 }
 // ...and its far scenery (landscape, skyline, railway...) is only there while the camera is
 // in that set, like scenery struck after its scene: it would otherwise spill into the
@@ -835,17 +865,21 @@ export function SteamSet() {
           <Box size={[0.06, 0.08, 2.2]} at={[-11.95, 3.8, z]} m={m.darkIron} />
           <Box size={[0.06, 0.08, 2.2]} at={[-11.95, 5.0, z]} m={m.darkIron} />
           {/* A faint shaft of daylight through the dusty air (kept very light). */}
+          <SceneOnly>
           <mesh position={[-7.4, 2.0, z]} rotation={[0, Math.PI / 2, 1.17, 'ZYX']} material={m.shaft}>
             <planeGeometry args={[2.2, 9.4]} />
           </mesh>
+          </SceneOnly>
         </group>
       ))}
+      <SceneOnly>
       {[-24, -18, -12, -6, 0].map((z) => (
         <group key={z}>
           <Box size={[24, 0.3, 0.3]} at={[0, 7.7, z]} m={m.timber} />
           <Box size={[0.2, 1.2, 0.2]} at={[0, 8.4, z]} m={m.timber} />
         </group>
       ))}
+      </SceneOnly>
       <Boiler />
       <BeamEngine />
       <SpinningFrames />
@@ -1060,9 +1094,11 @@ export function ElectricSet() {
         <Panel key={x} size={[1.6, 3.2]} at={[x, 3.9, -16.99]} m={m.dusk} />
       ))}
       {[-14, -1].flatMap((x) => [-14, -8, -2].map((z) => <Cyl key={`${x}${z}`} r={0.15} h={7} at={[x, 3.5, z]} m={m.iron} seg={12} />))}
-      {[-14, -8, -2].map((z) => (
-        <Box key={z} size={[13.4, 0.35, 0.25]} at={[-7.5, 6.6, z]} m={m.iron} />
-      ))}
+      <SceneOnly>
+        {[-14, -8, -2].map((z) => (
+          <Box key={z} size={[13.4, 0.35, 0.25]} at={[-7.5, 6.6, z]} m={m.iron} />
+        ))}
+      </SceneOnly>
       {[-10, -5.5].map((x) => (
         <group key={x}>
           <Box size={[2.8, 0.45, 2.2]} at={[x, 0.225, -10.6]} m={m.iron} />
@@ -1577,9 +1613,11 @@ export function SmartSet() {
       {[-15, -9, -3].map((z) => (
         <Panel key={z} size={[1.2, 6]} at={[-14.99, 4.5, z]} rot={[0, Math.PI / 2, 0]} m={m.daylight} />
       ))}
-      {[-17, -11, -5, 1].map((z) => (
-        <Box key={z} size={[26, 0.3, 0.3]} at={[-2, 8.6, z]} m={m.white} />
-      ))}
+      <SceneOnly>
+        {[-17, -11, -5, 1].map((z) => (
+          <Box key={z} size={[26, 0.3, 0.3]} at={[-2, 8.6, z]} m={m.white} />
+        ))}
+      </SceneOnly>
       {[[-2.5, -15.5, 21, 0.1], [-2.5, -6.5, 21, 0.1], [-13, -11, 0.1, 9], [8, -11, 0.1, 9]].map(([x, z, w, d]) => (
         <Box key={`${x}${z}`} size={[w, 0.01, d]} at={[x, 0.006, z]} m={m.yellow} />
       ))}
@@ -1686,25 +1724,96 @@ function Traffic() {
 // with each era's number standing over its set.
 // ======================================================================================
 
-export function Timeline() {
+// THE FINALE: four tall showcases ("lands"), one per era, side by side high above the sets.
+// Each is a column in its era's colours (those of the central hall's ceiling), with its
+// inventions on ledges up the column and its number at the top. The camera starts close on
+// CMCN 1 and pulls back until the four columns fill the screen.
+export const LANDS_Y = 200
+export const LAND_X = [-30, -10, 10, 30]
+const LAND_WIDTH = 19
+const LAND_HEIGHT = 40
+// Ceiling colours (dome-painting.ts), light to deep: bronze, steel blue, green, teal.
+const LAND_SHADES = [
+  ['#d6ba96', '#a47a52', '#8a6038'],
+  ['#96a0b0', '#3e4e6a', '#2a3852'],
+  ['#96ac98', '#3a604a', '#244634'],
+  ['#94acb4', '#385c6a', '#224250'],
+]
+const LAND_INVENTIONS = [
+  ['ir1-1', 'ir1-2', 'ir1-3', 'ir1-4'],
+  ['ir2-1', 'ir2-2', 'ir2-3', 'ir2-4', 'ir2-5'],
+  ['ir3-1', 'ir3-2', 'ir3-3', 'ir3-4'],
+  ['ir4-1', 'ir4-2', 'ir4-3', 'ir4-4', 'ir4-5'],
+]
+
+function Land({ era }: { era: number }) {
   const { m } = usePalette()
+  const back = useMemo(() => {
+    const [light, mid, deep] = LAND_SHADES[era]
+    const texture = paint(8, 256, (c, w, h) => {
+      const g = c.createLinearGradient(0, 0, 0, h)
+      g.addColorStop(0, light)
+      g.addColorStop(0.45, mid)
+      g.addColorStop(1, deep)
+      c.fillStyle = g
+      c.fillRect(0, 0, w, h)
+    })
+    const material = new MeshBasicMaterial({ map: texture })
+    material.color.setScalar(0.9)
+    return material
+  }, [era])
+  useEffect(() => () => {
+    back.map?.dispose()
+    back.dispose()
+  }, [back])
+  const items = LAND_INVENTIONS[era]
+  return (
+    <group position={[LAND_X[era], 0, 0]}>
+      {/* The column: its colour, a gold frame, a stone base. */}
+      <mesh position={[0, LAND_HEIGHT / 2, -2.6]} material={back}>
+        <planeGeometry args={[LAND_WIDTH, LAND_HEIGHT]} />
+      </mesh>
+      {[-1, 1].map((side) => (
+        <Box key={side} size={[0.25, LAND_HEIGHT, 0.3]} at={[side * (LAND_WIDTH / 2), LAND_HEIGHT / 2, -2.5]} m={m.gold} />
+      ))}
+      <Box size={[LAND_WIDTH + 0.25, 0.3, 0.3]} at={[0, LAND_HEIGHT, -2.5]} m={m.gold} />
+      <Box size={[LAND_WIDTH, 1.2, 7]} at={[0, -0.6, 0.8]} m={m.plinth} />
+      <Box size={[LAND_WIDTH, 0.08, 0.12]} at={[0, 0.02, 4.3]} m={m.gold} />
+      {/* The era's inventions on ledges, zig-zagging up the column. */}
+      {items.map((id, i) => {
+        const x = (i % 2 ? 1 : -1) * 4.2
+        const y = 1 + i * (30 / items.length)
+        return (
+          <group key={id} position={[x, y, 0]}>
+            <Box size={[6.5, 0.4, 5]} at={[0, -0.2, 0]} m={m.plinth} />
+            <Box size={[6.5, 0.06, 0.1]} at={[0, 0.02, 2.5]} m={m.gold} />
+            <group scale={1.25}>
+              <Invention id={id} />
+            </group>
+          </group>
+        )
+      })}
+      <group position={[0, LAND_HEIGHT - 4.5, -2.4]} scale={1.4}>
+        <EraNumeral era={(['ir1', 'ir2', 'ir3', 'ir4'] as const)[era]} />
+      </group>
+    </group>
+  )
+}
+
+export function FinaleLands() {
   const group = useRef<Group>(null)
   useFrame(() => {
-    const t = film.t - START.timeline
-    if (group.current) group.current.visible = t >= 0
-    m.ribbon.opacity = smooth(0, 3, t)
+    if (group.current) group.current.visible = film.t >= START.timeline - 0.5
   })
   return (
-    <group ref={group} visible={false}>
-      <mesh position={[0, 0.05, -32]} rotation={[-Math.PI / 2, 0, 0]} material={m.ribbon}>
-        <planeGeometry args={[200, 1.6]} />
-      </mesh>
-      {(['ir1', 'ir2', 'ir3', 'ir4'] as const).map((era, i) => (
-        <group key={era} position={[SET_X[i], 10, -32]} scale={1.8}>
-          <EraNumeral era={era} />
-        </group>
-      ))}
-    </group>
+    // The downloaded models are already shown in the museum: copies are made for here.
+    <ModelCopy.Provider value={true}>
+      <group ref={group} position={[0, LANDS_Y, 0]} visible={false}>
+        {[0, 1, 2, 3].map((era) => (
+          <Land key={era} era={era} />
+        ))}
+      </group>
+    </ModelCopy.Provider>
   )
 }
 

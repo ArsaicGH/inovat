@@ -2203,11 +2203,6 @@ body {
 }
 
 /* The closing title: the golden INOVAT of the title screen, larger, rising out of a warm glow. */
-.ending-title {
-  justify-content: flex-start;
-  padding-top: 4vh;
-  background: radial-gradient(ellipse at 50% 30%, rgba(201, 162, 90, 0.18) 0%, rgba(0, 0, 0, 0) 60%);
-}
 .ending-title h1.ending-brand {
   font-size: clamp(56px, 10vw, 136px);
   letter-spacing: 0.22em;
@@ -2228,7 +2223,16 @@ body {
     filter: drop-shadow(0 0 28px rgba(201, 162, 90, 0.5)) drop-shadow(0 4px 2px rgba(0, 0, 0, 0.5));
   }
 }
+
+/* Closing title: title and slogans at the top, the thank-you panel at the bottom, and the
+   film dimmed behind them so the text stands out. */
+.ending-title {
+  justify-content: flex-start;
+  padding-top: 2vh;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.2) 45%, rgba(0, 0, 0, 0.5) 100%);
+  animation: ending-fade-in 2s ease-out both;
+}
 .ending-title .ending-after {
   margin-top: auto;
-  margin-bottom: 2vh;
+  margin-bottom: 1vh;
 }
