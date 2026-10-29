@@ -83,12 +83,12 @@ export const ROOM_THEMES: Record<Exclude<RoomId, 'rotunda'>, RoomTheme> = {
     ceilingSurface: { texture: 'wood-floor', colour: '#6e5640', tile: 2.5, roughness: 0.85 },
     sky: '#ffcf96',
     // (Dark like a real gallery: the spotlit exhibits carry the room. Leader.)
-    fill: 0.24,
+    fill: 0.28,
     accent: { colour: '#ffa04d', intensity: 5, at: [-7.4, 2.6, 0] }, // the wall lanterns
     // Warm and low, like firelight: one continuous warm wash along the brick, the timber
     // ceiling glowing faintly; the Watt engine is the room's focus.
     lighting: {
-      environment: 0.6,
+      environment: 0.66,
       spotColour: '#ffd3a2',
       keyColour: '#ffc68c',
       wash: 5,
@@ -130,7 +130,8 @@ export const ROOM_THEMES: Record<Exclude<RoomId, 'rotunda'>, RoomTheme> = {
     walls: { painted: 'office-panels', colour: '#3b5a48', tile: 1.2, roughness: 0.7 },
     bounce: '#544f45',
     ceiling: '#6a655a',
-    ceilingSurface: { painted: 'ceiling-tiles', colour: '#d9d6cc', tile: 1.2, roughness: 0.9 },
+    // Dark green-grey ceiling tiles, to go with the green walls.
+    ceilingSurface: { painted: 'ceiling-tiles', colour: '#5f7466', tile: 1.2, roughness: 0.9 },
     sky: '#f2f6ff',
     fill: 0.34,
     accent: { colour: '#e4efff', intensity: 5, at: [0, 4.4, 0] }, // the fluorescent panels
@@ -142,7 +143,7 @@ export const ROOM_THEMES: Record<Exclude<RoomId, 'rotunda'>, RoomTheme> = {
       keyColour: '#f3f6ff',
       wash: 3,
       wallWash: { colour: '#7fd6a0', strength: 3.5, rhythm: 0, floor: 0.9 },
-      ceilingGlow: { colour: '#eef3ff', strength: 3.0 },
+      ceilingGlow: { colour: '#9fd8b4', strength: 3.0 },
       primary: 'ir3-1',
     },
   },
