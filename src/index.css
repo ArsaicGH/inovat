@@ -2252,3 +2252,51 @@ body {
     backdrop-filter: blur(2.5px);
   }
 }
+
+/* Enlarged boards: the parts of the text never squeeze (in a scrolling column they did on
+   phones, and the text spilled over the frame's margins). */
+.board-paper > * {
+  flex-shrink: 0;
+}
+
+/* Short screens (phones held sideways): the closing title, slogan, thank-you text and buttons
+   all fit without scrolling. */
+@media (max-height: 560px) {
+  .ending-title {
+    padding-top: 0;
+    gap: 4px;
+  }
+  .ending-title h1.ending-brand {
+    font-size: clamp(30px, 11vh, 64px);
+  }
+  .ending-title .title-ornament {
+    width: min(220px, 50%);
+  }
+  .ending-tagline {
+    font-size: 12px;
+  }
+  .ending-title .ending-after {
+    margin-top: 6px;
+    margin-bottom: 0;
+    padding: 10px 16px;
+    gap: 6px;
+    width: min(680px, 100%);
+  }
+  .ending-after h2 {
+    font-size: 15px;
+  }
+  .ending-after p {
+    font-size: 12px;
+    line-height: 1.45;
+  }
+  .ending-after .start-button {
+    padding: 8px 18px;
+    font-size: 13px;
+  }
+  .ending .ending-caption p {
+    font-size: 13px;
+  }
+  .ending .ending-caption strong {
+    font-size: 20px;
+  }
+}
