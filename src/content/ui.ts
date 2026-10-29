@@ -96,7 +96,6 @@ const vi = {
     label: 'Đồ họa',
     auto: 'Tự động',
     levels: ['Rất thấp', 'Thấp', 'Trung bình', 'Cao', 'Tối đa'],
-    hint: 'Hình ảnh có thể đứng yên vài giây khi đổi mức đồ họa.',
   },
   // Text painted on decorations in the 3D world (the same in both languages).
   decor: {
@@ -275,7 +274,6 @@ const en: UiText = {
     label: 'Graphics',
     auto: 'Automatic',
     levels: ['Very low', 'Low', 'Medium', 'High', 'Ultra'],
-    hint: 'The picture may freeze for a few seconds when the graphics level changes.',
   },
   decor: {
     quizMark: '?',
