@@ -6,16 +6,19 @@
 //   iiot   = sensors on machines -> network -> data analysis -> maintenance in time
 //   neural = an artificial neural network: input, hidden layers, output
 //   twin   = a real machine and its digital twin, linked both ways
+//   timeline = an era room's inventions in date order (on the wall of its entrance room)
+//   change   = what an era changed: driving forces, inventions, results, downside (the same)
 
-export type DiagramId = 'eras' | 'iiot' | 'neural' | 'twin'
+export type DiagramId = 'eras' | 'iiot' | 'neural' | 'twin' | 'timeline' | 'change'
 
 // Width / height of each diagram.
-export const DIAGRAM_ASPECT: Record<DiagramId, number> = { eras: 2.3, iiot: 2.1, neural: 1.9, twin: 2.1 }
+export const DIAGRAM_ASPECT: Record<DiagramId, number> = { eras: 2.3, iiot: 2.1, neural: 1.9, twin: 2.1, timeline: 2.2, change: 2.2 }
 
 export interface DiagramColours {
   ink: string // labels and outlines
   accent: string // highlighted parts
   muted: string // connecting lines, secondary parts
+  paper?: string // the background (fills the hole in the gear icon on a wall picture)
 }
 
 // Darker era colours, readable on cream paper (the walls' era numbers are lighter).
@@ -272,6 +275,57 @@ function robotArm(ctx: CanvasRenderingContext2D, cx: number, cy: number, s: numb
   ctx.restore()
 }
 
+// A warning sign: a triangle with an exclamation mark.
+function warning(ctx: CanvasRenderingContext2D, cx: number, cy: number, s: number) {
+  ctx.beginPath()
+  ctx.moveTo(cx, cy - s * 0.36)
+  ctx.lineTo(cx + s * 0.38, cy + s * 0.3)
+  ctx.lineTo(cx - s * 0.38, cy + s * 0.3)
+  ctx.closePath()
+  ctx.stroke()
+  ctx.fillRect(cx - s * 0.03, cy - s * 0.16, s * 0.06, s * 0.28)
+  ctx.beginPath()
+  ctx.arc(cx, cy + s * 0.2, s * 0.04, 0, Math.PI * 2)
+  ctx.fill()
+}
+
+// Rising bars with an arrow: growth.
+function growth(ctx: CanvasRenderingContext2D, cx: number, cy: number, s: number) {
+  const base = cy + s * 0.3
+  ;[0.18, 0.3, 0.44].forEach((height, i) => ctx.fillRect(cx - s * 0.33 + i * s * 0.24, base - height * s, s * 0.16, height * s))
+  arrow(ctx, cx - s * 0.36, cy - s * 0.02, cx + s * 0.34, cy - s * 0.34, s * 0.12)
+}
+
+const ERA_ICONS = [gear, bulb, chip, network]
+
+// The era's icon (the gear's hole filled with the paper colour, so it is not see-through).
+function eraIcon(ctx: CanvasRenderingContext2D, era: number, cx: number, cy: number, s: number, colours: DiagramColours) {
+  ERA_ICONS[era](ctx, cx, cy, s)
+  if (era === 0 && colours.paper) {
+    ctx.save()
+    ctx.fillStyle = colours.paper
+    ctx.beginPath()
+    ctx.arc(cx, cy, s * 0.3 * 0.42, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.restore()
+  }
+}
+
+// The height a wrapped label takes.
+function textHeight(ctx: CanvasRenderingContext2D, text: string, maxWidth: number, size: number, weight: number, font: string): number {
+  ctx.font = `${weight} ${size}px ${font}`
+  return wrap(ctx, text, maxWidth).length * size * 1.22
+}
+
+// Wrapped label whose LAST line ends at y (for labels above a line); returns the top.
+function labelUp(ctx: CanvasRenderingContext2D, text: string, cx: number, y: number, maxWidth: number, size: number, weight: number, colour: string, font: string): number {
+  ctx.font = `${weight} ${size}px ${font}`
+  const lines = wrap(ctx, text, maxWidth)
+  const top = y - lines.length * size * 1.22
+  label(ctx, text, cx, top, maxWidth, size, weight, colour, font)
+  return top
+}
+
 // ---- The diagrams ----
 
 export function paintDiagram(
@@ -284,6 +338,7 @@ export function paintDiagram(
   labels: readonly string[],
   font: string,
   colours: DiagramColours,
+  era = 0, // 0-3: which era's icon (timeline, change)
 ) {
   ctx.save()
   ctx.translate(x, y)
@@ -398,6 +453,107 @@ export function paintDiagram(
     }
     label(ctx, labels[0] ?? '', left, cy + s * 0.5 + text * 0.2, w * 0.3, text, 700, colours.ink, font)
     label(ctx, labels[1] ?? '', right, cy + s * 0.5 + text * 0.2, w * 0.3, text, 700, colours.accent, font)
+  } else if (id === 'timeline') {
+    // labels: title, period, then a date and a name for each invention, oldest first. The
+    // dates are evenly spaced (in order, not to scale), so close dates stay readable.
+    ctx.fillStyle = colours.accent
+    ctx.strokeStyle = colours.accent
+    eraIcon(ctx, era, w * 0.065, h * 0.12, h * 0.24, colours)
+    ctx.textAlign = 'left'
+    ctx.textBaseline = 'top'
+    ctx.fillStyle = colours.ink
+    ctx.font = `700 ${h * 0.1}px ${font}`
+    ctx.fillText(labels[0] ?? '', w * 0.125, h * 0.01)
+    ctx.fillStyle = colours.muted
+    ctx.font = `500 ${h * 0.065}px ${font}`
+    ctx.fillText(labels[1] ?? '', w * 0.125, h * 0.14)
+    const entries: [string, string][] = []
+    for (let i = 2; i + 1 < labels.length; i += 2) entries.push([labels[i], labels[i + 1]])
+    const n = entries.length
+    const axis = n > 5 ? h * 0.56 : h * 0.45
+    ctx.strokeStyle = colours.muted
+    ctx.fillStyle = colours.muted
+    ctx.lineWidth = line * 1.5
+    arrow(ctx, w * 0.03, axis, w * 0.985, axis, h * 0.04)
+    // More than five: alternately above and below the line, so the names have room (and the
+    // first and last further in from the edges, as their names spread wider).
+    const alternate = n > 5
+    const start = alternate ? 0.12 : 0.09
+    const step = n > 1 ? (w * (1 - start * 2 + 0.02)) / (n - 1) : 0
+    const width = alternate ? step * 1.8 : step * 0.92
+    const big = !alternate
+    // Each entry's place, the room for its name and its date's size: on one line, smaller if
+    // it is long ("Late 1960s"); never wider than twice the distance to the nearer edge, so
+    // nothing is cut off. With all the names below the line there is room for larger letters.
+    const places = entries.map(([date], i) => {
+      const cx = w * start + i * step
+      const room = Math.min(width, 2 * cx, 2 * (w - cx))
+      ctx.font = `700 100px ${font}`
+      const dateSize = Math.min(h * (big ? 0.1 : 0.08), (100 * Math.min(room, alternate ? step * 1.7 : step * 0.96)) / ctx.measureText(date).width)
+      return { cx, room, dateSize, above: alternate && i % 2 === 1 }
+    })
+    // The names' letter size: as large as fits between the title and the bottom edge (longer
+    // names, as in English, get smaller letters).
+    let nameSize = h * (big ? 0.072 : 0.06)
+    const fits = (size: number) =>
+      entries.every(([, name], i) => {
+        const { room, dateSize, above } = places[i]
+        const extent = h * 0.065 + dateSize * 1.22 + textHeight(ctx, name, room, size, 600, font)
+        return above ? axis - extent >= h * 0.25 : axis + extent <= h * 0.99
+      })
+    while (nameSize > h * 0.035 && !fits(nameSize)) nameSize *= 0.94
+    entries.forEach(([date, name], i) => {
+      const { cx, room, dateSize, above } = places[i]
+      ctx.strokeStyle = colours.muted
+      ctx.lineWidth = line
+      ctx.beginPath()
+      ctx.moveTo(cx, axis)
+      ctx.lineTo(cx, axis + (above ? -h * 0.05 : h * 0.05))
+      ctx.stroke()
+      ctx.fillStyle = colours.accent
+      ctx.beginPath()
+      ctx.arc(cx, axis, h * 0.026, 0, Math.PI * 2)
+      ctx.fill()
+      if (above) {
+        const top = labelUp(ctx, date, cx, axis - h * 0.05, w, dateSize, 700, colours.accent, font)
+        labelUp(ctx, name, cx, top - h * 0.01, room, nameSize, 600, colours.ink, font)
+      } else {
+        const below = label(ctx, date, cx, axis + h * 0.055, w, dateSize, 700, colours.accent, font)
+        label(ctx, name, cx, below + h * 0.01, room, nameSize, 600, colours.ink, font)
+      }
+    })
+  } else if (id === 'change') {
+    // labels: title, then a heading and a short text for each of four columns: driving
+    // forces -> landmark inventions -> results -> the downside.
+    label(ctx, labels[0] ?? '', w / 2, h * 0.01, w * 0.9, h * 0.1, 700, colours.ink, font)
+    const cy = h * 0.31
+    const s = h * 0.25
+    const xs = [0.125, 0.375, 0.625, 0.875].map((f) => w * f)
+    ctx.fillStyle = colours.accent
+    ctx.strokeStyle = colours.accent
+    ctx.lineWidth = line * 1.2
+    eraIcon(ctx, era, xs[0], cy, s, colours)
+    machine(ctx, xs[1], cy, s, colours.accent)
+    ctx.fillStyle = colours.accent
+    ctx.strokeStyle = colours.accent
+    growth(ctx, xs[2], cy, s)
+    ctx.fillStyle = colours.muted
+    ctx.strokeStyle = colours.muted
+    ctx.lineWidth = line * 1.2
+    warning(ctx, xs[3], cy, s)
+    ctx.strokeStyle = colours.muted
+    ctx.fillStyle = colours.muted
+    ctx.lineWidth = line * 1.4
+    for (let i = 0; i < 3; i++) arrow(ctx, xs[i] + s * 0.62, cy, xs[i + 1] - s * 0.62, cy, h * 0.035)
+    // The columns' letters as large as fits above the bottom edge (English runs longer).
+    let k = 1
+    const fits = (scale: number) =>
+      xs.every((_, i) => h * 0.485 + textHeight(ctx, labels[1 + i * 2] ?? '', w * 0.245, h * 0.08 * scale, 700, font) + textHeight(ctx, labels[2 + i * 2] ?? '', w * 0.24, h * 0.066 * scale, 500, font) <= h * 0.99)
+    while (k > 0.55 && !fits(k)) k *= 0.95
+    xs.forEach((cx, i) => {
+      const below = label(ctx, labels[1 + i * 2] ?? '', cx, h * 0.47, w * 0.245, h * 0.08 * k, 700, i === 3 ? colours.muted : colours.accent, font)
+      label(ctx, labels[2 + i * 2] ?? '', cx, below + h * 0.015, w * 0.24, h * 0.066 * k, 500, colours.ink, font)
+    })
   }
   ctx.restore()
 }

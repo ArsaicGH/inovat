@@ -3,6 +3,7 @@ import { useContent } from '../content/use-content'
 import { useFrame } from '@react-three/fiber'
 import type { Group, MeshStandardMaterial } from 'three'
 import type { RoomId } from '../types'
+import { ERA_NUMBER_SCALE, eraNumberY } from './WallPictures'
 import { ANTE_DEPTH, DOOR_WIDTH, HALL_PLANTS, QUIZ_BOARD as DISPLAY, QUIZ_PLATFORM, QUIZ_STAND, roomById, toWorld } from './layout'
 import { ROOM_ACCENT, DARK_WOOD, GOLD } from './style'
 import Sign from './Sign'
@@ -11,6 +12,7 @@ import QuizWall from './QuizWall'
 import MergeStatic from './MergeStatic'
 import PortalDoor from './PortalDoor'
 import EraSculpture from './era-sculptures'
+import AnteDecor from './ante-decor'
 import { useMuseumStore } from '../state/useMuseumStore'
 
 // DECORATION OF EACH ROOM (M6), built from simple shapes. Inside each room the local axes
@@ -49,11 +51,11 @@ function RoomIdentity({ room, size }: { room: ThemedRoom; size: RoomSize }) {
   const inlay = { polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }
   return (
     <>
-      {/* Era rooms: a huge decorated number high on the back wall, above the overview
-          board standing in the middle of the room. */}
+      {/* Era rooms: a decorated number in the middle of the back wall, framed by four
+          pictures of the era (WallPictures.tsx, ERA_NUMBER_Y). */}
       {room === 'ir1' || room === 'ir2' || room === 'ir3' || room === 'ir4' ? (
         // (CMCN 4's outline number reads smaller than the solid ones: drawn larger.)
-        <group position={[0, size.h / 2 + 0.2, -size.d / 2 + 0.03]} scale={room === 'ir4' ? 1.4 : 1}>
+        <group position={[0, eraNumberY(size.h), -size.d / 2 + 0.03]} scale={(room === 'ir4' ? 1.4 : 1) * ERA_NUMBER_SCALE}>
           <EraNumeral era={room} />
         </group>
       ) : (
@@ -80,7 +82,7 @@ function RoomIdentity({ room, size }: { room: ThemedRoom; size: RoomSize }) {
   )
 }
 
-// CMCN 1: dark wooden ceiling beams and wall lanterns.
+// CMCN 1: wall lanterns.
 function SteamAge({ size }: { size: RoomSize }) {
   const lanterns: [number, number, number][] = [
     [-size.w / 2 + 0.15, 2.6, -3 * spread(size)],
@@ -90,12 +92,6 @@ function SteamAge({ size }: { size: RoomSize }) {
   ]
   return (
     <>
-      {[-4.5, -1.5, 1.5, 4.5].map((z) => z * spread(size)).map((z) => (
-        <mesh key={z} position={[0, size.h - 0.2, z]}>
-          <boxGeometry args={[size.w, 0.4, 0.35]} />
-          <meshStandardMaterial color={DARK_WOOD} roughness={0.7} />
-        </mesh>
-      ))}
       {lanterns.map(([x, y, z], i) => (
         <group key={i} position={[x, y, z]}>
           <mesh>
@@ -112,25 +108,10 @@ function SteamAge({ size }: { size: RoomSize }) {
   )
 }
 
-// CMCN 2: steel I-beams across the ceiling and hanging electric bulbs.
+// CMCN 2: hanging electric bulbs.
 function ElectricAge({ size }: { size: RoomSize }) {
-  const steel = <meshStandardMaterial color="#5b636c" metalness={0.8} roughness={0.35} />
   return (
     <>
-      {[-4, 0, 4].map((z) => z * spread(size)).map((z) => (
-        <group key={z} position={[0, size.h - 0.25, z]}>
-          <mesh>
-            <boxGeometry args={[size.w, 0.5, 0.06]} />
-            {steel}
-          </mesh>
-          {[-0.25, 0.25].map((y) => (
-            <mesh key={y} position={[0, y, 0]}>
-              <boxGeometry args={[size.w, 0.05, 0.3]} />
-              {steel}
-            </mesh>
-          ))}
-        </group>
-      ))}
       {[-3, 0, 3].map((x) => x * spread(size)).flatMap((x) =>
         [-3, 3].map((z) => z * spread(size)).map((z) => (
           <group key={`${x}${z}`} position={[x, 0, z]}>
@@ -611,7 +592,7 @@ const CENTRE_SCALE = 0.62
 // High above the overview board standing under it (top at 2.3 m), so that from the
 // entrance the era number on the back wall shows between the two; the CMCN 4
 // hologram floats at the same height.
-const CENTRE_HEIGHT = 4.2
+const CENTRE_HEIGHT = 3.55 // (under the 4.8 m ceiling, still above the board)
 function CentreSculpture({ room, size }: { room: ThemedRoom; size: RoomSize }) {
   const z = anteZ(room, size)
   const spin = useRef<Group>(null)
@@ -662,6 +643,8 @@ export default function RoomDecor({ room }: { room: ThemedRoom }) {
         {room !== 'hall' && <RoomIdentity room={room} size={size} />}
         {Decor && <Decor size={size} />}
         {(room === 'ir1' || room === 'ir2' || room === 'ir3') && <CentreSculpture room={room} size={size} />}
+        {/* The entrance room's panelling and wall lights (ante-decor.tsx). */}
+        {(room === 'ir1' || room === 'ir2' || room === 'ir3' || room === 'ir4') && <AnteDecor room={room} size={size} />}
       </MergeStatic>
     </group>
   )

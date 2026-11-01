@@ -16,6 +16,14 @@ import { AUDIO_ENABLED } from '../features'
 // Browsers only allow sound after the visitor's first click or key press, so nothing
 // plays before that (unlockAudio is called on the first interaction).
 // Every sound file is listed in src/content/credits.ts.
+// CRACKLING (fixed): the sound system used to run at the sound card's own rate (96,000
+// samples a second on the leader's laptop) with the smallest possible buffer, made for
+// instant game sounds. Every track (all recorded at 44,100) was converted to 96,000 while
+// playing, and whenever a heavy 3D frame kept the computer busy for a moment the tiny
+// buffer ran dry: a crackle. Now it runs at the files' own rate (one conversion at the very
+// end, by the operating system's mixer) with a larger buffer (a delay of a few hundredths
+// of a second, which nobody hears on a click or footstep), and only the music that is
+// actually playing is connected (see Stream).
 
 // FILE FORMAT: every sound exists as .ogg (small, played by Chrome, Edge, Firefox) and as
 // .m4a (played by Safari, which every browser on iPhones and iPads uses underneath, and
@@ -100,8 +108,12 @@ let loading: Promise<void> | null = null
 const isMusic = (url: string) => url.includes('/music/')
 
 // A streamed track: the browser's audio player, routed through its own volume control.
+// Connected to the sound system only while it plays: a connected track keeps the sound
+// system working on it even while paused (eight tracks, most of them silent at any time).
 interface Stream {
   element: HTMLAudioElement
+  source: MediaElementAudioSourceNode | null // made on its first play
+  connected: boolean
   gain: GainNode
   stopTimer: number
 }
@@ -116,15 +128,39 @@ function stream(url: string, loop: boolean): Stream | null {
   element.preload = 'auto' // fetch the (small) file early, so it can start at once
   const gain = context.createGain()
   gain.gain.value = 0
-  context.createMediaElementSource(element).connect(gain).connect(ambienceBus)
-  const created = { element, gain, stopTimer: 0 }
+  gain.connect(ambienceBus)
+  const created: Stream = { element, source: null, connected: false, gain, stopTimer: 0 }
   streams.set(url, created)
+  // (A track that plays to its end, like the welcome music, is disconnected too.)
+  element.addEventListener('ended', () => disconnect(created))
   return created
+}
+
+function connect(track: Stream) {
+  if (track.connected || !context) return
+  track.source ??= context.createMediaElementSource(track.element)
+  track.source.connect(track.gain)
+  track.connected = true
+}
+
+function disconnect(track: Stream) {
+  if (!track.connected || !track.source) return
+  track.source.disconnect()
+  track.connected = false
+}
+
+// Pause a track and take it off the sound system.
+function pause(track: Stream) {
+  track.element.pause()
+  waitingToPlay.delete(track.element)
+  disconnect(track)
 }
 
 // Start a stream; browsers refuse until the first click, so remember to retry then.
 const waitingToPlay = new Set<HTMLAudioElement>()
-function play(element: HTMLAudioElement) {
+function play(track: Stream) {
+  connect(track)
+  const element = track.element
   element.play().then(
     () => waitingToPlay.delete(element),
     () => waitingToPlay.add(element),
@@ -135,7 +171,12 @@ function setUp(): AudioContext | null {
   if (!AUDIO_ENABLED) return null // sound switched off (src/features.ts)
   if (context) return context
   try {
-    context = new AudioContext()
+    // (See CRACKLING at the top. A browser that refuses these settings gets its defaults.)
+    try {
+      context = new AudioContext({ latencyHint: 'playback', sampleRate: 44100 })
+    } catch {
+      context = new AudioContext()
+    }
   } catch {
     return null // no Web Audio: the game simply stays silent
   }
@@ -182,7 +223,10 @@ export function loadSounds(): Promise<void> {
 export function unlockAudio() {
   const ctx = setUp()
   if (ctx && ctx.state === 'suspended') void ctx.resume()
-  for (const element of waitingToPlay) play(element)
+  for (const element of waitingToPlay) {
+    const track = [...streams.values()].find((s) => s.element === element)
+    if (track) play(track)
+  }
 }
 
 // Settings: on/off and the three volumes (0-1).
@@ -240,10 +284,7 @@ function fadeOutAmbience(now: number) {
   const old = ambienceStream
   if (old) {
     window.clearTimeout(old.stopTimer)
-    old.stopTimer = window.setTimeout(() => {
-      old.element.pause()
-      waitingToPlay.delete(old.element)
-    }, AMBIENCE_FADE * 2000)
+    old.stopTimer = window.setTimeout(() => pause(old), AMBIENCE_FADE * 2000)
   }
   ambienceSource = null
   ambienceStream = null
@@ -267,7 +308,7 @@ export function setAmbience(room: RoomId) {
     // Coming back while it was still fading out: just fade back in, without restarting.
     window.clearTimeout(streamed.stopTimer)
     if (streamed.element.paused) streamed.element.currentTime = 0
-    play(streamed.element)
+    play(streamed)
     streamed.gain.gain.setTargetAtTime(level, now, AMBIENCE_FADE / 3)
     ambienceStream = streamed
     ambienceGain = streamed.gain
@@ -300,7 +341,7 @@ export function playWelcome() {
   welcomed = true
   welcome.gain.gain.value = WELCOME_LEVEL
   welcomeGain = welcome.gain
-  play(welcome.element)
+  play(welcome)
 }
 
 // Walking into an exhibition room before the welcome music has ended: it fades out, so
@@ -323,10 +364,10 @@ export function duckAmbience(share: number) {
 document.addEventListener('visibilitychange', () => {
   if (!context) return
   // Streamed music is paused too, so it continues where it was, not further on.
-  const current = ambienceStream?.element
+  const current = ambienceStream
   if (document.hidden) {
     void context.suspend()
-    current?.pause()
+    current?.element.pause()
   } else {
     void context.resume()
     if (current) play(current)
@@ -349,13 +390,13 @@ export function playEndingMusic(at = 0) {
   music.element.currentTime = at
   music.gain.gain.cancelScheduledValues(now)
   music.gain.gain.setValueAtTime(ENDING_LEVEL, now)
-  play(music.element)
+  play(music)
 }
 export function stopEndingMusic() {
   const music = streams.get(ENDING_MUSIC)
   if (!music || !context) return
   music.gain.gain.setTargetAtTime(0, context.currentTime, 0.4)
-  music.stopTimer = window.setTimeout(() => music.element.pause(), 2000)
+  music.stopTimer = window.setTimeout(() => pause(music), 2000)
 }
 // Seconds into the ending's music, or null while it is not playing.
 export function endingMusicTime(): number | null {

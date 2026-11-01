@@ -107,7 +107,7 @@ function paintBoardPicture(
   const ph = pw / picture.aspect
   const px = x + (w - pw) / 2
   if (picture.diagram) {
-    paintDiagram(ctx, picture.diagram, px, y, pw, ph, picture.labels?.[language] ?? [], font, colours)
+    paintDiagram(ctx, picture.diagram, px, y, pw, ph, picture.labels?.[language] ?? [], font, colours, picture.era)
   } else if (image) {
     ctx.save()
     // On the green computer screen the photo shows in green too; on the hologram glass it

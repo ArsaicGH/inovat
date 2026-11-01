@@ -96,6 +96,14 @@ const vi = {
     label: 'Đồ họa',
     auto: 'Tự động',
     levels: ['Rất thấp', 'Thấp', 'Trung bình', 'Cao', 'Tối đa'],
+    // What each level is for (shown under the slider).
+    hints: [
+      'Nhanh nhất, hình ảnh đơn giản nhất',
+      'Cho máy văn phòng, máy cấu hình thấp: hình kém nét hơn, không có bóng đổ',
+      'Cho máy tầm trung: hình nét vừa, không có bóng mềm ở các góc',
+      'Hình ảnh đầy đủ như thiết kế của bảo tàng',
+      'Tối đa: mọi đèn chiếu đều đổ bóng',
+    ],
   },
   // Text painted on decorations in the 3D world (the same in both languages).
   decor: {
@@ -281,6 +289,13 @@ const en: UiText = {
     label: 'Graphics',
     auto: 'Automatic',
     levels: ['Very low', 'Low', 'Medium', 'High', 'Ultra'],
+    hints: [
+      'Fastest, simplest picture',
+      'For office and budget laptops: a softer picture, no shadows',
+      'For mid-range computers: a slightly softer picture, no soft shadows in corners',
+      'The full picture, as the museum was designed',
+      'Maximum: every spotlight casts shadows',
+    ],
   },
   decor: {
     quizMark: '?',

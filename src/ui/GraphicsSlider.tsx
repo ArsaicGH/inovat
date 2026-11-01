@@ -63,6 +63,7 @@ export default function GraphicsSlider() {
         aria-valuetext={ui.graphics.levels[shown]}
         onChange={(event) => move(Number(event.target.value) as GraphicsLevel)}
       />
+      <p className="graphics-hint">{ui.graphics.hints[shown]}</p>
     </div>
   )
 }

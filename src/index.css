@@ -1095,6 +1095,14 @@ body {
   text-align: left;
 }
 
+/* What the chosen graphics level is for, under the slider. */
+.graphics-hint {
+  margin: 4px 0 0;
+  font-size: 0.82em;
+  line-height: 1.35;
+  opacity: 0.75;
+}
+
 /* Graphics slider: the level name on the left, the "Automatic" switch on the right. */
 .graphics-head {
   display: flex;
@@ -2600,6 +2608,32 @@ body {
   max-height: calc(100dvh - 210px);
   border: clamp(8px, 1.3vw, 16px) solid var(--frame-colour);
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(201, 162, 90, 0.35);
+}
+/* A wall diagram opened large (the entrance rooms' timeline and summary, all 2.2 : 1): drawn
+   on the board's paper. Its width must be fixed here: the drawing sizes itself to the space
+   it is given, so without a limit it kept growing. */
+.picture-zoom .board-diagram {
+  display: block;
+  box-sizing: content-box;
+  width: min(88vw, 1100px, calc((100dvh - 230px) * 2.2));
+  height: auto;
+  padding: clamp(8px, 1.5vw, 20px);
+  background: var(--paper);
+  border: clamp(8px, 1.3vw, 16px) solid var(--frame-colour);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.65);
+}
+.picture-zoom.board-look-brass .board-diagram {
+  border-color: #b8893d;
+}
+.picture-zoom.board-look-enamel .board-diagram {
+  border-color: #1d1b19;
+}
+.picture-zoom.board-look-screen .board-diagram {
+  border-color: #b9bec4;
+}
+.picture-zoom.board-look-hologram .board-diagram {
+  border: 1px solid var(--rule);
+  box-shadow: 0 0 30px rgba(63, 208, 224, 0.45);
 }
 .picture-zoom.board-look-brass img {
   border-color: #b8893d;

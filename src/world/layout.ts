@@ -45,7 +45,7 @@ export const panelOffset = (id: string) => (id === SPOTLIGHT_ID ? 2.9 : PANEL_OF
 // through a doorway into the hall that holds only the exhibits.
 export const ANTE_DEPTH = 7
 export const ANTE_WIDTH = 11
-const INNER_DOOR = 4.2 // width of the doorway from the entrance room into the hall
+export const INNER_DOOR = 4.2 // width of the doorway from the entrance room into the hall
 
 export type DoorStyle = 'grand' | 'plain'
 const DOOR_HEIGHT: Record<DoorStyle, number> = { grand: 3.6, plain: 3 }
@@ -57,14 +57,19 @@ const DOOR_HEIGHT: Record<DoorStyle, number> = { grand: 3.6, plain: 3 }
 // Era rooms are large and tall, to match the 24 m rotunda (leader: spacious, comfortable),
 // and each era is bigger than the one before, as the revolutions grew in scale (leader):
 // more room for more inventions (INVENTIONS in types.ts), not more crowding.
+// (Leader, 2026-11-01: CMCN 1 and 3 the base size, CMCN 2 a little bigger, CMCN 4 a little
+// bigger again: 19, 20, 19 and 21 m.)
+// Every era room has the same, fairly low ceiling (leader): the pictures around the era
+// number stay at a comfortable viewing height, and no room towers over the others.
+const ERA_HEIGHT = 5.4 // (raised a little from 4.8 so the back wall keeps a margin above and below its pictures)
 const ROOM_SPECS: { id: RoomId; side: number; width: number; depth: number; height: number; doorStyle: DoorStyle }[] = [
   { id: 'hall', side: 6, width: 12, depth: 10, height: 4.5, doorStyle: 'plain' }, // south: start
   // (Era rooms: the depth includes the entrance room, ANTE below. CMCN 4 is the largest, for
   // its futuristic atmosphere and its AI spotlight exhibit: leader.)
-  { id: 'ir1', side: 8, width: 18, depth: 18 + ANTE_DEPTH + T, height: 5.5, doorStyle: 'grand' }, // south-west
-  { id: 'ir2', side: 10, width: 20, depth: 20 + ANTE_DEPTH + T, height: 5.5, doorStyle: 'grand' }, // north-west
-  { id: 'ir3', side: 0, width: 18, depth: 18 + ANTE_DEPTH + T, height: 5.5, doorStyle: 'grand' }, // north
-  { id: 'ir4', side: 2, width: 22, depth: 22 + ANTE_DEPTH + T, height: 7, doorStyle: 'grand' }, // north-east
+  { id: 'ir1', side: 8, width: 19, depth: 19 + ANTE_DEPTH + T, height: ERA_HEIGHT, doorStyle: 'grand' }, // south-west
+  { id: 'ir2', side: 10, width: 20, depth: 20 + ANTE_DEPTH + T, height: ERA_HEIGHT, doorStyle: 'grand' }, // north-west
+  { id: 'ir3', side: 0, width: 19, depth: 19 + ANTE_DEPTH + T, height: ERA_HEIGHT, doorStyle: 'grand' }, // north
+  { id: 'ir4', side: 2, width: 21, depth: 21 + ANTE_DEPTH + T, height: ERA_HEIGHT, doorStyle: 'grand' }, // north-east
   { id: 'quiz', side: 4, width: 12, depth: 10, height: 4.5, doorStyle: 'plain' }, // south-east: end
 ]
 
@@ -434,15 +439,6 @@ function quizStandBox(): Box[] {
   return [makeBox(x, z, QUIZ_STAND.width / 2 + 0.05, 0.35, room.frame.angle)]
 }
 
-// The desk of old computers along CMCN 3's back wall (RoomDecor.tsx), local x 0,
-// z = 0.7 m in front of the back wall, 4.4 x 0.9 m.
-function ir3DeskBox(): Box[] {
-  const room = roomById('ir3')
-  if (!room) return []
-  const [x, z] = toWorld(room.frame, 0, room.vBack - 0.7)
-  return [makeBox(x, z, 2.2, 0.45, room.frame.angle)]
-}
-
 // ---------- Collision ----------
 
 // Everything fixed that the player bumps into: solid walls, pillars, pedestals and
@@ -451,7 +447,6 @@ export const COLLISION_BOXES: Box[] = [
   ...WALL_PIECES.filter((p) => p.solid),
   // Column bases are about 1 m wide (Rotunda.tsx).
   ...PILLARS.map(([x, z]) => makeBox(x, z, 0.55, 0.55)),
-  ...ir3DeskBox(),
   ...quizStandBox(),
   // The centrepiece in the middle of the rotunda (Centrepiece.tsx), about 3.4 m across.
   makeBox(0, 0, 1.75, 1.75, Math.PI / 4),

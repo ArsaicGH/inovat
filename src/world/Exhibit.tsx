@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { CanvasTexture, type Group } from 'three'
+import { CanvasTexture, type Group, type Object3D } from 'three'
 import { useMuseumStore } from '../state/useMuseumStore'
 import { SPOTLIGHT_ID, SPOTLIGHT_SCALE, panelOffset, type ExhibitSpot } from './layout'
 import { addAimTarget, removeAimTarget } from './aim-targets'
@@ -16,9 +16,13 @@ const PLINTH_TOP = 0.6 // height of the plinth's top surface (metres)
 function Prototype({ id }: { id: string }) {
   const ref = useRef<Group>(null)
   useLayoutEffect(() => {
-    ref.current?.traverse((object) => {
+    // (A downloaded model sets its own shadows: userData.ownShadows, inventions.tsx.)
+    const enable = (object: Object3D) => {
+      if (object.userData.ownShadows) return
       object.castShadow = true
-    })
+      object.children.forEach(enable)
+    }
+    if (ref.current) enable(ref.current)
   }, [id])
   useFrame((_, delta) => {
     if (ref.current) ref.current.rotation.y += delta * 0.25

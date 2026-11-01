@@ -2,6 +2,7 @@ import { useEffect, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Raycaster, Vector2, type Camera, type Intersection, type Object3D } from 'three'
 import { useMuseumStore, canUse } from '../state/useMuseumStore'
+import { isWallPicture } from '../content/pictures'
 import { aimTargets, exhibitIdOf, isQuizTarget } from './aim-targets'
 import { releasePointer, requestPointerLock } from './pointer-lock'
 import { IS_TOUCH, touchInput } from '../ui/touch'
@@ -10,6 +11,9 @@ import { IS_TOUCH, touchInput } from '../ui/touch'
 // and read from the middle of the room, so its tiles can be chosen from further away.
 const AIM_DISTANCE = 3
 const QUIZ_AIM_DISTANCE = 6
+// Wall pictures are looked at from a few steps back (the top ones around the era number
+// above all), so they can be opened from as far as the quiz wall.
+const PICTURE_AIM_DISTANCE = 6
 
 // Keys by PHYSICAL position (event.code), like the movement keys.
 const OPEN_KEY = 'KeyE'
@@ -38,7 +42,7 @@ function targetAt(raycaster: Raycaster, at: Vector2, camera: Camera): string | n
   raycaster.intersectObjects(shownTargets, true, hits)
   const nearest = hits[0]
   const id = nearest ? exhibitIdOf(nearest.object) : null
-  if (id && !isQuizTarget(id) && nearest.distance > AIM_DISTANCE) return null
+  if (id && !isQuizTarget(id) && nearest.distance > (isWallPicture(id) ? PICTURE_AIM_DISTANCE : AIM_DISTANCE)) return null
   return id
 }
 

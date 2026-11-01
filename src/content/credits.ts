@@ -74,6 +74,7 @@ export const credits: Credit[] = [
   model('815dd2ba92474299a387faeeaac83fd4', { vi: 'Mô hình "CPU Intel 4004" - CMCN 3', en: 'Model "CPU Intel 4004" - IR 3' }, 'Nadya Sarieva', 'ir3/intel-4004.glb'),
   model('556af16d476d4144bab11ed744a849e6', { vi: 'Mô hình "IBM PC XT 5150" - CMCN 3', en: 'Model "IBM PC XT 5150" - IR 3' }, 'denisstephane', 'ir3/ibm-pc-5150.glb'),
   model('e695ca5586014c0cbe6878492259a210', { vi: 'Mô hình "DEC PDP-11" - CMCN 3', en: 'Model "DEC PDP-11" - IR 3' }, 'maxdragonn', 'ir3/dec-pdp-11.glb'),
+  model('83a800f6ca824d37859f575e4b505e31', { vi: 'Mô hình "SIMATIC S7-1200, CPU2" (bộ điều khiển PLC) - CMCN 3', en: 'Model "SIMATIC S7-1200, CPU2" (a PLC) - IR 3' }, 'MaaB', 'ir3/siemens-s7-1200.glb'),
   model('0e825a8d48b14bee883a131fe029d4fc', { vi: 'Mô hình "3D Printer" - CMCN 4', en: 'Model "3D Printer" - IR 4' }, 'Gregsterius', 'ir4/3d-printer.glb'),
   model('31968bd4ec5943f785cdf028facfba5c', { vi: 'Mô hình "Universal Robots UR3 Animated Cobot" - CMCN 4', en: 'Model "Universal Robots UR3 Animated Cobot" - IR 4' }, 'kerwink', 'ir4/ur3-cobot.glb'),
   model('048b9dc3095e44c0883b6b7944ad4916', { vi: 'Mô hình "Electric Motor (high poly)" - CMCN 4', en: 'Model "Electric Motor (high poly)" - IR 4' }, 'Scarecrow_original', 'ir4/electric-motor.glb'),

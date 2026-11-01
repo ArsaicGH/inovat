@@ -30,14 +30,17 @@ function DiagramCanvas({ picture, language, theme }: { picture: Picture; languag
     if (!canvas || !diagram) return
     const draw = () => {
       const scale = Math.min(window.devicePixelRatio || 1, 2)
-      const width = Math.round(canvas.getBoundingClientRect().width * scale)
+      // (Its laid-out width, not its size on screen: the panel opens with a zoom animation,
+      // and measured mid-zoom the drawing came out small and blurry.)
+      const style = getComputedStyle(canvas)
+      const width = Math.round((canvas.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight)) * scale)
       if (width === 0) return
       canvas.width = width
       canvas.height = Math.round(width / picture.aspect)
       const ctx = canvas.getContext('2d')
       if (!ctx) return
       const accent = theme.look === 'screen' || theme.look === 'hologram' ? theme.title : theme.rule
-      paintDiagram(ctx, diagram, 0, 0, canvas.width, canvas.height, picture.labels?.[language] ?? [], paintFont(fontsReady), { ink: theme.ink, accent, muted: theme.muted })
+      paintDiagram(ctx, diagram, 0, 0, canvas.width, canvas.height, picture.labels?.[language] ?? [], paintFont(fontsReady), { ink: theme.ink, accent, muted: theme.muted }, picture.era)
     }
     draw()
     const observer = new ResizeObserver(draw)

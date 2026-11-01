@@ -33,6 +33,7 @@ import { borrowedLights } from './ending-shots'
 import SpotFixtures from './SpotFixtures'
 import EndingScene from './EndingScene'
 import { useFontsReady } from './fonts'
+import { SHADOW_LAYER } from './shadow-layer'
 
 // DEVELOPMENT-ONLY test switches in the address bar, to find what slows frames down:
 // ?dpr=1 (normal resolution), ?aa=0 (no edge smoothing), ?shadows=0 (no shadows),
@@ -64,9 +65,15 @@ const FULL_RATIO = Math.min(window.devicePixelRatio, MAX_PIXEL_RATIO)
 //   key light moves, so turning prototypes keep a still shadow). At ultra the museum
 //   spotlights cast shadows too, not just the one key light;
 // - edge smoothing: SMAA, or the cheaper FXAA (about a third of the work, softer edges).
-// "High" is what every computer got before this menu existed; "ultra" goes beyond it.
+// "High" is what every computer got before this menu existed, the museum as designed;
+// "ultra" goes beyond it. "Medium" and "low" are for weaker computers (budget and office
+// laptops): measured on the leader's laptop, drawing the lit rooms is about 90% of the work
+// and grows with the number of pixels, the effects only about 10%. So they mostly draw
+// fewer pixels (medium about two thirds of them, low about a third), and low also drops the
+// shadows (each pixel then skips its shadow test, and the shadow picture is never drawn).
 interface GraphicsSettings {
   sharpness: number
+  keyShadows: boolean // the key light casts shadows (off at the lowest levels)
   ao: 'off' | 'half' | 'full'
   shadowSize: number
   shadowSoftness: number
@@ -78,11 +85,11 @@ interface GraphicsSettings {
 const SPOT_SHADOWS = 4
 
 const GRAPHICS_LEVELS: Record<GraphicsLevel, GraphicsSettings> = {
-  0: { sharpness: 0.75, ao: 'off', shadowSize: 512, shadowSoftness: 1, shadowEvery: 0, spotShadows: false, smoothing: 'fxaa' }, // very low
-  1: { sharpness: 0.85, ao: 'off', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 3, spotShadows: false, smoothing: 'smaa' }, // low
-  2: { sharpness: 1, ao: 'off', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 3, spotShadows: false, smoothing: 'smaa' }, // medium
-  3: { sharpness: 1, ao: 'half', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 3, spotShadows: false, smoothing: 'smaa' }, // high
-  4: { sharpness: 1, ao: 'full', shadowSize: 2048, shadowSoftness: 2, shadowEvery: 1, spotShadows: true, smoothing: 'smaa' }, // ultra
+  0: { sharpness: 0.5, keyShadows: false, ao: 'off', shadowSize: 512, shadowSoftness: 1, shadowEvery: 0, spotShadows: false, smoothing: 'fxaa' }, // very low
+  1: { sharpness: 0.6, keyShadows: false, ao: 'off', shadowSize: 512, shadowSoftness: 1, shadowEvery: 0, spotShadows: false, smoothing: 'fxaa' }, // low
+  2: { sharpness: 0.8, keyShadows: true, ao: 'off', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 4, spotShadows: false, smoothing: 'smaa' }, // medium
+  3: { sharpness: 1, keyShadows: true, ao: 'half', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 3, spotShadows: false, smoothing: 'smaa' }, // high
+  4: { sharpness: 1, keyShadows: true, ao: 'full', shadowSize: 2048, shadowSoftness: 2, shadowEvery: 1, spotShadows: true, smoothing: 'smaa' }, // ultra
 }
 
 const GROUPS: RoomId[] = ['rotunda', ...ROOMS.map((room) => room.id)]
@@ -137,7 +144,20 @@ function Lighting() {
   useEffect(() => {
     const light = keyLight.current
     if (!light) return
-    const { shadowSize, shadowSoftness, spotShadows } = GRAPHICS_LEVELS[graphicsLevel]
+    const { shadowSize, shadowSoftness, spotShadows, keyShadows } = GRAPHICS_LEVELS[graphicsLevel]
+    // (Low levels: no key-light shadows. Changing this rebuilds the drawing code once, like
+    // the ultra spotlights below; WarmUp prepares it again.)
+    if (light.castShadow !== keyShadows) {
+      light.castShadow = keyShadows
+      if (!keyShadows) {
+        light.shadow.map?.dispose()
+        light.shadow.map = null
+      }
+    }
+    // The shadow lights also see the detailed models' simplified shadow stand-ins
+    // (inventions.tsx), which the camera never draws.
+    light.shadow.camera.layers.enable(SHADOW_LAYER)
+    spots.current.forEach((spot) => spot?.shadow.camera.layers.enable(SHADOW_LAYER))
     light.shadow.radius = shadowSoftness
     get().gl.shadowMap.needsUpdate = true
     // Ultra only: the museum spotlights cast shadows too (leader's decision; CLAUDE.md
@@ -487,7 +507,9 @@ function MuseumPart({ id }: { id: RoomId }) {
 function WarmUp() {
   const target = useMemo(() => new WebGLRenderTarget(64, 64, { type: HalfFloatType }), [])
   useEffect(() => () => target.dispose(), [target])
-  const spotShadows = GRAPHICS_LEVELS[useMuseumStore((state) => state.graphicsLevel)].spotShadows
+  const level = GRAPHICS_LEVELS[useMuseumStore((state) => state.graphicsLevel)]
+  // (Which lights cast shadows: a change rebuilds every material's drawing code.)
+  const spotShadows = `${level.spotShadows}|${level.keyShadows}`
   const warmedWith = useRef(spotShadows)
   useFrame(({ gl, scene, camera }) => {
     const store = useMuseumStore.getState()
@@ -546,7 +568,9 @@ function PreparedDoors({ children }: { children: ReactNode }) {
 const RATIO_STEPS = [2, 1.75, 1.5, 1.25, 1, 0.85]
 const MIN_PIXEL_RATIO = 0.75
 const TARGET_FPS = 60
-const AO_SAVING = 1.3 // frame rate gain assumed from turning ambient occlusion off
+// Frame rate gain assumed from turning ambient occlusion off (measured: only a few per cent
+// in its half-resolution "high" form; 1.3 made automatic mode drop it expecting much more).
+const AO_SAVING = 1.1
 const SETTLE = 1 // seconds to wait in the rotunda before measuring (lights fade in)
 const MEASURE = 1.5 // seconds of frames measured
 // Set by AdaptiveQuality on machines that needed a lower resolution: the number of pixels

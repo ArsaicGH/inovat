@@ -182,8 +182,10 @@ export const TUTORIAL_STEPS: TutorialStep[] = (['intro', 'look', 'move', 'sprint
 export type Control = 'look' | 'move' | 'sprint' | 'interact' | 'map' | 'keys'
 
 // May this control be used now? Always, unless the tutorial has not reached it yet.
+// (Development build: always, so every part of the game can be reached for testing; the
+// tutorial cards still show and advance.)
 export function canUse(tutorial: TutorialStep | null, control: Control): boolean {
-  return tutorial === null || TUTORIAL_STEPS.indexOf(tutorial) >= TUTORIAL_STEPS.indexOf(control)
+  return import.meta.env.DEV || tutorial === null || TUTORIAL_STEPS.indexOf(tutorial) >= TUTORIAL_STEPS.indexOf(control)
 }
 
 interface MuseumState {
@@ -388,7 +390,8 @@ export const useMuseumStore = create<MuseumState>((set, get) => ({
       if (!savedProgress) return state
       const gameCores = Math.max(state.gameCores, savedProgress.gameCores ?? 0)
       return {
-        visitedRooms: savedProgress.visitedRooms,
+        // (Development build: every room stays visited, whatever the saved visit says.)
+        visitedRooms: [...new Set([...DEV_VISITED, ...savedProgress.visitedRooms])],
         tutorial: savedProgress.tutorial,
         gameCores,
         quizPassed: state.quizPassed || savedProgress.quizPassed === true || gameCores >= 4,

@@ -82,31 +82,33 @@ export const ROOM_THEMES: Record<Exclude<RoomId, 'rotunda'>, RoomTheme> = {
     // Timber boards overhead (a plain dark colour read as a black hole).
     ceilingSurface: { texture: 'wood-floor', colour: '#6e5640', tile: 2.5, roughness: 0.85 },
     sky: '#ffcf96',
-    // (Dark like a real gallery: the spotlit exhibits carry the room. Leader.)
-    fill: 0.28,
+    // (Dark like a real gallery, but not so dark that the paintings on the walls disappear:
+    // brightened, leader 2026-11-01.)
+    fill: 0.4,
     accent: { colour: '#ffa04d', intensity: 5, at: [-7.4, 2.6, 0] }, // the wall lanterns
     // Warm and low, like firelight: one continuous warm wash along the brick, the timber
     // ceiling glowing faintly; the Watt engine is the room's focus.
     lighting: {
-      environment: 0.66,
+      environment: 0.8,
       spotColour: '#ffd3a2',
       keyColour: '#ffc68c',
-      wash: 5,
-      wallWash: { colour: '#d9965a', strength: 3.5, rhythm: 0, floor: 0 },
-      ceilingGlow: { colour: '#ffb47a', strength: 3.3 },
+      wash: 9,
+      wallWash: { colour: '#d9965a', strength: 5.2, rhythm: 0, floor: 0 },
+      ceilingGlow: { colour: '#ffb47a', strength: 4 },
       primary: 'ir1-1',
     },
   },
   // CMCN 2: electricity and mass production. Steel, concrete, early bulbs.
   ir2: {
-    // Cool grey polished concrete, to go with the navy walls.
-    floor: { texture: 'concrete', colour: '#7f8796', tile: 3, roughness: 0.5 },
-    bounce: '#45423c',
+    // Polished concrete in a deep navy, a darker shade of the walls' blue (grey and beige
+    // did not belong with them: leader).
+    floor: { texture: 'concrete', colour: '#4f5f86', tile: 3, roughness: 0.5 },
+    bounce: '#323f5c',
     // Dark navy steel plates (the central hall ceiling's CMCN 2 blue; bare metal read as black).
     walls: { texture: 'metal-plates', colour: '#5a78c4', tile: 2, roughness: 0.6, metalness: 0.15 },
     ceiling: '#24282d',
-    // A concrete slab overhead.
-    ceilingSurface: { texture: 'concrete', colour: '#a19d96', tile: 3, roughness: 0.9 },
+    // A concrete slab overhead, in a lighter, greyer blue.
+    ceilingSurface: { texture: 'concrete', colour: '#6c7ba3', tile: 3, roughness: 0.9 },
     sky: '#e9e1d2',
     fill: 0.4,
     accent: { colour: '#ffc977', intensity: 5, at: [0, 2.9, 0] }, // the hanging bulbs
@@ -118,23 +120,25 @@ export const ROOM_THEMES: Record<Exclude<RoomId, 'rotunda'>, RoomTheme> = {
       keyColour: '#ffead2',
       wash: 5,
       wallWash: { colour: '#d4e0ff', strength: 5, rhythm: 2.4, floor: 0 },
-      ceilingGlow: { colour: '#ffe6c8', strength: 2.4 },
+      ceilingGlow: { colour: '#e2e9ff', strength: 2.4 },
       primary: 'ir2-3',
     },
   },
   // CMCN 3: computers. Beige panels, checkered floor, fluorescent light.
   ir3: {
-    // Charcoal-green tiles, to go with the dark green walls.
-    floor: { texture: 'tiles', colour: '#5d6b62', tile: 1.6, roughness: 0.4 },
-    // Dark green panels (the central hall ceiling's CMCN 3 green), lit by neon-green lines.
-    walls: { painted: 'office-panels', colour: '#3b5a48', tile: 1.2, roughness: 0.7 },
-    bounce: '#544f45',
-    ceiling: '#6a655a',
-    // Dark green-grey ceiling tiles, to go with the green walls.
-    ceilingSurface: { painted: 'ceiling-tiles', colour: '#5f7466', tile: 1.2, roughness: 0.9 },
-    sky: '#f2f6ff',
+    // Polished concrete in a deep green, a darker shade of the walls (brown tiles and then grey
+    // did not belong with them: leader). The same concrete pictures as CMCN 2's floor.
+    floor: { texture: 'concrete', colour: '#45665a', tile: 3, roughness: 0.42 },
+    // Deep teal-green panels (a calmer, cooler green than the bright one before: leader),
+    // lit by a soft sea-green wash.
+    walls: { painted: 'office-panels', colour: '#3a5f56', tile: 1.2, roughness: 0.7 },
+    bounce: '#2f463e',
+    ceiling: '#55706a',
+    // Ceiling tiles in a soft, lighter green.
+    ceilingSurface: { painted: 'ceiling-tiles', colour: '#5f8074', tile: 1.2, roughness: 0.9 },
+    sky: '#eef6f4',
     fill: 0.34,
-    accent: { colour: '#e4efff', intensity: 5, at: [0, 4.4, 0] }, // the fluorescent panels
+    accent: { colour: '#e4efff', intensity: 5, at: [0, 4.2, 0] }, // the fluorescent panels
     // Neutral white, clean and even: a precise continuous wash and a lit tile ceiling; the
     // microprocessor is the focus.
     lighting: {
@@ -142,8 +146,8 @@ export const ROOM_THEMES: Record<Exclude<RoomId, 'rotunda'>, RoomTheme> = {
       spotColour: '#fff3e6',
       keyColour: '#f3f6ff',
       wash: 3,
-      wallWash: { colour: '#7fd6a0', strength: 3.5, rhythm: 0, floor: 0.9 },
-      ceilingGlow: { colour: '#9fd8b4', strength: 3.0 },
+      wallWash: { colour: '#9ad8c3', strength: 3.7, rhythm: 0, floor: 0.9 },
+      ceilingGlow: { colour: '#b4d6cb', strength: 2.9 },
       primary: 'ir3-1',
     },
   },
@@ -157,7 +161,7 @@ export const ROOM_THEMES: Record<Exclude<RoomId, 'rotunda'>, RoomTheme> = {
     sky: '#e2f1f6',
     fill: 0.3,
     // (Cyan only as an accent: at 22 it tinted the whole room.)
-    accent: { colour: '#5fe3f2', intensity: 12, at: [0, 5.2, 0] }, // the cyan light ring
+    accent: { colour: '#5fe3f2', intensity: 12, at: [0, 4.4, 0] }, // the cyan light ring
     // Cool daylight white, the brightest era room: a wash from above and a light line along
     // the foot of the walls; AI, in the middle, is the focus of the whole museum.
     lighting: {
