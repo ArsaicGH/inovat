@@ -8,11 +8,13 @@ import { ROOM_ACCENT, GOLD, DARK_WOOD, BOARD_SIZE, BOARD_THEMES } from './style'
 import PanelBoard from './PanelBoard'
 import BoardStand from './BoardStand'
 import Invention from './inventions'
+import { useShadowProxy } from './shadow-proxy'
 
 const PLINTH_TOP = 0.6 // height of the plinth's top surface (metres)
 
 // The invention's prototype (inventions.tsx) on top of the plinth. It turns slowly like a
-// showcase piece, and every part of it casts a shadow from the key light.
+// showcase piece, and every part of it casts a shadow from the key light (drawn from one
+// combined shape: shadow-proxy.ts).
 function Prototype({ id }: { id: string }) {
   const ref = useRef<Group>(null)
   useLayoutEffect(() => {
@@ -24,11 +26,13 @@ function Prototype({ id }: { id: string }) {
     }
     if (ref.current) enable(ref.current)
   }, [id])
+  useShadowProxy(ref)
   useFrame((_, delta) => {
     if (ref.current) ref.current.rotation.y += delta * 0.25
   })
   return (
-    <group ref={ref} position={[0, PLINTH_TOP, 0]}>
+    // (moves: it turns, so the exhibit's own shadow shape below leaves it to its own.)
+    <group ref={ref} position={[0, PLINTH_TOP, 0]} userData={{ moves: true }}>
       <Invention id={id} />
     </group>
   )
@@ -100,6 +104,8 @@ export default function Exhibit({ spot }: { spot: ExhibitSpot }) {
     addAimTarget(exhibit)
     return () => removeAimTarget(exhibit)
   }, [])
+  // The plinth, the board and its stand: one shadow shape too.
+  useShadowProxy(group)
 
   return (
     <group ref={group} position={[spot.x, 0, spot.z]} rotation={[0, spot.yaw, 0]} userData={{ exhibitId: spot.id }}>

@@ -294,10 +294,10 @@ function Tube({ points, r, m }: { points: V3[]; r: number; m: Material }) {
 }
 
 // Turning parts: their own pieces joined, then turned as one (keepSeparate: the machine's
-// merging leaves them alone).
+// merging leaves them alone; moves: they keep their own moving shadow, Exhibit.tsx).
 function Turning({ at, children, groupRef }: { at?: V3; children: ReactNode; groupRef: Ref<Group> }) {
   return (
-    <group ref={groupRef} position={at} userData={{ keepSeparate: true }}>
+    <group ref={groupRef} position={at} userData={{ keepSeparate: true, moves: true }}>
       <MergeStatic>{children}</MergeStatic>
     </group>
   )
@@ -678,7 +678,7 @@ export function BessemerConverter() {
         </Turning>
         {/* The flame, tipping with the vessel (outside its joined pieces: it flickers). */}
         <Follow target={vessel} axis="z">
-          <group ref={flame} position={[0, 0.66, 0]} userData={{ keepSeparate: true }}>
+          <group ref={flame} position={[0, 0.66, 0]} userData={{ keepSeparate: true, moves: true }}>
             <C r={0.15} r2={0.03} l={0.75} at={[0, 0.37, 0]} m={m.flameOuter} seg={16} />
             <C r={0.1} r2={0.015} l={0.52} at={[0, 0.26, 0]} m={m.flame} seg={14} />
             <C r={0.055} r2={0.008} l={0.3} at={[0, 0.15, 0]} m={m.flameCore} seg={10} />
@@ -903,7 +903,7 @@ export function Unimate() {
             </Turning>
             <Follow target={boom} axis="z">
               {/* The telescoping arm, sliding out of the boom, with the wrist and gripper. */}
-              <group ref={arm} position={[0.5, 0, 0]} userData={{ keepSeparate: true }}>
+              <group ref={arm} position={[0.5, 0, 0]} userData={{ keepSeparate: true, moves: true }}>
                 <MergeStatic>
                   <B s={[0.5, 0.1, 0.1]} at={[0.05, 0, 0]} m={m.steel} />
                   <C r={0.058} l={0.08} at={[0.34, 0, 0]} axis="x" m={m.paintDark} seg={18} />
@@ -935,7 +935,7 @@ function Follow({ target, axis, children }: { target: RefObject<Group | null>; a
     if (ref.current && target.current) ref.current.rotation[axis] = target.current.rotation[axis]
   })
   return (
-    <group ref={ref} userData={{ keepSeparate: true }}>
+    <group ref={ref} userData={{ keepSeparate: true, moves: true }}>
       {children}
     </group>
   )

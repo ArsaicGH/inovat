@@ -1,4 +1,5 @@
-import { Suspense, useEffect, useMemo, useRef } from 'react'
+import { Suspense, useEffect, useLayoutEffect, useMemo, useRef } from 'react'
+import { skipWhileHidden } from './skip-while-hidden'
 import { HalfFloatType, Texture, WebGLRenderTarget, type Mesh, type Object3D } from 'three'
 import { useFrame, useThree } from '@react-three/fiber'
 import { Color, Fog, Vector3, type Camera, type Group, type PerspectiveCamera, type Scene, type WebGLRenderer } from 'three'
@@ -34,9 +35,13 @@ const ease = (u: number) => u * u * u * (u * (u * 6 - 15) + 10)
 
 export default function EndingScene({ running }: { running: boolean }) {
   const run = useMuseumStore((state) => state.endingRun)
-  const warm = useRef({ frames: 0, compiled: false, done: false })
+  const warm = useRef({ frames: 0, compiled: false, done: false, pieces: -1 })
   const warmTarget = useMemo(() => new WebGLRenderTarget(64, 64, { type: HalfFloatType }), [])
   useEffect(() => () => warmTarget.dispose(), [warmTarget])
+  // (While hidden, its objects' places are not worked out every frame: skip-while-hidden.ts.)
+  useLayoutEffect(() => {
+    if (group.current) skipWhileHidden(group.current)
+  }, [])
   // (Its shared materials are freed only when the ending's world is removed: it stays built
   // after a first run, ready for "Replay".)
   useEffect(() => () => disposePalette(), [])
@@ -103,11 +108,24 @@ export default function EndingScene({ running }: { running: boolean }) {
   // (with the film's haze, which the drawing code depends on), then a moment later it is
   // drawn once, all of it, into a tiny picture out of sight, which sends every picture and
   // shape to the graphics card. Then it waits, hidden, for the visitor to step in.
+  // Its downloaded models arrive a little later than the rest, and a third of its pieces
+  // were then never prepared (the first run stuttered as they were): so it is counted twice
+  // a second, and prepared again whenever new pieces have appeared.
   function prepare(gl: WebGLRenderer, scene: Scene, camera: Camera) {
     const root = group.current
     if (!root) return
     const state = warm.current
     state.frames += 1
+    if (state.frames % 30 === 0 && (state.done || state.frames < 1000)) {
+      let pieces = 0
+      root.traverse(() => void (pieces += 1))
+      if (pieces !== state.pieces) {
+        state.pieces = pieces
+        state.frames = 0
+        state.compiled = false
+        state.done = false
+      }
+    }
     const compileNow = state.frames === 20 && !state.compiled
     const drawNow = state.frames >= 1000 && !state.done
     if (!compileNow && !drawNow) return

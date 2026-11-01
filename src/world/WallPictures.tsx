@@ -414,11 +414,13 @@ function hangings(room: EraRoom): Hanging[] {
     const y = top ? numberY + 1.0 : numberY - 1.0 + 0.65 - h / 2
     list.push({ id, x: side * ERA_WALL_X, z: -d / 2 + off, yaw: 0, y, maxW: 2.2, maxH })
   })
-  // Entrance room, facing the visitor coming in: one picture on each side of the doorway.
+  // Entrance room, facing the visitor coming in: one picture on each side of the doorway,
+  // high enough that its caption plaque stays clear above the dado rail (at 0.96-1.02 m:
+  // ante-decor.tsx; the plaque once ran through it and flickered).
   const anteSlot = ANTE_WIDTH / 2 - door
   gallery.ante.forEach((id, i) => {
     const side = i === 0 ? -1 : 1
-    list.push({ id, x: side * (door + anteSlot / 2), z: anteFace + off, yaw: 0, y: 2.05, maxW: anteSlot - 0.9, maxH: 1.7 })
+    list.push({ id, x: side * (door + anteSlot / 2), z: anteFace + off, yaw: 0, y: 2.2, maxW: anteSlot - 0.9, maxH: 1.5 })
   })
   // Entrance room side walls: the timeline (left) and what the era changed (right).
   ;[gallery.timeline, gallery.change].forEach((id, i) => {

@@ -79,16 +79,36 @@ export default function MergeStatic({ children }: { children: ReactNode }) {
       merged.push(mesh)
       meshes.forEach((original) => {
         original.visible = false
+        // (Hidden for good: not even its place is worked out any more.)
+        original.matrixWorldAutoUpdate = false
         hidden.push(original)
       })
     }
+
+    // Nothing here moves, so every object's place is worked out now, once, instead of on
+    // every frame (three.js otherwise does it for every object, every frame: together with
+    // the hidden rooms, about 2 ms of the processor's time per frame on the leader's
+    // laptop). Its place in the world still follows a group around it that moves.
+    const frozen: Object3D[] = []
+    const freeze = (object: Object3D) => {
+      if (object.userData.keepSeparate) return
+      object.updateMatrix()
+      object.matrixAutoUpdate = false
+      frozen.push(object)
+      object.children.forEach(freeze)
+    }
+    freeze(root)
 
     return () => {
       for (const mesh of merged) {
         root.remove(mesh)
         mesh.geometry.dispose()
       }
-      hidden.forEach((mesh) => (mesh.visible = true))
+      hidden.forEach((mesh) => {
+        mesh.visible = true
+        mesh.matrixWorldAutoUpdate = true
+      })
+      frozen.forEach((object) => (object.matrixAutoUpdate = true))
     }
   }, [])
 

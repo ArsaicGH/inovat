@@ -233,6 +233,14 @@ function GltfModel({ url, size, yaw = 0, lift = 0, animate = false, onOrigin = f
 function AnimatedModel({ scene, animations, offset, scale }: { scene: Group; animations: AnimationClip[]; offset: V3; scale: number }) {
   const root = useRef<Group>(null)
   const { actions, names } = useAnimations(animations, root)
+  // Only the parts the animation moves keep their own shadow (moves); the rest of the
+  // model joins the exhibit's one shadow shape (shadow-proxy.ts).
+  useLayoutEffect(() => {
+    const moving = new Set(animations.flatMap((clip) => clip.tracks.map((track) => track.name.split('.')[0])))
+    scene.traverse((object) => {
+      if (moving.has(object.name) || moving.has(object.uuid)) object.userData.moves = true
+    })
+  }, [scene, animations])
   useEffect(() => {
     const action = names[0] ? actions[names[0]] : null
     action?.play()
@@ -501,7 +509,7 @@ function PredictiveMaintenance() {
       {chart.slice(1).map((point, i) => (
         <Link key={i} from={chart[i]} to={point} material={M.cyan} r={0.01} />
       ))}
-      <mesh ref={warning} position={[0.45, 0.85, 0]} material={M.ledAmber} userData={{ keepSeparate: true }}>
+      <mesh ref={warning} position={[0.45, 0.85, 0]} material={M.ledAmber} userData={{ keepSeparate: true, moves: true }}>
         <sphereGeometry args={[0.05, 12, 8]} />
       </mesh>
     </group>
@@ -618,7 +626,7 @@ function ArtificialIntelligence() {
           <sphereGeometry args={[0.045, 12, 8]} />
         </mesh>
       ))}
-      <group ref={core} position={[0, 1.15, -0.25]} userData={{ keepSeparate: true }}>
+      <group ref={core} position={[0, 1.15, -0.25]} userData={{ keepSeparate: true, moves: true }}>
         <mesh material={HOLO_WIRE}>
           <icosahedronGeometry args={[0.55, 1]} />
         </mesh>

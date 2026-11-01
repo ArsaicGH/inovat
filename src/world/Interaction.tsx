@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { Raycaster, Vector2, type Camera, type Intersection, type Object3D } from 'three'
+import { Box3, Raycaster, Vector2, Vector3, type Camera, type Intersection, type Object3D } from 'three'
 import { useMuseumStore, canUse } from '../state/useMuseumStore'
 import { isWallPicture } from '../content/pictures'
 import { aimTargets, exhibitIdOf, isQuizTarget } from './aim-targets'
@@ -24,6 +24,26 @@ const SPACE = 'Space' // starts the tutorial; later shows / hides the key list
 const shownTargets: Object3D[] = []
 const hits: Intersection[] = []
 
+// Each target's outer box in the world, measured once everything has loaded (with room to
+// spare for the turning prototypes). A target whose box the aiming line cannot reach within its length is
+// skipped without testing its pieces one by one (that took about 0.65 ms every frame).
+const outerBoxes = new WeakMap<Object3D, Box3>()
+const boxHit = new Vector3()
+function outerBox(target: Object3D): Box3 {
+  let box = outerBoxes.get(target)
+  if (!box) {
+    box = new Box3().setFromObject(target).expandByScalar(0.5)
+    // (Before then a model may still be on its way: measured again next time.)
+    if (useMuseumStore.getState().warmedUp) outerBoxes.set(target, box)
+  }
+  return box
+}
+function inReach(raycaster: Raycaster, target: Object3D): boolean {
+  const box = outerBox(target)
+  if (box.containsPoint(raycaster.ray.origin)) return true
+  return raycaster.ray.intersectBox(box, boxHit) !== null && boxHit.distanceTo(raycaster.ray.origin) <= raycaster.far
+}
+
 // Is this object drawn (it and every group around it visible)?
 function isShown(object: Object3D): boolean {
   for (let o: Object3D | null = object; o; o = o.parent) if (!o.visible) return false
@@ -37,7 +57,7 @@ function targetAt(raycaster: Raycaster, at: Vector2, camera: Camera): string | n
   // testing the whole museum every frame). The nearest hit wins, so a wall in front
   // of an exhibit blocks it.
   shownTargets.length = 0
-  for (const target of aimTargets) if (isShown(target)) shownTargets.push(target)
+  for (const target of aimTargets) if (isShown(target) && inReach(raycaster, target)) shownTargets.push(target)
   hits.length = 0
   raycaster.intersectObjects(shownTargets, true, hits)
   const nearest = hits[0]

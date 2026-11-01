@@ -1,6 +1,6 @@
-import { Suspense, lazy, useLayoutEffect, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react'
+import { Suspense, lazy, useLayoutEffect, useEffect, useMemo, useRef, type ReactNode, type RefObject } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { Bloom, EffectComposer, FXAA, N8AO, SMAA, ToneMapping, Vignette } from '@react-three/postprocessing'
+import { Bloom, EffectComposer, N8AO, SMAA, ToneMapping, Vignette } from '@react-three/postprocessing'
 import { CopyPass, EffectPass, ToneMappingMode, type EffectComposer as Composer } from 'postprocessing'
 import { Color, CubeCamera, DefaultLoadingManager, DoubleSide, HalfFloatType, Mesh as MeshObject, MeshBasicMaterial, PlaneGeometry, RingGeometry, Scene as SceneObject, WebGLCubeRenderTarget, Object3D, Texture, WebGLRenderTarget, type Camera, type Group, type HemisphereLight, type Mesh, type PointLight, type SpotLight, type Scene, type WebGLRenderer } from 'three'
 import type { RoomId } from '../types'
@@ -34,6 +34,7 @@ import SpotFixtures from './SpotFixtures'
 import EndingScene from './EndingScene'
 import { useFontsReady } from './fonts'
 import { SHADOW_LAYER } from './shadow-layer'
+import { skipWhileHidden } from './skip-while-hidden'
 
 // DEVELOPMENT-ONLY test switches in the address bar, to find what slows frames down:
 // ?dpr=1 (normal resolution), ?aa=0 (no edge smoothing), ?shadows=0 (no shadows),
@@ -64,7 +65,9 @@ const FULL_RATIO = Math.min(window.devicePixelRatio, MAX_PIXEL_RATIO)
 //   picture pixels), and how often they are redrawn (every Nth frame; 0 = only when the
 //   key light moves, so turning prototypes keep a still shadow). At ultra the museum
 //   spotlights cast shadows too, not just the one key light;
-// - edge smoothing: SMAA, or the cheaper FXAA (about a third of the work, softer edges).
+// - edge smoothing: SMAA at every level. (FXAA, about a third of the work, was tried for
+//   low and medium: it left large dark patches around bright lights, on the ceilings and
+//   across the boards.)
 // "High" is what every computer got before this menu existed, the museum as designed;
 // "ultra" goes beyond it. "Medium" and "low" are for weaker computers (budget and office
 // laptops): measured on the leader's laptop, drawing the lit rooms is about 90% of the work
@@ -81,17 +84,16 @@ interface GraphicsSettings {
   shadowSoftness: number
   shadowEvery: number
   spotShadows: boolean // the museum spotlights cast shadows too (ultra only)
-  smoothing: 'smaa' | 'fxaa'
 }
 // How many museum spotlights may cast shadows at the ultra level.
 const SPOT_SHADOWS = 4
 
 const GRAPHICS_LEVELS: Record<GraphicsLevel, GraphicsSettings> = {
-  0: { sharpness: 0.5, ao: 'off', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 0, spotShadows: false, smoothing: 'fxaa' }, // very low
-  1: { sharpness: 0.6, ao: 'off', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 0, spotShadows: false, smoothing: 'fxaa' }, // low
-  2: { sharpness: 0.78, ao: 'off', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 4, spotShadows: false, smoothing: 'fxaa' }, // medium
-  3: { sharpness: 1, ao: 'half', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 3, spotShadows: false, smoothing: 'smaa' }, // high
-  4: { sharpness: 1, ao: 'full', shadowSize: 2048, shadowSoftness: 2, shadowEvery: 1, spotShadows: true, smoothing: 'smaa' }, // ultra
+  0: { sharpness: 0.5, ao: 'off', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 0, spotShadows: false }, // very low
+  1: { sharpness: 0.6, ao: 'off', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 0, spotShadows: false }, // low
+  2: { sharpness: 0.78, ao: 'off', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 4, spotShadows: false }, // medium
+  3: { sharpness: 1, ao: 'half', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 3, spotShadows: false }, // high
+  4: { sharpness: 1, ao: 'full', shadowSize: 2048, shadowSoftness: 2, shadowEvery: 1, spotShadows: true }, // ultra
 }
 
 const GROUPS: RoomId[] = ['rotunda', ...ROOMS.map((room) => room.id)]
@@ -471,6 +473,11 @@ function MuseumPart({ id }: { id: RoomId }) {
   const group = useRef<Group>(null)
   const prepared = usePrepareForDrawing(group)
 
+  // (While hidden, its objects' places are not worked out every frame: skip-while-hidden.ts.)
+  useLayoutEffect(() => {
+    if (group.current) skipWhileHidden(group.current)
+  }, [])
+
   useFrame(() => {
     // Keep everything visible until it has been prepared.
     if (prepared.current < 5) return
@@ -632,7 +639,7 @@ function AdaptiveQuality() {
     if (next === undefined) {
       // Too slow even at 1x without ambient occlusion.
       next = MIN_PIXEL_RATIO
-      if (at(next) * AO_SAVING < TARGET_FPS * 0.7) level = 0 // fewer shadow redraws, FXAA
+      if (at(next) * AO_SAVING < TARGET_FPS * 0.7) level = 0 // fewer shadow redraws
     }
     // No ambient occlusion and less than full sharpness: shown as "low" in the pause menu.
     if (level === 2 && next < ratio) level = 1
@@ -775,17 +782,14 @@ function EffectsFollowResolution({ composer }: { composer: RefObject<Composer | 
   return null
 }
 
-// The ending's world exists only while the ending runs (EndingScene.tsx).
-// Built ahead, hidden, once the visitor is in the Game Room with the portal open, so it is
-// ready the moment they step in (EndingScene.tsx); kept from then on.
+// The ending's world, built ahead and hidden as soon as the museum has loaded (behind the
+// loading and title screens), so it is ready the moment the visitor steps into the portal
+// (EndingScene.tsx). (Built when the visitor entered the Game Room, it froze the game there
+// for a moment: about 2,500 objects and their models made at once.)
 function EndingWhileRunning() {
   const ending = useMuseumStore((state) => state.mode === 'ending')
-  const near = useMuseumStore((state) => state.quizPassed && state.currentRoom === 'quiz')
-  const [built, setBuilt] = useState(false)
-  useEffect(() => {
-    if (ending || near) setBuilt(true)
-  }, [ending, near])
-  return built || ending ? <EndingScene running={ending} /> : null
+  const loaded = useMuseumStore((state) => state.warmedUp)
+  return loaded || ending ? <EndingScene running={ending} /> : null
 }
 
 export default function Museum() {
@@ -865,8 +869,8 @@ export default function Museum() {
           <ToneMapping mode={ToneMappingMode.AGX} />
           {/* Slightly darker corners, like a camera lens: a cinematic frame. */}
           <Vignette offset={0.3} darkness={0.55} />
-          {/* Edge smoothing: SMAA, or at the lowest level the cheaper FXAA. */}
-          {ANTIALIAS ? settings.smoothing === 'fxaa' ? <FXAA /> : <SMAA /> : <></>}
+          {/* Edge smoothing (SMAA). */}
+          {ANTIALIAS ? <SMAA /> : <></>}
         </EffectComposer>
       )}
 
