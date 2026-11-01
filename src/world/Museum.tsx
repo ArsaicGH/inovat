@@ -72,7 +72,8 @@ const FULL_RATIO = Math.min(window.devicePixelRatio, MAX_PIXEL_RATIO)
 // "ultra" goes beyond it. "Medium" and "low" are for weaker computers (budget and office
 // laptops): measured on the leader's laptop, drawing the lit rooms is about 90% of the work
 // and grows with the number of pixels, the effects only about 10%. So they mostly draw
-// fewer pixels (medium about two thirds of them, low about a third); low also redraws the
+// fewer pixels (medium about two thirds of them, low about a third; medium's sharpness is
+// halfway between low and high, leader's decision); low also redraws the
 // shadows only when the key light moves. (Low once had no shadows at all: places meant to be
 // in shadow, like the rotunda's columns, were then lit directly and showed hard, patchy
 // highlights. The shadow test itself is cheap, about 0.7 ms; drawing the shadow picture is
@@ -91,7 +92,7 @@ const SPOT_SHADOWS = 4
 const GRAPHICS_LEVELS: Record<GraphicsLevel, GraphicsSettings> = {
   0: { sharpness: 0.5, ao: 'off', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 0, spotShadows: false }, // very low
   1: { sharpness: 0.6, ao: 'off', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 0, spotShadows: false }, // low
-  2: { sharpness: 0.78, ao: 'off', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 4, spotShadows: false }, // medium
+  2: { sharpness: 0.8, ao: 'off', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 4, spotShadows: false }, // medium
   3: { sharpness: 1, ao: 'half', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 3, spotShadows: false }, // high
   4: { sharpness: 1, ao: 'full', shadowSize: 2048, shadowSoftness: 2, shadowEvery: 1, spotShadows: true }, // ultra
 }
@@ -566,6 +567,9 @@ function PreparedDoors({ children }: { children: ReactNode }) {
 const RATIO_STEPS = [2, 1.75, 1.5, 1.25, 1, 0.85]
 const MIN_PIXEL_RATIO = 0.75
 const TARGET_FPS = 60
+// What counts as reaching it: one dropped frame in the short measurement already reads as
+// 59, and a laptop that keeps 60 fps (the leader's, the benchmark for "high") then lost it.
+const ENOUGH_FPS = TARGET_FPS * 0.95
 // Frame rate gain assumed from turning ambient occlusion off (measured: only a few per cent
 // in its half-resolution "high" form; 1.3 made automatic mode drop it expecting much more).
 const AO_SAVING = 1.1
@@ -629,12 +633,12 @@ function AdaptiveQuality() {
     let level: GraphicsLevel = 3 // high
     // Touch devices: ambient occlusion (soft corner shadows, hard to see on a small screen)
     // goes BEFORE any sharpness, since blurry text matters far more there.
-    if (IS_TOUCH && at(ratio) < TARGET_FPS) level = 2
+    if (IS_TOUCH && at(ratio) < ENOUGH_FPS) level = 2
     const saving = level < 3 ? AO_SAVING : 1
-    let next = steps.find((r) => r >= 1 && at(r) * saving >= TARGET_FPS)
+    let next = steps.find((r) => r >= 1 && at(r) * saving >= ENOUGH_FPS)
     if (next === undefined && !IS_TOUCH) {
       level = 2 // ambient occlusion off
-      next = steps.find((r) => at(r) * AO_SAVING >= TARGET_FPS)
+      next = steps.find((r) => at(r) * AO_SAVING >= ENOUGH_FPS)
     }
     if (next === undefined) {
       // Too slow even at 1x without ambient occlusion.
@@ -782,13 +786,15 @@ function EffectsFollowResolution({ composer }: { composer: RefObject<Composer | 
   return null
 }
 
-// The ending's world, built ahead and hidden as soon as the museum has loaded (behind the
-// loading and title screens), so it is ready the moment the visitor steps into the portal
-// (EndingScene.tsx). (Built when the visitor entered the Game Room, it froze the game there
-// for a moment: about 2,500 objects and their models made at once.)
+// The ending's world, built ahead and hidden as soon as the museum has loaded and the
+// automatic quality has been measured (behind the loading and title screens), so it is
+// ready the moment the visitor steps into the portal (EndingScene.tsx). (Built when the
+// visitor entered the Game Room, it froze the game there for a moment: about 2,500 objects
+// and their models made at once. Built during the quality measurement, it slowed those
+// frames and made automatic mode choose "low" on the leader's laptop.)
 function EndingWhileRunning() {
   const ending = useMuseumStore((state) => state.mode === 'ending')
-  const loaded = useMuseumStore((state) => state.warmedUp)
+  const loaded = useMuseumStore((state) => state.qualityChosen)
   return loaded || ending ? <EndingScene running={ending} /> : null
 }
 
