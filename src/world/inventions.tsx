@@ -49,6 +49,8 @@ const holo = (opacity: number) =>
   new MeshBasicMaterial({ color: '#5fe3ff', transparent: true, opacity, blending: AdditiveBlending, depthWrite: false, toneMapped: false })
 const HOLO_FILL = holo(0.12)
 const HOLO_WIRE = new MeshBasicMaterial({ color: '#7febff', wireframe: true, transparent: true, opacity: 0.55, depthWrite: false, toneMapped: false })
+// The digital twin's wireframe: fainter, as a detailed model has very many lines.
+const TWIN_WIRE = new MeshBasicMaterial({ color: '#7febff', wireframe: true, transparent: true, opacity: 0.14, depthWrite: false, toneMapped: false })
 
 // ---------- Small building blocks ----------
 
@@ -170,11 +172,22 @@ function prepareModel(scene: Group) {
 // stays on its plinth in the museum.
 export const ModelCopy = createContext(false)
 
-function GltfModel({ url, size, yaw = 0, lift = 0, animate = false, onOrigin = false }: { url: string; size: number; yaw?: number; lift?: number; animate?: boolean; onOrigin?: boolean }) {
+// copy: a separate copy even in the museum (a model shown in two places there).
+// wire: drawn in this material instead of its own (the digital twin's wireframe).
+function GltfModel({ url, size, yaw = 0, lift = 0, animate = false, onOrigin = false, copy: ownCopy = false, wire }: { url: string; size: number; yaw?: number; lift?: number; animate?: boolean; onOrigin?: boolean; copy?: boolean; wire?: MeshBasicMaterial }) {
   const loaded = useGLTF(url)
-  const copy = useContext(ModelCopy)
+  const copy = useContext(ModelCopy) || ownCopy || Boolean(wire)
   // (The copy shares the original's shapes and materials: cheap.)
-  const scene = useMemo(() => (copy ? (loaded.scene.clone(true) as Group) : loaded.scene), [copy, loaded.scene])
+  const scene = useMemo(() => {
+    if (!copy) return loaded.scene
+    const clone = loaded.scene.clone(true) as Group
+    if (wire)
+      clone.traverse((object) => {
+        const mesh = object as Mesh
+        if (mesh.isMesh) mesh.material = wire
+      })
+    return clone
+  }, [copy, loaded.scene, wire])
   const animations = loaded.animations
   const fit = useMemo(() => {
     prepareModel(scene)
@@ -229,12 +242,16 @@ const MODEL = {
   watt: '/models/ir1/watt-steam-engine.glb',
   rocket: '/models/ir1/rocket-locomotive.glb',
   bulb: '/models/ir2/edison-light-bulb.glb',
-  modelT: '/models/ir2/ford-model-t.glb',
+  modelT: '/models/ir2/ford-model-t-v2.glb',
+  benz: '/models/ir2/benz-motorwagen.glb',
   telephone: '/models/ir2/bell-telephone-1876.glb',
   chip: '/models/ir3/intel-4004.glb',
-  pc: '/models/ir3/ibm-5150.glb',
+  pc: '/models/ir3/ibm-pc-5150.glb',
+  pdp11: '/models/ir3/dec-pdp-11.glb',
   printer: '/models/ir4/3d-printer.glb',
   cobot: '/models/ir4/ur3-cobot.glb',
+  motor: '/models/ir4/electric-motor.glb',
+  gpu: '/models/ir4/gpu-rtx-3070.glb',
 }
 
 // ---------- CMCN 1 ----------
@@ -329,7 +346,7 @@ function AssemblyLine() {
         <Rod key={i} r={0.04} length={0.82} at={[-0.76 + i * 0.19, 0.17, 0]} axis="z" material={M.steel} />
       ))}
       <Suspense fallback={null}>
-        <GltfModel url={MODEL.modelT} size={1.5} lift={0.21} />
+        <GltfModel url={MODEL.modelT} size={1.5} lift={0.21} yaw={Math.PI / 2} />
       </Suspense>
     </group>
   )
@@ -406,19 +423,9 @@ function Unimate() {
   )
 }
 
-// ARPANET: a minicomputer cabinet like the network's first routers (the IMPs), with its
-// panel of lights, and above it the first four linked sites as glowing points.
+// ARPANET: a minicomputer (a model of a DEC PDP-11, a kind of computer connected to the
+// network), and above it the first four linked sites as glowing points.
 function Arpanet() {
-  const lights = useMemo(() => {
-    const out: { at: V3; material: MeshStandardMaterial }[] = []
-    for (let row = 0; row < 4; row++) {
-      for (let col = 0; col < 8; col++) {
-        const pick = (row * 5 + col * 3) % 7
-        out.push({ at: [-0.21 + col * 0.06, 0.75 + row * 0.07, 0.31], material: pick < 2 ? M.ledRed : pick < 5 ? M.ledAmber : M.ledWhite })
-      }
-    }
-    return out
-  }, [])
   const sites: V3[] = [
     [-0.4, 1.45, 0.2],
     [0.35, 1.55, 0.25],
@@ -427,12 +434,9 @@ function Arpanet() {
   ]
   return (
     <group>
-      <Box size={[0.66, 1.15, 0.6]} at={[0, 0.575, 0]} material={M.cabinet} />
-      <Box size={[0.56, 0.4, 0.02]} at={[0, 0.85, 0.3]} material={M.black} />
-      {lights.map((light, i) => (
-        <Box key={i} size={[0.025, 0.025, 0.01]} at={light.at} material={light.material} />
-      ))}
-      <Box size={[0.56, 0.4, 0.02]} at={[0, 0.35, 0.3]} material={M.beige} />
+      <Suspense fallback={null}>
+        <GltfModel url={MODEL.pdp11} size={1.2} />
+      </Suspense>
       {/* The four sites and their links (lines between them), joined to the cabinet. */}
       {sites.map((site, i) => (
         <mesh key={i} position={site} material={M.ledAmber}>
@@ -448,7 +452,7 @@ function Arpanet() {
       ].map(([a, b]) => (
         <Link key={`${a}${b}`} from={sites[a]} to={sites[b]} material={M.ledAmber} />
       ))}
-      <Link from={[0, 1.15, 0]} to={sites[0]} material={M.ledAmber} />
+      <Link from={[0, 1.2, 0]} to={sites[0]} material={M.ledAmber} />
     </group>
   )
 }
@@ -524,35 +528,22 @@ function Printer3d() {
   )
 }
 
-// A small turbine (housing, fan, stand), used twice by the digital twin.
-function Turbine({ body, fan }: { body: MeshStandardMaterial | MeshBasicMaterial; fan: MeshStandardMaterial | MeshBasicMaterial }) {
-  return (
-    <group>
-      <Box size={[0.12, 0.45, 0.3]} at={[0, 0.225, 0]} material={body} />
-      <Rod r={0.26} length={0.4} at={[0, 0.7, 0]} axis="x" material={body} sides={20} />
-      <Rod r={0.1} r2={0.04} length={0.18} at={[-0.29, 0.7, 0]} axis="x" material={body} />
-      <Spin speed={2} axis="x" at={[0.22, 0.7, 0]}>
-        {Array.from({ length: 5 }, (_, i) => (
-          <Box key={i} size={[0.02, 0.4, 0.08]} at={[0, 0, 0]} rotation={[(i / 5) * Math.PI, 0.4, 0]} material={fan} />
-        ))}
-      </Spin>
-    </group>
-  )
-}
 
 // The digital twin: a real machine and, floating beside it, its glowing digital copy that
 // turns in step with it.
 function DigitalTwin() {
   return (
     <group>
-      <group position={[-0.42, 0, 0]}>
-        <Turbine body={M.steel} fan={M.iron} />
-      </group>
-      <group position={[0.45, 0.45, 0]}>
-        <Turbine body={HOLO_WIRE} fan={HOLO_WIRE} />
-      </group>
-      <Rod r={0.25} length={0.02} at={[0.45, 0.4, 0]} material={HOLO_FILL} sides={24} />
-      <Link from={[-0.2, 0.7, 0]} to={[0.23, 1.15, 0]} material={HOLO_FILL} r={0.006} />
+      <Suspense fallback={null}>
+        <group position={[-0.42, 0, 0]}>
+          <GltfModel url={MODEL.motor} size={0.75} copy />
+        </group>
+        <group position={[0.45, 0.45, 0]}>
+          <GltfModel url={MODEL.motor} size={0.75} wire={TWIN_WIRE} />
+        </group>
+      </Suspense>
+      <Rod r={0.3} length={0.02} at={[0.45, 0.4, 0]} material={HOLO_FILL} sides={24} />
+      <Link from={[-0.2, 0.6, 0]} to={[0.23, 0.95, 0]} material={HOLO_FILL} r={0.006} />
     </group>
   )
 }
@@ -569,8 +560,8 @@ function Cobot() {
   )
 }
 
-// Predictive maintenance: a motor and pump with a vibration sensor; above it a hologram
-// chart whose line starts to climb, and a warning light asking for a check.
+// Predictive maintenance: an electric motor (a downloaded model) with a vibration sensor;
+// above it a hologram chart whose line starts to climb, and a warning light asking for a check.
 function PredictiveMaintenance() {
   const warning = useRef<Mesh>(null)
   useFrame(({ clock }) => {
@@ -579,14 +570,10 @@ function PredictiveMaintenance() {
   const chart: V3[] = [0, 0.02, 0.01, 0.03, 0.02, 0.05, 0.04, 0.09, 0.14, 0.22].map((y, i) => [-0.35 + i * 0.078, 1.3 + y, 0])
   return (
     <group>
-      <Box size={[1.3, 0.12, 0.5]} at={[0, 0.06, 0]} material={M.navy} />
-      <Rod r={0.2} length={0.55} at={[-0.25, 0.36, 0]} axis="x" material={M.blue} sides={20} />
-      {Array.from({ length: 6 }, (_, i) => (
-        <Rod key={i} r={0.215} length={0.02} at={[-0.45 + i * 0.08, 0.36, 0]} axis="x" material={M.iron} sides={20} />
-      ))}
-      <Rod r={0.04} length={0.3} at={[0.15, 0.36, 0]} axis="x" material={M.steel} />
-      <Rod r={0.18} length={0.3} at={[0.42, 0.36, 0]} axis="z" material={M.steel} sides={20} />
-      <Rod r={0.06} length={0.3} at={[0.42, 0.65, 0]} material={M.steel} />
+      <Box size={[1.3, 0.12, 0.6]} at={[0, 0.06, 0]} material={M.navy} />
+      <Suspense fallback={null}>
+        <GltfModel url={MODEL.motor} size={0.95} lift={0.12} />
+      </Suspense>
       {/* The sensor on top, with its link to the chart. */}
       <Rod r={0.035} length={0.08} at={[-0.25, 0.6, 0]} material={M.black} />
       <mesh position={[-0.25, 0.65, 0]} material={M.cyan}>
@@ -693,33 +680,9 @@ function BessemerConverter() {
 // tiller and, at the back, the engine with its big flywheel lying flat.
 function MotorWagen() {
   return (
-    <group>
-      {[-0.42, 0.42].map((z) => (
-        <group key={z} position={[-0.35, 0.44, z]}>
-          <Wheel radius={0.42} tube={0.022} spokes={6} material={M.black} />
-        </group>
-      ))}
-      <Rod r={0.025} length={0.9} at={[-0.35, 0.44, 0]} axis="z" material={M.steel} />
-      <group position={[0.62, 0.28, 0]}>
-        <Wheel radius={0.27} tube={0.02} spokes={5} material={M.black} />
-      </group>
-      <Rod r={0.02} length={0.5} at={[0.62, 0.52, 0]} material={M.steel} />
-      {[-0.2, 0.2].map((z) => (
-        <Rod key={z} r={0.018} length={1.15} at={[0.1, 0.5, z]} axis="x" material={M.steel} />
-      ))}
-      <Box size={[0.42, 0.28, 0.5]} at={[-0.12, 0.66, 0]} material={M.darkWood} />
-      <Box size={[0.46, 0.08, 0.62]} at={[-0.12, 0.84, 0]} material={M.black} />
-      <Box size={[0.06, 0.28, 0.62]} at={[-0.34, 0.98, 0]} material={M.black} />
-      <Rod r={0.014} length={0.55} at={[0.3, 0.98, 0]} material={M.steel} />
-      <Box size={[0.03, 0.03, 0.22]} at={[0.3, 1.26, 0]} material={M.black} />
-      <Box size={[0.32, 0.22, 0.24]} at={[-0.6, 0.66, 0]} material={M.iron} />
-      <Rod r={0.07} length={0.3} at={[-0.62, 0.62, 0.12]} axis="x" material={M.brass} />
-      <Spin speed={2.4} axis="y" at={[-0.62, 0.82, 0]}>
-        <group rotation={[Math.PI / 2, 0, 0]}>
-          <Wheel radius={0.2} tube={0.025} spokes={4} material={M.iron} />
-        </group>
-      </Spin>
-    </group>
+    <Suspense fallback={null}>
+      <GltfModel url={MODEL.benz} size={1.95} />
+    </Suspense>
   )
 }
 
@@ -752,8 +715,8 @@ function Automation() {
 }
 
 // Artificial intelligence (the spotlight exhibit): a glowing neural network floating above
-// a dark base: layers of nodes joined by links, signals pulsing through them, and a slowly
-// turning core.
+// a graphics processor on a dark base: layers of nodes joined by links, signals pulsing
+// through them, and a slowly turning core.
 const NETWORK: number[][] = [
   [-0.36, -0.12, 0.12, 0.36],
   [-0.48, -0.24, 0, 0.24, 0.48],
@@ -773,7 +736,11 @@ function ArtificialIntelligence() {
     <group>
       <Rod r={0.42} r2={0.32} length={0.18} at={[0, 0.09, 0]} material={M.black} sides={32} />
       <Rod r={0.34} length={0.02} at={[0, 0.19, 0]} material={M.cyan} sides={32} />
-      <Rod r={0.02} length={0.5} at={[0, 0.45, 0]} material={HOLO_FILL} />
+      {/* A graphics processor (a downloaded model of a GPU card), the kind of chip that deep
+          learning runs on, under the network it computes. */}
+      <Suspense fallback={null}>
+        <GltfModel url={MODEL.gpu} size={0.62} lift={0.2} />
+      </Suspense>
       {NETWORK.slice(1).flatMap((layer, i) =>
         layer.flatMap((y) =>
           NETWORK[i].map((y0) => (
@@ -833,5 +800,19 @@ export default function Invention({ id }: { id: string }) {
     <MergeStatic>
       <Prototype />
     </MergeStatic>
+  )
+}
+
+// THE ENDING FILM shows some of these downloaded models again (ending-acts.tsx), much larger
+// and as copies (ModelCopy), so the museum's own stay on their plinths. `size` = the model's
+// largest side in metres; yaw turns it about its middle.
+export type FilmModelName = keyof typeof MODEL
+export function FilmModel({ name, size, yaw = 0, animate = false, onOrigin = false }: { name: FilmModelName; size: number; yaw?: number; animate?: boolean; onOrigin?: boolean }) {
+  return (
+    <ModelCopy.Provider value={true}>
+      <Suspense fallback={null}>
+        <GltfModel url={MODEL[name]} size={size} yaw={yaw} animate={animate} onOrigin={onOrigin} />
+      </Suspense>
+    </ModelCopy.Provider>
   )
 }

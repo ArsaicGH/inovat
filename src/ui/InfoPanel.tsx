@@ -1,9 +1,15 @@
 import { Suspense, lazy, useEffect, useRef, useState, type CSSProperties } from 'react'
 import { useContent } from '../content/use-content'
 import { useMuseumStore } from '../state/useMuseumStore'
+import { useScrollFades } from './scroll-fades'
 import { resumeWalking } from '../world/pointer-lock'
 import { EXHIBIT_SPOTS } from '../world/layout'
-import { BOARD_FRAME, BOARD_SIZE, BOARD_THEMES } from '../world/style'
+import { BOARD_FRAME, BOARD_SIZE, BOARD_THEMES, type BoardTheme } from '../world/style'
+import { PICTURES, isWallPicture, type Picture } from '../content/pictures'
+import type { Language } from '../content/language'
+import { paintDiagram } from '../world/diagrams'
+import { paintFont, useFontsReady } from '../world/fonts'
+import type { RoomId } from '../types'
 
 // The turning 3D model beside invention boards (part of the 3D download, so loaded on first use).
 const ModelViewer = lazy(() => import('../world/ModelViewer'))
@@ -14,13 +20,69 @@ const ERA_GLOW: Record<string, string> = { ir1: '#e0a050', ir2: '#ffd36a', ir3: 
 // How long the shrink-away animation plays after closing (must match index.css).
 const CLOSE_ANIMATION_MS = 220
 
+// A diagram drawn by the museum (world/diagrams.ts), sharp at the screen's own resolution.
+function DiagramCanvas({ picture, language, theme }: { picture: Picture; language: Language; theme: BoardTheme }) {
+  const ref = useRef<HTMLCanvasElement>(null)
+  const fontsReady = useFontsReady()
+  useEffect(() => {
+    const canvas = ref.current
+    const diagram = picture.diagram
+    if (!canvas || !diagram) return
+    const draw = () => {
+      const scale = Math.min(window.devicePixelRatio || 1, 2)
+      const width = Math.round(canvas.getBoundingClientRect().width * scale)
+      if (width === 0) return
+      canvas.width = width
+      canvas.height = Math.round(width / picture.aspect)
+      const ctx = canvas.getContext('2d')
+      if (!ctx) return
+      const accent = theme.look === 'screen' || theme.look === 'hologram' ? theme.title : theme.rule
+      paintDiagram(ctx, diagram, 0, 0, canvas.width, canvas.height, picture.labels?.[language] ?? [], paintFont(fontsReady), { ink: theme.ink, accent, muted: theme.muted })
+    }
+    draw()
+    const observer = new ResizeObserver(draw)
+    observer.observe(canvas)
+    return () => observer.disconnect()
+  }, [picture, language, theme, fontsReady])
+  return <canvas ref={ref} className="board-diagram" style={{ aspectRatio: picture.aspect }} />
+}
+
+// The picture with its caption and credit (who made it, its licence, a link to its page).
+function PictureFigure({ picture, language, theme, credit, className }: { picture: Picture; language: Language; theme: BoardTheme; credit: { picture: string; diagram: string }; className: string }) {
+  return (
+    <figure className={className}>
+      {picture.file ? (
+        <img src={`/${picture.file}`} alt={picture.caption[language]} style={{ aspectRatio: picture.aspect }} />
+      ) : (
+        <DiagramCanvas picture={picture} language={language} theme={theme} />
+      )}
+      <figcaption>
+        {picture.caption[language]}
+        <small>
+          {picture.file && picture.author && picture.licence ? (
+            <>
+              {credit.picture}:{' '}
+              <a href={picture.source} target="_blank" rel="noreferrer">
+                {picture.author[language]}
+              </a>
+              , {picture.licence[language]}
+            </>
+          ) : (
+            credit.diagram
+          )}
+        </small>
+      </figcaption>
+    </figure>
+  )
+}
+
 // The enlarged version of an exhibit's text board: the same wooden frame, cream paper,
 // proportions and layout as the board in the 3D world (PanelBoard.tsx), but with the full
 // text (it scrolls if long). It zooms out of the board (which sits
 // under the crosshair, i.e. in the middle of the screen) and shrinks back when closed.
 // It stays mounted for a moment after closing so the shrink animation can play.
 export default function InfoPanel() {
-  const { ui, exhibit } = useContent()
+  const { ui, exhibit, language } = useContent()
   const openId = useMuseumStore((state) => state.openExhibitId)
   // The exhibit currently on screen: follows openId, but lingers while shrinking away.
   const [shownId, setShownId] = useState<string | null>(openId)
@@ -36,6 +98,8 @@ export default function InfoPanel() {
   useEffect(() => {
     setModelReady(false)
   }, [openId])
+  // The board's text scrolls on short windows (scroll-fades.ts).
+  const scroll = useScrollFades<HTMLDivElement>(shownId)
 
   // After closing, remove the panel once the shrink animation has finished.
   useEffect(() => {
@@ -59,10 +123,14 @@ export default function InfoPanel() {
   if (!shownId) return null
   const text = exhibit(shownId)
   const spot = EXHIBIT_SPOTS.find((s) => s.id === shownId)
+  // A picture from a wall gallery ('wall-ir1-2'): shown large on its own, in its room's colours.
+  const wallPicture = isWallPicture(shownId) ? PICTURES[shownId] : undefined
+  const room = (spot?.room ?? (wallPicture ? shownId.split('-')[1] : 'hall')) as RoomId
+  const picture = PICTURES[shownId] as Picture | undefined
   const [width, height] =
     spot?.kind === 'wall' ? BOARD_SIZE.wall : spot?.kind === 'overview' ? BOARD_SIZE.overview : BOARD_SIZE.stand
   // The same look as the board in the room (style.ts board themes).
-  const theme = BOARD_THEMES[spot?.room ?? 'hall']
+  const theme = BOARD_THEMES[room]
   // Passed to index.css: the board's shape, frame width (as a share of its width) and colours.
   const look = {
     '--ratio': width / height,
@@ -73,7 +141,7 @@ export default function InfoPanel() {
     '--muted': theme.muted,
     '--rule': theme.rule,
     '--frame-colour': theme.frame,
-    '--era-glow': ERA_GLOW[spot?.room ?? ''] ?? '#c9a25a',
+    '--era-glow': ERA_GLOW[room] ?? '#c9a25a',
   } as CSSProperties
 
   return (
@@ -88,6 +156,11 @@ export default function InfoPanel() {
       }}
     >
       <div className="info-panel" onAnimationEnd={(event) => event.target === event.currentTarget && !closing && setModelReady(true)}>
+        {wallPicture ? (
+          <div className="picture-row" style={look}>
+            <PictureFigure picture={wallPicture} language={language} theme={theme} credit={{ picture: ui.infoPanel.pictureCredit, diagram: ui.infoPanel.diagramCredit }} className={`picture-zoom board-look-${theme.look}`} />
+          </div>
+        ) : (
         <div className="board-row" style={look}>
           {spot?.kind === 'corner' && (
             <div className="model-viewer">
@@ -99,43 +172,51 @@ export default function InfoPanel() {
         <article className={`board-zoom board-look-${theme.look}`} style={look}>
           <div className="board-frame">
             <div className="board-paper">
-              <h2>{text.title}</h2>
-              <div className="board-rule" />
-              {text.facts.length > 0 && (
-                <ul className="board-facts">
-                  {text.facts.map((fact) => (
-                    <li key={fact}>{fact}</li>
-                  ))}
-                </ul>
-              )}
-                <p className="board-body" style={shownId === 'hall-credits' ? { order: 2 } : undefined}>
-                  {text.body}
-                </p>
-              {text.sources.length > 0 ? (
-                <div className="board-sources">
-                  {ui.infoPanel.sourcesLabel}:
-                  <ul>
-                    {text.sources.map((source) => (
-                      <li key={source.url}>
-                        {/* Opens in a new tab, so the museum stays where it was. */}
-                        <a href={source.url} target="_blank" rel="noreferrer">
-                          {source.name}, “{source.title}”
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
+              <div ref={scroll} className="board-scroll scroll-fade">
+                <div className="board-text">
+                  <h2>{text.title}</h2>
+                  <div className="board-rule" />
+                  {text.facts.length > 0 && (
+                    <ul className="board-facts">
+                      {text.facts.map((fact) => (
+                        <li key={fact}>{fact}</li>
+                      ))}
+                    </ul>
+                  )}
+                  {picture && (
+                    <PictureFigure picture={picture} language={language} theme={theme} credit={{ picture: ui.infoPanel.pictureCredit, diagram: ui.infoPanel.diagramCredit }} className="board-figure" />
+                  )}
+                    <p className="board-body" style={shownId === 'hall-credits' ? { order: 2 } : undefined}>
+                      {text.body}
+                    </p>
+                  {text.sources.length > 0 ? (
+                    <div className="board-sources">
+                      {ui.infoPanel.sourcesLabel}:
+                      <ul>
+                        {text.sources.map((source) => (
+                          <li key={source.url}>
+                            {/* Opens in a new tab, so the museum stays where it was. */}
+                            <a href={source.url} target="_blank" rel="noreferrer">
+                              {source.name}, “{source.title}”
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : (
+                    text.placeholder && (
+                      <p className="board-sources">
+                        {ui.infoPanel.sourcesLabel}: {ui.infoPanel.sourcesPlaceholder}
+                      </p>
+                    )
+                  )}
                 </div>
-              ) : (
-                text.placeholder && (
-                  <p className="board-sources">
-                    {ui.infoPanel.sourcesLabel}: {ui.infoPanel.sourcesPlaceholder}
-                  </p>
-                )
-              )}
+              </div>
             </div>
           </div>
         </article>
         </div>
+        )}
         <div className="board-actions">
           <button type="button" className="board-close" onClick={resumeWalking}>
             {ui.infoPanel.close}

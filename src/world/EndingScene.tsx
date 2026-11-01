@@ -4,10 +4,12 @@ import { Color, Fog, Vector3, type Group, type PerspectiveCamera } from 'three'
 import { useMuseumStore } from '../state/useMuseumStore'
 import { endingMusicTime, playEndingMusic } from '../audio/sound'
 import { ORIGIN, RIGS, SET_X, SHOTS, START, TITLE_AT, borrowedLights, film, filmVeil, mixPose, shotIndexAt, type PlacedLight, type StageLight } from './ending-shots'
-import { DigitalSet, ElectricSet, SmartSet, SteamSet, FinaleLands, disposePalette } from './ending-sets'
+import { FinaleLands, disposePalette } from './ending-sets'
+import { ActConnected, ActDigital, ActElectric, ActSteam } from './ending-acts'
 
 // THE ENDING: after the Game Room's portal, a short film through the four Industrial
-// Revolutions, shot by shot (the script is in ending-shots.ts, the sets in ending-sets.tsx),
+// Revolutions, shot by shot (the script is in ending-shots.ts, the four acts in
+// ending-acts.tsx, the finale's columns in ending-sets.tsx),
 // ending on all four eras side by side and the closing title (EndingScreen.tsx).
 //
 // It is built far from the museum (beyond the camera's view distance, so none of the
@@ -68,6 +70,7 @@ export default function EndingScene() {
     else ready()
     return () => {
       alive = false
+      film.ready = false
       window.clearTimeout(timer)
       borrowedLights.active = false
       scene.fog = saved.fog
@@ -114,6 +117,7 @@ export default function EndingScene() {
       const music = endingMusicTime()
       film.t = music !== null ? Math.max(music, film.t) : film.t + Math.min(delta, 0.1)
     }
+    film.ready = state.ready
     const index = shotIndexAt(film.t)
     const shot = SHOTS[index]
     const s = film.t - START[shot.id]
@@ -173,8 +177,8 @@ export default function EndingScene() {
   return (
     <group ref={group} position={ORIGIN}>
       <Suspense fallback={null}>
-        {/* (The sets leave before the finale: it shows only the line of time and the four era numbers.) */}
-        {[SteamSet, ElectricSet, DigitalSet, SmartSet].map((Set, i) => (
+        {/* (Each act's scenes are drawn only during their own shots; the finale shows only its columns.) */}
+        {[ActSteam, ActElectric, ActDigital, ActConnected].map((Set, i) => (
           <group key={i} position={[SET_X[i], 0, 0]} ref={(g) => void (sets.current[i] = g)}>
             <Set />
           </group>

@@ -4,9 +4,14 @@ import { useThree } from '@react-three/fiber'
 import { CanvasTexture, DoubleSide, MeshBasicMaterial, SRGBColorSpace } from 'three'
 import { BOARD_FRAME, type BoardTheme } from './style'
 import { drawWrappedText, paintFont, useFontsReady } from './fonts'
+import { PICTURES, type Picture } from '../content/pictures'
+import type { Language } from '../content/language'
+import { paintDiagram, type DiagramColours } from './diagrams'
+import { usePicture } from './picture-images'
 
 // A text board in the 3D world that is readable as you walk past: title, summary, full
-// text and source, painted onto a picture (canvas texture). Pressing E enlarges it on screen.
+// text and source, with its picture (content/pictures.ts), painted onto a canvas texture.
+// Pressing E enlarges it on screen.
 // Its look (frame, paper, colours) follows the room's board theme (style.ts).
 
 const PIXELS_PER_METRE = 512 // sharp enough to read from a couple of metres away
@@ -75,10 +80,79 @@ function paintPaper(ctx: CanvasRenderingContext2D, theme: BoardTheme, w: number,
   }
 }
 
+// The board's picture and its caption (up to captionMaxLines lines; none on the tall boards,
+// where the text needs the room), fitted inside the box x, y, w, h: as large as the box
+// allows, centred across it, from its top.
+function paintBoardPicture(
+  ctx: CanvasRenderingContext2D,
+  picture: Picture,
+  image: HTMLImageElement | null,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  captionSize: number,
+  font: string,
+  language: Language,
+  colours: DiagramColours,
+  look: BoardTheme['look'],
+  captionMaxLines: number,
+) {
+  ctx.font = `500 ${captionSize}px ${font}`
+  const lines = captionMaxLines > 0 ? captionLines(ctx, picture.caption[language], w, captionMaxLines) : []
+  const captionHeight = lines.length ? lines.length * captionSize * 1.25 + captionSize * 0.5 : 0
+  const room = h - captionHeight
+  if (room < captionSize * 4) return // no space left: the enlarged board still shows it
+  const pw = Math.min(w, room * picture.aspect)
+  const ph = pw / picture.aspect
+  const px = x + (w - pw) / 2
+  if (picture.diagram) {
+    paintDiagram(ctx, picture.diagram, px, y, pw, ph, picture.labels?.[language] ?? [], font, colours)
+  } else if (image) {
+    ctx.save()
+    // On the green computer screen the photo shows in green too; on the hologram glass it
+    // is dimmed, as the glass is drawn brighter than white so its letters glow.
+    if (look === 'screen') ctx.filter = 'grayscale(1) sepia(1) hue-rotate(75deg) saturate(2.4) brightness(0.85)'
+    if (look === 'hologram') ctx.filter = 'brightness(0.7)'
+    ctx.drawImage(image, px, y, pw, ph)
+    ctx.restore()
+    ctx.strokeStyle = colours.muted
+    ctx.lineWidth = Math.max(1, captionSize * 0.06)
+    ctx.strokeRect(px, y, pw, ph)
+  }
+  ctx.fillStyle = colours.muted
+  ctx.textAlign = 'center'
+  lines.forEach((line, i) => ctx.fillText(line, x + w / 2, y + ph + captionSize * 0.4 + i * captionSize * 1.25))
+  ctx.textAlign = 'left'
+}
+
+// Wraps text into at most maxLines lines, ending with "…" if it is longer.
+function captionLines(ctx: CanvasRenderingContext2D, text: string, maxWidth: number, maxLines: number): string[] {
+  const lines: string[] = []
+  let line = ''
+  for (const word of text.split(' ')) {
+    const next = line ? `${line} ${word}` : word
+    if (line && ctx.measureText(next).width > maxWidth) {
+      lines.push(line)
+      line = word
+    } else line = next
+  }
+  if (line) lines.push(line)
+  if (lines.length <= maxLines) return lines
+  const kept = lines.slice(0, maxLines)
+  let last = kept[maxLines - 1]
+  while (last && ctx.measureText(`${last}…`).width > maxWidth) last = last.slice(0, last.lastIndexOf(' '))
+  kept[maxLines - 1] = `${last}…`
+  return kept
+}
+
 export default function PanelBoard({ exhibitId, width, height, aimed, theme }: PanelBoardProps) {
-  const { ui, exhibit } = useContent()
+  const { ui, exhibit, language } = useContent()
   const fontsReady = useFontsReady()
+  const picture = PICTURES[exhibitId] as Picture | undefined
+  const image = usePicture(picture?.file) // the board is painted again once it has loaded
   const maxAnisotropy = useThree((state) => state.gl.capabilities.getMaxAnisotropy())
+  const gl = useThree((state) => state.gl)
   const { look } = theme
   const faceWidth = width - 2 * FRAME
   const faceHeight = height - 2 * FRAME
@@ -105,6 +179,12 @@ export default function PanelBoard({ exhibitId, width, height, aimed, theme }: P
       ctx.textBaseline = 'top'
       ctx.textAlign = 'left'
 
+      // The exhibit's picture (content/pictures.ts): beside the text on wide boards, under
+      // it on tall ones, where it fills the room the text leaves (at least `reserved`).
+      const beside = !!picture && w / h >= 1.3 && picture.aspect < 1.9
+      const textWidth = beside ? maxWidth * 0.58 : maxWidth
+      const reserved = picture && !beside ? h * 0.15 : 0
+      const textBottom = bottom - reserved
 
       let y = pad
       ctx.fillStyle = theme.title
@@ -114,6 +194,7 @@ export default function PanelBoard({ exhibitId, width, height, aimed, theme }: P
       ctx.fillStyle = theme.rule
       ctx.fillRect(pad, y + unit * 0.3, maxWidth * 0.3, unit * 0.12)
       y += unit * 1.1
+      const belowTitle = y
 
       // Facts (person, year...), the short text, then the sources (the long text is on the
       // enlarged board). If something does not fit, end with "…".
@@ -134,16 +215,27 @@ export default function PanelBoard({ exhibitId, width, height, aimed, theme }: P
         if (y < 0) break
         ctx.font = partFont
         ctx.fillStyle = colour
-        const next = drawWrappedText(ctx, content, pad, y, maxWidth, unit * spacing, bottom - unit * 1.4)
+        const next = drawWrappedText(ctx, content, pad, y, textWidth, unit * spacing, textBottom - unit * 1.4)
         if (next < 0) {
           ctx.font = `600 ${unit * 0.8}px ${font}`
           ctx.fillStyle = theme.rule
-          ctx.fillText(ui.panelMore, pad, bottom - unit * 1.1)
+          ctx.fillText(ui.panelMore, pad, textBottom - unit * 1.1)
           y = -1
           break
         }
         // The facts sit close together, with a full gap after the last one.
         y = next + (index < facts.length - 1 ? unit * 0.15 : unit * 0.6)
+      }
+
+      if (picture) {
+        const colours = { ink: theme.ink, accent: look === 'screen' || look === 'hologram' ? theme.title : theme.rule, muted: theme.muted }
+        if (beside) {
+          const left = pad + maxWidth * 0.62
+          paintBoardPicture(ctx, picture, image, left, belowTitle, maxWidth * 0.38, bottom - belowTitle, unit * 0.6, font, language, colours, look, 2)
+        } else {
+          const top = y < 0 ? textBottom : Math.min(y, textBottom) + unit * 0.2
+          paintBoardPicture(ctx, picture, image, pad, top, maxWidth, bottom - top, unit * 0.6, font, language, colours, look, 0)
+        }
       }
 
       if (look === 'screen') {
@@ -156,9 +248,14 @@ export default function PanelBoard({ exhibitId, width, height, aimed, theme }: P
     tex.colorSpace = SRGBColorSpace
     tex.anisotropy = maxAnisotropy // stays sharp when seen at an angle
     return tex
-  }, [exhibitId, faceWidth, faceHeight, maxAnisotropy, fontsReady, theme, look, ui, exhibit])
+  }, [exhibitId, faceWidth, faceHeight, maxAnisotropy, fontsReady, theme, look, ui, exhibit, picture, image, language])
 
-  useEffect(() => () => texture.dispose(), [texture])
+  // Sent to the graphics card at once, not when its room first comes into view (that made a
+  // hitch on entering a room: the board is painted again when its photo arrives).
+  useEffect(() => {
+    gl.initTexture(texture)
+    return () => texture.dispose()
+  }, [gl, texture])
 
   // Hologram glass: unlit and brighter than white where the text is, so the bloom makes
   // the letters glow; the faint tint stays below the glow threshold.

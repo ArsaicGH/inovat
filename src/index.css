@@ -2333,3 +2333,309 @@ body {
     width: min(40vw, 78vh);
   }
 }
+
+/* ---------- Every window size and display scaling ----------
+   Laptops with Windows display scaling at 125-200 % give the page a short window (for
+   example 1097 x 520 px instead of 1920 x 1080). Sizes here follow the window's height as
+   well as its width, and whatever can still be too tall scrolls inside its own margins,
+   with its text fading at the edge where more lies beyond (scroll-fades.ts). */
+.scroll-fade {
+  --fade-top: 0px;
+  --fade-bottom: 0px;
+}
+.scroll-fade.fade-top {
+  --fade-top: 28px;
+}
+.scroll-fade.fade-bottom {
+  --fade-bottom: 28px;
+}
+.scroll-fade.fade-top,
+.scroll-fade.fade-bottom {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--fade-top), #000 calc(100% - var(--fade-bottom)), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 var(--fade-top), #000 calc(100% - var(--fade-bottom)), transparent 100%);
+}
+
+/* Enlarged boards: the paper and its border stay still; only the text inside scrolls. The
+   text also shrinks a little on short windows, so more of it fits unscrolled. */
+.board-frame {
+  max-height: min(80vh, calc(100dvh - 96px));
+}
+.board-paper {
+  --unit: clamp(13px, min(2.3cqw, 2.5vh), 19px);
+  overflow: hidden;
+}
+.board-paper > .board-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--rule) transparent;
+}
+.board-text {
+  display: flex;
+  flex-direction: column;
+}
+.board-text > * {
+  flex-shrink: 0;
+}
+.board-text > :last-child {
+  margin-bottom: 0;
+}
+.board-text .board-sources {
+  order: 1;
+}
+.board-row {
+  max-height: min(80vh, calc(100dvh - 96px));
+}
+.board-row:has(.model-viewer) .board-zoom {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+.model-viewer {
+  width: min(36vw, 76vh, calc(100dvh - 120px), 520px);
+}
+@media (max-height: 520px) {
+  .board-paper {
+    --unit: clamp(10px, min(3.4cqw, 3.6vh), 15px);
+  }
+  .board-frame,
+  .board-row {
+    max-height: calc(100dvh - 64px);
+  }
+}
+@media (max-width: 760px) {
+  .board-row {
+    max-height: none;
+  }
+  .model-viewer {
+    width: min(80vw, 30dvh);
+  }
+  .board-row:has(.model-viewer) .board-frame {
+    max-height: calc(100dvh - 30dvh - 96px);
+  }
+}
+
+/* The Time Machine window: its header and result bar stay in view, the round scrolls
+   between them. */
+.game-panel {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100dvh - 32px);
+  overflow: hidden;
+}
+.game-panel > header,
+.game-panel > footer {
+  flex-shrink: 0;
+}
+.game-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #b8893d transparent;
+}
+.game-visual {
+  min-height: min(280px, 42dvh);
+}
+
+/* The closing title: sized by the window's height too, so the brand, the thank-you and both
+   buttons fit (on a short window everything shrinks; it scrolls only as a last resort). */
+.ending-title {
+  padding-top: clamp(0px, calc(32vh - 110px), 16vh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  pointer-events: auto;
+}
+.ending-title::-webkit-scrollbar {
+  display: none;
+}
+.ending-title > * {
+  flex-shrink: 0;
+}
+.ending-title h1.ending-brand {
+  font-size: clamp(34px, min(10vw, 14vh), 136px);
+}
+.ending-title .title-ornament {
+  width: min(360px, 70%, 40vh);
+}
+.ending-tagline {
+  font-size: clamp(11px, min(1.8vw, 2.6vh), 22px);
+}
+.ending-title .ending-after {
+  padding: clamp(10px, 2.6vh, 20px) clamp(14px, 2.4vw, 24px);
+  gap: clamp(6px, 1.5vh, 12px);
+}
+.ending-after h2 {
+  font-size: clamp(15px, min(2vw, 3.2vh), 24px);
+}
+.ending-after p {
+  font-size: clamp(12px, 2.2vh, 15px);
+  line-height: 1.5;
+}
+.ending-after .button-row {
+  gap: clamp(8px, 1.4vh, 12px);
+}
+.ending-after .start-button {
+  margin-top: 0;
+  padding: clamp(7px, 1.4vh, 12px) clamp(16px, 2.4vw, 34px);
+  font-size: clamp(13px, 2vh, 16px);
+}
+
+/* Phones held sideways (and other short, narrow windows): the turning model stays beside
+   the board, sized by the screen's height (stacked above it, the text had no room left). */
+@media (max-width: 760px) and (orientation: landscape) {
+  .board-row {
+    flex-direction: row;
+    align-items: center;
+    max-height: calc(100dvh - 64px);
+  }
+  .model-viewer {
+    width: min(36vw, calc(100dvh - 90px));
+  }
+  .board-row:has(.model-viewer) .board-zoom {
+    width: min(56vw, 760px);
+  }
+  .board-row:has(.model-viewer) .board-frame {
+    max-height: calc(100dvh - 64px);
+  }
+}
+
+/* Very short windows: the pause menu's settings in two columns, so it all fits unscrolled. */
+@media (max-height: 520px) and (min-width: 640px) {
+  .pause-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 28px;
+    align-items: center;
+    width: min(780px, calc(100% - 24px));
+  }
+  .pause-card > h2,
+  .pause-card > .map-ornament,
+  .pause-card > .button-row,
+  .pause-card > .pause-hint {
+    grid-column: 1 / -1;
+  }
+  .pause-card > .map-ornament {
+    margin: 6px auto 10px;
+  }
+  .pause-card > .pause-hint {
+    margin-top: 6px;
+  }
+}
+
+/* ---------- Pictures (content/pictures.ts) ---------- */
+/* On an enlarged board: the exhibit's picture or diagram under its facts, with the caption
+   and the picture's credit. */
+.board-figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--unit) * 0.5);
+  margin: 0 0 calc(var(--unit) * 1.1);
+}
+.board-figure img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: min(44vh, 420px);
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--rule) 60%, transparent), 0 6px 18px rgba(0, 0, 0, 0.2);
+}
+.board-figure .board-diagram {
+  display: block;
+  width: 100%;
+  max-width: 720px;
+  height: auto;
+}
+.board-figure figcaption {
+  max-width: 62ch;
+  color: var(--muted);
+  font-size: calc(var(--unit) * 0.8);
+  line-height: 1.45;
+  text-align: center;
+}
+.board-figure figcaption small,
+.picture-zoom figcaption small {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.85em;
+  opacity: 0.85;
+}
+.board-figure a,
+.picture-zoom a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.board-look-screen .board-figure img {
+  box-shadow: 0 0 0 1px var(--rule), 0 0 14px rgba(107, 224, 139, 0.35);
+}
+.board-look-hologram .board-figure img {
+  box-shadow: 0 0 0 1px var(--rule), 0 0 18px rgba(63, 208, 224, 0.45);
+}
+
+/* A wall-gallery picture opened large: in a frame of its room's colour, the caption below. */
+.picture-row {
+  display: flex;
+  justify-content: center;
+  max-width: 96vw;
+}
+.picture-zoom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+}
+.picture-zoom img {
+  display: block;
+  box-sizing: content-box;
+  width: auto;
+  height: auto;
+  max-width: min(88vw, 1024px);
+  max-height: calc(100dvh - 210px);
+  border: clamp(8px, 1.3vw, 16px) solid var(--frame-colour);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(201, 162, 90, 0.35);
+}
+.picture-zoom.board-look-brass img {
+  border-color: #b8893d;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.65), inset 0 0 0 2px rgba(60, 35, 10, 0.5), 0 0 0 2px #e0b56a;
+}
+.picture-zoom.board-look-enamel img {
+  border-color: #1d1b19;
+}
+.picture-zoom.board-look-screen img {
+  border-color: #b9bec4;
+}
+.picture-zoom.board-look-hologram img {
+  border: 1px solid var(--rule);
+  box-shadow: 0 0 30px rgba(63, 208, 224, 0.45);
+}
+.picture-zoom figcaption {
+  box-sizing: border-box;
+  max-width: min(720px, 90vw);
+  padding: 10px 18px;
+  border: 1px solid color-mix(in srgb, var(--rule) 55%, transparent);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: clamp(14px, 2.2vh, 17px);
+  line-height: 1.45;
+  text-align: center;
+}
+.picture-zoom figcaption small {
+  color: var(--muted);
+}
+@media (max-height: 520px) {
+  .picture-zoom img {
+    max-height: calc(100dvh - 150px);
+  }
+  .picture-zoom figcaption {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+}

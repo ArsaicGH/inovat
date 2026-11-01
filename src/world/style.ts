@@ -17,8 +17,8 @@ export const ROOM_ACCENT: Record<RoomId, string> = {
 // enlargement (InfoPanel.tsx) uses the same proportions, so it looks like the same board.
 export const BOARD_SIZE = {
   wall: [2.2, 1.5],
-  stand: [1.4, 1.9],
-  overview: [2.4, 1.4], // the overview board on each era room's back wall
+  stand: [1.4, 2.2], // (taller than it was, to fit the exhibit's picture under the text)
+  overview: [2.4, 1.75], // the overview board in each era room's entrance room (with its picture beside the text)
 } as const
 
 // TEXT BOARD STYLES: each era room dresses its boards like the room itself. The same

@@ -3,6 +3,7 @@ import { useContent } from '../content/use-content'
 import TutorialCard from './TutorialCard'
 import { isQuizTarget } from '../world/aim-targets'
 import { gameText } from '../content/game'
+import { PICTURES, isWallPicture } from '../content/pictures'
 
 // On-screen layer while walking: crosshair, exhibit prompt, room name, warnings.
 // Text comes from src/content/.
@@ -47,7 +48,7 @@ export default function Hud() {
       <div className={aimedId ? 'crosshair crosshair-active' : 'crosshair'} />
       {aimedId && (
         <div className="hud-prompt">
-          <strong>{isQuizTarget(aimedId) ? (cores > 0 ? gameText[language].consoleContinue : gameText[language].consoleStart) : exhibit(aimedId).title}</strong>
+          <strong>{isQuizTarget(aimedId) ? (cores > 0 ? gameText[language].consoleContinue : gameText[language].consoleStart) : isWallPicture(aimedId) ? PICTURES[aimedId]?.caption[language] : exhibit(aimedId).title}</strong>
           <span>{isQuizTarget(aimedId) ? ui.quiz.prompt : ui.prompt}</span>
         </div>
       )}

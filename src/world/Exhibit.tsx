@@ -129,7 +129,7 @@ export default function Exhibit({ spot }: { spot: ExhibitSpot }) {
               exhibitId={spot.id}
               width={BOARD_SIZE.stand[0]}
               height={BOARD_SIZE.stand[1]}
-              centreY={1.55}
+              centreY={1.62}
               aimed={aimed}
               theme={theme}
             />

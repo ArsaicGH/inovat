@@ -8,6 +8,7 @@ import { useMuseumStore, type GraphicsLevel } from '../state/useMuseumStore'
 import Room from './Room'
 import Rotunda from './Rotunda'
 import Walls from './Walls'
+import WallPictures from './WallPictures'
 import Doors from './Doors'
 import Exhibit from './Exhibit'
 import Player from './Player'
@@ -468,6 +469,7 @@ function MuseumPart({ id }: { id: RoomId }) {
       {id === 'rotunda' ? <Rotunda /> : <Room room={id} />}
       <SpotFixtures room={id} />
       <Walls group={id} />
+      {(id === 'ir1' || id === 'ir2' || id === 'ir3' || id === 'ir4') && <WallPictures room={id} />}
       {EXHIBIT_SPOTS.filter((spot) => spot.room === id).map((spot) => (
         <Exhibit key={spot.id} spot={spot} />
       ))}

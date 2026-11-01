@@ -1,6 +1,7 @@
 import { useContent } from '../content/use-content'
 import { useMuseumStore } from '../state/useMuseumStore'
 import { filmVeil } from '../world/ending-shots'
+import { useScrollFades } from './scroll-fades'
 
 // THE ENDING's interface, over the film through time (EndingScene.tsx): a white flash as
 // the visitor steps through the portal, cinema bars, the veil for the film's dips and
@@ -14,7 +15,8 @@ export default function EndingScreen() {
   const stage = useMuseumStore((state) => state.endingStage)
   const run = useMuseumStore((state) => state.endingRun)
   const era = stage >= 1 && stage <= 4 ? roomNames[ERAS[stage - 1]] : null
-
+  // (On very short windows the closing title and its buttons scroll: scroll-fades.ts.)
+  const titleScroll = useScrollFades<HTMLDivElement>(stage)
 
   return (
     <div className="ending ending-bars">
@@ -46,7 +48,7 @@ export default function EndingScreen() {
           </button>
         </>
       ) : (
-        <div className="ending-title">
+        <div ref={titleScroll} className="ending-title scroll-fade">
           <h1 className="game-title ending-brand">{ui.ending.brand}</h1>
           <div className="title-ornament" aria-hidden="true">
             <span />

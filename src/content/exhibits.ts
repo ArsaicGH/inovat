@@ -95,8 +95,8 @@ const ENTRIES: Record<string, Entry> = {
       en: 'Four exhibition rooms, one for each Industrial Revolution, lie around the Central Hall. Visit them in order from IR 1 to IR 4, following the arrow on the map, then go on to the Game Room.',
     },
     long: {
-      vi: 'Bốn phòng trưng bày, mỗi phòng dành cho một cuộc Cách mạng Công nghiệp, nằm quanh Sảnh trung tâm. CMCN 1 (khoảng giữa thế kỷ XVIII - giữa thế kỷ XIX): hơi nước và máy móc cơ khí, bắt đầu tại Anh. CMCN 2 (cuối thế kỷ XIX - đầu thế kỷ XX): điện năng và sản xuất hàng loạt. CMCN 3 (nửa sau thế kỷ XX): điện tử, máy tính và tự động hóa. CMCN 4 (đầu thế kỷ XXI đến nay): trí tuệ nhân tạo, Internet vạn vật và dữ liệu. Mỗi phòng có một bảng tổng quan và các phát minh tiêu biểu, phòng sau nhiều hơn phòng trước: 4, 4, 5 rồi 6 phát minh. Mỗi bảng chữ đều có thể phóng to để đọc toàn văn. Sau khi tham quan cả bốn phòng, Phòng trò chơi sẽ mở cửa.',
-      en: 'Four exhibition rooms, one for each Industrial Revolution, lie around the Central Hall. IR 1 (about the mid-18th to the mid-19th century): steam and mechanical machinery, beginning in Britain. IR 2 (the late 19th to the early 20th century): electricity and mass production. IR 3 (the second half of the 20th century): electronics, computers and automation. IR 4 (the early 21st century to today): artificial intelligence, the Internet of Things and data. Each room has an overview board and its landmark inventions, more in each room than the one before: 4, 4, 5 and then 6. Every board can be enlarged to read its full text. Once you have visited all four rooms, the Game Room opens.',
+      vi: 'Bốn phòng trưng bày, mỗi phòng dành cho một cuộc Cách mạng Công nghiệp, nằm quanh Sảnh trung tâm. CMCN 1 (khoảng giữa thế kỷ XVIII - giữa thế kỷ XIX): hơi nước và máy móc cơ khí, bắt đầu tại Anh. CMCN 2 (cuối thế kỷ XIX - đầu thế kỷ XX): điện năng và sản xuất hàng loạt. CMCN 3 (nửa sau thế kỷ XX): điện tử, máy tính và tự động hóa. CMCN 4 (đầu thế kỷ XXI đến nay): trí tuệ nhân tạo, Internet vạn vật và dữ liệu. Mỗi phòng có một bảng tổng quan và bốn hoặc năm phát minh tiêu biểu. Mỗi bảng chữ đều có thể phóng to để đọc toàn văn. Sau khi tham quan cả bốn phòng, Phòng trò chơi sẽ mở cửa.',
+      en: 'Four exhibition rooms, one for each Industrial Revolution, lie around the Central Hall. IR 1 (about the mid-18th to the mid-19th century): steam and mechanical machinery, beginning in Britain. IR 2 (the late 19th to the early 20th century): electricity and mass production. IR 3 (the second half of the 20th century): electronics, computers and automation. IR 4 (the early 21st century to today): artificial intelligence, the Internet of Things and data. Each room has an overview board and four or five landmark inventions. Every board can be enlarged to read its full text. Once you have visited all four rooms, the Game Room opens.',
     },
     sources: [BRITANNICA_IR, WEF],
   },
@@ -690,7 +690,7 @@ function buildTexts(lang: Language): Record<string, ExhibitText> {
       credits
         // (Sound credits only while sound is switched on, see src/features.ts.)
         .filter((c) => AUDIO_ENABLED || !c.files.every((file) => file.startsWith('sounds/')))
-        .map((c) => `• ${c.item[lang]}: ${c.author}, ${c.licence[lang]}`)
+        .map((c) => `• ${c.item[lang]}: ${typeof c.author === 'string' ? c.author : c.author[lang]}, ${c.licence[lang]}`)
         .join('\n'),
     sources: [BRITANNICA_IR, BRITANNICA_TECH, WEF],
     placeholder: false,

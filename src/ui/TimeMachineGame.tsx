@@ -4,6 +4,7 @@ import { CHALLENGES, INVENTION_IDS, MAKERS, eraOf, gameText, gameTouchText, type
 import { useMuseumStore } from '../state/useMuseumStore'
 import { resumeWalking } from '../world/pointer-lock'
 import { playEffect } from '../audio/sound'
+import { useScrollFades } from './scroll-fades'
 import { IS_TOUCH } from './touch'
 
 // THE TIME MACHINE GAME (opened from the Game Room's lectern): four short rounds, each
@@ -22,6 +23,15 @@ function shuffle<T>(list: T[]): T[] {
     ;[copy[i], copy[j]] = [copy[j], copy[i]]
   }
   return copy
+}
+
+// Four machines drawn evenly from all 18, drawn again in the rare case that every one
+// comes from the same revolution.
+function pickMysteries(): string[] {
+  for (;;) {
+    const picks = shuffle(INVENTION_IDS).slice(0, 4)
+    if (new Set(picks.map(eraOf)).size > 1) return picks
+  }
 }
 
 function useGame() {
@@ -235,23 +245,22 @@ function MysteryRound({ onFinish }: { onFinish: Finish }) {
   const { g, room, exhibit } = useGame()
   const questions = useMemo<Question[]>(
     () =>
-      shuffle(INVENTION_IDS)
-        .slice(0, 4)
-        .map((answer) => ({
-          answer,
-          options: shuffle([answer, ...shuffle(INVENTION_IDS.filter((id) => id !== answer)).slice(0, 3)]),
-          prompt: (
-            <>
-              <p>{g.clueEra.replace('{room}', room(answer))}</p>
-              <p className="game-clue">{exhibit(answer).facts.find((f) => f.includes(':') && !/^(Nhân vật|Person|People|Pioneer|Công ty|Company)/.test(f))}</p>
-            </>
-          ),
-          visual: (revealed: boolean) => (
-            <Suspense fallback={null}>
-              <ModelViewer id={answer} silhouette={!revealed} />
-            </Suspense>
-          ),
-        })),
+      pickMysteries().map((answer) => ({
+        answer,
+        options: shuffle([answer, ...shuffle(INVENTION_IDS.filter((id) => id !== answer)).slice(0, 3)]),
+        prompt: (
+          <>
+            <p>{g.clueEra.replace('{room}', room(answer))}</p>
+            <p className="game-clue">{exhibit(answer).facts.find((f) => f.includes(':') && !/^(Nhân vật|Person|People|Pioneer|Công ty|Company)/.test(f))}</p>
+          </>
+        ),
+        visual: (revealed: boolean) => (
+          // (A fresh view for each machine, so it is measured and centred anew.)
+          <Suspense key={answer} fallback={null}>
+            <ModelViewer id={answer} silhouette={!revealed} />
+          </Suspense>
+        ),
+      })),
     // (New machines on every attempt; the texts follow the language.)
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
@@ -287,6 +296,7 @@ export default function TimeMachineGame() {
   const [attempt, setAttempt] = useState(0)
   const [score, setScore] = useState<number | null>(null)
   const done = cores >= 4 && score === null
+  const scroll = useScrollFades<HTMLDivElement>(`${round}-${attempt}-${done}`)
 
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
@@ -328,49 +338,52 @@ export default function TimeMachineGame() {
           </button>
         </header>
 
-        {done ? (
-          <div className="game-done">
-            <h3>{g.doneTitle}</h3>
-            <p>{g.doneText}</p>
-            <button className="game-primary" onClick={() => void resumeWalking()}>
-              {g.finish}
-            </button>
-          </div>
-        ) : (
-          <>
-            <p className="game-task">{g.rounds[round].task}</p>
-            <div className="game-body">
-              <Round key={`${round}-${attempt}`} onFinish={finish} />
+        {/* The round scrolls between the header and the result bar, which stay in view. */}
+        <div ref={scroll} className="game-scroll scroll-fade">
+          {done ? (
+            <div className="game-done">
+              <h3>{g.doneTitle}</h3>
+              <p>{g.doneText}</p>
+              <button className="game-primary" onClick={() => void resumeWalking()}>
+                {g.finish}
+              </button>
             </div>
-            {score !== null && (
-              <footer className={`game-result ${passed ? 'is-right' : 'is-wrong'}`}>
-                <span>
-                  <strong>{passed ? g.passed : g.failed}</strong> {g.score.replace('{score}', String(score)).replace('{total}', String(TOTALS[round])).replace('{need}', String(NEED[round]))}
-                </span>
-                {passed ? (
-                  <button
-                    className="game-primary"
-                    onClick={() => {
-                      setScore(null)
-                      if (round < 3) setRound(round + 1)
-                    }}
-                  >
-                    {round < 3 ? g.next : g.finish}
-                  </button>
-                ) : (
-                  <button
-                    className="game-primary"
-                    onClick={() => {
-                      setScore(null)
-                      setAttempt(attempt + 1)
-                    }}
-                  >
-                    {g.retry}
-                  </button>
-                )}
-              </footer>
+          ) : (
+            <>
+              <p className="game-task">{g.rounds[round].task}</p>
+              <div className="game-body">
+                <Round key={`${round}-${attempt}`} onFinish={finish} />
+              </div>
+            </>
+          )}
+        </div>
+        {!done && score !== null && (
+          <footer className={`game-result ${passed ? 'is-right' : 'is-wrong'}`}>
+            <span>
+              <strong>{passed ? g.passed : g.failed}</strong> {g.score.replace('{score}', String(score)).replace('{total}', String(TOTALS[round])).replace('{need}', String(NEED[round]))}
+            </span>
+            {passed ? (
+              <button
+                className="game-primary"
+                onClick={() => {
+                  setScore(null)
+                  if (round < 3) setRound(round + 1)
+                }}
+              >
+                {round < 3 ? g.next : g.finish}
+              </button>
+            ) : (
+              <button
+                className="game-primary"
+                onClick={() => {
+                  setScore(null)
+                  setAttempt(attempt + 1)
+                }}
+              >
+                {g.retry}
+              </button>
             )}
-          </>
+          </footer>
         )}
       </div>
     </div>

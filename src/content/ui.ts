@@ -111,6 +111,10 @@ const vi = {
     sourcesPlaceholder: 'Chưa có nguồn. [CẦN KIỂM TRA]',
     close: 'Đóng',
     closeHint: 'Nhấp vào khoảng trống hoặc nhấn E để đóng',
+    // Under each picture (content/pictures.ts): who made it and its licence, or for the
+    // museum's own diagrams, who drew them.
+    pictureCredit: 'Ảnh',
+    diagramCredit: 'Sơ đồ do nhóm INOVAT vẽ',
   },
   map: {
     title: 'Bản đồ bảo tàng',
@@ -167,6 +171,9 @@ const vi = {
       'Máy móc biết học hỏi, vạn vật được kết nối: và câu chuyện ấy vẫn đang được viết tiếp, bởi chính chúng ta.',
     ],
     skip: 'Bỏ qua',
+    // The program typed on the computer screen in the film's third act (an old BASIC program
+    // that counts the four revolutions).
+    screen: ['] LIST', '10 REM *** INOVAT ***', '20 FOR I = 1 TO 4', '30 PRINT "CMCN "; I', '40 NEXT I', '] RUN', 'CMCN 1', 'CMCN 2', 'CMCN 3', 'CMCN 4', ']'],
     title: 'Cảm ơn Quý khách đã tham quan!',
     text: 'Quý khách vừa đi qua bốn cuộc Cách mạng Công nghiệp: từ hơi nước và máy móc cơ khí, đến điện năng, máy tính, rô-bốt và trí tuệ nhân tạo. Câu chuyện ấy vẫn đang được viết tiếp, và thế hệ hôm nay sẽ góp phần tạo nên chương tiếp theo.',
     replay: 'Xem lại hành trình',
@@ -285,6 +292,8 @@ const en: UiText = {
     sourcesPlaceholder: 'No sources yet. [NEEDS CHECKING]',
     close: 'Close',
     closeHint: 'Click on blank space or press E to close',
+    pictureCredit: 'Picture',
+    diagramCredit: 'Diagram drawn by the INOVAT team',
   },
   map: {
     title: 'Museum map',
@@ -333,6 +342,7 @@ const en: UiText = {
       'Machines that learn, everything connected: and the story is still being written, by all of us.',
     ],
     skip: 'Skip',
+    screen: ['] LIST', '10 REM *** INOVAT ***', '20 FOR I = 1 TO 4', '30 PRINT "IR "; I', '40 NEXT I', '] RUN', 'IR 1', 'IR 2', 'IR 3', 'IR 4', ']'],
     title: 'Thank you for visiting!',
     text: 'You have just travelled through four Industrial Revolutions: from steam and mechanical machinery to electricity, computers, robots and artificial intelligence. That story is still being written, and today’s generation will help shape its next chapter.',
     replay: 'Replay the journey',
