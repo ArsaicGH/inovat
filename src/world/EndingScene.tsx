@@ -1,6 +1,7 @@
 import { Suspense, useEffect, useMemo, useRef } from 'react'
+import { HalfFloatType, Texture, WebGLRenderTarget, type Mesh, type Object3D } from 'three'
 import { useFrame, useThree } from '@react-three/fiber'
-import { Color, Fog, Vector3, type Group, type PerspectiveCamera } from 'three'
+import { Color, Fog, Vector3, type Camera, type Group, type PerspectiveCamera, type Scene, type WebGLRenderer } from 'three'
 import { useMuseumStore } from '../state/useMuseumStore'
 import { endingMusicTime, playEndingMusic } from '../audio/sound'
 import { ORIGIN, RIGS, SET_X, SHOTS, START, TITLE_AT, borrowedLights, film, filmVeil, mixPose, shotIndexAt, type PlacedLight, type StageLight } from './ending-shots'
@@ -13,7 +14,11 @@ import { ActConnected, ActDigital, ActElectric, ActSteam } from './ending-acts'
 // ending on all four eras side by side and the closing title (EndingScreen.tsx).
 //
 // It is built far from the museum (beyond the camera's view distance, so none of the
-// museum is drawn meanwhile) and exists only while the ending runs. It adds no lights: the
+// museum is drawn meanwhile). BUILT AHEAD: as soon as the visitor is in the Game Room with
+// the portal open (Museum.tsx), hidden and still, and prepared for the graphics card there:
+// its drawing code built, its pictures and shapes sent over by drawing it once out of sight.
+// Built at the moment the visitor stepped into the portal, it froze the first seconds of the
+// film, and the finale (all four eras at once) stuttered as its pieces were first sent. It adds no lights: the
 // museum's own are lent to it shot by shot (Lighting in Museum.tsx), since a change in the
 // number of lights would make the graphics card rebuild every material in the museum.
 
@@ -27,8 +32,14 @@ const FLASH_OUT = 1.0 // ...and fades after it
 // Camera moves start and end gently (no jolt at either end).
 const ease = (u: number) => u * u * u * (u * (u * 6 - 15) + 10)
 
-export default function EndingScene() {
+export default function EndingScene({ running }: { running: boolean }) {
   const run = useMuseumStore((state) => state.endingRun)
+  const warm = useRef({ frames: 0, compiled: false, done: false })
+  const warmTarget = useMemo(() => new WebGLRenderTarget(64, 64, { type: HalfFloatType }), [])
+  useEffect(() => () => warmTarget.dispose(), [warmTarget])
+  // (Its shared materials are freed only when the ending's world is removed: it stays built
+  // after a first run, ready for "Replay".)
+  useEffect(() => () => disposePalette(), [])
   const get = useThree((state) => state.get)
   const group = useRef<Group>(null)
   const sets = useRef<(Group | null)[]>([])
@@ -54,6 +65,8 @@ export default function EndingScene() {
   // prepared before it starts (behind the portal's flash and a moment of black), so the
   // first shots do not stutter. Ending: everything put back and freed.
   useEffect(() => {
+    film.running = running
+    if (!running) return
     const { gl, scene, camera } = get()
     const lens = camera as PerspectiveCamera
     const saved = { far: lens.far, fov: lens.fov, fog: scene.fog }
@@ -66,10 +79,14 @@ export default function EndingScene() {
       if (alive) playing.current.ready = true
     }
     const timer = window.setTimeout(ready, 3000) // never wait longer than this
-    if (group.current) gl.compileAsync(group.current, lens, scene).then(ready, ready)
+    // (Already prepared in the Game Room: it starts at once.)
+    if (warm.current.done) ready()
+    else if (group.current) gl.compileAsync(group.current, lens, scene).then(ready, ready)
     else ready()
     return () => {
       alive = false
+      film.running = false
+      playing.current.ready = false
       film.ready = false
       window.clearTimeout(timer)
       borrowedLights.active = false
@@ -79,9 +96,57 @@ export default function EndingScene() {
       lens.updateProjectionMatrix()
       if (scene.background instanceof Color) scene.background.set(MUSEUM_SKY)
       if (filmVeil.element) filmVeil.element.style.opacity = '0'
-      disposePalette()
     }
-  }, [get, haze])
+  }, [get, haze, running])
+
+  // PREPARING IT AHEAD (while hidden): once its pieces exist, its drawing code is built
+  // (with the film's haze, which the drawing code depends on), then a moment later it is
+  // drawn once, all of it, into a tiny picture out of sight, which sends every picture and
+  // shape to the graphics card. Then it waits, hidden, for the visitor to step in.
+  function prepare(gl: WebGLRenderer, scene: Scene, camera: Camera) {
+    const root = group.current
+    if (!root) return
+    const state = warm.current
+    state.frames += 1
+    const compileNow = state.frames === 20 && !state.compiled
+    const drawNow = state.frames >= 1000 && !state.done
+    if (!compileNow && !drawNow) return
+    // Everything shown for this moment (each shot's scene hides itself while not playing),
+    // with the film's haze.
+    const fog = scene.fog
+    scene.fog = haze
+    const changed: [Object3D, boolean, boolean][] = []
+    root.traverse((object) => {
+      changed.push([object, object.visible, object.frustumCulled])
+      object.visible = true
+      object.frustumCulled = false
+    })
+    if (compileNow) {
+      state.compiled = true
+      // (The drawing code is built in the background where the browser can; then, a frame
+      // later, the drawing below.)
+      gl.compileAsync(root, camera, scene).then(
+        () => (state.frames = 1000),
+        () => (state.frames = 1000),
+      )
+    } else {
+      state.done = true
+      root.traverse((object) => {
+        const material = (object as Mesh).material
+        if (material)
+          for (const m of Array.isArray(material) ? material : [material])
+            for (const value of Object.values(m)) if (value instanceof Texture) gl.initTexture(value)
+      })
+      gl.setRenderTarget(warmTarget)
+      gl.render(scene, camera)
+      gl.setRenderTarget(null)
+    }
+    for (const [object, visible, culled] of changed) {
+      object.visible = visible
+      object.frustumCulled = culled
+    }
+    scene.fog = fog
+  }
 
   // Place one of the film's lights, in the ending's own space.
   function place(out: PlacedLight, light: StageLight, ox: number) {
@@ -99,7 +164,12 @@ export default function EndingScene() {
 
   // (Runs before the museum's own frame code, so the lights move in the same frame as the
   // camera cuts.)
-  useFrame(({ camera, scene }, delta) => {
+  useFrame(({ camera, scene, gl }, delta) => {
+    if (!running) {
+      prepare(gl, scene, camera)
+      return
+    }
+    if (group.current) group.current.visible = true
     const store = useMuseumStore.getState()
     const state = playing.current
     const veil = filmVeil.element
@@ -175,7 +245,7 @@ export default function EndingScene() {
   }, -1)
 
   return (
-    <group ref={group} position={ORIGIN}>
+    <group ref={group} position={ORIGIN} visible={running}>
       <Suspense fallback={null}>
         {/* (Each act's scenes are drawn only during their own shots; the finale shows only its columns.) */}
         {[ActSteam, ActElectric, ActDigital, ActConnected].map((Set, i) => (

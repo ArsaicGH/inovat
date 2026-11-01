@@ -49,7 +49,7 @@ function Scene({ shots, children }: { shots: string[]; children: ReactNode }) {
   const ref = useRef<Group>(null)
   const state = useMemo(() => ({ on: true }), [])
   useFrame(() => {
-    state.on = !film.ready || shots.includes(shotId())
+    state.on = film.running && (!film.ready || shots.includes(shotId()))
     if (ref.current) ref.current.visible = state.on
   })
   return (

@@ -99,7 +99,7 @@ const vi = {
     // What each level is for (shown under the slider).
     hints: [
       'Nhanh nhất, hình ảnh đơn giản nhất',
-      'Cho máy văn phòng, máy cấu hình thấp: hình kém nét hơn, không có bóng đổ',
+      'Cho máy văn phòng, máy cấu hình thấp: hình kém nét hơn, bóng đổ đứng yên',
       'Cho máy tầm trung: hình nét vừa, không có bóng mềm ở các góc',
       'Hình ảnh đầy đủ như thiết kế của bảo tàng',
       'Tối đa: mọi đèn chiếu đều đổ bóng',
@@ -291,7 +291,7 @@ const en: UiText = {
     levels: ['Very low', 'Low', 'Medium', 'High', 'Ultra'],
     hints: [
       'Fastest, simplest picture',
-      'For office and budget laptops: a softer picture, no shadows',
+      'For office and budget laptops: a softer picture, shadows that stay still',
       'For mid-range computers: a slightly softer picture, no soft shadows in corners',
       'The full picture, as the museum was designed',
       'Maximum: every spotlight casts shadows',

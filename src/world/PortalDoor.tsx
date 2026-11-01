@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { AdditiveBlending, CanvasTexture, RepeatWrapping, SRGBColorSpace, type Group, type MeshBasicMaterial, type Points, type PointsMaterial } from 'three'
+import { AdditiveBlending, CanvasTexture, Color, RepeatWrapping, SRGBColorSpace, type Group, type MeshBasicMaterial, type Points, type PointsMaterial } from 'three'
 import { useMuseumStore } from '../state/useMuseumStore'
 import { GOLD } from './style'
 
@@ -141,6 +141,9 @@ function paintSpot(): CanvasTexture {
   return texture
 }
 
+// The rays and the light on the floor and wall, brighter than white so they glow.
+const RAY_COLOUR = new Color(1.7, 1.6, 1.4)
+const SPILL_COLOUR = new Color(1.6, 1.4, 1.0)
 const MOTES = 70 // golden specks of light drifting up out of the portal
 const MOTE_DEPTH = 1.2 // how far into the room they drift (metres)
 
@@ -163,6 +166,7 @@ export default function PortalDoor() {
   const glow = useRef<MeshBasicMaterial>(null)
   const rays = useRef<(MeshBasicMaterial | null)[]>([])
   const spill = useRef<MeshBasicMaterial>(null)
+  const halo = useRef<MeshBasicMaterial>(null)
   const motes = useRef<Points>(null)
   const light = useRef<Group>(null)
   const textures = useMemo(() => ({ glow: paintGlow(), rays: [paintRays(7), paintRays(31)], spot: paintSpot() }), [])
@@ -179,13 +183,15 @@ export default function PortalDoor() {
     const o = open.current
     // The light swells as the doors open, then breathes slowly.
     const breath = 1 + 0.08 * Math.sin(t * 1.3)
-    if (glow.current) glow.current.color.setScalar(1.6 * o * breath)
+    // (Brighter, leader 2026-11-01: the core well above white, so the bloom makes it blaze.)
+    if (glow.current) glow.current.color.setScalar(2.8 * o * breath)
     rays.current.forEach((ray, i) => {
       if (!ray?.map) return
       ray.map.offset.x += delta * (i === 0 ? 0.015 : -0.022)
-      ray.opacity = o * (0.55 + 0.25 * Math.sin(t * (0.7 + i * 0.4) + i))
+      ray.opacity = o * (0.8 + 0.2 * Math.sin(t * (0.7 + i * 0.4) + i))
     })
-    if (spill.current) spill.current.opacity = 0.55 * o * breath
+    if (spill.current) spill.current.opacity = Math.min(1, 0.9 * o * breath)
+    if (halo.current) halo.current.opacity = 0.45 * o * breath
     // Motes rise and sway gently; one that reaches the top starts again at the bottom.
     const points = motes.current
     if (points) {
@@ -221,7 +227,7 @@ export default function PortalDoor() {
                 rays.current[i] = material
               }}
               map={map}
-              color="#fff3da"
+              color={RAY_COLOUR}
               opacity={0}
               {...additive}
             />
@@ -230,13 +236,18 @@ export default function PortalDoor() {
         {/* (Above the carpet, not in it: two surfaces at one height flickered.) */}
         <mesh position={[0, 0.03, 0.9]} rotation={[-Math.PI / 2, 0, 0]}>
           <planeGeometry args={[W * 1.6, 2]} />
-          <meshBasicMaterial ref={spill} map={textures.spot} color="#ffe2a8" opacity={0} {...additive} />
+          <meshBasicMaterial ref={spill} map={textures.spot} color={SPILL_COLOUR} opacity={0} {...additive} />
+        </mesh>
+        {/* A soft halo of the light on the wall around the doorway. */}
+        <mesh position={[0, H / 2, -0.01]}>
+          <planeGeometry args={[W * 2.6, H * 1.7]} />
+          <meshBasicMaterial ref={halo} map={textures.spot} color={SPILL_COLOUR} opacity={0} {...additive} />
         </mesh>
         <points ref={motes} frustumCulled={false}>
           <bufferGeometry>
             <bufferAttribute attach="attributes-position" args={[moteData.positions, 3]} />
           </bufferGeometry>
-          <pointsMaterial map={textures.spot} color="#fff0c8" size={0.07} sizeAttenuation opacity={0} {...additive} />
+          <pointsMaterial map={textures.spot} color="#fff0c8" size={0.09} sizeAttenuation opacity={0} {...additive} />
         </points>
       </group>
       <Leaf side={-1} open={open} />

@@ -27,7 +27,9 @@ export const SET_X = [-66, -22, 22, 66]
 // The film's clock (seconds), advanced by EndingScene; the sets move their machines by it.
 // ready: everything is prepared and the film is playing (until then every scene is drawn,
 // behind the black, so the graphics card prepares all of them before the first shot).
-export const film = { t: 0, ready: false }
+// running: the film is playing (it is also built ahead of time, hidden, while the visitor is
+// in the Game Room: EndingScene.tsx; nothing in it moves until it runs).
+export const film = { t: 0, ready: false, running: false }
 
 export const smooth = (a: number, b: number, x: number) => {
   const t = Math.min(1, Math.max(0, (x - a) / (b - a)))

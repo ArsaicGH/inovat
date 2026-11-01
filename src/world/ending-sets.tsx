@@ -413,7 +413,7 @@ export function Surface({ name, size, at, tint, tile, roughness = 0.85, wall }: 
 export function Spin({ at, axis = 'z', speed, children, phase = 0 }: { at: V3; axis?: 'x' | 'y' | 'z'; speed: number | (() => number); phase?: number; children: ReactNode }) {
   const ref = useRef<Group>(null)
   useFrame(() => {
-    if (ref.current) ref.current.rotation[axis] = phase + (typeof speed === 'number' ? film.t * speed : speed())
+    if (ref.current && film.running) ref.current.rotation[axis] = phase + (typeof speed === 'number' ? film.t * speed : speed())
   })
   return (
     <group ref={ref} position={at}>
@@ -458,7 +458,7 @@ export function Puffs({ count, material, colour, size, life, rate, spawn, rise =
   }, [count, tmp])
   useFrame(({ camera }, delta) => {
     const mesh = ref.current
-    if (!mesh) return
+    if (!mesh || !film.running) return
     const dt = Math.min(delta, 0.05)
     parts.due += rate * dt
     while (parts.due >= 1) {
@@ -501,6 +501,7 @@ export function Figure({ era, at, turn = 0, action = 'stand', phase = 0 }: { era
   const left = useRef<Group>(null)
   const right = useRef<Group>(null)
   useFrame(() => {
+    if (!film.running) return
     const t = film.t + phase
     // Arm angles (negative = forwards).
     let l = -0.08
@@ -809,7 +810,7 @@ function LandDeco({ era }: { era: number }) {
 export function FinaleLands() {
   const group = useRef<Group>(null)
   useFrame(() => {
-    if (group.current) group.current.visible = film.t >= START.timeline - 0.5
+    if (group.current) group.current.visible = film.running && film.t >= START.timeline - 0.5
   })
   return (
     // The downloaded models are already shown in the museum: copies are made for here.

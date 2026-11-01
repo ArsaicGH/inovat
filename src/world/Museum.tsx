@@ -1,4 +1,4 @@
-import { Suspense, lazy, useLayoutEffect, useEffect, useMemo, useRef, type ReactNode, type RefObject } from 'react'
+import { Suspense, lazy, useLayoutEffect, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Bloom, EffectComposer, FXAA, N8AO, SMAA, ToneMapping, Vignette } from '@react-three/postprocessing'
 import { CopyPass, EffectPass, ToneMappingMode, type EffectComposer as Composer } from 'postprocessing'
@@ -69,11 +69,13 @@ const FULL_RATIO = Math.min(window.devicePixelRatio, MAX_PIXEL_RATIO)
 // "ultra" goes beyond it. "Medium" and "low" are for weaker computers (budget and office
 // laptops): measured on the leader's laptop, drawing the lit rooms is about 90% of the work
 // and grows with the number of pixels, the effects only about 10%. So they mostly draw
-// fewer pixels (medium about two thirds of them, low about a third), and low also drops the
-// shadows (each pixel then skips its shadow test, and the shadow picture is never drawn).
+// fewer pixels (medium about two thirds of them, low about a third); low also redraws the
+// shadows only when the key light moves. (Low once had no shadows at all: places meant to be
+// in shadow, like the rotunda's columns, were then lit directly and showed hard, patchy
+// highlights. The shadow test itself is cheap, about 0.7 ms; drawing the shadow picture is
+// what costs.)
 interface GraphicsSettings {
   sharpness: number
-  keyShadows: boolean // the key light casts shadows (off at the lowest levels)
   ao: 'off' | 'half' | 'full'
   shadowSize: number
   shadowSoftness: number
@@ -85,11 +87,11 @@ interface GraphicsSettings {
 const SPOT_SHADOWS = 4
 
 const GRAPHICS_LEVELS: Record<GraphicsLevel, GraphicsSettings> = {
-  0: { sharpness: 0.5, keyShadows: false, ao: 'off', shadowSize: 512, shadowSoftness: 1, shadowEvery: 0, spotShadows: false, smoothing: 'fxaa' }, // very low
-  1: { sharpness: 0.6, keyShadows: false, ao: 'off', shadowSize: 512, shadowSoftness: 1, shadowEvery: 0, spotShadows: false, smoothing: 'fxaa' }, // low
-  2: { sharpness: 0.8, keyShadows: true, ao: 'off', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 4, spotShadows: false, smoothing: 'smaa' }, // medium
-  3: { sharpness: 1, keyShadows: true, ao: 'half', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 3, spotShadows: false, smoothing: 'smaa' }, // high
-  4: { sharpness: 1, keyShadows: true, ao: 'full', shadowSize: 2048, shadowSoftness: 2, shadowEvery: 1, spotShadows: true, smoothing: 'smaa' }, // ultra
+  0: { sharpness: 0.5, ao: 'off', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 0, spotShadows: false, smoothing: 'fxaa' }, // very low
+  1: { sharpness: 0.6, ao: 'off', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 0, spotShadows: false, smoothing: 'fxaa' }, // low
+  2: { sharpness: 0.78, ao: 'off', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 4, spotShadows: false, smoothing: 'fxaa' }, // medium
+  3: { sharpness: 1, ao: 'half', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 3, spotShadows: false, smoothing: 'smaa' }, // high
+  4: { sharpness: 1, ao: 'full', shadowSize: 2048, shadowSoftness: 2, shadowEvery: 1, spotShadows: true, smoothing: 'smaa' }, // ultra
 }
 
 const GROUPS: RoomId[] = ['rotunda', ...ROOMS.map((room) => room.id)]
@@ -144,16 +146,7 @@ function Lighting() {
   useEffect(() => {
     const light = keyLight.current
     if (!light) return
-    const { shadowSize, shadowSoftness, spotShadows, keyShadows } = GRAPHICS_LEVELS[graphicsLevel]
-    // (Low levels: no key-light shadows. Changing this rebuilds the drawing code once, like
-    // the ultra spotlights below; WarmUp prepares it again.)
-    if (light.castShadow !== keyShadows) {
-      light.castShadow = keyShadows
-      if (!keyShadows) {
-        light.shadow.map?.dispose()
-        light.shadow.map = null
-      }
-    }
+    const { shadowSize, shadowSoftness, spotShadows } = GRAPHICS_LEVELS[graphicsLevel]
     // The shadow lights also see the detailed models' simplified shadow stand-ins
     // (inventions.tsx), which the camera never draws.
     light.shadow.camera.layers.enable(SHADOW_LAYER)
@@ -507,9 +500,7 @@ function MuseumPart({ id }: { id: RoomId }) {
 function WarmUp() {
   const target = useMemo(() => new WebGLRenderTarget(64, 64, { type: HalfFloatType }), [])
   useEffect(() => () => target.dispose(), [target])
-  const level = GRAPHICS_LEVELS[useMuseumStore((state) => state.graphicsLevel)]
-  // (Which lights cast shadows: a change rebuilds every material's drawing code.)
-  const spotShadows = `${level.spotShadows}|${level.keyShadows}`
+  const spotShadows = GRAPHICS_LEVELS[useMuseumStore((state) => state.graphicsLevel)].spotShadows
   const warmedWith = useRef(spotShadows)
   useFrame(({ gl, scene, camera }) => {
     const store = useMuseumStore.getState()
@@ -770,10 +761,31 @@ function DropTrailingCopy({ composer }: { composer: RefObject<Composer | null> }
   return null
 }
 
+// THE EFFECTS' PICTURES FOLLOW THE RESOLUTION. The effects (bloom, colours, smoothing...)
+// draw the scene into pictures of their own, sized when the window size changes, but not
+// when only the resolution (sharpness) changes. So a lower graphics level, or automatic
+// mode lowering the resolution on a weak computer, still drew the whole scene at full
+// resolution: measured, medium cost 9.0 ms a frame with the effects and 5.9 ms without.
+function EffectsFollowResolution({ composer }: { composer: RefObject<Composer | null> }) {
+  const dpr = useThree((state) => state.viewport.dpr)
+  const size = useThree((state) => state.size)
+  useEffect(() => {
+    composer.current?.setSize(size.width, size.height)
+  }, [composer, dpr, size.width, size.height])
+  return null
+}
+
 // The ending's world exists only while the ending runs (EndingScene.tsx).
+// Built ahead, hidden, once the visitor is in the Game Room with the portal open, so it is
+// ready the moment they step in (EndingScene.tsx); kept from then on.
 function EndingWhileRunning() {
   const ending = useMuseumStore((state) => state.mode === 'ending')
-  return ending ? <EndingScene /> : null
+  const near = useMuseumStore((state) => state.quizPassed && state.currentRoom === 'quiz')
+  const [built, setBuilt] = useState(false)
+  useEffect(() => {
+    if (ending || near) setBuilt(true)
+  }, [ending, near])
+  return built || ending ? <EndingScene running={ending} /> : null
 }
 
 export default function Museum() {
@@ -820,6 +832,7 @@ export default function Museum() {
       <GraphicsResolution />
       <ShadowThrottle />
       <DropTrailingCopy composer={composer} />
+      <EffectsFollowResolution composer={composer} />
       <PreparedDoors>
         <Doors />
       </PreparedDoors>
