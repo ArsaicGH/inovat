@@ -5,6 +5,7 @@ import { gameText } from '../content/game'
 import { useMuseumStore } from '../state/useMuseumStore'
 import { addAimTarget, removeAimTarget } from './aim-targets'
 import { drawWrappedText, paintFont, useFontsReady } from './fonts'
+import { SharpText, recordText, type TextRun } from './sharp-text'
 import { QUIZ_BOARD } from './layout'
 
 // THE TIME MACHINE CONSOLE on the Game Room's platform: an ivory board in a gilded frame
@@ -96,15 +97,18 @@ type Paint = (ctx: CanvasRenderingContext2D, w: number, h: number, font: string)
 // A flat picture on the wall, repainted whenever `key` changes (state, language, aim...).
 function Panel({ width, height, paint, paintKey, glow = 0.86 }: { width: number; height: number; paint: Paint; paintKey: string; glow?: number }) {
   const fontsReady = useFontsReady()
-  const texture = useMemo(() => {
+  // (Its letters are drawn sharp over it: sharp-text.tsx.)
+  const { texture, runs, pixels } = useMemo(() => {
+    const runs: TextRun[] = []
     const canvas = document.createElement('canvas')
     canvas.width = Math.round(width * PX)
     canvas.height = Math.round(height * PX)
     const ctx = canvas.getContext('2d')
+    if (ctx) recordText(ctx, runs)
     if (ctx) paint(ctx, canvas.width, canvas.height, paintFont(fontsReady))
     const tex = new CanvasTexture(canvas)
     tex.colorSpace = SRGBColorSpace
-    return tex
+    return { texture: tex, runs, pixels: [canvas.width, canvas.height] as const }
     // paintKey describes everything the picture depends on.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paintKey, width, height, fontsReady])
@@ -116,9 +120,12 @@ function Panel({ width, height, paint, paintKey, glow = 0.86 }: { width: number;
   }, [material, glow])
   useEffect(() => () => material.dispose(), [material])
   return (
-    <mesh material={material}>
-      <planeGeometry args={[width, height]} />
-    </mesh>
+    <group>
+      <mesh material={material}>
+        <planeGeometry args={[width, height]} />
+      </mesh>
+      <SharpText runs={runs} pixels={pixels} face={[width, height]} z={0.002} shading={{ lit: false, glow }} />
+    </group>
   )
 }
 

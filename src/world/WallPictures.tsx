@@ -12,6 +12,7 @@ import { usePicture } from './picture-images'
 import { paintDiagram, type DiagramColours } from './diagrams'
 import { BOARD_THEMES, GOLD } from './style'
 import MergeStatic from './MergeStatic'
+import { SharpText, recordText, type TextRun } from './sharp-text'
 
 // THE WALL GALLERIES: historical pictures and the museum's own diagrams (content/pictures.ts,
 // WALL_GALLERY) on the walls of each era room. Like an exhibit, each can be aimed at and
@@ -42,6 +43,9 @@ const PICTURE_GLOW: Record<EraRoom, number> = { ir1: 0.55, ir2: 0.45, ir3: 0.42,
 const TEXTURE_MAX = 640 // pixels: sharp enough on the wall (the enlarged view shows the full file)
 const DIAGRAM_WIDTH = 1280 // pixels across a wall diagram (about 4.4 m wide: readable up close)
 const PLAQUE = [0.72, 0.18] as const
+// How the sharp letters are lit, like the surface they lie on (its material below).
+const PLAQUE_TEXT = { lit: true, glow: 0.3, roughness: 0.7 }
+const GLASS_TEXT = { lit: false, glow: 1 }
 
 // The picture, made smaller for the graphics card (it is seen from a few metres away).
 function useWallTexture(file: string | undefined): Texture | null {
@@ -89,16 +93,19 @@ const WALL_DIAGRAM: Partial<Record<EraRoom, Required<DiagramColours>>> = {
 
 // A museum diagram painted in the room's board colours (painted again with the font, or in
 // the other language).
-function useDiagramTexture(picture: Picture | undefined, room: EraRoom, language: Language): Texture | null {
+// (Its letters are drawn sharp over it: sharp-text.tsx.)
+function useDiagramTexture(picture: Picture | undefined, room: EraRoom, language: Language): Painted | null {
   const gl = useThree((state) => state.gl)
   const fontsReady = useFontsReady()
-  const texture = useMemo(() => {
+  const painted = useMemo(() => {
     if (!picture?.diagram) return null
+    const runs: TextRun[] = []
     const theme = BOARD_THEMES[room]
     const canvas = document.createElement('canvas')
     canvas.width = DIAGRAM_WIDTH
     canvas.height = Math.round(DIAGRAM_WIDTH / picture.aspect)
     const ctx = canvas.getContext('2d')
+    if (ctx) recordText(ctx, runs)
     if (ctx) {
       const accent = theme.look === 'screen' || theme.look === 'hologram' ? theme.title : theme.rule
       const colours = WALL_DIAGRAM[room] ?? { paper: wallPaper(room), ink: theme.ink, accent, muted: theme.muted }
@@ -110,26 +117,35 @@ function useDiagramTexture(picture: Picture | undefined, room: EraRoom, language
     const tex = new CanvasTexture(canvas)
     tex.colorSpace = SRGBColorSpace
     tex.anisotropy = 4
-    return tex
+    return { texture: tex, runs, pixels: [canvas.width, canvas.height] as const }
   }, [picture, room, language, fontsReady])
   useEffect(() => {
-    if (!texture) return
-    gl.initTexture(texture)
-    return () => texture.dispose()
-  }, [gl, texture])
-  return texture
+    if (!painted) return
+    gl.initTexture(painted.texture)
+    return () => painted.texture.dispose()
+  }, [gl, painted])
+  return painted
 }
 
-// The caption plaque, in the room's board colours.
-function usePlaqueTexture(caption: string, room: EraRoom): Texture {
+// A picture painted for a surface, with its text noted to be drawn sharp over it.
+interface Painted {
+  texture: Texture
+  runs: TextRun[]
+  pixels: readonly [number, number]
+}
+
+// The caption plaque, in the room's board colours (its letters drawn sharp: sharp-text.tsx).
+function usePlaqueTexture(caption: string, room: EraRoom): Painted {
   const gl = useThree((state) => state.gl)
   const fontsReady = useFontsReady()
-  const texture = useMemo(() => {
+  const painted = useMemo(() => {
+    const runs: TextRun[] = []
     const theme = BOARD_THEMES[room]
     const canvas = document.createElement('canvas')
     canvas.width = 512
     canvas.height = 128
     const ctx = canvas.getContext('2d')
+    if (ctx) recordText(ctx, runs)
     if (ctx) {
       ctx.fillStyle = wallPaper(room)
       ctx.fillRect(0, 0, 512, 128)
@@ -157,13 +173,13 @@ function usePlaqueTexture(caption: string, room: EraRoom): Texture {
     }
     const tex = new CanvasTexture(canvas)
     tex.colorSpace = SRGBColorSpace
-    return tex
+    return { texture: tex, runs, pixels: [canvas.width, canvas.height] as const }
   }, [caption, room, fontsReady])
   useEffect(() => {
-    gl.initTexture(texture)
-    return () => texture.dispose()
-  }, [gl, texture])
-  return texture
+    gl.initTexture(painted.texture)
+    return () => painted.texture.dispose()
+  }, [gl, painted])
+  return painted
 }
 
 // One place on a wall: position in the room (x across, z towards the entrance), the turn
@@ -193,7 +209,7 @@ function WallPicture({ room, hanging }: { room: EraRoom; hanging: Hanging }) {
   const photo = useWallTexture(picture?.file)
   const diagram = useDiagramTexture(picture, room, language)
   const plaque = usePlaqueTexture(picture?.file ? picture.caption[language] : '', room)
-  const image = photo ?? diagram
+  const image = photo ?? diagram?.texture ?? null
 
   useEffect(() => {
     const target = group.current
@@ -233,6 +249,7 @@ function WallPicture({ room, hanging }: { room: EraRoom; hanging: Hanging }) {
             <meshStandardMaterial color="#2a2622" roughness={0.9} />
           )}
         </mesh>
+        {diagram && <SharpText runs={diagram.runs} pixels={diagram.pixels} face={[w, h]} z={frame.depth / 2 + 0.004} shading={glass ? GLASS_TEXT : { lit: true, glow: PICTURE_GLOW[room], roughness: 0.75 }} />}
         {/* CMCN 4: thin glowing edges, top and bottom. */}
         {glass &&
           [-1, 1].map((s) => (
@@ -245,8 +262,13 @@ function WallPicture({ room, hanging }: { room: EraRoom; hanging: Hanging }) {
         {picture.file && (
           <mesh position={[0, -h / 2 - frame.border - 0.06 - PLAQUE[1] / 2, frame.depth / 2 - 0.01]}>
             <planeGeometry args={PLAQUE as unknown as [number, number]} />
-            <meshStandardMaterial map={plaque} roughness={0.7} emissive="#ffffff" emissiveMap={plaque} emissiveIntensity={0.3} />
+            <meshStandardMaterial map={plaque.texture} roughness={0.7} emissive="#ffffff" emissiveMap={plaque.texture} emissiveIntensity={0.3} />
           </mesh>
+        )}
+        {picture.file && (
+          <group position={[0, -h / 2 - frame.border - 0.06 - PLAQUE[1] / 2, 0]}>
+            <SharpText runs={plaque.runs} pixels={plaque.pixels} face={PLAQUE} z={frame.depth / 2 - 0.009} shading={PLAQUE_TEXT} />
+          </group>
         )}
       </group>
     </group>
