@@ -29,6 +29,7 @@ import {
 import { useContent } from '../content/use-content'
 import { FilmModel } from './inventions'
 import { Box, Cyl, Figure, Panel, Puffs, Rod, Spin, Surface, paint, seeded, usePalette } from './ending-sets'
+import { ERA_ICONS } from './diagrams'
 import { LINE_SPEED, ORIGIN, film, fireLevel, gridRadius, lampLevel, mindLevel, rocketX, shotId, since, smooth } from './ending-shots'
 
 // THE ENDING FILM'S FOUR ACTS (script in ending-shots.ts, played by EndingScene.tsx): one
@@ -1475,92 +1476,120 @@ function PrintAndTwin() {
   )
 }
 
-// A PERSON BEFORE A NETWORK OF ARTIFICIAL NEURONS: layers of nodes, their connections, and
-// signals running from layer to layer, faster as the network "wakes".
-const LAYERS = [4, 6, 7, 6, 4]
-const SIGNALS = 240
+// A PERSON BEFORE AN ARTIFICIAL NEURAL NETWORK THAT RECOGNISES PICTURES. Shown the way such
+// networks are drawn in textbooks, so it reads at a glance: on the left a picture comes in
+// (one of the four eras' icons: a gear, a bulb, a chip, a network), columns of neurons pass a
+// wave of signals from layer to layer, and on the right the matching answer lights up among
+// four icons. Then the next picture. The waves come faster as the network "wakes".
+const MIND_LAYERS = [5, 7, 7, 5] // neurons in each hidden column
+const MIND_X = [-5.4, -1.9, 1.6, 5.1] // the columns' places, left to right
+const MIND_Y = 4.4 // the network's middle height
+const MIND_Z = -8
+const MIND_GAP = 1.0 // between neurons in a column
+const INPUT_X = -9 // the picture coming in
+const OUTPUT_X = 8.6 // the four answers
+const OUTPUT_Y = [1.65, 0.55, -0.55, -1.65].map((y) => MIND_Y + y * 1.35)
 function MindNetwork() {
   const on = useOn()
   const net = useMemo(() => {
     const r = seeded(83)
-    const layers = LAYERS.map((n, l) => {
-      const list: Vector3[] = []
-      // Each layer is a round cloud of n x n nodes, widest in the middle of the network.
-      const radius = 1.2 + n * 0.62
-      for (let i = 0; i < n * n; i++) {
-        const a = r() * Math.PI * 2
-        const d = Math.sqrt(r()) * radius
-        list.push(new Vector3(Math.cos(a) * d * 1.25, 4.4 + Math.sin(a) * d, -3 - l * 3 + random(r, -0.6, 0.6)))
-      }
-      return list
-    })
-    const nodes = layers.flat()
-    const offset = layers.map((_, l) => layers.slice(0, l).reduce((s, x) => s + x.length, 0))
-    // Each node links to five nodes of the next layer.
-    const next: number[][] = nodes.map(() => [])
-    const pairs: number[] = []
-    layers.forEach((list, l) => {
-      if (l === layers.length - 1) return
-      list.forEach((_, i) => {
-        for (let k = 0; k < 3; k++) {
-          const j = offset[l + 1] + Math.floor(r() * layers[l + 1].length)
-          next[offset[l] + i].push(j)
-          pairs.push(offset[l] + i, j)
-        }
-      })
-    })
-    const positions = new Float32Array(pairs.length * 3)
-    pairs.forEach((n, k) => positions.set([nodes[n].x, nodes[n].y, nodes[n].z], k * 3))
+    const columns = MIND_LAYERS.map((n, l) =>
+      Array.from({ length: n }, (_, i) => new Vector3(MIND_X[l], MIND_Y + (i - (n - 1) / 2) * MIND_GAP, MIND_Z)),
+    )
+    const nodes = columns.flat()
+    const input = new Vector3(INPUT_X + 1.1, MIND_Y, MIND_Z)
+    const outputs = OUTPUT_Y.map((y) => new Vector3(OUTPUT_X - 0.75, y, MIND_Z))
+    // Every connection, by stage: picture -> first column, column -> column, last -> answers.
+    // Each has a strength for each picture (which signals pass when that picture comes in).
+    type Link = { from: Vector3; to: Vector3; stage: number; answer?: number; weight: number[] }
+    const links: Link[] = []
+    const strengths = () => [0, 1, 2, 3].map(() => r())
+    columns[0].forEach((to) => links.push({ from: input, to, stage: 0, weight: strengths() }))
+    for (let l = 0; l < columns.length - 1; l++)
+      for (const from of columns[l]) for (const to of columns[l + 1]) links.push({ from, to, stage: l + 1, weight: strengths() })
+    columns[columns.length - 1].forEach((from) =>
+      outputs.forEach((to, answer) => links.push({ from, to, stage: columns.length, answer, weight: strengths() })),
+    )
+    const positions = new Float32Array(links.length * 6)
+    links.forEach((link, k) => positions.set([link.from.x, link.from.y, link.from.z, link.to.x, link.to.y, link.to.z], k * 6))
     const geometry = new BufferGeometry()
     geometry.setAttribute('position', new BufferAttribute(positions, 3))
-    const signals = Array.from({ length: SIGNALS }, () => {
-      const from = Math.floor(r() * offset[1])
-      return { from, to: next[from][0], u: r(), speed: random(r, 0.8, 1.6) }
-    })
-    return { nodes, next, geometry, signals, firstLayer: offset[1], flash: new Float32Array(nodes.length) }
+    // The pictures (and the answers' tiles): the four icons in light on dark glass.
+    const icons = [0, 1, 2, 3].map((era) =>
+      paint(256, 256, (c, w, h) => {
+        c.fillStyle = 'rgba(8, 30, 40, 0.85)'
+        c.fillRect(0, 0, w, h)
+        c.strokeStyle = '#8fe8ff'
+        c.lineWidth = 8
+        c.strokeRect(6, 6, w - 12, h - 12)
+        c.fillStyle = '#d8fbff'
+        c.strokeStyle = '#d8fbff'
+        c.lineWidth = 7
+        ERA_ICONS[era](c, w / 2, h / 2, w * 0.62)
+      }),
+    )
+    return { nodes, columns, links, geometry, icons }
   }, [])
-  useEffect(() => () => net.geometry.dispose(), [net])
+  useEffect(
+    () => () => {
+      net.geometry.dispose()
+      net.icons.forEach((icon) => icon.dispose())
+    },
+    [net],
+  )
   const nodeMesh = useRef<InstancedMesh>(null)
   const signalMesh = useRef<InstancedMesh>(null)
+  const picture = useRef<MeshBasicMaterial>(null)
+  const answers = useRef<(MeshBasicMaterial | null)[]>([])
   const o = useMemo(() => new Object3D(), [])
+  const wave = useRef({ phase: 0, shown: 0 })
   useFrame((_, delta) => {
     if (!on.on) return
-    const dt = Math.min(delta, 0.05)
-    const speed = 1.6 * mindLevel()
-    const { nodes, next, signals, flash } = net
-    for (let i = 0; i < flash.length; i++) flash[i] = Math.max(0, flash[i] - dt * 2.5)
+    const stages = MIND_LAYERS.length + 1
+    const w = wave.current
+    // One picture every 2 seconds or so, faster once awake; a pause at the end of each,
+    // with the answer lit.
+    w.phase += Math.min(delta, 0.05) * (0.35 + 0.45 * mindLevel())
+    if (w.phase >= 1) {
+      w.phase -= 1
+      w.shown = (w.shown + 1) % 4
+    }
+    const front = w.phase * (stages + 1.5) // how far the wave has come, in stages
+    if (picture.current) picture.current.map = net.icons[w.shown]
+    // The signals: on the stronger connections for this picture, and into the right answer.
     const mesh = signalMesh.current
-    signals.forEach((s, i) => {
-      s.u += dt * s.speed * speed
-      if (s.u >= 1) {
-        flash[s.to] = 1
-        s.u -= 1
-        s.from = s.to
-        const options = next[s.from]
-        if (options.length) s.to = options[Math.floor(Math.random() * options.length)]
-        else {
-          s.from = Math.floor(Math.random() * net.firstLayer)
-          s.to = next[s.from][Math.floor(Math.random() * next[s.from].length)]
-        }
-      }
-      if (mesh) {
-        o.position.lerpVectors(nodes[s.from], nodes[s.to], s.u)
-        o.scale.setScalar(1)
+    if (mesh) {
+      net.links.forEach((link, k) => {
+        const u = front - link.stage
+        const passes = link.answer === undefined ? link.weight[w.shown] > 0.55 : link.answer === w.shown
+        const visible = passes && u > 0 && u < 1
+        o.position.lerpVectors(link.from, link.to, Math.min(Math.max(u, 0), 1))
+        o.scale.setScalar(visible ? 1 : 0)
         o.updateMatrix()
-        mesh.setMatrixAt(i, o.matrix)
-      }
-    })
-    if (mesh) mesh.instanceMatrix.needsUpdate = true
+        mesh.setMatrixAt(k, o.matrix)
+      })
+      mesh.instanceMatrix.needsUpdate = true
+    }
+    // The neurons light up as the wave reaches their column.
     const nm = nodeMesh.current
     if (nm) {
-      nodes.forEach((p, i) => {
-        o.position.copy(p)
-        o.scale.setScalar(1 + flash[i] * 0.9)
-        o.updateMatrix()
-        nm.setMatrixAt(i, o.matrix)
+      let i = 0
+      net.columns.forEach((column, l) => {
+        const glow = Math.max(0, 1 - Math.abs(front - (l + 1)) * 1.4)
+        for (const p of column) {
+          o.position.copy(p)
+          o.scale.setScalar(1 + glow * 0.8)
+          o.updateMatrix()
+          nm.setMatrixAt(i++, o.matrix)
+        }
       })
       nm.instanceMatrix.needsUpdate = true
     }
+    // The answer: the matching tile lights up once the wave arrives, the others stay dim.
+    const done = smooth(stages, stages + 0.5, front)
+    answers.current.forEach((material, a) => {
+      if (material) material.color.setScalar(a === w.shown ? 0.55 + done * 1.6 : 0.4)
+    })
   })
   return (
     <group>
@@ -1575,16 +1604,28 @@ function MindNetwork() {
         </mesh>
       ))}
       <lineSegments geometry={net.geometry}>
-        <lineBasicMaterial color="#3fd0e0" transparent opacity={0.16} blending={AdditiveBlending} depthWrite={false} toneMapped={false} />
+        <lineBasicMaterial color="#3fd0e0" transparent opacity={0.22} blending={AdditiveBlending} depthWrite={false} toneMapped={false} />
       </lineSegments>
       <instancedMesh ref={nodeMesh} args={[undefined, undefined, net.nodes.length]} frustumCulled={false}>
-        <sphereGeometry args={[0.065, 12, 8]} />
+        <sphereGeometry args={[0.16, 16, 12]} />
         <meshBasicMaterial color={new Color('#8fe8ff').multiplyScalar(1.15)} toneMapped={false} />
       </instancedMesh>
-      <instancedMesh ref={signalMesh} args={[undefined, undefined, SIGNALS]} frustumCulled={false}>
-        <sphereGeometry args={[0.05, 8, 6]} />
+      <instancedMesh ref={signalMesh} args={[undefined, undefined, net.links.length]} frustumCulled={false}>
+        <sphereGeometry args={[0.08, 8, 6]} />
         <meshBasicMaterial color={new Color('#ffffff').multiplyScalar(2)} toneMapped={false} />
       </instancedMesh>
+      {/* The picture coming in, on the left. */}
+      <mesh position={[INPUT_X, MIND_Y, MIND_Z]}>
+        <planeGeometry args={[2.2, 2.2]} />
+        <meshBasicMaterial ref={picture} map={net.icons[0]} transparent toneMapped={false} />
+      </mesh>
+      {/* The four answers, on the right. */}
+      {OUTPUT_Y.map((y, a) => (
+        <mesh key={a} position={[OUTPUT_X, y, MIND_Z]}>
+          <planeGeometry args={[1.4, 1.4]} />
+          <meshBasicMaterial ref={(m) => void (answers.current[a] = m)} map={net.icons[a]} transparent toneMapped={false} />
+        </mesh>
+      ))}
       {/* The person, small before it, on a disc of light. */}
       <Figure era={2} at={[0, 0, 5]} turn={Math.PI} action="stand" />
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 5]}>

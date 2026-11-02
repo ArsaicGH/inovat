@@ -1,15 +1,16 @@
 import { useMemo } from 'react'
 import { useLoader } from '@react-three/fiber'
-import { RepeatWrapping, SRGBColorSpace, TextureLoader, type Texture } from 'three'
+import { RepeatWrapping, SRGBColorSpace, type Texture } from 'three'
+import { ktx2Loader } from './ktx2'
 
 // Surface textures in /public/textures (CC0, listed in src/content/credits.ts).
 // Each has a colour picture and a "normal" picture (tiny bumps that catch the light).
 export type SurfaceName = 'marble' | 'plaster' | 'wood-floor' | 'bricks' | 'metal-plates' | 'concrete' | 'tiles'
 
-// The two loaded pictures of a surface. Loading pauses drawing until they are in
-// (React "Suspense").
+// The two loaded pictures of a surface (compressed, see ktx2.ts). Loading pauses drawing
+// until they are in (React "Suspense").
 export function useSurfaceTextures(name: SurfaceName): [Texture, Texture] {
-  const [colour, normal] = useLoader(TextureLoader, [`/textures/${name}-color.jpg`, `/textures/${name}-normal.jpg`])
+  const [colour, normal] = useLoader(ktx2Loader, [`/textures/${name}-color.ktx2`, `/textures/${name}-normal.ktx2`])
   return [colour, normal]
 }
 

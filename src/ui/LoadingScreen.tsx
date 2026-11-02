@@ -10,14 +10,20 @@ import { useFontsReady } from '../world/fonts'
 // the whole museum (Museum.tsx). Then it
 // fades away and the title screen appears.
 
-// If something never reports back, go on anyway after this long (milliseconds).
-const GIVE_UP_AFTER = 30000
+// If something never reports back, go on anyway: after this long (milliseconds) with no
+// progress at all. Only time while the page is really drawing counts (a tab in the
+// background, or a window out of sight, draws nothing, so nothing could progress), and any
+// step forward starts the count again. (It used to give up after 30 s in any case: on slow
+// computers and tablets the visit then began while the museum was still being prepared,
+// and the automatic graphics choice ran during the visit, freezing it for many seconds.)
+const GIVE_UP_AFTER = 20000
 
 export default function LoadingScreen() {
   const { progress, active, total } = useLoadProgress() // pictures being downloaded (0-100)
   const parts = useMuseumStore((state) => state.partsPrepared)
   const warmedUp = useMuseumStore((state) => state.warmedUp)
   const qualityChosen = useMuseumStore((state) => state.qualityChosen)
+  const endingPrepared = useMuseumStore((state) => state.endingPrepared)
   const worldReady = useMuseumStore((state) => state.worldReady)
   const setWorldReady = useMuseumStore((state) => state.setWorldReady)
   const fontsReady = useFontsReady()
@@ -28,9 +34,13 @@ export default function LoadingScreen() {
   const [shown, setShown] = useState(0)
   // (Before the first download has even started, total is 0: count that as nothing yet.)
   const textures = total === 0 ? 0 : active ? progress : 100
-  const target = textures * 0.7 + Math.min(parts / PART_COUNT, 1) * 30
+  // (The last steps, the warm-up drawing, the graphics measurement and preparing the ending
+  // film's world, fill the last eighth.)
+  const target = textures * 0.55 + Math.min(parts / PART_COUNT, 1) * 30 + (warmedUp ? 4 : 0) + (qualityChosen ? 5 : 0) + (endingPrepared ? 6 : 0)
   if (target > shown) setShown(target)
-  const done = parts >= PART_COUNT && warmedUp && qualityChosen && fontsReady && !active
+  const done = parts >= PART_COUNT && warmedUp && qualityChosen && endingPrepared && fontsReady && !active
+  // Anything that moves the loading forward (the next picture, part or step).
+  const step = `${Math.round(target)}|${fontsReady}|${active}`
 
   useEffect(() => {
     if (!done || worldReady) return
@@ -40,10 +50,20 @@ export default function LoadingScreen() {
     return () => clearTimeout(timer)
   }, [done, worldReady, setWorldReady])
 
+  // The give-up count: time spent drawing frames since the last step forward.
   useEffect(() => {
-    const timer = setTimeout(setWorldReady, GIVE_UP_AFTER)
-    return () => clearTimeout(timer)
-  }, [setWorldReady])
+    if (worldReady) return
+    let waited = 0
+    let last = performance.now()
+    let frame = requestAnimationFrame(function tick(now) {
+      // (A long gap between frames means the page was not being drawn: not counted.)
+      waited += Math.min(now - last, 100)
+      last = now
+      if (waited >= GIVE_UP_AFTER) setWorldReady()
+      else frame = requestAnimationFrame(tick)
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [step, worldReady, setWorldReady])
 
   // After fading out, remove the screen completely.
   useEffect(() => {

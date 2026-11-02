@@ -11,10 +11,10 @@ export type Era = 1 | 2 | 3 | 4
 // Which era room each invention is in (from its id: ir2-3 = CMCN 2).
 export const eraOf = (id: string) => Number(id[2]) as Era
 export const INVENTION_IDS = [
-  'ir1-1', 'ir1-2', 'ir1-3', 'ir1-4',
+  'ir1-1', 'ir1-2', 'ir1-3', 'ir1-4', 'ir1-5',
   'ir2-1', 'ir2-2', 'ir2-3', 'ir2-4', 'ir2-5',
-  'ir3-1', 'ir3-2', 'ir3-3', 'ir3-4',
-  'ir4-1', 'ir4-2', 'ir4-3', 'ir4-4', 'ir4-5',
+  'ir3-1', 'ir3-2', 'ir3-3', 'ir3-4', 'ir3-5',
+  'ir4-1', 'ir4-2', 'ir4-3', 'ir4-4', 'ir4-5', 'ir4-6',
 ]
 
 // Round 2: who is behind each invention (as on the exhibit boards).
@@ -23,6 +23,7 @@ export const MAKERS: { id: string; who: Both }[] = [
   { id: 'ir1-2', who: { vi: 'Richard Arkwright', en: 'Richard Arkwright' } },
   { id: 'ir1-3', who: { vi: 'Henry Cort', en: 'Henry Cort' } },
   { id: 'ir1-4', who: { vi: 'Robert Stephenson', en: 'Robert Stephenson' } },
+  { id: 'ir1-5', who: { vi: 'Samuel Morse và Alfred Vail', en: 'Samuel Morse and Alfred Vail' } },
   { id: 'ir2-1', who: { vi: 'Henry Bessemer', en: 'Henry Bessemer' } },
   { id: 'ir2-2', who: { vi: 'Nikolaus Otto và Karl Benz', en: 'Nikolaus Otto and Karl Benz' } },
   { id: 'ir2-3', who: { vi: 'Thomas Edison và Nikola Tesla', en: 'Thomas Edison and Nikola Tesla' } },
@@ -32,8 +33,10 @@ export const MAKERS: { id: string; who: Both }[] = [
   { id: 'ir3-2', who: { vi: 'IBM', en: 'IBM' } },
   { id: 'ir3-3', who: { vi: 'George Devol và Joseph Engelberger', en: 'George Devol and Joseph Engelberger' } },
   { id: 'ir3-4', who: { vi: 'ARPA (Bộ Quốc phòng Hoa Kỳ)', en: 'ARPA (US Department of Defense)' } },
+  { id: 'ir3-5', who: { vi: 'Martin Cooper và Tim Berners-Lee', en: 'Martin Cooper and Tim Berners-Lee' } },
   { id: 'ir4-1', who: { vi: 'Chuck Hull', en: 'Chuck Hull' } },
   { id: 'ir4-3', who: { vi: 'John McCarthy và Alan Turing', en: 'John McCarthy and Alan Turing' } },
+  { id: 'ir4-6', who: { vi: 'Emmanuelle Charpentier và Jennifer Doudna', en: 'Emmanuelle Charpentier and Jennifer Doudna' } },
 ]
 
 // Round 4: real situations; the answer is the invention that solves them.
@@ -44,6 +47,30 @@ export interface Challenge {
   why: Both
 }
 export const CHALLENGES: Challenge[] = [
+  {
+    situation: {
+      vi: 'Năm 1845, một công ty đường sắt muốn báo cho ga sau biết đoàn tàu đã xuất phát, trước khi tàu tới nơi. Phát minh nào giúp họ?',
+      en: 'In 1845 a railway company wants to tell the next station that a train has left, before the train arrives. Which invention helps it?',
+    },
+    answer: 'ir1-5',
+    options: ['ir1-5', 'ir1-4', 'ir2-5', 'ir1-1'],
+    why: {
+      vi: 'Điện báo gửi tin nhắn bằng dòng điện qua dây dẫn, gần như tức thì, nhanh hơn bất kỳ đoàn tàu nào. Điện thoại chỉ ra đời hơn ba mươi năm sau.',
+      en: 'The telegraph sent messages as electric current along a wire, almost instantly, faster than any train. The telephone came more than thirty years later.',
+    },
+  },
+  {
+    situation: {
+      vi: 'Năm 1990, các nhà khoa học ở nhiều nước muốn chia sẻ tài liệu bằng những trang liên kết với nhau, ai cũng mở được từ máy tính của mình. Họ cần gì?',
+      en: 'In 1990, scientists in many countries want to share documents as pages linked to one another, which anyone can open on their own computer. What do they need?',
+    },
+    answer: 'ir3-5',
+    options: ['ir3-5', 'ir3-4', 'ir3-2', 'ir2-5'],
+    why: {
+      vi: 'World Wide Web, do Tim Berners-Lee đề xuất tại CERN năm 1989, chia sẻ thông tin bằng các trang liên kết, chạy trên nền Internet.',
+      en: 'The World Wide Web, proposed by Tim Berners-Lee at CERN in 1989, shares information as linked pages, running on the Internet.',
+    },
+  },
   {
     situation: {
       vi: 'Năm 1830, một nhà buôn muốn chở than và hàng hóa giữa hai thành phố nhanh hơn xe ngựa. Phát minh nào giúp ông?',
@@ -73,11 +100,35 @@ export const CHALLENGES: Challenge[] = [
       vi: 'Một công ty muốn thử nghiệm thay đổi dây chuyền trên bản sao ảo trước, mà không phải dừng nhà máy thật. Họ cần gì?',
       en: 'A company wants to test changes to its production line on a virtual copy first, without stopping the real factory. What does it need?',
     },
-    answer: 'ir4-4',
-    options: ['ir4-4', 'ir4-1', 'ir3-3', 'ir2-3'],
+    answer: 'ir4-2',
+    options: ['ir4-2', 'ir4-1', 'ir3-3', 'ir2-3'],
     why: {
-      vi: 'Bản sao số là mô hình ảo của máy móc hoặc nhà máy thật, dùng để thử nghiệm và dự đoán trước khi thay đổi ngoài thực tế.',
-      en: 'A digital twin is a virtual model of a real machine or factory, used to test and predict before changing the real thing.',
+      vi: 'Trong nhà máy kết nối, bản sao số là mô hình ảo của máy móc hoặc dây chuyền thật, dùng để thử nghiệm và dự đoán trước khi thay đổi ngoài thực tế.',
+      en: 'In a connected factory, a digital twin is a virtual model of a real machine or production line, used to test and predict before changing the real thing.',
+    },
+  },
+  {
+    situation: {
+      vi: 'Một công ty khởi nghiệp cần lưu trữ và phân tích dữ liệu từ hàng nghìn cảm biến, nhưng không đủ tiền mua và vận hành máy chủ riêng. Họ nên dùng gì?',
+      en: 'A start-up needs to store and analyse data from thousands of sensors, but cannot afford to buy and run its own servers. What should it use?',
+    },
+    answer: 'ir4-4',
+    options: ['ir4-4', 'ir3-2', 'ir4-1', 'ir2-5'],
+    why: {
+      vi: 'Điện toán đám mây cho thuê sức mạnh tính toán và chỗ lưu trữ qua Internet, dùng bao nhiêu trả bấy nhiêu, nên không cần tự mua máy chủ.',
+      en: 'Cloud computing rents out computing power and storage over the Internet, paid for as it is used, so there is no need to buy servers.',
+    },
+  },
+  {
+    situation: {
+      vi: 'Các nhà khoa học muốn sửa một đoạn gen gây bệnh tại đúng vị trí của nó trên ADN. Công cụ nào giúp họ?',
+      en: 'Scientists want to correct a faulty gene at exactly its place in the DNA. Which tool helps them?',
+    },
+    answer: 'ir4-6',
+    options: ['ir4-6', 'ir4-3', 'ir3-1', 'ir1-3'],
+    why: {
+      vi: '"Chiếc kéo di truyền" CRISPR-Cas9 có thể được điều khiển để cắt ADN tại một vị trí chọn trước, mở đường cho việc chỉnh sửa gen.',
+      en: 'The “genetic scissors” CRISPR-Cas9 can be controlled to cut DNA at a chosen place, opening the way to editing genes.',
     },
   },
   {

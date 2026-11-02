@@ -333,8 +333,10 @@ export const SHOTS: Shot[] = [
   { id: 'cobots', act: 4, set: 3, duration: 3.4, rig: 'cobots', into: 'flash', veil: '#dcfaff', from: [[-7.5, 2.1, 6], [-1, 1.1, -2]], to: [[2.8, 1.7, 2.6], [4.5, 1.1, -3]] },
   // ...a 3D printer builds a vase that already exists, complete, as its digital twin...
   { id: 'printer', act: 4, set: 3, duration: 3.3, rig: 'printer', path: printerPath, fov: 40 },
-  // ...and a person stands before a vast network of artificial neurons, waking up.
-  { id: 'mind', act: 4, set: 3, duration: 3.8, rig: 'mind', fov: 50, from: [[0.4, 4.2, -9.5], [0, 4, -16]], to: [[0.5, 2.0, 10.5], [0, 3.4, -8]] },
+  // ...and a person stands before an artificial neural network that recognises pictures:
+  // close on its columns of neurons first, then back to show the picture going in and the
+  // answer lighting up.
+  { id: 'mind', act: 4, set: 3, duration: 3.8, rig: 'mind', fov: 50, from: [[0.3, 4.6, -2.6], [0, 4.4, -8]], to: [[0.5, 2.2, 10.5], [0, 3.8, -8]] },
   // FINALE. Echoes of each era's motion, faster and faster: flywheel, line, signals, neurons...
   { id: 'echo1', act: 5, set: 0, duration: 1.6, rig: 'engine', into: 'dip', from: [[5.6, 3.0, 5.6], [0.4, 2.8, 0]], to: [[4.8, 3.2, 4.8], [0.4, 2.9, 0]] },
   { id: 'echo2', act: 5, set: 1, duration: 1.6, rig: 'line', from: [[2.2, 1.3, 1.0], [0, 1.0, -6]], to: [[1.9, 1.2, -0.2], [0, 1.0, -7]] },

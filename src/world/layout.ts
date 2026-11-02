@@ -33,9 +33,18 @@ function roomStart(width: number): number {
 }
 const CORNER_INSET = 4.2 // how far corner exhibits stand from the walls (nearer the middle)
 const PANEL_OFFSET = 2.3 // text panel distance from the centre of its plinth
+// A room with six inventions (CMCN 4) has a pair in the middle of the hall: this far either
+// side of the middle line, a little in front of the centre, each turned outwards by this
+// angle (radians).
+const MIDDLE_PAIR = 2.1
+const MIDDLE_FORWARD = 0.6
+const MIDDLE_TURN = 0.6
+// With five inventions, the one in the middle of the hall is the room's headline exhibit
+// (the same as `primary` in room-themes.ts); the others take the corners in walking order.
+const CENTRE_EXHIBIT: Partial<Record<RoomId, number>> = { ir1: 1, ir2: 3, ir3: 1 }
 
 // THE SPOTLIGHT EXHIBIT: artificial intelligence, the centre of attention today, stands on a
-// larger plinth (scaled up) in the middle of CMCN 4's back wall.
+// larger plinth (scaled up) in the middle of CMCN 4's hall, the left one of its middle pair.
 export const SPOTLIGHT_ID = 'ir4-3'
 export const SPOTLIGHT_SCALE = 1.4
 export const panelOffset = (id: string) => (id === SPOTLIGHT_ID ? 2.9 : PANEL_OFFSET)
@@ -57,8 +66,8 @@ const DOOR_HEIGHT: Record<DoorStyle, number> = { grand: 3.6, plain: 3 }
 // Era rooms are large and tall, to match the 24 m rotunda (leader: spacious, comfortable),
 // and each era is bigger than the one before, as the revolutions grew in scale (leader):
 // more room for more inventions (INVENTIONS in types.ts), not more crowding.
-// (Leader, 2026-11-01: CMCN 1 and 3 the base size, CMCN 2 a little bigger, CMCN 4 a little
-// bigger again: 19, 20, 19 and 21 m.)
+// (Leader, 2026-11-02: CMCN 1 to 3 the same size, 20 m, each with five inventions; CMCN 4
+// a little bigger, 21 m, for its six.)
 // Every era room has the same, fairly low ceiling (leader): the pictures around the era
 // number stay at a comfortable viewing height, and no room towers over the others.
 const ERA_HEIGHT = 5.4 // (raised a little from 4.8 so the back wall keeps a margin above and below its pictures)
@@ -66,9 +75,9 @@ const ROOM_SPECS: { id: RoomId; side: number; width: number; depth: number; heig
   { id: 'hall', side: 6, width: 12, depth: 10, height: 4.5, doorStyle: 'plain' }, // south: start
   // (Era rooms: the depth includes the entrance room, ANTE below. CMCN 4 is the largest, for
   // its futuristic atmosphere and its AI spotlight exhibit: leader.)
-  { id: 'ir1', side: 8, width: 19, depth: 19 + ANTE_DEPTH + T, height: ERA_HEIGHT, doorStyle: 'grand' }, // south-west
+  { id: 'ir1', side: 8, width: 20, depth: 20 + ANTE_DEPTH + T, height: ERA_HEIGHT, doorStyle: 'grand' }, // south-west
   { id: 'ir2', side: 10, width: 20, depth: 20 + ANTE_DEPTH + T, height: ERA_HEIGHT, doorStyle: 'grand' }, // north-west
-  { id: 'ir3', side: 0, width: 19, depth: 19 + ANTE_DEPTH + T, height: ERA_HEIGHT, doorStyle: 'grand' }, // north
+  { id: 'ir3', side: 0, width: 20, depth: 20 + ANTE_DEPTH + T, height: ERA_HEIGHT, doorStyle: 'grand' }, // north
   { id: 'ir4', side: 2, width: 21, depth: 21 + ANTE_DEPTH + T, height: ERA_HEIGHT, doorStyle: 'grand' }, // north-east
   { id: 'quiz', side: 4, width: 12, depth: 10, height: 4.5, doorStyle: 'plain' }, // south-east: end
 ]
@@ -359,25 +368,40 @@ function buildSpots(): ExhibitSpot[] {
       const [ox, oz] = at(0, room.vFront + ANTE_DEPTH / 2)
       spots.push({ id: `${room.id}-overview`, room: room.id, kind: 'overview', number: 0, x: ox, z: oz, yaw: faceTowards(-f.nx, -f.nz), panelSide: 1 })
 
-      // The inventions (INVENTIONS in types.ts: 4, 5, 4 and 5), numbered in walking order as
+      // The inventions (INVENTIONS in types.ts: 4, 5, 4 and 6), numbered in walking order as
       // seen when entering: the four corners, plus (with five) the room's headline exhibit in
-      // the middle of the hall. sv: 1 = front, 0 = middle, -1 = back.
+      // the middle of the hall, or (with six) a pair in the middle. sv: 1 = front, 0 = middle,
+      // -1 = back; su: -1 = left, 1 = right, and a fraction for the middle pair.
       const centreV = (room.vHall + room.vBack) / 2
       const places: Record<number, [number, number][]> = {
         4: [[-1, 1], [-1, -1], [1, -1], [1, 1]],
         5: [[-1, 1], [-1, -1], [0, 0], [1, -1], [1, 1]],
+        6: [[-1, 1], [-1, -1], [-MIDDLE_PAIR, 0], [MIDDLE_PAIR, 0], [1, -1], [1, 1]],
       }
-      places[INVENTIONS[room.id] ?? 4].forEach(([su, sv], i) => {
-        const u = su * (room.width / 2 - CORNER_INSET)
-        const v = sv > 0 ? room.vHall + CORNER_INSET : sv < 0 ? room.vBack - CORNER_INSET : centreV
+      const count = INVENTIONS[room.id] ?? 4
+      // Which invention stands in each place (its number, 1 to count).
+      const centre = count === 5 ? (CENTRE_EXHIBIT[room.id] ?? 3) : 0
+      const others = Array.from({ length: count }, (_, k) => k + 1).filter((n) => n !== centre)
+      const numbers = places[count].map(([su, sv]) => (su === 0 && sv === 0 ? centre : (others.shift() ?? 0)))
+      places[count].forEach(([su, sv], i) => {
+        const middle = sv === 0
+        const u = middle ? su : su * (room.width / 2 - CORNER_INSET)
+        const v = sv > 0 ? room.vHall + CORNER_INSET : sv < 0 ? room.vBack - CORNER_INSET : centreV - (su === 0 ? 0 : MIDDLE_FORWARD)
         const [x, z] = at(u, v)
         const [cx, cz] = at(0, centreV)
-        const yaw = su === 0 && sv === 0 ? faceTowards(-f.nx, -f.nz) : faceTowards(cx - x, cz - z)
+        // The middle pair (leader's sketch) stand side by side in a shallow V: each faces the
+        // entrance, turned outwards, with its board behind it on the outer side, so both
+        // fronts greet the visitor and the walkway between them stays open.
+        const turn = Math.sign(su) * MIDDLE_TURN
+        const yaw = middle
+          ? faceTowards(-f.nx * Math.cos(turn) + f.tx * Math.sin(turn), -f.nz * Math.cos(turn) + f.tz * Math.sin(turn))
+          : faceTowards(cx - x, cz - z)
         // Put the text panel on the side towards the nearer side wall, away from the walkway:
         // the panel moves along the exhibit's local x axis, (cos yaw, -sin yaw).
         const sideways = Math.cos(yaw) * f.tx - Math.sin(yaw) * f.tz
         const panelSide = u * sideways >= 0 ? 1 : -1
-        spots.push({ id: `${room.id}-${i + 1}`, room: room.id, kind: 'corner', number: i + 1, x, z, yaw, panelSide })
+        const number = numbers[i]
+        spots.push({ id: `${room.id}-${number}`, room: room.id, kind: 'corner', number, x, z, yaw, panelSide })
       })
     }
   }

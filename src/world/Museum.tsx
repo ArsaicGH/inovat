@@ -2,7 +2,7 @@ import { Suspense, lazy, useLayoutEffect, useEffect, useMemo, useRef, type React
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Bloom, EffectComposer, N8AO, SMAA, ToneMapping, Vignette } from '@react-three/postprocessing'
 import { CopyPass, EffectPass, ToneMappingMode, type EffectComposer as Composer } from 'postprocessing'
-import { Color, CubeCamera, Vector2, DefaultLoadingManager, DoubleSide, HalfFloatType, Mesh as MeshObject, MeshBasicMaterial, PlaneGeometry, RingGeometry, Scene as SceneObject, WebGLCubeRenderTarget, Object3D, Texture, WebGLRenderTarget, type Camera, type Group, type HemisphereLight, type Mesh, type PointLight, type SpotLight, type Scene, type WebGLRenderer } from 'three'
+import { Color, CubeCamera, Vector2, DefaultLoadingManager, DoubleSide, HalfFloatType, Mesh as MeshObject, MeshBasicMaterial, PlaneGeometry, RingGeometry, Scene as SceneObject, WebGLCubeRenderTarget, Object3D, Texture, WebGLRenderTarget, type Camera, type Group, type HemisphereLight, type Material, type Mesh, type PointLight, type SpotLight, type Scene, type WebGLRenderer } from 'three'
 import type { RoomId } from '../types'
 import { useMuseumStore, type GraphicsLevel } from '../state/useMuseumStore'
 import Room from './Room'
@@ -105,6 +105,17 @@ function RenderScale({ composer }: { composer: RefObject<Composer | null> }) {
     }
     gl.getDrawingBufferSize(canvasPixels)
     if (Math.abs(effects.inputBuffer.width - Math.round(canvasPixels.x * effects.renderShare())) > 1) resizeEffects()
+    // The sharp-text step draws the finished picture onto the screen itself, so it must be
+    // the last step. With ambient occlusion ("high") the effects library adds a plain copy
+    // to the screen after it: then the text was drawn into the smaller picture instead
+    // (blurred, and compared with the scene's depth at the wrong places: text through
+    // walls, letters missing). Anything after it is switched off.
+    const passes = effects.passes
+    const last = passes.findIndex((pass) => pass instanceof SharpTextPass)
+    if (last >= 0 && !passes[last].renderToScreen) {
+      for (let i = last + 1; i < passes.length; i++) passes[i].enabled = false
+      passes[last].renderToScreen = true
+    }
   })
   return null
 }
@@ -585,11 +596,23 @@ function WarmUp() {
     const again = store.warmedUp && warmedWith.current !== spotShadows
     if ((store.warmedUp && !again) || store.partsPrepared < PART_COUNT) return
     warmedWith.current = spotShadows
+    // Everything is shown for this one drawing: the hidden rooms, and also whatever waits
+    // hidden for the visit to start or for a moment in it (the hall's fading name, blinking
+    // lights, warning lamps). Otherwise its drawing code was built the moment it first
+    // appeared: a freeze right after "Start" on slower computers and tablets.
     const changed: [Object3D, boolean, boolean][] = []
+    const hiddenMaterials = new Set<Material>()
     scene.traverse((object) => {
       changed.push([object, object.visible, object.frustumCulled])
       object.frustumCulled = false
-      if (object.userData.museumPart) object.visible = true
+      // (Not the lights: a light switched on changes every material's drawing code.)
+      if (!(object as { isLight?: boolean }).isLight) object.visible = true
+      const material = (object as Mesh).material
+      for (const m of Array.isArray(material) ? material : material ? [material] : [])
+        if (!m.visible) {
+          hiddenMaterials.add(m)
+          m.visible = true
+        }
     })
     gl.setRenderTarget(target)
     gl.render(scene, camera)
@@ -598,6 +621,7 @@ function WarmUp() {
       object.visible = visible
       object.frustumCulled = culled
     }
+    hiddenMaterials.forEach((m) => (m.visible = false))
     store.setWarmedUp()
   })
   return null
@@ -966,7 +990,10 @@ export default function Museum() {
           {/* Edge smoothing (SMAA). */}
           {ANTIALIAS && settings.smoothing ? <SMAA /> : <></>}
           {/* Last: the picture onto the screen, and the sharp text over it. */}
-          <SharpTextStep />
+          {/* (Made again whenever the set of effects changes: an effect switched on later
+              is added at the end, and this step must stay last. Rebuilding the whole chain
+              instead froze the game and confused the automatic graphics choice.) */}
+          <SharpTextStep key={`${settings.ao}|${settings.smoothing}`} />
         </EffectComposer>
       )}
 

@@ -9,10 +9,10 @@
 //   timeline = an era room's inventions in date order (on the wall of its entrance room)
 //   change   = what an era changed: driving forces, inventions, results, downside (the same)
 
-export type DiagramId = 'eras' | 'iiot' | 'neural' | 'twin' | 'timeline' | 'change'
+export type DiagramId = 'eras' | 'iiot' | 'neural' | 'twin' | 'cloud' | 'dna' | 'morse' | 'timeline' | 'change'
 
 // Width / height of each diagram.
-export const DIAGRAM_ASPECT: Record<DiagramId, number> = { eras: 2.3, iiot: 2.1, neural: 1.9, twin: 2.1, timeline: 2.2, change: 2.2 }
+export const DIAGRAM_ASPECT: Record<DiagramId, number> = { eras: 2.3, iiot: 2.1, neural: 1.9, twin: 2.1, cloud: 2.1, dna: 2.1, morse: 2.1, timeline: 2.2, change: 2.2 }
 
 export interface DiagramColours {
   ink: string // labels and outlines
@@ -296,7 +296,8 @@ function growth(ctx: CanvasRenderingContext2D, cx: number, cy: number, s: number
   arrow(ctx, cx - s * 0.36, cy - s * 0.02, cx + s * 0.34, cy - s * 0.34, s * 0.12)
 }
 
-const ERA_ICONS = [gear, bulb, chip, network]
+// (Also drawn on the ending film's neural network, ending-acts.tsx.)
+export const ERA_ICONS = [gear, bulb, chip, network]
 
 // The era's icon (the gear's hole filled with the paper colour, so it is not see-through).
 function eraIcon(ctx: CanvasRenderingContext2D, era: number, cx: number, cy: number, s: number, colours: DiagramColours) {
@@ -324,6 +325,75 @@ function labelUp(ctx: CanvasRenderingContext2D, text: string, cx: number, y: num
   const top = y - lines.length * size * 1.22
   label(ctx, text, cx, top, maxWidth, size, weight, colour, font)
   return top
+}
+
+// A rack of servers in a data centre, each with its row of status lights.
+function serverRack(ctx: CanvasRenderingContext2D, cx: number, cy: number, s: number, accent: string) {
+  const w = s * 0.42
+  const h = s * 0.62
+  ctx.strokeRect(cx - w / 2, cy - h / 2, w, h)
+  for (let i = 0; i < 4; i++) {
+    const y = cy - h / 2 + h * (0.1 + i * 0.22)
+    ctx.strokeRect(cx - w * 0.38, y, w * 0.76, h * 0.15)
+    const ink = ctx.fillStyle
+    ctx.fillStyle = accent
+    ctx.beginPath()
+    ctx.arc(cx + w * 0.24, y + h * 0.075, s * 0.018, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.fillStyle = ink
+    ctx.fillRect(cx - w * 0.3, y + h * 0.06, w * 0.3, h * 0.03)
+  }
+}
+
+// A stretch of DNA: two strands twisting round each other, joined by rungs; `mark` picks out
+// the rungs between two fractions of its length (the gene being edited) in the accent colour.
+function helix(ctx: CanvasRenderingContext2D, x0: number, x1: number, cy: number, amp: number, ink: string, accent: string, mark?: [number, number], gap?: number) {
+  const turns = 2
+  const steps = 64
+  const at = (f: number, phase: number) => cy + Math.sin(f * turns * Math.PI * 2 + phase) * amp
+  const cut = (f: number) => gap !== undefined && Math.abs(f - gap) < 0.025
+  // Rungs first, then the strands over them.
+  for (let i = 1; i < 24; i++) {
+    const f = i / 24
+    if (cut(f)) continue
+    ctx.strokeStyle = mark && f >= mark[0] && f <= mark[1] ? accent : ink
+    ctx.globalAlpha = 0.6
+    ctx.beginPath()
+    ctx.moveTo(x0 + (x1 - x0) * f, at(f, 0))
+    ctx.lineTo(x0 + (x1 - x0) * f, at(f, Math.PI))
+    ctx.stroke()
+  }
+  ctx.globalAlpha = 1
+  for (const phase of [0, Math.PI]) {
+    ctx.strokeStyle = ink
+    ctx.beginPath()
+    let drawing = false
+    for (let i = 0; i <= steps; i++) {
+      const f = i / steps
+      if (cut(f)) {
+        drawing = false
+        continue
+      }
+      const x = x0 + (x1 - x0) * f
+      if (drawing) ctx.lineTo(x, at(f, phase))
+      else ctx.moveTo(x, at(f, phase))
+      drawing = true
+    }
+    ctx.stroke()
+  }
+}
+
+// Scissors, open, pointing down: the Cas9 protein cutting the DNA.
+function scissors(ctx: CanvasRenderingContext2D, cx: number, cy: number, s: number) {
+  for (const side of [-1, 1]) {
+    ctx.beginPath()
+    ctx.arc(cx + side * s * 0.12, cy - s * 0.28, s * 0.08, 0, Math.PI * 2)
+    ctx.stroke()
+    ctx.beginPath()
+    ctx.moveTo(cx + side * s * 0.09, cy - s * 0.21)
+    ctx.lineTo(cx - side * s * 0.05, cy + s * 0.22)
+    ctx.stroke()
+  }
 }
 
 // ---- The diagrams ----
@@ -383,6 +453,69 @@ export function paintDiagram(
     ctx.fillStyle = colours.muted
     for (let i = 0; i < 3; i++) arrow(ctx, steps[i] + s * 0.5, cy, steps[i + 1] - s * 0.5, cy, h * 0.045)
     steps.forEach((cx, i) => label(ctx, labels[i] ?? '', cx, cy + s * 0.55, w * 0.23, text, 600, colours.ink, font))
+  } else if (id === 'cloud') {
+    // Machines send data over the Internet to the cloud's data centres, which store and
+    // analyse it (and train AI): four steps joined by arrows, like the IIoT diagram.
+    const s = Math.min(w * 0.17, h * 0.52)
+    const cy = h * 0.32
+    const steps = [0.12, 0.373, 0.627, 0.88].map((f) => w * f)
+    machine(ctx, steps[0], cy, s, colours.accent)
+    cloud(ctx, steps[1], cy, s)
+    serverRack(ctx, steps[2], cy, s, colours.accent)
+    chart(ctx, steps[3], cy, s, colours.accent)
+    ctx.strokeStyle = colours.muted
+    ctx.fillStyle = colours.muted
+    for (let i = 0; i < 3; i++) arrow(ctx, steps[i] + s * 0.5, cy, steps[i + 1] - s * 0.5, cy, h * 0.045)
+    steps.forEach((cx, i) => label(ctx, labels[i] ?? '', cx, cy + s * 0.55, w * 0.23, text, 600, colours.ink, font))
+  } else if (id === 'dna') {
+    // Gene editing in three steps: the DNA with its target gene, the scissors cutting there,
+    // and the repaired DNA with the edited gene picked out.
+    const cy = h * 0.32
+    const amp = h * 0.13
+    const thirds = [0.03, 0.35, 0.67].map((f) => w * f)
+    const span = w * 0.28
+    ctx.lineWidth = line * 1.3
+    helix(ctx, thirds[0], thirds[0] + span, cy, amp, colours.ink, colours.accent, [0.42, 0.58])
+    helix(ctx, thirds[1], thirds[1] + span, cy, amp, colours.ink, colours.accent, [0.42, 0.58], 0.5)
+    helix(ctx, thirds[2], thirds[2] + span, cy, amp, colours.ink, colours.accent, [0.42, 0.58])
+    ctx.strokeStyle = colours.accent
+    ctx.lineWidth = line * 1.6
+    scissors(ctx, thirds[1] + span / 2, cy - amp * 1.25, h * 0.32)
+    ctx.lineWidth = line
+    ctx.strokeStyle = colours.muted
+    ctx.fillStyle = colours.muted
+    for (let i = 0; i < 2; i++) arrow(ctx, thirds[i] + span + w * 0.01, cy, thirds[i + 1] - w * 0.01, cy, h * 0.04)
+    thirds.forEach((x, i) => label(ctx, labels[i] ?? '', x + span / 2, cy + amp + h * 0.12, w * 0.3, text, 600, colours.ink, font))
+  } else if (id === 'morse') {
+    // A word in Morse code: each letter, and under it its dots and dashes (the same signals
+    // the exhibit's key taps out). labels: the word, then the line under it.
+    const MORSE_CODE: Record<string, string> = { A: '.-', I: '..', N: '-.', O: '---', T: '-', V: '...-' }
+    const word = (labels[0] ?? '').toUpperCase()
+    const letters = [...word].filter((c) => MORSE_CODE[c])
+    const step = w / (letters.length + 0.4)
+    const unit = Math.min(step * 0.12, h * 0.045)
+    letters.forEach((letter, i) => {
+      const cx = step * (i + 0.7)
+      label(ctx, letter, cx, h * 0.04, step, h * 0.22, 700, colours.ink, font)
+      const code = MORSE_CODE[letter]
+      const width = [...code].reduce((sum, c) => sum + (c === '-' ? 3 : 1) * unit + unit, -unit)
+      let x = cx - width / 2
+      ctx.fillStyle = colours.accent
+      for (const c of code) {
+        if (c === '-') {
+          ctx.beginPath()
+          ctx.roundRect(x, h * 0.4 - unit / 2, unit * 3, unit, unit / 2)
+          ctx.fill()
+          x += unit * 4
+        } else {
+          ctx.beginPath()
+          ctx.arc(x + unit / 2, h * 0.4, unit / 2, 0, Math.PI * 2)
+          ctx.fill()
+          x += unit * 2
+        }
+      }
+    })
+    label(ctx, labels[1] ?? '', w / 2, h * 0.55, w * 0.9, text, 600, colours.muted, font)
   } else if (id === 'neural') {
     // Layers of connected nodes; data flows from left to right.
     const layers = [3, 5, 5, 2]

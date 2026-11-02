@@ -17,7 +17,7 @@ export interface SpotAim {
   narrow?: boolean // a tight beam on one object (exhibits) instead of a wider one (boards)
 }
 
-// Six: CMCN 3 has five inventions and an overview board, CMCN 4 six inventions. (Every
+// Six: CMCN 2 has five inventions and the lamp on its era number, CMCN 4 six inventions. (Every
 // lamp costs a little drawing work for each pixel, so not more than the busiest room needs.)
 export const SPOT_COUNT = 6
 
@@ -40,7 +40,11 @@ function eraRoom(id: RoomId): SpotAim[] {
   // soft wash down the middle of the back wall.)
   const [nx, nz] = toWorld(room.frame, 0, room.vBack - 0.05)
   const [wx, wz] = toWorld(room.frame, 0, room.vBack - 2.8)
-  const overviewAim: SpotAim[] = [{ from: [wx, room.height - 0.25, wz], to: [nx, room.height / 2 + 0.2, nz], strength: 0.4 * reach }]
+  // (A room with as many inventions as lamps, CMCN 4 with six, gives this one up: its era
+  // number is a glowing hologram that needs no lamp.)
+  const inventions = EXHIBIT_SPOTS.filter((spot) => spot.room === id && spot.kind === 'corner').length
+  const overviewAim: SpotAim[] =
+    inventions < SPOT_COUNT ? [{ from: [wx, room.height - 0.25, wz], to: [nx, room.height / 2 + 0.2, nz], strength: 0.4 * reach }] : []
   const { primary } = ROOM_THEMES[id as Exclude<RoomId, 'rotunda'>].lighting
   return EXHIBIT_SPOTS.filter((spot) => spot.room === id && spot.kind === 'corner')
     // Like a real gallery (leader's reference photos): each lamp hangs in front of its

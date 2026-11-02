@@ -79,6 +79,7 @@ export default function MergeStatic({ children }: { children: ReactNode }) {
       merged.push(mesh)
       meshes.forEach((original) => {
         original.visible = false
+        original.userData.mergedAway = true // (a copy of the model shows it again: inventions.tsx)
         // (Hidden for good: not even its place is worked out any more.)
         original.matrixWorldAutoUpdate = false
         hidden.push(original)
@@ -107,6 +108,7 @@ export default function MergeStatic({ children }: { children: ReactNode }) {
       hidden.forEach((mesh) => {
         mesh.visible = true
         mesh.matrixWorldAutoUpdate = true
+        delete mesh.userData.mergedAway
       })
       frozen.forEach((object) => (object.matrixAutoUpdate = true))
     }

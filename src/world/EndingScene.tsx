@@ -121,6 +121,10 @@ export default function EndingScene({ running }: { running: boolean }) {
       let pieces = 0
       root.traverse(() => void (pieces += 1))
       if (pieces === state.pieces && state.done) state.settled += 1
+      // Prepared, and nothing new arrived since: the loading screen may go. (Not after the
+      // first preparing: the downloaded models arrive a little later, and preparing again
+      // for them froze the title screen for seconds.)
+      if (state.settled >= 2 && !useMuseumStore.getState().endingPrepared) useMuseumStore.getState().setEndingPrepared()
       if (pieces !== state.pieces) {
         state.pieces = pieces
         state.frames = 0

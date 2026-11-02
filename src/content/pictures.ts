@@ -132,6 +132,18 @@ export const PICTURES: Record<string, Picture> = {
     CC0,
     'Robert_Stephenson_locomotive,_1931_replica_of_1829_original,_view_1_-_Museum_of_Science_and_Industry_(Chicago)_-_DSC06584.JPG',
   ),
+  'ir1-5': {
+    diagram: 'morse',
+    aspect: 2.1,
+    caption: {
+      vi: 'Sơ đồ minh họa: tên bảo tàng, INOVAT, viết bằng mã Morse, đúng như chiếc khóa điện báo trong phòng đang gõ',
+      en: 'Diagram: the museum’s name, INOVAT, written in Morse code, just as the telegraph key in this room taps it out',
+    },
+    labels: {
+      vi: ['INOVAT', 'Chấm = tín hiệu ngắn, gạch = tín hiệu dài'],
+      en: ['INOVAT', 'Dot = a short signal, dash = a long one'],
+    },
+  },
 
   // ---------- CMCN 2 ----------
   'ir2-overview': photo(
@@ -206,6 +218,7 @@ export const PICTURES: Record<string, Picture> = {
     'Unimate_pouring_coffee_for_a_woman_at_Biltmore_Hotel,_1967.jpg',
   ),
   'ir3-4': photo('ir3-4', 1.397, { vi: 'Sơ đồ logic của mạng ARPANET, tháng 3 năm 1977', en: 'Logical map of the ARPANET, March 1977' }, same('ARPANET'), PD, 'Arpanet_logical_map,_march_1977.png'),
+  'ir3-5': photo('ir3-5', 1.5, { vi: 'Điện thoại di động Motorola DynaTAC bên cạnh một chiếc điện thoại thông minh Samsung Galaxy Note Edge', en: 'A Motorola DynaTAC mobile phone beside a Samsung Galaxy Note Edge smartphone' }, same('Umut Çolak'), PD, 'Motorola_DynaTAC_and_Samsung_Galaxy_Note_Edge.jpg'),
 
   // ---------- CMCN 4 ----------
   'ir4-overview': photo(
@@ -239,15 +252,15 @@ export const PICTURES: Record<string, Picture> = {
     labels: { vi: ['Dữ liệu vào', 'Các lớp ẩn', 'Kết quả'], en: ['Input data', 'Hidden layers', 'Output'] },
   },
   'ir4-4': {
-    diagram: 'twin',
+    diagram: 'cloud',
     aspect: 2.1,
     caption: {
-      vi: 'Sơ đồ minh họa: bản sao số nhận dữ liệu từ thiết bị thật; các phương án được thử trên bản sao trước khi áp dụng',
-      en: 'Diagram: the digital twin receives data from the real machine; changes are tried on the twin before they are applied',
+      vi: 'Sơ đồ minh họa: máy móc và thiết bị gửi dữ liệu qua Internet lên các trung tâm dữ liệu của đám mây, nơi dữ liệu được lưu trữ, phân tích và dùng để huấn luyện AI',
+      en: 'Diagram: machines and devices send data over the Internet to the cloud’s data centres, where it is stored, analysed and used to train AI',
     },
     labels: {
-      vi: ['Thiết bị thật', 'Bản sao số', 'Dữ liệu vận hành', 'Phương án đã thử'],
-      en: ['Real machine', 'Digital twin', 'Operating data', 'Tested changes'],
+      vi: ['Máy móc, thiết bị', 'Internet', 'Trung tâm dữ liệu', 'Phân tích, AI'],
+      en: ['Machines and devices', 'The Internet', 'Data centres', 'Analysis and AI'],
     },
   },
   'ir4-5': photo(
@@ -258,6 +271,18 @@ export const PICTURES: Record<string, Picture> = {
     cc('CC BY-SA 4.0'),
     'UR16e_robot_arm.png',
   ),
+  'ir4-6': {
+    diagram: 'dna',
+    aspect: 2.1,
+    caption: {
+      vi: 'Sơ đồ minh họa: "chiếc kéo di truyền" CRISPR-Cas9 tìm đến một đoạn ADN chọn trước, cắt tại đó, và tế bào sửa lại đoạn gen',
+      en: 'Diagram: the “genetic scissors” CRISPR-Cas9 find a chosen stretch of DNA, cut it there, and the cell repairs the gene',
+    },
+    labels: {
+      vi: ['ADN', 'Cas9 cắt đúng vị trí', 'Gen đã được sửa'],
+      en: ['DNA', 'Cas9 cuts at the chosen place', 'The edited gene'],
+    },
+  },
 
   // ---------- Intro hall: the route board ----------
   'hall-overview': {
@@ -305,7 +330,7 @@ export const PICTURES: Record<string, Picture> = {
   ),
   'wall-ir3-3': photo('wall-ir3-3', 0.408, { vi: 'Điện thoại di động Motorola DynaTAC 8000X, sản xuất năm 1984', en: 'A Motorola DynaTAC 8000X mobile phone from 1984' }, same('Redrum0486'), cc('CC BY-SA 3.0'), 'DynaTAC8000X.jpg'),
   'wall-ir3-4': photo('wall-ir3-4', 1.333, { vi: 'Máy tính NeXT mà Tim Berners-Lee dùng làm máy chủ Web đầu tiên, trưng bày tại CERN, nơi ông phát minh ra Web năm 1991', en: 'The NeXT computer Tim Berners-Lee used as the first Web server, on display at CERN, where he invented the Web in 1991' }, same('Coolcaesar (Wikipedia)'), cc('CC BY-SA 3.0'), 'First_Web_Server.jpg'),
-  'wall-ir4-1': photo('wall-ir4-1', 1.333, { vi: 'Một trung tâm dữ liệu tại Đại học Virginia Tech (Mỹ), năm 2008', en: 'A data centre at Virginia Tech, USA, 2008' }, same('Christopher Bowns'), cc('CC BY-SA 2.0'), 'Virginia_Tech_-_data_center.jpg'),
+  'wall-ir4-1': photo('wall-ir4-1', 1.499, { vi: 'Siêu máy tính Frontier tại Phòng thí nghiệm Quốc gia Oak Ridge (Hoa Kỳ), năm 2022 được xếp hạng nhanh nhất thế giới, cỗ máy đầu tiên đạt sức tính exaflop', en: 'The Frontier supercomputer at Oak Ridge National Laboratory, USA, ranked the world’s fastest in 2022, the first machine to reach exaflop performance' }, same('Oak Ridge National Laboratory'), cc('CC BY 2.0'), 'Frontier_supercomputer_(52280657003).jpg'),
   'wall-ir4-4': photo('wall-ir4-4', 1.501, { vi: 'Xe tự lái của Waymo trên đường phố Mountain View (Mỹ), năm 2017', en: 'A Waymo self-driving car on the road in Mountain View, USA, 2017' }, same('Grendelkhan'), cc('CC BY-SA 4.0'), 'Waymo_self-driving_car_front_view.gk.jpg'),
 
   // ---------- More of the gallery: beside the hall's doorway and in the entrance rooms ----------
@@ -330,8 +355,8 @@ export const PICTURES: Record<string, Picture> = {
   'wall-ir3-5': photo('wall-ir3-5', 1.5, { vi: 'Máy tính Apple II (1977) tại Bảo tàng Lịch sử Máy tính (Mỹ)', en: 'An Apple II computer (1977) at the Computer History Museum, USA' }, same('The wub'), cc('CC BY-SA 4.0'), 'Apple_II,_1977,_Computer_History_Museum.jpg'),
   'wall-ir3-6': photo('wall-ir3-6', 1.333, { vi: 'Cận cảnh một tấm wafer silic, trên đó các mạch tích hợp được khắc bằng phương pháp quang khắc', en: 'Close-up of a silicon wafer, on which integrated circuits are engraved by photolithography' }, same('Le hollandais volant'), cc('CC BY 4.0'), 'Silicon_wafer_close_view.jpg'),
   'wall-ir3-8': photo('wall-ir3-8', 1.5, { vi: 'Bộ hiển thị và bàn phím (DSKY) của máy tính dẫn đường Apollo, tại Bảo tàng Hàng không và Vũ trụ Quốc gia Hoa Kỳ', en: 'The display and keyboard (DSKY) of the Apollo Guidance Computer, at the US National Air and Space Museum' }, same('Tamorlan'), cc('CC BY-SA 3.0'), 'Apollo_Guidance_Computer_(NASM).JPG'),
-  'wall-ir4-6': photo('wall-ir4-6', 1.5, { vi: 'Robot bốn chân Spot của hãng Boston Dynamics', en: 'Spot, a four-legged robot by Boston Dynamics' }, same('Jonte'), cc('CC BY-SA 4.0'), 'Spot_by_Boston_Dynamics.jpg'),
-  'wall-ir4-8': photo('wall-ir4-8', 0.912, { vi: 'Mặt cắt một sợi cáp quang truyền tín hiệu, loại chôn dưới đất', en: 'Cross-section of an optical fibre cable for signal transmission, made to be buried in the ground' }, same('Asurnipal'), cc('CC BY-SA 4.0'), 'Optical_fiber_cable-02ASD.jpg'),
+  'wall-ir4-6': photo('wall-ir4-6', 0.594, { vi: 'Robot hình người Unitree G1 tại một triển lãm năm 2024', en: 'A Unitree G1 humanoid robot at an expo in 2024' }, same('Sayanesy'), CC0, 'Unitree_G1.jpg'),
+  'wall-ir4-8': photo('wall-ir4-8', 0.931, { vi: 'Một lọ vắc-xin mRNA Comirnaty (Pfizer-BioNTech) ngừa COVID-19, năm 2021', en: 'A vial of the Comirnaty (Pfizer-BioNTech) mRNA vaccine against COVID-19, 2021' }, same('Alison Newman'), CC0, 'Pfizer-Comirnaty_vaccine_held_in_a_gloved_hand_-_October_2021.png'),
 
   'wall-ir1-9': photo('wall-ir1-9', 1.326, { vi: '“Các nhà máy của Arkwright”, tranh của Joseph Wright of Derby (khoảng 1795-1796), Bảo tàng và Phòng tranh Derby', en: '“Arkwright’s Mills”, painting by Joseph Wright of Derby (about 1795-1796), Derby Museum and Art Gallery' }, same('Joseph Wright of Derby'), PD, "Joseph_Wright_of_Derby_(1734-1797)_-_Arkwright's_Mills_-_2016-56-2_-_Derby_Museum_and_Art_Gallery.jpg"),
   'wall-ir3-9': photo('wall-ir3-9', 1.24, { vi: 'Phòng máy tính điều khiển sứ mệnh của NASA với hai máy IBM 7090, vào khoảng thời gian chuyến bay vũ trụ Mercury-Atlas 6 năm 1962', en: 'NASA’s mission control computer room with two IBM 7090s, around the time of the Mercury-Atlas 6 spaceflight in 1962' }, same('NASA'), PD, 'NASAComputerRoom7090.NARA.jpg'),
@@ -390,8 +415,8 @@ export const PICTURES: Record<string, Picture> = {
   // Every date, name and idea comes from the room's own exhibit and overview texts
   // (content/exhibits.ts, with their sources): nothing that the boards do not say.
   ...timeline(0, {
-    vi: ['1769', 'Động cơ hơi nước của Watt (bằng sáng chế)', '1769', 'Máy kéo sợi Water Frame (bằng sáng chế)', '1784', 'Luyện sắt bằng lò khuấy (bằng sáng chế)', '1829', 'Đầu máy xe lửa Rocket'],
-    en: ['1769', 'Watt’s steam engine (patent)', '1769', 'The Water Frame (patent)', '1784', 'Puddled iron (patent)', '1829', 'The Rocket locomotive'],
+    vi: ['1769', 'Động cơ hơi nước của Watt (bằng sáng chế)', '1769', 'Máy kéo sợi Water Frame (bằng sáng chế)', '1784', 'Luyện sắt bằng lò khuấy (bằng sáng chế)', '1829', 'Đầu máy xe lửa Rocket', '1837', 'Điện báo của Cooke và Wheatstone (bằng sáng chế)', '1844', 'Bức điện Morse đầu tiên'],
+    en: ['1769', 'Watt’s steam engine (patent)', '1769', 'The Water Frame (patent)', '1784', 'Puddled iron (patent)', '1829', 'The Rocket locomotive', '1837', 'Cooke and Wheatstone’s telegraph (patent)', '1844', 'Morse’s first telegraph message'],
   }),
   ...timeline(1, {
     vi: [
@@ -419,47 +444,59 @@ export const PICTURES: Record<string, Picture> = {
       'Cuối thập niên 1960', 'Bộ điều khiển logic khả trình (PLC)',
       '1969', 'Những kết nối đầu tiên của ARPANET',
       '1971', 'Bộ vi xử lý Intel 4004',
+      '1973', 'Cuộc gọi đầu tiên từ điện thoại di động cầm tay',
       '1981', 'Máy tính cá nhân IBM 5150',
+      '1989', 'Đề xuất World Wide Web',
     ],
     en: [
       '1961', 'The Unimate robot at work in a General Motors factory',
       'Late 1960s', 'The programmable logic controller (PLC)',
       '1969', 'ARPANET’s first connections',
       '1971', 'The Intel 4004 microprocessor',
+      '1973', 'The first call from a handheld mobile phone',
       '1981', 'The IBM 5150 personal computer',
+      '1989', 'The World Wide Web proposed',
     ],
   }),
   ...timeline(3, {
     vi: [
       '1956', 'Hội thảo Dartmouth đặt nền móng cho ngành AI',
       '1986', 'Bằng sáng chế kỹ thuật in 3D stereolithography',
-      'Thế kỷ XXI', 'IIoT, bản sao số và robot cộng tác phát triển mạnh',
-      'Từ thập niên 2010', 'Học sâu bùng nổ',
+      'Thập niên 1990', 'Robot cộng tác (cobot)',
+      '1999', 'Thuật ngữ Internet vạn vật',
+      '2003', 'Hoàn thành giải mã bộ gen người',
+      '2006', 'Điện toán đám mây đại chúng',
+      '2012', 'Công cụ chỉnh sửa gen CRISPR-Cas9',
       '2022', 'ChatGPT ra mắt',
+      '2026', 'Luật AI của Việt Nam có hiệu lực',
     ],
     en: [
       '1956', 'The Dartmouth workshop founds the field of AI',
       '1986', 'Patent on stereolithography (3D printing)',
-      '21st century', 'IIoT, digital twins and cobots spread',
-      'Since the 2010s', 'Deep learning booms',
+      '1990s', 'The collaborative robot (cobot)',
+      '1999', 'The term “Internet of Things”',
+      '2003', 'The human genome is read',
+      '2006', 'Public cloud computing',
+      '2012', 'The CRISPR-Cas9 gene-editing tool',
       '2022', 'ChatGPT released',
+      '2026', 'Vietnam’s AI Law takes effect',
     ],
   }),
   ...change(0, {
-    vi: ['Máy móc và năng lượng hơi nước', 'Động cơ hơi nước, máy kéo sợi, lò khuấy, đầu máy xe lửa', 'Nhà máy ra đời, năng suất tăng, giao thông được cải thiện', 'Điều kiện lao động khó khăn, ô nhiễm, đô thị phát triển nhanh chóng'],
-    en: ['Machinery and steam power', 'The steam engine, the spinning frame, the puddling furnace, the locomotive', 'Factories, higher productivity, better transport', 'Harsh working conditions, pollution, rapidly growing cities'],
+    vi: ['Máy móc và năng lượng hơi nước', 'Động cơ hơi nước, máy kéo sợi, lò khuấy, đầu máy xe lửa, điện báo', 'Nhà máy ra đời, năng suất tăng, giao thông và liên lạc nhanh hơn', 'Điều kiện lao động khó khăn, ô nhiễm, đô thị phát triển nhanh chóng'],
+    en: ['Machinery and steam power', 'The steam engine, the spinning frame, the puddling furnace, the locomotive, the telegraph', 'Factories, higher productivity, faster transport and communication', 'Harsh working conditions, pollution, rapidly growing cities'],
   }),
   ...change(1, {
     vi: ['Điện năng, kỹ thuật cơ khí và tiến bộ khoa học', 'Động cơ điện, dây chuyền lắp ráp, điện thoại', 'Nhà máy sản xuất quy mô lớn hơn; sản xuất, thông tin và đời sống thay đổi', 'Nhiều công việc trở nên lặp lại, đòi hỏi tổ chức lao động chặt chẽ'],
     en: ['Electricity, mechanical engineering and scientific progress', 'The electric motor, the assembly line, the telephone', 'Larger-scale factories; production, communication and daily life changed', 'Much work became repetitive and tightly organised'],
   }),
   ...change(2, {
-    vi: ['Điện tử, máy tính và công nghệ thông tin', 'Máy tính, robot, bộ điều khiển lập trình, mạng máy tính', 'Độ chính xác và năng suất tăng; trao đổi thông tin mở rộng', 'Nhu cầu việc làm và kỹ năng của người lao động thay đổi'],
-    en: ['Electronics, computers and information technology', 'Computers, robots, programmable controls, computer networks', 'Greater accuracy and productivity; a wider exchange of information', 'Changes in the jobs and skills workers need'],
+    vi: ['Điện tử, máy tính và công nghệ thông tin', 'Máy tính, robot, bộ điều khiển lập trình, mạng máy tính, điện thoại di động, Web', 'Độ chính xác và năng suất tăng; trao đổi thông tin mở rộng', 'Nhu cầu việc làm và kỹ năng của người lao động thay đổi'],
+    en: ['Electronics, computers and information technology', 'Computers, robots, programmable controls, computer networks, mobile phones, the Web', 'Greater accuracy and productivity; a wider exchange of information', 'Changes in the jobs and skills workers need'],
   }),
   ...change(3, {
-    vi: ['Trí tuệ nhân tạo, Internet vạn vật, dữ liệu lớn', 'In 3D, nhà máy kết nối, AI, bản sao số, robot cộng tác', 'Máy móc thu thập dữ liệu, hỗ trợ ra quyết định; chất lượng tăng, lãng phí giảm', 'Bảo mật, chi phí, việc làm và kỹ năng lao động'],
-    en: ['Artificial intelligence, the Internet of Things, big data', '3D printing, the connected factory, AI, the digital twin, the cobot', 'Machines collect data and support decisions; higher quality, less waste', 'Security, cost, jobs and workers’ skills'],
+    vi: ['Trí tuệ nhân tạo, dữ liệu, kết nối và sinh học', 'In 3D, nhà máy kết nối, AI, điện toán đám mây, robot tiên tiến, công nghệ sinh học', 'Máy móc thu thập dữ liệu, hỗ trợ ra quyết định; chất lượng tăng, lãng phí giảm; y học tiến bộ', 'Bảo mật, năng lượng, việc làm, kỹ năng lao động và đạo đức'],
+    en: ['Artificial intelligence, data, connectivity and biology', '3D printing, the connected factory, AI, the cloud, advanced robots, biotechnology', 'Machines collect data and support decisions; higher quality, less waste; advances in medicine', 'Security, energy, jobs, workers’ skills and ethics'],
   }),
 }
 
@@ -518,10 +555,11 @@ export const WALL_GALLERY: Record<'ir1' | 'ir2' | 'ir3' | 'ir4', WallGallery> = 
     timeline: 'wall-ir3-timeline',
     change: 'wall-ir3-change',
   },
-  // CMCN 4. First impression: a connected smart factory, and a data centre.
-  // Bird's-eye: the self-driving car, the smartphone, mobile robots, fibre-optic networks.
-  // Facts: the "first robot citizen", robot-assisted surgery, a robot that adapts to its
-  // opponent, printing with concrete.
+  // CMCN 4. First impression: a connected smart factory (2016), and the first exascale
+  // supercomputer (2022). Bird's-eye: the self-driving car, the smartphone, a humanoid robot
+  // (2024), an mRNA vaccine (2021). Facts: the "first robot citizen" (2018), robot-assisted
+  // surgery, a robot that adapts to its opponent (2016), printing with concrete. (Spread over
+  // the era, from the early 2010s to the 2020s.)
   ir4: {
     ante: ['wall-ir4-9', 'wall-ir4-1'],
     eraWall: ['wall-ir4-4', 'wall-ir4-11', 'wall-ir4-6', 'wall-ir4-8'],

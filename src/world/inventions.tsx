@@ -4,6 +4,8 @@ import { useFrame } from '@react-three/fiber'
 import { useAnimations, useGLTF } from '@react-three/drei'
 import { AdditiveBlending, type AnimationClip, Box3, BufferAttribute, MeshBasicMaterial, MeshStandardMaterial, Quaternion, Vector3, type Group, type Intersection, type Mesh, type Raycaster } from 'three'
 import MergeStatic from './MergeStatic'
+import { withKtx2 } from './ktx2'
+import { splitWheels, WheelSpin, type Axle } from './spinning-wheels'
 // The historic machines no museum has shared as a 3D model, built in detail by the team.
 import { BessemerConverter, InductionMotor, PuddlingFurnace, Unimate, WaterFrame } from './historic-machines'
 
@@ -158,7 +160,7 @@ function hasShadowStandIn(url: string): boolean {
   return [MODEL.rocket, MODEL.benz, MODEL.pc, MODEL.plc, MODEL.motor, MODEL.gpu, MODEL.printer, MODEL.telephone, MODEL.modelT].includes(url)
 }
 function ShadowStandIn({ url, yaw }: { url: string; yaw: number }) {
-  const loaded = useGLTF(url.replace(/\.glb$/, '-shadow.glb'))
+  const loaded = useGLTF(url.replace(/\.glb$/, '-shadow.glb'), true, true, withKtx2)
   const scene = useMemo(() => {
     const copy = loaded.scene.clone(true) as Group
     copy.rotation.y = yaw
@@ -175,20 +177,34 @@ function ShadowStandIn({ url, yaw }: { url: string; yaw: number }) {
   return <primitive object={scene} />
 }
 
-function GltfModel({ url, size, yaw = 0, lift = 0, animate = false, onOrigin = false, copy: ownCopy = false, wire }: { url: string; size: number; yaw?: number; lift?: number; animate?: boolean; onOrigin?: boolean; copy?: boolean; wire?: MeshBasicMaterial }) {
-  const loaded = useGLTF(url)
+function GltfModel({ url, size, yaw = 0, lift = 0, animate = false, onOrigin = false, copy: ownCopy = false, wire, axles }: { url: string; size: number; yaw?: number; lift?: number; animate?: boolean; onOrigin?: boolean; copy?: boolean; wire?: MeshBasicMaterial; axles?: Axle[] }) {
+  const loaded = useGLTF(url, true, true, withKtx2)
   const copy = useContext(ModelCopy) || ownCopy || Boolean(wire)
   // (The copy shares the original's shapes and materials: cheap.)
-  const scene = useMemo(() => {
-    if (!copy) return loaded.scene
+  const { scene, wheels } = useMemo(() => {
+    if (!copy) return { scene: loaded.scene, wheels: [] }
     const clone = loaded.scene.clone(true) as Group
-    if (wire)
-      clone.traverse((object) => {
-        const mesh = object as Mesh
-        if (mesh.isMesh) mesh.material = wire
-      })
-    return clone
-  }, [copy, loaded.scene, wire])
+    clone.traverse((object) => {
+      // The original may already stand in the museum, joined into one piece (MergeStatic):
+      // its parts hidden and frozen in their museum places. The copy would inherit that and
+      // be measured where the original stands (the IBM PC came out tiny, off to one side),
+      // so its parts are made ordinary again.
+      if (object.userData.mergedAway) {
+        object.visible = true
+        delete object.userData.mergedAway
+      }
+      object.matrixAutoUpdate = true
+      object.matrixWorldAutoUpdate = true
+      const mesh = object as Mesh
+      if (wire && mesh.isMesh) mesh.material = wire
+    })
+    // (Wheels that turn as the model moves: the Rocket in the ending film.)
+    let body: Mesh | undefined
+    clone.traverse((object) => {
+      if (!body && (object as Mesh).isMesh) body = object as Mesh
+    })
+    return { scene: clone, wheels: axles && body ? splitWheels(body, axles) : [] }
+  }, [copy, loaded.scene, wire, axles])
   const animations = loaded.animations
   // (A see-through hologram copy casts no shadow; a model with a stand-in lets it cast its own.)
   const standIn = hasShadowStandIn(url) && !wire
@@ -224,6 +240,7 @@ function GltfModel({ url, size, yaw = 0, lift = 0, animate = false, onOrigin = f
         <primitive object={scene} />
       </MergeStatic>
       {standIn && <ShadowStandIn url={url} yaw={yaw} />}
+      {wheels.length > 0 && <WheelSpin pivots={wheels} />}
     </group>
   )
 }
@@ -283,7 +300,6 @@ function WattEngine() {
     </Suspense>
   )
 }
-
 
 // ---------- CMCN 2 ----------
 
@@ -437,8 +453,6 @@ function Plc() {
 
 // ---------- CMCN 4 ----------
 
-
-
 // 3D printing: a desktop 3D printer.
 function Printer3d() {
   return (
@@ -451,26 +465,6 @@ function Printer3d() {
   )
 }
 
-
-// The digital twin: a real machine and, floating beside it, its glowing digital copy that
-// turns in step with it.
-function DigitalTwin() {
-  return (
-    <group>
-      <Suspense fallback={null}>
-        <group position={[-0.42, 0, 0]}>
-          <GltfModel url={MODEL.motor} size={0.75} copy />
-        </group>
-        <group position={[0.45, 0.45, 0]}>
-          <GltfModel url={MODEL.motor} size={0.75} wire={TWIN_WIRE} />
-        </group>
-      </Suspense>
-      <Rod r={0.3} length={0.02} at={[0.45, 0.4, 0]} material={HOLO_FILL} sides={24} />
-      <Link from={[-0.2, 0.6, 0]} to={[0.23, 0.95, 0]} material={HOLO_FILL} r={0.006} />
-    </group>
-  )
-}
-
 // A cobot: a model of a Universal Robots UR3 arm, playing its own pick-and-place motion.
 function Cobot() {
   return (
@@ -479,39 +473,6 @@ function Cobot() {
       <Suspense fallback={null}>
         <GltfModel url={MODEL.cobot} size={1.9} lift={0.25} animate onOrigin />
       </Suspense>
-    </group>
-  )
-}
-
-// Predictive maintenance: an electric motor (a downloaded model) with a vibration sensor;
-// above it a hologram chart whose line starts to climb, and a warning light asking for a check.
-function PredictiveMaintenance() {
-  const warning = useRef<Mesh>(null)
-  useFrame(({ clock }) => {
-    if (warning.current) warning.current.visible = Math.sin(clock.elapsedTime * 4) > 0
-  })
-  const chart: V3[] = [0, 0.02, 0.01, 0.03, 0.02, 0.05, 0.04, 0.09, 0.14, 0.22].map((y, i) => [-0.35 + i * 0.078, 1.3 + y, 0])
-  return (
-    <group>
-      <Box size={[1.3, 0.12, 0.6]} at={[0, 0.06, 0]} material={M.navy} />
-      <Suspense fallback={null}>
-        <GltfModel url={MODEL.motor} size={0.95} lift={0.12} />
-      </Suspense>
-      {/* The sensor on top, with its link to the chart. */}
-      <Rod r={0.035} length={0.08} at={[-0.25, 0.6, 0]} material={M.black} />
-      <mesh position={[-0.25, 0.65, 0]} material={M.cyan}>
-        <sphereGeometry args={[0.025, 10, 8]} />
-      </mesh>
-      <Link from={[-0.25, 0.65, 0]} to={[-0.25, 1.15, 0]} material={HOLO_FILL} r={0.006} />
-      {/* Hologram chart. */}
-      <Box size={[0.85, 0.5, 0.01]} at={[0, 1.42, 0]} material={HOLO_FILL} />
-      <Box size={[0.8, 0.008, 0.01]} at={[0, 1.27, 0]} material={M.cyan} />
-      {chart.slice(1).map((point, i) => (
-        <Link key={i} from={chart[i]} to={point} material={M.cyan} r={0.01} />
-      ))}
-      <mesh ref={warning} position={[0.45, 0.85, 0]} material={M.ledAmber} userData={{ keepSeparate: true, moves: true }}>
-        <sphereGeometry args={[0.05, 12, 8]} />
-      </mesh>
     </group>
   )
 }
@@ -639,6 +600,277 @@ function ArtificialIntelligence() {
   )
 }
 
+// The connected factory: an electric motor (a downloaded model) with a vibration sensor that
+// sends its readings to a hologram chart (its line starting to climb, a warning light asking
+// for a check: predictive maintenance), and beside it the motor's glowing wireframe digital
+// twin, floating, fed by the same data.
+function ConnectedFactory() {
+  const warning = useRef<Mesh>(null)
+  useFrame(({ clock }) => {
+    if (warning.current) warning.current.visible = Math.sin(clock.elapsedTime * 4) > 0
+  })
+  const chart: V3[] = [0, 0.02, 0.01, 0.03, 0.02, 0.05, 0.04, 0.09, 0.14, 0.22].map((y, i) => [-0.7 + i * 0.07, 1.3 + y, 0])
+  return (
+    <group>
+      <Box size={[1.6, 0.12, 0.6]} at={[0, 0.06, 0]} material={M.navy} />
+      <Suspense fallback={null}>
+        <group position={[-0.38, 0, 0]}>
+          <GltfModel url={MODEL.motor} size={0.8} lift={0.12} copy />
+        </group>
+        {/* The digital twin: the same motor as a wireframe, floating on a ring of light. */}
+        <group position={[0.45, 0.62, 0]}>
+          <GltfModel url={MODEL.motor} size={0.62} wire={TWIN_WIRE} />
+        </group>
+      </Suspense>
+      <Rod r={0.34} length={0.02} at={[0.45, 0.58, 0]} material={HOLO_FILL} sides={24} />
+      {/* The sensor on top, with its links to the chart and to the twin. */}
+      <Rod r={0.035} length={0.08} at={[-0.55, 0.55, 0]} material={M.black} />
+      <mesh position={[-0.55, 0.6, 0]} material={M.cyan}>
+        <sphereGeometry args={[0.025, 10, 8]} />
+      </mesh>
+      <Link from={[-0.55, 0.6, 0]} to={[-0.55, 1.15, 0]} material={HOLO_FILL} r={0.006} />
+      <Link from={[-0.55, 0.6, 0]} to={[0.2, 0.9, 0]} material={HOLO_FILL} r={0.006} />
+      {/* Hologram chart. */}
+      <Box size={[0.75, 0.5, 0.01]} at={[-0.38, 1.42, 0]} material={HOLO_FILL} />
+      <Box size={[0.7, 0.008, 0.01]} at={[-0.38, 1.27, 0]} material={M.cyan} />
+      {chart.slice(1).map((point, i) => (
+        <Link key={i} from={chart[i]} to={point} material={M.cyan} r={0.01} />
+      ))}
+      <mesh ref={warning} position={[0.08, 1.62, 0]} material={M.ledAmber} userData={{ keepSeparate: true, moves: true }}>
+        <sphereGeometry args={[0.045, 12, 8]} />
+      </mesh>
+    </group>
+  )
+}
+
+// Cloud computing and big data: two server racks of a data centre, their status lights
+// blinking, sending data up to a glowing hologram cloud.
+const SERVER_LEDS: V3[] = [-0.32, 0.32].flatMap((x) => [0.35, 0.6, 0.85, 1.1, 1.35].map((y): V3 => [x + 0.14, y, 0.31]))
+function CloudComputing() {
+  const blink = useRef<Group>(null)
+  useFrame(({ clock }) => {
+    // A few lights flicker at their own pace, like disks and network cards at work.
+    blink.current?.children.forEach((led, i) => (led.visible = Math.sin(clock.elapsedTime * (3 + i * 1.7) + i) > -0.2))
+  })
+  const cloud: [V3, number][] = [
+    [[-0.28, 2.0, 0], 0.2],
+    [[0, 2.1, 0], 0.27],
+    [[0.28, 2.0, 0], 0.21],
+    [[0.12, 1.92, 0.08], 0.17],
+    [[-0.12, 1.93, -0.06], 0.17],
+  ]
+  return (
+    <group>
+      <Box size={[1.4, 0.1, 0.8]} at={[0, 0.05, 0]} material={M.black} />
+      {[-0.32, 0.32].map((x) => (
+        <group key={x}>
+          <Box size={[0.56, 1.45, 0.6]} at={[x, 0.8, 0]} material={M.black} />
+          {/* The servers: a front plate each, with a slot and a steady green light. */}
+          {[0.35, 0.6, 0.85, 1.1, 1.35].map((y) => (
+            <group key={y}>
+              <Box size={[0.5, 0.2, 0.02]} at={[x, y, 0.3]} material={M.iron} />
+              <Box size={[0.22, 0.03, 0.01]} at={[x - 0.08, y, 0.315]} material={M.black} />
+              <Box size={[0.03, 0.03, 0.01]} at={[x + 0.2, y, 0.315]} material={M.ledGreen} />
+            </group>
+          ))}
+          <Link from={[x, 1.55, 0]} to={[x * 0.6, 1.85, 0]} material={HOLO_FILL} r={0.008} />
+        </group>
+      ))}
+      <group ref={blink} userData={{ keepSeparate: true, moves: true }}>
+        {SERVER_LEDS.map((at, i) => (
+          <mesh key={i} position={at} material={i % 3 === 0 ? M.ledAmber : M.cyan}>
+            <boxGeometry args={[0.03, 0.03, 0.01]} />
+          </mesh>
+        ))}
+      </group>
+      {cloud.map(([at, r], i) => (
+        <mesh key={i} position={at} material={HOLO_FILL}>
+          <sphereGeometry args={[r, 20, 14]} />
+        </mesh>
+      ))}
+      <mesh position={[0, 2.02, 0]} material={HOLO_WIRE}>
+        <icosahedronGeometry args={[0.36, 1]} />
+      </mesh>
+    </group>
+  )
+}
+
+// Biotechnology: a glowing DNA double helix turning slowly, its rungs (the base pairs) in
+// cyan, with one stretch, the gene being edited, picked out in amber.
+const PINK = new MeshStandardMaterial({ color: '#ff7ad9', emissive: '#ff7ad9', emissiveIntensity: 1.8, toneMapped: false })
+const HELIX_PAIRS = 16
+function Biotechnology() {
+  const spin = useRef<Group>(null)
+  useFrame((_, delta) => {
+    if (spin.current) spin.current.rotation.y += delta * 0.5
+  })
+  const pairs = useMemo(
+    () =>
+      Array.from({ length: HELIX_PAIRS }, (_, i) => {
+        const y = 0.45 + i * 0.085
+        const a = i * 0.55
+        const r = 0.26
+        return { a: [Math.cos(a) * r, y, Math.sin(a) * r] as V3, b: [-Math.cos(a) * r, y, -Math.sin(a) * r] as V3, edited: i >= 7 && i <= 9 }
+      }),
+    [],
+  )
+  return (
+    <group>
+      <Rod r={0.42} r2={0.32} length={0.18} at={[0, 0.09, 0]} material={M.black} sides={32} />
+      <Rod r={0.34} length={0.02} at={[0, 0.19, 0]} material={M.cyan} sides={32} />
+      <group ref={spin} userData={{ keepSeparate: true, moves: true }}>
+        {/* (Joined into a few meshes here, inside the turning group.) */}
+        <MergeStatic>
+          {pairs.map(({ a, b, edited }, i) => (
+            <group key={i}>
+              <mesh position={a} material={M.cyan}>
+                <sphereGeometry args={[0.04, 12, 8]} />
+              </mesh>
+              <mesh position={b} material={PINK}>
+                <sphereGeometry args={[0.04, 12, 8]} />
+              </mesh>
+              <Link from={a} to={b} material={edited ? M.ledAmber : HOLO_FILL} r={edited ? 0.012 : 0.008} />
+              {i > 0 && <Link from={pairs[i - 1].a} to={a} material={M.cyan} r={0.012} />}
+              {i > 0 && <Link from={pairs[i - 1].b} to={b} material={PINK} r={0.012} />}
+            </group>
+          ))}
+        </MergeStatic>
+      </group>
+    </group>
+  )
+}
+
+// The electric telegraph: a Morse key tapping out the museum's name, INOVAT, in Morse code
+// (its lamp lights with each dot and dash), and behind it Cooke and Wheatstone's five-needle
+// instrument, its diamond-shaped dial of letters with the needles swinging to the signal; a
+// telegraph pole carries the wire away.
+// INOVAT in Morse: 1 = a dot, 3 = a dash (in time units), 0 = the gap between letters.
+const MORSE = [1, 1, 0, 3, 1, 0, 3, 3, 3, 0, 1, 1, 1, 3, 0, 1, 3, 0, 3]
+const MORSE_UNIT = 0.16 // seconds
+// The moments the key is down, in time units: [start, end] of each signal, and the loop length.
+const MORSE_SIGNALS = (() => {
+  const signals: [number, number][] = []
+  let t = 0
+  for (const mark of MORSE) {
+    if (mark === 0) t += 2 // (a letter gap is 3 units: 1 after the last signal, plus 2)
+    else {
+      signals.push([t, t + mark])
+      t += mark + 1
+    }
+  }
+  return { signals, length: t + 7 } // (a pause before it starts again)
+})()
+function Telegraph() {
+  const lever = useRef<Group>(null)
+  const lamp = useRef<Mesh>(null)
+  const needles = useRef<Group>(null)
+  useFrame(({ clock }) => {
+    const t = (clock.elapsedTime / MORSE_UNIT) % MORSE_SIGNALS.length
+    const down = MORSE_SIGNALS.signals.some(([a, b]) => t >= a && t < b)
+    if (lever.current) lever.current.rotation.z = down ? 0.07 : 0 // (the knob, on the left, dips)
+    if (lamp.current) lamp.current.visible = down
+    // The needles lean one way while the current flows, and rest upright between signals.
+    needles.current?.children.forEach((needle, i) => (needle.rotation.z = down ? (i % 2 ? 0.35 : -0.35) : 0))
+  })
+  return (
+    <group>
+      <Box size={[1.5, 0.7, 0.8]} at={[0, 0.35, 0]} material={M.darkWood} />
+      {/* The Morse key: a brass lever on a pivot, with a black knob. */}
+      {/* (Shown larger than life, like the other small inventions, so it reads from afar.) */}
+      <Box size={[0.66, 0.06, 0.34]} at={[0.3, 0.73, 0.18]} material={M.oak} />
+      <Box size={[0.09, 0.09, 0.12]} at={[0.36, 0.8, 0.18]} material={M.brass} />
+      <group ref={lever} position={[0.36, 0.85, 0.18]} userData={{ keepSeparate: true, moves: true }}>
+        <Box size={[0.56, 0.035, 0.06]} at={[-0.08, 0, 0]} material={M.brass} />
+        <Rod r={0.055} length={0.06} at={[-0.34, 0.045, 0]} material={M.black} sides={16} />
+      </group>
+      <mesh ref={lamp} position={[0.58, 0.8, 0.18]} material={M.ledAmber} userData={{ keepSeparate: true, moves: true }}>
+        <sphereGeometry args={[0.045, 12, 8]} />
+      </mesh>
+      {/* The five-needle instrument: a diamond-shaped dial on a wooden case. */}
+      <Box size={[0.9, 0.9, 0.08]} at={[-0.3, 1.25, -0.2]} material={M.oak} />
+      <mesh position={[-0.3, 1.25, -0.155]} rotation={[0, 0, Math.PI / 4]} material={M.beige}>
+        <boxGeometry args={[0.52, 0.52, 0.01]} />
+      </mesh>
+      {/* The grid of letters on the dial, as thin lines. */}
+      {[-2, -1, 0, 1, 2].map((k) => (
+        <group key={k}>
+          <Link from={[-0.3 + k * 0.074 - 0.18, 1.25 - k * 0.074 - 0.18, -0.148]} to={[-0.3 + k * 0.074 + 0.18, 1.25 - k * 0.074 + 0.18, -0.148]} material={M.darkWood} r={0.003} />
+          <Link from={[-0.3 + k * 0.074 - 0.18, 1.25 + k * 0.074 + 0.18, -0.148]} to={[-0.3 + k * 0.074 + 0.18, 1.25 + k * 0.074 - 0.18, -0.148]} material={M.darkWood} r={0.003} />
+        </group>
+      ))}
+      <group ref={needles} userData={{ keepSeparate: true, moves: true }}>
+        {[-2, -1, 0, 1, 2].map((k) => (
+          <group key={k} position={[-0.3 + k * 0.1, 1.25, -0.14]}>
+            <Box size={[0.012, 0.16, 0.008]} at={[0, 0, 0]} material={M.black} />
+          </group>
+        ))}
+      </group>
+      {[-1, 1].map((side) => (
+        <Rod key={side} r={0.02} length={0.06} at={[-0.3 + side * 0.36, 0.77, -0.2]} axis="z" material={M.brass} />
+      ))}
+      {/* The telegraph pole and its wire. */}
+      <Rod r={0.035} length={1.9} at={[0.62, 1.65, -0.28]} material={M.darkWood} />
+      <Box size={[0.45, 0.04, 0.04]} at={[0.62, 2.45, -0.28]} material={M.darkWood} />
+      {[-0.17, 0.17].map((x) => (
+        <Rod key={x} r={0.022} length={0.06} at={[0.62 + x, 2.5, -0.28]} material={M.ceramic} />
+      ))}
+      <Link from={[0.45, 2.53, -0.28]} to={[0.4, 0.82, 0.18]} material={M.copper} r={0.005} />
+      <Link from={[0.79, 2.53, -0.28]} to={[-0.3, 1.7, -0.2]} material={M.copper} r={0.005} />
+    </group>
+  )
+}
+
+// The mobile phone and the Web: a Motorola DynaTAC "brick" phone of the 1980s and a modern
+// smartphone (both shown much larger than life), under a slowly turning hologram web of
+// pages linked to one another.
+const WEB_PAGES: V3[] = [
+  [0, 1.95, 0],
+  [-0.45, 1.75, 0.15],
+  [0.45, 1.8, -0.1],
+  [-0.2, 2.25, -0.25],
+  [0.3, 2.3, 0.2],
+  [-0.55, 2.15, -0.1],
+]
+const WEB_LINKS: [number, number][] = [[0, 1], [0, 2], [0, 3], [0, 4], [1, 5], [3, 5], [2, 4], [3, 4]]
+function MobileAndWeb() {
+  const web = useRef<Group>(null)
+  useFrame((_, delta) => {
+    if (web.current) web.current.rotation.y += delta * 0.35
+  })
+  return (
+    <group>
+      <Rod r={0.42} r2={0.32} length={0.18} at={[0, 0.09, 0]} material={M.black} sides={32} />
+      {/* The DynaTAC: a tall cream case, keypad, small display and a thick aerial. */}
+      <group position={[-0.25, 0.18, 0]} rotation={[0, 0.25, 0]}>
+        <Box size={[0.3, 0.9, 0.16]} at={[0, 0.45, 0]} material={M.beige} />
+        <Box size={[0.2, 0.06, 0.01]} at={[0, 0.72, 0.085]} material={M.black} />
+        <Box size={[0.12, 0.02, 0.012]} at={[0, 0.72, 0.09]} material={M.ledRed} />
+        {[0, 1, 2, 3, 4].flatMap((row) =>
+          [-1, 0, 1].map((col) => <Box key={`${row}${col}`} size={[0.05, 0.035, 0.012]} at={[col * 0.07, 0.6 - row * 0.065, 0.085]} material={M.black} />),
+        )}
+        <Rod r={0.03} length={0.32} at={[0.08, 1.06, 0]} material={M.black} />
+      </group>
+      {/* The smartphone: thin and black, its glowing screen almost the whole front. */}
+      <group position={[0.25, 0.18, 0.05]} rotation={[-0.08, -0.25, 0]}>
+        <Box size={[0.3, 0.62, 0.035]} at={[0, 0.31, 0]} material={M.black} />
+        <Box size={[0.27, 0.56, 0.005]} at={[0, 0.31, 0.02]} material={M.cyan} />
+      </group>
+      {/* The web: pages (glowing cards) joined by links. */}
+      <group ref={web} userData={{ keepSeparate: true, moves: true }}>
+        {WEB_PAGES.map((at, i) => (
+          <group key={i}>
+            <Box size={[0.2, 0.14, 0.005]} at={at} material={HOLO_FILL} />
+            <Box size={[0.14, 0.012, 0.006]} at={[at[0], at[1] + 0.035, at[2]]} material={M.cyan} />
+          </group>
+        ))}
+        {WEB_LINKS.map(([a, b]) => (
+          <Link key={`${a}-${b}`} from={WEB_PAGES[a]} to={WEB_PAGES[b]} material={HOLO_FILL} r={0.005} />
+        ))}
+      </group>
+    </group>
+  )
+}
+
 // ---------- Which prototype goes with which text ----------
 
 const PROTOTYPES: Record<string, () => JSX.Element> = {
@@ -646,6 +878,7 @@ const PROTOTYPES: Record<string, () => JSX.Element> = {
   'ir1-2': WaterFrame,
   'ir1-3': PuddlingFurnace,
   'ir1-4': Locomotive,
+  'ir1-5': Telegraph,
   'ir2-1': BessemerConverter,
   'ir2-2': MotorWagen,
   'ir2-3': ElectricPower,
@@ -655,17 +888,19 @@ const PROTOTYPES: Record<string, () => JSX.Element> = {
   'ir3-2': PersonalComputer,
   'ir3-3': Automation,
   'ir3-4': Arpanet,
+  'ir3-5': MobileAndWeb,
   'ir4-1': Printer3d,
-  'ir4-2': PredictiveMaintenance,
+  'ir4-2': ConnectedFactory,
   'ir4-3': ArtificialIntelligence,
-  'ir4-4': DigitalTwin,
+  'ir4-4': CloudComputing,
   'ir4-5': Cobot,
+  'ir4-6': Biotechnology,
 }
 
 // Start downloading the models straight away (they are small), so they are ready by the
 // time the visitor reaches their room.
-Object.values(MODEL).forEach((url) => useGLTF.preload(url))
-Object.values(MODEL).filter(hasShadowStandIn).forEach((url) => useGLTF.preload(url.replace(/\.glb$/, '-shadow.glb')))
+Object.values(MODEL).forEach((url) => useGLTF.preload(url, true, true, withKtx2))
+Object.values(MODEL).filter(hasShadowStandIn).forEach((url) => useGLTF.preload(url.replace(/\.glb$/, '-shadow.glb'), true, true, withKtx2))
 
 export default function Invention({ id }: { id: string }) {
   const Prototype = PROTOTYPES[id]
@@ -694,11 +929,21 @@ export default function Invention({ id }: { id: string }) {
 // and as copies (ModelCopy), so the museum's own stay on their plinths. `size` = the model's
 // largest side in metres; yaw turns it about its middle.
 export type FilmModelName = keyof typeof MODEL
+// The Rocket's axles, measured in its file (its own units): the tender's two, the small rear
+// pair and the big driving wheels in front. Its wheels turn as it races past.
+const FILM_AXLES: Partial<Record<FilmModelName, Axle[]>> = {
+  rocket: [
+    { y: -0.557, z: -0.8115, r: 0.125 },
+    { y: -0.557, z: -0.4475, r: 0.125 },
+    { y: -0.556, z: -0.024, r: 0.131 },
+    { y: -0.4615, z: 0.6315, r: 0.225 },
+  ],
+}
 export function FilmModel({ name, size, yaw = 0, animate = false, onOrigin = false }: { name: FilmModelName; size: number; yaw?: number; animate?: boolean; onOrigin?: boolean }) {
   return (
     <ModelCopy.Provider value={true}>
       <Suspense fallback={null}>
-        <GltfModel url={MODEL[name]} size={size} yaw={yaw} animate={animate} onOrigin={onOrigin} />
+        <GltfModel url={MODEL[name]} size={size} yaw={yaw} animate={animate} onOrigin={onOrigin} axles={FILM_AXLES[name]} />
       </Suspense>
     </ModelCopy.Provider>
   )

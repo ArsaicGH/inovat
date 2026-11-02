@@ -64,7 +64,13 @@ export interface TextRun {
 export function recordText(ctx: CanvasRenderingContext2D, runs: TextRun[], alsoPaint = false) {
   const paint = ctx.fillText.bind(ctx)
   ctx.fillText = (text: string, x: number, y: number, maxWidth?: number) => {
-    if (alsoPaint) paint(text, x, y, maxWidth)
+    // (Painted softly blurred: a glow around the sharp letters, not a second set of them.)
+    if (alsoPaint) {
+      const filter = ctx.filter
+      ctx.filter = `blur(${Math.max(1, Number(/([\d.]+)px/.exec(ctx.font)?.[1] ?? 16) * 0.07).toFixed(1)}px)`
+      paint(text, x, y, maxWidth)
+      ctx.filter = filter
+    }
     if (!text) return
     // (The browser rewrites the font: weight 700 as "bold", and 400 left out.)
     const named = /\b(bold|[1-9]00)\b/.exec(ctx.font)?.[1]
@@ -80,15 +86,21 @@ export function recordText(ctx: CanvasRenderingContext2D, runs: TextRun[], alsoP
     const descent = metrics.emHeightDescent ?? metrics.fontBoundingBoxDescent ?? size * 0.2
     const shift = baseline === 'top' || baseline === 'hanging' ? ascent : baseline === 'middle' ? (ascent - descent) / 2 : baseline === 'bottom' ? -descent : 0
     const align = ctx.textAlign
+    // Where it lands on the picture: the canvas may be moved or scaled at this moment (the
+    // diagrams are drawn in their own corner of a board).
+    const m = ctx.getTransform()
+    const scaleX = Math.hypot(m.a, m.b)
+    const scaleY = Math.hypot(m.c, m.d)
+    const baseY = y + shift
     runs.push({
       text,
-      x,
-      y: y + shift,
-      size,
+      x: m.a * x + m.c * baseY + m.e,
+      y: m.b * x + m.d * baseY + m.f,
+      size: size * scaleY,
       weight,
       colour: typeof ctx.fillStyle === 'string' ? ctx.fillStyle : '#000000',
       anchor: align === 'center' ? 'center' : align === 'right' || align === 'end' ? 'right' : 'left',
-      squeeze: maxWidth !== undefined && metrics.width > maxWidth ? maxWidth / metrics.width : 1,
+      squeeze: (maxWidth !== undefined && metrics.width > maxWidth ? maxWidth / metrics.width : 1) * (scaleX / scaleY),
     })
   }
 }
@@ -166,7 +178,11 @@ export function SharpText({ runs, pixels, face, z, shading }: { runs: TextRun[];
   // One batch per font weight (a batch can only use one font file's letters).
   const batches = useMemo(() => {
     const byWeight = new Map<number, BatchedText>()
-    const metre = face[0] / pixels[0] // the picture's pixels are square
+    // Metres per picture pixel, across and down. (Usually the same; the hologram glass
+    // stretches its picture a little more one way, and the text must follow it exactly, or
+    // it drifts away from the glow painted under it.)
+    const metreX = face[0] / pixels[0]
+    const metre = face[1] / pixels[1]
     for (const run of runs) {
       let batched = byWeight.get(run.weight)
       if (!batched) {
@@ -189,8 +205,8 @@ export function SharpText({ runs, pixels, face, z, shading }: { runs: TextRun[];
       text.anchorX = run.anchor
       text.anchorY = 'top-baseline'
       text.whiteSpace = 'nowrap'
-      text.position.set(run.x * metre - face[0] / 2, face[1] / 2 - run.y * metre, 0)
-      text.scale.x = run.squeeze
+      text.position.set(run.x * metreX - face[0] / 2, face[1] / 2 - run.y * metre, 0)
+      text.scale.x = (run.squeeze * metreX) / metre
       text.layers.set(TEXT_LAYER)
       batched.add(text)
       text.sync()
@@ -234,22 +250,29 @@ export class SharpTextPass extends Pass {
     this.needsDepthTexture = true
   }
 
+  // The scene's depth picture, from the effects chain this step belongs to. (Kept here and
+  // handed to the text only while this step draws: a step from a chain being taken down
+  // must never leave its old, frozen picture behind, or text shows through walls.)
+  private depth: DepthTexture | null = null
   setDepthTexture(depthTexture: DepthTexture) {
-    shared.sharpDepth.value = depthTexture
+    this.depth = depthTexture
   }
 
-  render(renderer: WebGLRenderer, inputBuffer: WebGLRenderTarget) {
-    // 1. The picture, stretched to the screen (smoothly, as the browser did before).
+  render(renderer: WebGLRenderer, inputBuffer: WebGLRenderTarget, outputBuffer: WebGLRenderTarget) {
+    // 1. The picture, stretched to the screen (smoothly, as the browser did before). If
+    // another step should ever come after this one, it goes into the next picture instead
+    // (never into the one it reads from: that draws nothing, a black screen).
     this.copy.inputBuffer = inputBuffer.texture
-    renderer.setRenderTarget(this.renderToScreen ? null : inputBuffer)
+    this.needsSwap = !this.renderToScreen
+    renderer.setRenderTarget(this.renderToScreen ? null : outputBuffer)
     renderer.render(this.scene, this.camera)
-    if (!this.renderToScreen) return
 
     // 2. The text, over it. The lamps must be seen by this step too (they are found again
     // now and then, as the ending brings its own).
     const scene = this.textScene
     const camera = this.textCamera
     if (this.frames++ % 120 === 0) scene.traverse((object) => (object as { isLight?: boolean }).isLight && object.layers.enable(TEXT_LAYER))
+    shared.sharpDepth.value = this.depth
     const size = renderer.getDrawingBufferSize(screenSize)
     shared.sharpScreen.value = [size.x, size.y]
     shared.sharpNear.value = (camera as PerspectiveCamera).near

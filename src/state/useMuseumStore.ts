@@ -208,6 +208,10 @@ interface MuseumState {
   qualityChosen: boolean // the quality was measured and set during loading (Museum.tsx)
   setQualityChosen: () => void
   setWarmedUp: () => void
+  // The ending film's world is built and prepared ahead (EndingScene.tsx); the loading screen
+  // waits for it, so building it never freezes the title screen or the visit.
+  endingPrepared: boolean
+  setEndingPrepared: () => void
   worldReady: boolean
   setWorldReady: () => void
   // Called when the mouse is captured: back to walking, any open panel is closed.
@@ -311,6 +315,8 @@ export const useMuseumStore = create<MuseumState>((set, get) => ({
   qualityChosen: false,
   setQualityChosen: () => set((state) => ({ qualityChosen: true, graphicsLevel: drawnLevel({ ...state, qualityChosen: true }) })),
   setWarmedUp: () => set({ warmedUp: true }),
+  endingPrepared: false,
+  setEndingPrepared: () => set({ endingPrepared: true }),
   worldReady: false,
   setWorldReady: () => set({ worldReady: true }),
   // A finished tutorial ends when the visitor resumes from the pause menu.

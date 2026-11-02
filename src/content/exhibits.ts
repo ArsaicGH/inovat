@@ -95,8 +95,8 @@ const ENTRIES: Record<string, Entry> = {
       en: 'Four exhibition rooms, one for each Industrial Revolution, lie around the Central Hall. Visit them in order from IR 1 to IR 4, following the arrow on the map, then go on to the Game Room.',
     },
     long: {
-      vi: 'Bốn phòng trưng bày, mỗi phòng dành cho một cuộc Cách mạng Công nghiệp, nằm quanh Sảnh trung tâm. CMCN 1 (khoảng giữa thế kỷ XVIII - giữa thế kỷ XIX): hơi nước và máy móc cơ khí, bắt đầu tại Anh. CMCN 2 (cuối thế kỷ XIX - đầu thế kỷ XX): điện năng và sản xuất hàng loạt. CMCN 3 (nửa sau thế kỷ XX): điện tử, máy tính và tự động hóa. CMCN 4 (đầu thế kỷ XXI đến nay): trí tuệ nhân tạo, Internet vạn vật và dữ liệu. Mỗi phòng có một bảng tổng quan và bốn hoặc năm phát minh tiêu biểu. Mỗi bảng chữ đều có thể phóng to để đọc toàn văn. Sau khi tham quan cả bốn phòng, Phòng trò chơi sẽ mở cửa.',
-      en: 'Four exhibition rooms, one for each Industrial Revolution, lie around the Central Hall. IR 1 (about the mid-18th to the mid-19th century): steam and mechanical machinery, beginning in Britain. IR 2 (the late 19th to the early 20th century): electricity and mass production. IR 3 (the second half of the 20th century): electronics, computers and automation. IR 4 (the early 21st century to today): artificial intelligence, the Internet of Things and data. Each room has an overview board and four or five landmark inventions. Every board can be enlarged to read its full text. Once you have visited all four rooms, the Game Room opens.',
+      vi: 'Bốn phòng trưng bày, mỗi phòng dành cho một cuộc Cách mạng Công nghiệp, nằm quanh Sảnh trung tâm. CMCN 1 (khoảng giữa thế kỷ XVIII - giữa thế kỷ XIX): hơi nước và máy móc cơ khí, bắt đầu tại Anh. CMCN 2 (cuối thế kỷ XIX - đầu thế kỷ XX): điện năng và sản xuất hàng loạt. CMCN 3 (nửa sau thế kỷ XX): điện tử, máy tính và tự động hóa. CMCN 4 (đầu thế kỷ XXI đến nay): trí tuệ nhân tạo, Internet vạn vật và dữ liệu. Mỗi phòng có một bảng tổng quan và từ bốn đến sáu phát minh tiêu biểu. Mỗi bảng chữ đều có thể phóng to để đọc toàn văn. Sau khi tham quan cả bốn phòng, Phòng trò chơi sẽ mở cửa.',
+      en: 'Four exhibition rooms, one for each Industrial Revolution, lie around the Central Hall. IR 1 (about the mid-18th to the mid-19th century): steam and mechanical machinery, beginning in Britain. IR 2 (the late 19th to the early 20th century): electricity and mass production. IR 3 (the second half of the 20th century): electronics, computers and automation. IR 4 (the early 21st century to today): artificial intelligence, the Internet of Things and data. Each room has an overview board and four to six landmark inventions. Every board can be enlarged to read its full text. Once you have visited all four rooms, the Game Room opens.',
     },
     sources: [BRITANNICA_IR, WEF],
   },
@@ -215,6 +215,28 @@ const ENTRIES: Record<string, Entry> = {
     ],
   },
 
+  'ir1-5': {
+    title: { vi: 'Điện báo và mã Morse', en: 'The Electric Telegraph and Morse Code' },
+    facts: [
+      ['people', { vi: 'William Cooke và Charles Wheatstone; Samuel Morse và Alfred Vail', en: 'William Cooke and Charles Wheatstone; Samuel Morse and Alfred Vail' }],
+      ['year', { vi: '1837 (bằng sáng chế của Cooke và Wheatstone); 1844 (bức điện Morse đầu tiên, Washington - Baltimore)', en: '1837 (Cooke and Wheatstone’s patent); 1844 (Morse’s first message, Washington to Baltimore)' }],
+      ['field', { vi: 'Thông tin liên lạc', en: 'Communication' }],
+    ],
+    short: {
+      vi: 'Điện báo gửi tin nhắn bằng dòng điện chạy qua dây dẫn, gần như tức thì qua những khoảng cách rất xa. Mã Morse biến mỗi chữ cái thành một chuỗi tín hiệu ngắn và dài (chấm và gạch). Lần đầu tiên, tin tức đi nhanh hơn cả con tàu nhanh nhất.',
+      en: 'The telegraph sent messages as electric current along a wire, almost instantly, over great distances. Morse code turned each letter into a pattern of short and long signals (dots and dashes). For the first time, news travelled faster than the fastest train.',
+    },
+    long: {
+      vi: 'Trước điện báo, một tin nhắn chỉ đi nhanh bằng người, ngựa hay con tàu mang nó. Năm 1837, William Cooke và Charles Wheatstone được cấp bằng sáng chế ở Anh cho một máy điện báo dùng năm kim từ: dòng điện làm các kim chỉ vào chữ cái trên mặt máy. Hệ thống của họ được dùng dọc các tuyến đường sắt, giúp điều phối tàu an toàn hơn. Ở Hoa Kỳ, Samuel Morse cùng cộng sự Alfred Vail phát triển một máy điện báo đơn giản hơn, chỉ cần một dây, và một bộ mã gồm những tín hiệu ngắn và dài, nay gọi là mã Morse. Ngày 24 tháng 5 năm 1844, Morse gửi từ Điện Capitol ở Washington tới Baltimore bức điện "What hath God wrought?" (Chúa đã tạo nên điều gì?); dải giấy ghi bức điện này nay được lưu giữ tại Thư viện Quốc hội Hoa Kỳ. Điện báo nhanh chóng nối liền các thành phố, phục vụ đường sắt, báo chí, thương mại và ngoại giao, mở đầu cho kỷ nguyên viễn thông.',
+      en: 'Before the telegraph, a message could only travel as fast as the person, horse or train carrying it. In 1837 William Cooke and Charles Wheatstone were granted a British patent for a telegraph with five magnetic needles: electric current made the needles point to letters on its face. Their system was used along railway lines, helping to run trains more safely. In the United States, Samuel Morse and his partner Alfred Vail developed a simpler telegraph that needed only one wire, and a code of short and long signals now called Morse code. On 24 May 1844 Morse sent the message “What hath God wrought?” from the Capitol in Washington to Baltimore; the paper tape that recorded it is kept at the Library of Congress. The telegraph soon linked cities, serving railways, newspapers, trade and diplomacy, and opened the age of telecommunications.',
+    },
+    sources: [
+      { name: 'Britannica', title: 'telegraph', url: 'https://www.britannica.com/technology/telegraph' },
+      { name: 'Library of Congress', title: 'Invention of the Telegraph (Samuel F. B. Morse Papers)', url: 'https://www.loc.gov/collections/samuel-morse-papers/articles-and-essays/collection-highlights/invention-of-the-telegraph/' },
+      { name: 'US Senate', title: 'Morse’s Telegraph in the Capitol', url: 'https://www.senate.gov/artandhistory/senate-stories/morses-telegraph-in-the-capitol.htm' },
+      { name: 'Wikipedia', title: 'Cooke and Wheatstone telegraph', url: 'https://en.wikipedia.org/wiki/Cooke_and_Wheatstone_telegraph' },
+    ],
+  },
   // ---------- CMCN 2 ----------
   'ir2-overview': {
     title: { vi: 'Tổng quan CMCN 2', en: 'IR 2 Overview' },
@@ -495,13 +517,34 @@ const ENTRIES: Record<string, Entry> = {
     ],
   },
 
+  'ir3-5': {
+    title: { vi: 'Điện thoại di động và World Wide Web', en: 'The Mobile Phone and the World Wide Web' },
+    facts: [
+      ['people', { vi: 'Martin Cooper (Motorola); Tim Berners-Lee (CERN)', en: 'Martin Cooper (Motorola); Tim Berners-Lee (CERN)' }],
+      ['year', { vi: '1973 (cuộc gọi đầu tiên từ điện thoại di động cầm tay); 1989 (đề xuất World Wide Web)', en: '1973 (the first call from a handheld mobile phone); 1989 (the World Wide Web proposed)' }],
+      ['field', { vi: 'Viễn thông và mạng máy tính', en: 'Telecommunications and computer networks' }],
+    ],
+    short: {
+      vi: 'Năm 1973, Martin Cooper của hãng Motorola gọi cuộc gọi đầu tiên từ một chiếc điện thoại di động cầm tay. Năm 1989, Tim Berners-Lee đề xuất World Wide Web tại CERN. Điện thoại di động và Web đưa thông tin đến tay mỗi người, ở bất cứ đâu.',
+      en: 'In 1973 Martin Cooper of Motorola made the first call from a handheld mobile phone. In 1989 Tim Berners-Lee proposed the World Wide Web at CERN. Mobile phones and the Web put information in everyone’s hands, wherever they are.',
+    },
+    long: {
+      vi: 'Ngày 3 tháng 4 năm 1973, trên một con phố ở New York, Martin Cooper, kỹ sư của hãng Motorola, thực hiện cuộc gọi đầu tiên từ một chiếc điện thoại di động cầm tay, nguyên mẫu DynaTAC. Mười năm sau, năm 1983, chiếc DynaTAC 8000X được bán ra: nặng, đắt và pin chỉ đủ cho một lúc trò chuyện, nhưng đã mở đầu cho điện thoại di động. Tháng 3 năm 1989, Tim Berners-Lee, khi làm việc tại Trung tâm Nghiên cứu Hạt nhân châu Âu (CERN), đề xuất một hệ thống chia sẻ thông tin qua mạng bằng các trang liên kết với nhau: World Wide Web. Cuối năm 1990, máy chủ Web và trình duyệt đầu tiên hoạt động tại CERN, và ngày 30 tháng 4 năm 1993, CERN cho phép mọi người dùng phần mềm Web miễn phí. Web chạy trên nền Internet, vốn bắt nguồn từ những mạng như ARPANET. Khi điện thoại di động và Web gặp nhau, trong chiếc điện thoại thông minh, thông tin, mua bán và trò chuyện theo con người đi khắp nơi.',
+      en: 'On 3 April 1973, on a New York street, Martin Cooper, an engineer at Motorola, made the first call from a handheld mobile phone, a DynaTAC prototype. Ten years later, in 1983, the DynaTAC 8000X went on sale: heavy, expensive, with a battery good for only a short chat, but it began the age of the mobile phone. In March 1989 Tim Berners-Lee, working at CERN, the European Organization for Nuclear Research, proposed a system for sharing information over a network through pages linked to one another: the World Wide Web. By the end of 1990 the first Web server and browser were running at CERN, and on 30 April 1993 CERN made the Web software free for everyone to use. The Web runs on the Internet, which grew out of networks such as ARPANET. When the mobile phone and the Web came together, in the smartphone, information, shopping and conversation followed people everywhere.',
+    },
+    sources: [
+      { name: 'Britannica', title: 'Martin Cooper', url: 'https://www.britannica.com/biography/Martin-Cooper' },
+      { name: 'CERN', title: 'A short history of the Web', url: 'https://home.cern/science/computing/the-birth-of-the-web/short-history-web/' },
+      { name: 'CERN', title: 'The birth of the Web', url: 'https://home.cern/science/computing/birth-web' },
+    ],
+  },
   // ---------- CMCN 4 ----------
   'ir4-overview': {
     title: { vi: 'Tổng quan CMCN 4', en: 'IR 4 Overview' },
     facts: [['period', { vi: 'Đầu thế kỷ XXI đến nay', en: 'The early 21st century to today' }]],
     long: {
-      vi: 'Cuộc Cách mạng Công nghiệp lần thứ tư kết hợp trí tuệ nhân tạo, Internet vạn vật, dữ liệu lớn, robot và công nghệ sản xuất mới. Máy móc không chỉ tự động thực hiện nhiệm vụ mà còn có thể thu thập dữ liệu và hỗ trợ ra quyết định. Các công nghệ này giúp tăng chất lượng và giảm lãng phí, nhưng đặt ra thách thức về bảo mật, chi phí, việc làm và kỹ năng lao động.',
-      en: 'The Fourth Industrial Revolution brings together artificial intelligence, the Internet of Things, big data, robots and new production technologies. Machines not only carry out tasks automatically, but can also collect data and support decisions. These technologies raise quality and reduce waste, but bring challenges in security, cost, jobs and workers’ skills.',
+      vi: 'Cuộc Cách mạng Công nghiệp lần thứ tư kết hợp thế giới vật lý, số và sinh học: trí tuệ nhân tạo, Internet vạn vật, điện toán đám mây và dữ liệu lớn, robot tiên tiến, in 3D và công nghệ sinh học. Máy móc không chỉ tự động thực hiện nhiệm vụ mà còn thu thập dữ liệu, học từ dữ liệu và hỗ trợ ra quyết định. Các công nghệ này giúp tăng chất lượng, giảm lãng phí và mở ra những phương pháp chữa bệnh mới, nhưng đặt ra thách thức về bảo mật, năng lượng, việc làm, kỹ năng lao động và đạo đức.',
+      en: 'The Fourth Industrial Revolution brings together the physical, digital and biological worlds: artificial intelligence, the Internet of Things, cloud computing and big data, advanced robots, 3D printing and biotechnology. Machines not only carry out tasks automatically, but also collect data, learn from it and support decisions. These technologies raise quality, reduce waste and open up new ways to treat disease, but bring challenges in security, energy, jobs, workers’ skills and ethics.',
     },
     sources: [WEF],
   },
@@ -530,27 +573,31 @@ const ENTRIES: Record<string, Entry> = {
     ],
   },
   'ir4-2': {
-    title: { vi: 'Nhà máy kết nối: IIoT và bảo trì dự đoán', en: 'The Connected Factory: IIoT and Predictive Maintenance' },
+    title: { vi: 'Nhà máy kết nối: IoT, hệ thống thực-ảo và bản sao số', en: 'The Connected Factory: IoT, Cyber-Physical Systems and the Digital Twin' },
     facts: [
-      ['developedBy', { vi: 'Nhiều doanh nghiệp và tổ chức công nghệ công nghiệp', en: 'Many industrial technology companies and organisations' }],
-      ['time', { vi: 'Phát triển mạnh trong thế kỷ XXI', en: 'Grew rapidly in the 21st century' }],
-      ['field', { vi: 'Cảm biến, dữ liệu và bảo trì', en: 'Sensors, data and maintenance' }],
+      ['people', { vi: 'Kevin Ashton (người đặt tên "Internet vạn vật")', en: 'Kevin Ashton (who named the “Internet of Things”)' }],
+      ['time', { vi: '1999 (thuật ngữ Internet vạn vật); 2011 (khái niệm "Industrie 4.0" ra mắt tại Hội chợ Hannover, Đức)', en: '1999 (the term “Internet of Things”); 2011 (the idea of “Industrie 4.0” presented at the Hannover Fair, Germany)' }],
+      ['field', { vi: 'Cảm biến, mạng và tự động hóa', en: 'Sensors, networks and automation' }],
     ],
     short: {
-      vi: 'IIoT kết nối máy móc và cảm biến để thu thập dữ liệu liên tục. Từ dữ liệu đó, hệ thống có thể phát hiện sớm dấu hiệu hỏng hóc để bảo trì trước khi máy dừng, dù dự đoán vẫn có thể sai.',
-      en: 'IIoT connects machines and sensors to collect data continuously. From that data, systems can spot early signs of failure and plan maintenance before a machine stops, though predictions can still be wrong.',
+      vi: 'Trong nhà máy kết nối, cảm biến trên máy móc gửi dữ liệu liên tục qua mạng. Máy tính phân tích dữ liệu để báo trước hỏng hóc, điều chỉnh sản xuất và cập nhật một bản sao số của nhà máy, nơi kỹ sư thử thay đổi trước khi làm thật.',
+      en: 'In a connected factory, sensors on machines send data over the network all the time. Computers analyse it to warn of breakdowns, adjust production and update a digital twin of the factory, where engineers try out changes before making them for real.',
     },
     long: {
-      vi: 'Internet vạn vật công nghiệp (IIoT) kết nối máy móc, cảm biến và thiết bị qua mạng để thu thập và trao đổi dữ liệu về tình trạng thiết bị, sản lượng và năng lượng. Một ứng dụng quan trọng là bảo trì dự đoán: thay vì chỉ sửa khi máy hỏng hoặc bảo trì theo lịch cố định, hệ thống phân tích dữ liệu cảm biến và lịch sử vận hành để báo khi nguy cơ sự cố tăng lên. Cách làm này giúp giảm thời gian dừng máy và chi phí. Tuy nhiên, dự đoán vẫn có sai số, cần kết hợp với chuyên môn của kỹ thuật viên, và hệ thống kết nối phải được bảo vệ trước nguy cơ an ninh mạng.',
-      en: 'The Industrial Internet of Things (IIoT) connects machines, sensors and equipment over a network to collect and share data on their condition, output and energy use. One key use is predictive maintenance: instead of repairing machines only after they break, or servicing them on a fixed schedule, systems analyse sensor data and operating history to warn when the risk of failure is rising. This cuts downtime and costs. But predictions still have errors and must be combined with technicians’ expertise, and connected systems must be protected against cyber threats.',
+      vi: 'Năm 1999, Kevin Ashton, khi làm việc tại công ty Procter & Gamble, được cho là người đầu tiên dùng cụm từ "Internet vạn vật" (IoT) để mô tả việc gắn thẻ và cảm biến vào đồ vật để máy tính tự thu thập dữ liệu về chúng. Trong công nghiệp, IoT kết nối máy móc, cảm biến và thiết bị qua mạng. Khi phần tính toán và phần máy móc vật lý được thiết kế để vận hành cùng nhau như một thể thống nhất, ta có hệ thống thực-ảo (cyber-physical system). Năm 2011, khái niệm "Industrie 4.0" (Công nghiệp 4.0) được giới thiệu tại Hội chợ Hannover ở Đức, mô tả những nhà máy thông minh như vậy. Hai ứng dụng tiêu biểu: bảo trì dự đoán, khi hệ thống phân tích dữ liệu cảm biến để báo trước nguy cơ hỏng hóc thay vì chờ máy dừng; và bản sao số, một mô hình kỹ thuật số phản ánh trạng thái của thiết bị hay dây chuyền thật, giúp kỹ sư thử các phương án trước khi thay đổi ngoài thực tế. Tuy nhiên, dự đoán vẫn có sai số, mô hình chỉ tốt khi dữ liệu chính xác, và hệ thống kết nối phải được bảo vệ trước nguy cơ an ninh mạng.',
+      en: 'In 1999 Kevin Ashton, then working at Procter & Gamble, is believed to have been the first to use the phrase “Internet of Things” (IoT), for tagging objects with chips and sensors so that computers could gather data about them by themselves. In industry, the IoT connects machines, sensors and equipment over a network. When the computing and the physical machinery are designed to work together as one, the result is a cyber-physical system. In 2011 the idea of “Industrie 4.0” was presented at the Hannover Fair in Germany to describe such smart factories. Two key uses: predictive maintenance, where systems analyse sensor data to warn that a breakdown is becoming likely instead of waiting for the machine to stop; and the digital twin, a digital model that mirrors the state of a real machine or production line, so engineers can test changes before making them for real. But predictions still have errors, a model is only as good as its data, and connected systems must be protected against cyber threats.',
     },
     sources: [
+      { name: 'University of Cambridge, Institute for Manufacturing', title: 'The origin of the Internet of Things', url: 'https://www.ifm.eng.cam.ac.uk/news/the-origin-of-the-internet-of-things' },
+      { name: 'DFKI (2021)', title: 'Ten years of Industrie 4.0: interview with Wolfgang Wahlster', url: 'https://dfki.de/en/web/news/ten-years-of-industrie-4-0-interview-wolfgang-wahlster-cea-dfki' },
+      { name: 'NIST', title: 'Glossary: cyber-physical systems', url: 'https://csrc.nist.gov/glossary/term/cyber_physical_systems' },
       { name: 'SAP', title: 'What is the Industrial Internet of Things (IIoT)?', url: 'https://www.sap.com/resources/what-is-iiot' },
       {
         name: 'US Department of Energy (FEMP)',
         title: 'Operations & Maintenance Best Practices: A Guide to Achieving Operational Efficiency, Release 3.0 (2010)',
         url: 'https://www.energy.gov/eere/femp/articles/operations-and-maintenance-best-practices-guide-achieving-operational-efficiency',
       },
+      { name: 'Britannica', title: 'digital twin', url: 'https://www.britannica.com/technology/digital-twin' },
     ],
   },
   'ir4-3': {
@@ -560,24 +607,38 @@ const ENTRIES: Record<string, Entry> = {
       [
         'time',
         {
-          vi: '1956 (hội thảo Dartmouth đặt nền móng cho ngành AI); bùng nổ từ thập niên 2010 với học sâu; 2022 (ChatGPT ra mắt)',
-          en: '1956 (the Dartmouth workshop that founded the field); booming since the 2010s with deep learning; 2022 (ChatGPT released)',
+          vi: '1956 (hội thảo Dartmouth đặt nền móng cho ngành AI); bùng nổ từ thập niên 2010 với học sâu; 2022 (ChatGPT ra mắt); 2024 (hai giải Nobel cho các công trình về AI)',
+          en: '1956 (the Dartmouth workshop that founded the field); booming since the 2010s with deep learning; 2022 (ChatGPT released); 2024 (two Nobel Prizes for work on AI)',
         },
       ],
       ['field', { vi: 'Khoa học máy tính', en: 'Computer science' }],
     ],
     short: {
-      vi: 'AI là những hệ thống máy tính có thể học từ dữ liệu để nhận dạng, dự đoán, ra quyết định và tạo nội dung. Từ kiểm tra sản phẩm trong nhà máy đến trợ lý trò chuyện, AI là trung tâm của Cách mạng Công nghiệp lần thứ tư.',
-      en: 'AI means computer systems that learn from data to recognise, predict, decide and create. From inspecting products in factories to chat assistants, AI is at the heart of the Fourth Industrial Revolution.',
+      vi: 'AI là những hệ thống máy tính học từ dữ liệu để nhận dạng, dự đoán, ra quyết định và tạo nội dung. Từ năm 2022, AI tạo sinh lan rộng rất nhanh; nay AI còn giải toán thi Olympic, hỗ trợ nghiên cứu khoa học và tự thực hiện nhiều bước công việc, nhưng vẫn có thể sai và cần con người giám sát.',
+      en: 'AI means computer systems that learn from data to recognise, predict, decide and create. Since 2022 generative AI has spread very fast; today AI also solves Olympiad maths problems, helps with scientific research and carries out multi-step tasks on its own, but it can still be wrong and needs human oversight.',
     },
     long: {
-      vi: 'Năm 1950, Alan Turing đặt câu hỏi liệu máy móc có thể suy nghĩ hay không. Năm 1956, hội thảo tại Đại học Dartmouth do John McCarthy cùng các đồng nghiệp tổ chức đã đặt tên và nền móng cho ngành trí tuệ nhân tạo. Thay vì chỉ làm theo các quy tắc viết sẵn, AI hiện đại học từ lượng dữ liệu rất lớn. Từ thập niên 2010, học sâu (mạng nơ-ron nhiều lớp) giúp máy tính nhận dạng hình ảnh và giọng nói tốt hơn hẳn; năm 2022, ChatGPT đưa AI tạo sinh đến với hàng trăm triệu người. Trong công nghiệp, AI kiểm tra chất lượng sản phẩm, dự đoán hỏng hóc và tối ưu sản xuất. Tuy nhiên, AI có thể sai, có thể mang thiên lệch từ dữ liệu, và cần con người giám sát, sử dụng có trách nhiệm.',
-      en: 'In 1950 Alan Turing asked whether machines could think. In 1956 a workshop at Dartmouth College, organised by John McCarthy and colleagues, named the field of artificial intelligence and laid its foundations. Instead of only following rules written in advance, modern AI learns from very large amounts of data. Since the 2010s, deep learning (many-layered neural networks) has made computers far better at recognising images and speech, and in 2022 ChatGPT brought generative AI to hundreds of millions of people. In industry, AI inspects product quality, predicts breakdowns and optimises production. But AI can be wrong, can inherit bias from its data, and needs human oversight and responsible use.',
+      vi: 'Năm 1950, Alan Turing đặt câu hỏi liệu máy móc có thể suy nghĩ hay không. Năm 1956, hội thảo tại Đại học Dartmouth do John McCarthy cùng các đồng nghiệp tổ chức đã đặt tên và nền móng cho ngành trí tuệ nhân tạo. Thay vì chỉ làm theo các quy tắc viết sẵn, AI hiện đại học từ lượng dữ liệu rất lớn. Từ thập niên 2010, học sâu (mạng nơ-ron nhiều lớp) giúp máy tính nhận dạng hình ảnh và giọng nói tốt hơn hẳn; năm 2022, ChatGPT đưa AI tạo sinh đến với hàng trăm triệu người. Năm 2024, giải Nobel Vật lý được trao cho John Hopfield và Geoffrey Hinton vì những nền tảng của học máy bằng mạng nơ-ron, còn một nửa giải Nobel Hóa học thuộc về Demis Hassabis và John Jumper, tác giả AlphaFold, hệ thống AI dự đoán cấu trúc protein. Năm 2025, một phiên bản Gemini của Google DeepMind giải trọn 5 trên 6 bài thi Olympic Toán học Quốc tế (IMO), đạt mức điểm huy chương vàng do chính ban giám khảo IMO chấm. Theo báo cáo AI Index 2026 của Đại học Stanford, đầu tư của doanh nghiệp toàn cầu vào AI đạt 581,7 tỷ USD trong năm 2025. Trong công nghiệp, AI kiểm tra chất lượng sản phẩm, dự đoán hỏng hóc và tối ưu sản xuất. Các nước cũng bắt đầu đặt luật cho AI: Đạo luật AI của Liên minh châu Âu có hiệu lực từ năm 2024, và Luật Trí tuệ nhân tạo của Việt Nam, được Quốc hội thông qua tháng 12 năm 2025, có hiệu lực từ ngày 1 tháng 3 năm 2026. Tuy nhiên, AI vẫn có thể sai, có thể mang thiên lệch từ dữ liệu, tiêu tốn nhiều điện năng, và cần con người giám sát, sử dụng có trách nhiệm.',
+      en: 'In 1950 Alan Turing asked whether machines could think. In 1956 a workshop at Dartmouth College, organised by John McCarthy and colleagues, named the field of artificial intelligence and laid its foundations. Instead of only following rules written in advance, modern AI learns from very large amounts of data. Since the 2010s, deep learning (many-layered neural networks) has made computers far better at recognising images and speech, and in 2022 ChatGPT brought generative AI to hundreds of millions of people. In 2024 the Nobel Prize in Physics went to John Hopfield and Geoffrey Hinton for the foundations of machine learning with neural networks, and half of the Nobel Prize in Chemistry to Demis Hassabis and John Jumper, creators of AlphaFold, an AI system that predicts the structure of proteins. In 2025 a version of Google DeepMind’s Gemini solved five of the six problems of the International Mathematical Olympiad (IMO) perfectly, a gold-medal score graded by the IMO’s own coordinators. According to Stanford University’s AI Index 2026, companies worldwide invested 581.7 billion US dollars in AI in 2025. In industry, AI inspects product quality, predicts breakdowns and optimises production. Countries have also begun to make laws for AI: the European Union’s AI Act came into force in 2024, and Vietnam’s Law on Artificial Intelligence, passed by the National Assembly in December 2025, took effect on 1 March 2026. But AI can still be wrong, can inherit bias from its data, uses a lot of electricity, and needs human oversight and responsible use.',
     },
     sources: [
       { name: 'Britannica', title: 'Artificial intelligence', url: 'https://www.britannica.com/technology/artificial-intelligence' },
       { name: 'Britannica', title: 'Alan Turing', url: 'https://www.britannica.com/biography/Alan-Turing' },
       { name: 'OpenAI', title: 'Introducing ChatGPT (2022)', url: 'https://openai.com/index/chatgpt/' },
+      { name: 'NobelPrize.org', title: 'The Nobel Prize in Physics 2024', url: 'https://www.nobelprize.org/prizes/physics/2024/summary/' },
+      { name: 'NobelPrize.org', title: 'The Nobel Prize in Chemistry 2024', url: 'https://www.nobelprize.org/prizes/chemistry/2024/summary/' },
+      {
+        name: 'Google DeepMind (2025)',
+        title: 'Advanced version of Gemini with Deep Think officially achieves gold-medal standard at the International Mathematical Olympiad',
+        url: 'https://deepmind.google/blog/advanced-version-of-gemini-with-deep-think-officially-achieves-gold-medal-standard-at-the-international-mathematical-olympiad/',
+      },
+      { name: 'Stanford HAI (2026)', title: 'Inside the AI Index: 12 Takeaways from the 2026 Report', url: 'https://hai.stanford.edu/news/inside-the-ai-index-12-takeaways-from-the-2026-report' },
+      { name: 'European Commission', title: 'AI Act', url: 'https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai' },
+      {
+        name: 'Ministry of Science and Technology of Vietnam (2025)',
+        title: 'First-ever Law on Artificial Intelligence approved',
+        url: 'https://beta-en.mic.gov.vn/first-ever-law-on-artificial-intelligence-approved-197251215231241888.htm',
+      },
       {
         name: 'IEEE Access (Prunella et al., 2023)',
         title: 'Deep Learning for Automatic Vision-Based Recognition of Industrial Surface Defects: A Survey',
@@ -586,27 +647,28 @@ const ENTRIES: Record<string, Entry> = {
     ],
   },
   'ir4-4': {
-    title: { vi: 'Bản sao số (Digital Twin)', en: 'The Digital Twin' },
+    title: { vi: 'Điện toán đám mây và dữ liệu lớn', en: 'Cloud Computing and Big Data' },
     facts: [
-      ['developedBy', { vi: 'Nhiều nhóm nghiên cứu và doanh nghiệp công nghệ', en: 'Many research groups and technology companies' }],
-      ['time', { vi: 'Được ứng dụng rộng hơn trong thế kỷ XXI', en: 'Used more widely in the 21st century' }],
-      ['field', { vi: 'Mô phỏng và quản lý hệ thống', en: 'Simulation and systems management' }],
+      ['time', { vi: '2006 (Amazon Web Services ra mắt dịch vụ lưu trữ S3 và máy chủ thuê EC2); 2011 (NIST công bố định nghĩa điện toán đám mây)', en: '2006 (Amazon Web Services launches S3 storage and EC2 rented servers); 2011 (NIST publishes its definition of cloud computing)' }],
+      ['field', { vi: 'Trung tâm dữ liệu và mạng Internet', en: 'Data centres and the Internet' }],
     ],
     short: {
-      vi: 'Bản sao số là mô hình kỹ thuật số đại diện cho một thiết bị hoặc hệ thống thực tế. Nó hỗ trợ theo dõi hoạt động, thử nghiệm phương án và phân tích hiệu suất trước khi thay đổi hệ thống thật.',
-      en: 'A digital twin is a digital model that stands for a real device or system. It helps monitor operations, test options and analyse performance before the real system is changed.',
+      vi: 'Điện toán đám mây cho phép thuê sức mạnh tính toán và chỗ lưu trữ qua Internet, dùng bao nhiêu trả bấy nhiêu. Nhờ đó, nhà máy và doanh nghiệp xử lý được dữ liệu lớn từ hàng nghìn cảm biến, và các mô hình AI được huấn luyện trong những trung tâm dữ liệu khổng lồ.',
+      en: 'Cloud computing lets anyone rent computing power and storage over the Internet, paying for what they use. Factories and businesses can then handle big data from thousands of sensors, and AI models are trained in huge data centres.',
     },
     long: {
-      vi: 'Bản sao số là mô hình kỹ thuật số đại diện cho một thiết bị, quy trình hoặc hệ thống thực tế. Khi được kết nối với dữ liệu phù hợp, mô hình có thể phản ánh trạng thái hoạt động của đối tượng và hỗ trợ thử nghiệm các phương án thay đổi. Trong nhà máy, bản sao số giúp kỹ sư quan sát quy trình, phân tích hiệu suất và dự đoán ảnh hưởng của một số điều chỉnh trước khi áp dụng ngoài thực tế. Giá trị của nó phụ thuộc vào độ chính xác của mô hình và dữ liệu đầu vào.',
-      en: 'A digital twin is a digital model that represents a real device, process or system. Connected to suitable data, it can mirror how the real thing is working and help test possible changes. In factories, digital twins let engineers watch processes, analyse performance and predict the effect of some adjustments before making them for real. Its value depends on how accurate the model and its data are.',
+      vi: 'Trước đây, mỗi doanh nghiệp phải tự mua và vận hành máy chủ của mình. Năm 2006, Amazon Web Services ra mắt dịch vụ lưu trữ S3 rồi dịch vụ thuê máy chủ ảo EC2, mở đầu cho điện toán đám mây đại chúng. Năm 2011, Viện Tiêu chuẩn và Công nghệ Quốc gia Hoa Kỳ (NIST) định nghĩa điện toán đám mây là mô hình cho phép truy cập qua mạng, theo nhu cầu, vào một kho tài nguyên tính toán dùng chung, có thể cấp phát nhanh và mở rộng hay thu hẹp linh hoạt, với mức sử dụng được đo đếm. "Dữ liệu lớn" là những lượng dữ liệu khổng lồ và liên tục, như dữ liệu từ cảm biến trong nhà máy, giao dịch và thiết bị di động, quá lớn để một máy tính thông thường xử lý. Đám mây cung cấp chỗ lưu trữ và sức mạnh để phân tích chúng, và cũng là nơi huấn luyện các mô hình AI. Theo báo cáo AI Index 2026 của Đại học Stanford, công suất điện của các trung tâm dữ liệu AI đã lên tới 29,6 gigawatt. Đám mây giúp tiết kiệm chi phí đầu tư và mở rộng nhanh, nhưng cũng đặt ra thách thức về tiêu thụ năng lượng, bảo mật dữ liệu và sự phụ thuộc vào kết nối mạng.',
+      en: 'In the past, every business had to buy and run its own servers. In 2006 Amazon Web Services launched its S3 storage service and then EC2, which rents out virtual servers, opening the way to public cloud computing. In 2011 the US National Institute of Standards and Technology (NIST) defined cloud computing as a model for on-demand network access to a shared pool of computing resources that can be provided quickly, scaled up or down flexibly, and measured as it is used. “Big data” means huge, constant streams of data, from factory sensors, transactions and mobile devices, too large for an ordinary computer to handle. The cloud provides the storage and the power to analyse them, and it is also where AI models are trained. According to Stanford University’s AI Index 2026, the power capacity of AI data centres has reached 29.6 gigawatts. The cloud saves upfront costs and lets organisations grow quickly, but it raises challenges of energy use, data security and dependence on network connections.',
     },
     sources: [
-      { name: 'Britannica', title: 'digital twin', url: 'https://www.britannica.com/technology/digital-twin' },
-      { name: 'Wikipedia', title: 'Digital twin', url: 'https://en.wikipedia.org/wiki/Digital_twin' },
+      { name: 'NIST (Mell and Grance, 2011)', title: 'SP 800-145: The NIST Definition of Cloud Computing', url: 'https://doi.org/10.6028/NIST.SP.800-145' },
+      { name: 'Wikipedia', title: 'Timeline of Amazon Web Services', url: 'https://en.wikipedia.org/wiki/Timeline_of_Amazon_Web_Services' },
+      { name: 'Britannica', title: 'cloud computing', url: 'https://www.britannica.com/technology/cloud-computing' },
+      { name: 'Stanford HAI (2026)', title: 'Inside the AI Index: 12 Takeaways from the 2026 Report', url: 'https://hai.stanford.edu/news/inside-the-ai-index-12-takeaways-from-the-2026-report' },
     ],
   },
   'ir4-5': {
-    title: { vi: 'Robot cộng tác (Cobot)', en: 'The Collaborative Robot (Cobot)' },
+    title: { vi: 'Robot tiên tiến và robot cộng tác', en: 'Advanced Robots and Cobots' },
     facts: [
       [
         'developedBy',
@@ -615,18 +677,19 @@ const ENTRIES: Record<string, Entry> = {
           en: 'Many robot makers; the word “cobot” dates from the 1990s',
         },
       ],
-      ['time', { vi: 'Phát triển và ứng dụng mạnh trong thế kỷ XXI', en: 'Developed and widely used in the 21st century' }],
+      ['time', { vi: 'Năm 2024: khoảng 4,66 triệu robot công nghiệp đang hoạt động trên thế giới', en: '2024: about 4.66 million industrial robots at work worldwide' }],
       ['field', { vi: 'Robot và sản xuất thông minh', en: 'Robotics and smart manufacturing' }],
     ],
     short: {
-      vi: 'Cobot hỗ trợ con người trong các công việc như lắp ráp, gắp đặt và đóng gói. Robot giúp quy trình linh hoạt hơn, nhưng cần được đánh giá rủi ro và trang bị biện pháp an toàn phù hợp.',
-      en: 'Cobots help people with tasks such as assembly, picking and placing, and packing. They make processes more flexible, but need a risk assessment and proper safety measures.',
+      vi: 'Robot ngày nay linh hoạt hơn nhiều: nhờ cảm biến và phần mềm, chúng nhìn, cảm nhận lực và có thể làm việc cạnh con người. Năm 2024, khoảng 4,66 triệu robot công nghiệp đang hoạt động trên thế giới, gấp đôi so với mười năm trước.',
+      en: 'Today’s robots are far more flexible: with sensors and software they can see, feel force and work beside people. In 2024 about 4.66 million industrial robots were at work worldwide, more than twice as many as ten years earlier.',
     },
     long: {
-      vi: 'Robot cộng tác được thiết kế để hỗ trợ con người trong những nhiệm vụ sản xuất nhất định. Tùy theo thiết kế và hệ thống an toàn, cobot có thể hỗ trợ lắp ráp, gắp đặt, đóng gói hoặc xử lý những thao tác lặp lại. Việc kết hợp khả năng của robot với kinh nghiệm của con người giúp quy trình sản xuất linh hoạt hơn. Tuy nhiên, cobot vẫn cần được đánh giá rủi ro và lắp đặt biện pháp bảo vệ phù hợp trước khi làm việc gần con người.',
-      en: 'Collaborative robots are designed to help people with particular production tasks. Depending on their design and safety systems, cobots can help with assembly, picking and placing, packing or repetitive movements. Combining a robot’s abilities with human experience makes production more flexible. But a cobot still needs a risk assessment and proper safeguards before it works near people.',
+      vi: 'Robot công nghiệp đầu tiên, Unimate, làm việc sau hàng rào và lặp lại đúng một chuỗi động tác. Robot tiên tiến ngày nay được trang bị camera, cảm biến lực và phần mềm thông minh, nên có thể nhận ra vật thể, điều chỉnh động tác và làm những việc tinh tế hơn. Một nhánh quan trọng là robot cộng tác (cobot), được thiết kế để làm việc gần con người trong lắp ráp, gắp đặt và đóng gói; thuật ngữ "cobot" xuất hiện từ thập niên 1990. Theo Liên đoàn Robot Quốc tế (IFR), năm 2024 thế giới lắp đặt khoảng 542.000 robot công nghiệp, gấp đôi so với mười năm trước, và khoảng 4,66 triệu robot đang hoạt động. Robot giúp sản xuất chính xác và linh hoạt hơn, đảm nhận việc nặng nhọc hay nguy hiểm. Tuy nhiên, robot vẫn cần được đánh giá rủi ro và lắp biện pháp an toàn trước khi làm việc gần con người, và người lao động cần học kỹ năng mới để làm việc cùng chúng.',
+      en: 'The first industrial robot, the Unimate, worked behind a fence and repeated exactly one sequence of moves. Today’s advanced robots carry cameras, force sensors and smart software, so they can recognise objects, adjust their movements and take on more delicate work. One important branch is the collaborative robot (cobot), designed to work near people in assembly, picking and placing, and packing; the word “cobot” dates from the 1990s. According to the International Federation of Robotics (IFR), about 542,000 industrial robots were installed worldwide in 2024, more than twice as many as ten years earlier, and about 4.66 million were at work. Robots make production more precise and flexible and take over heavy or dangerous jobs. But a robot still needs a risk assessment and proper safeguards before it works near people, and workers need new skills to work alongside them.',
     },
     sources: [
+      { name: 'International Federation of Robotics (2025)', title: 'World Robotics 2025: global robot demand in factories doubles over 10 years', url: 'https://ifr.org/ifr-press-releases/news/global-robot-demand-in-factories-doubles-over-10-years' },
       { name: 'Northwestern University (Michael Peshkin)', title: 'Cobots', url: 'https://peshkin.mech.northwestern.edu/cobot/' },
       {
         name: 'Association for Advancing Automation',
@@ -635,7 +698,28 @@ const ENTRIES: Record<string, Entry> = {
       },
     ],
   },
-
+  'ir4-6': {
+    title: { vi: 'Công nghệ sinh học và chỉnh sửa gen', en: 'Biotechnology and Gene Editing' },
+    facts: [
+      ['people', { vi: 'Emmanuelle Charpentier, Jennifer Doudna (CRISPR); Katalin Karikó, Drew Weissman (vắc-xin mRNA)', en: 'Emmanuelle Charpentier, Jennifer Doudna (CRISPR); Katalin Karikó, Drew Weissman (mRNA vaccines)' }],
+      ['time', { vi: '2003 (hoàn thành giải mã bộ gen người); 2012 (công cụ chỉnh sửa gen CRISPR-Cas9); 2020 (vắc-xin mRNA ngừa COVID-19)', en: '2003 (the human genome is read); 2012 (the CRISPR-Cas9 gene-editing tool); 2020 (mRNA vaccines against COVID-19)' }],
+      ['field', { vi: 'Sinh học, y học và nông nghiệp', en: 'Biology, medicine and agriculture' }],
+    ],
+    short: {
+      vi: 'Cách mạng Công nghiệp lần thứ tư kết hợp thế giới số với sinh học. Máy tính giúp đọc và phân tích gen; công cụ CRISPR-Cas9 cho phép "cắt" ADN tại đúng vị trí mong muốn; vắc-xin mRNA được phát triển nhanh chưa từng có trong đại dịch COVID-19.',
+      en: 'The Fourth Industrial Revolution joins the digital world with biology. Computers help read and analyse genes; the CRISPR-Cas9 tool can “cut” DNA at exactly the chosen place; and mRNA vaccines were developed at unprecedented speed during the COVID-19 pandemic.',
+    },
+    long: {
+      vi: 'Diễn đàn Kinh tế Thế giới mô tả Cách mạng Công nghiệp lần thứ tư là sự hòa quyện giữa thế giới vật lý, số và sinh học. Năm 2003, Dự án Bộ gen người hoàn thành việc giải trình tự gần như toàn bộ ADN của con người, một khối dữ liệu khổng lồ chỉ có thể xử lý bằng máy tính. Năm 2012, Emmanuelle Charpentier và Jennifer Doudna công bố cách điều khiển "chiếc kéo di truyền" CRISPR-Cas9 để cắt ADN tại một vị trí chọn trước; khám phá này mang về cho hai bà giải Nobel Hóa học năm 2020 và đã giúp tạo ra giống cây trồng mới cũng như những liệu pháp điều trị ung thư đang được thử nghiệm. Katalin Karikó và Drew Weissman tìm ra cách biến đổi mRNA để cơ thể không phản ứng viêm với nó; phát hiện này là nền tảng của các vắc-xin mRNA ngừa COVID-19 được cấp phép từ cuối năm 2020, và hai nhà khoa học nhận giải Nobel Y học năm 2023. AI cũng thúc đẩy ngành này, như hệ thống AlphaFold dự đoán cấu trúc protein. Tuy nhiên, chỉnh sửa gen đặt ra những câu hỏi lớn về đạo đức và an toàn, nhất là khi áp dụng trên con người, nên cần được quản lý chặt chẽ.',
+      en: 'The World Economic Forum describes the Fourth Industrial Revolution as a fusion of the physical, digital and biological worlds. In 2003 the Human Genome Project finished sequencing almost all of human DNA, a mass of data that only computers could handle. In 2012 Emmanuelle Charpentier and Jennifer Doudna showed how the “genetic scissors” CRISPR-Cas9 could be controlled to cut DNA at a chosen place; the discovery earned them the 2020 Nobel Prize in Chemistry and has already led to new crops and to cancer therapies now in clinical trials. Katalin Karikó and Drew Weissman found how to modify mRNA so that the body does not react to it with inflammation; their discovery was the basis of the mRNA vaccines against COVID-19 approved from late 2020, and it earned them the 2023 Nobel Prize in Physiology or Medicine. AI is speeding up the field too, as with AlphaFold, which predicts the structure of proteins. But gene editing raises serious ethical and safety questions, above all when used on people, so it must be carefully regulated.',
+    },
+    sources: [
+      WEF,
+      { name: 'National Human Genome Research Institute', title: 'Human Genome Project fact sheet', url: 'https://www.genome.gov/about-genomics/educational-resources/fact-sheets/human-genome-project' },
+      { name: 'NobelPrize.org', title: 'The Nobel Prize in Chemistry 2020', url: 'https://www.nobelprize.org/prizes/chemistry/2020/summary/' },
+      { name: 'NobelPrize.org', title: 'The Nobel Prize in Physiology or Medicine 2023', url: 'https://www.nobelprize.org/prizes/medicine/2023/summary/' },
+    ],
+  },
   // ---------- Game Room ----------
   // (The minigame is not finished yet: this board stays a placeholder.)
   'quiz-info': {

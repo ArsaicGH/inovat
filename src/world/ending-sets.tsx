@@ -585,10 +585,10 @@ const LAND_SHADES = [
   ['#94acb4', '#385c6a', '#224250'],
 ]
 const LAND_INVENTIONS = [
-  ['ir1-1', 'ir1-2', 'ir1-3', 'ir1-4'],
+  ['ir1-1', 'ir1-2', 'ir1-3', 'ir1-4', 'ir1-5'],
   ['ir2-1', 'ir2-2', 'ir2-3', 'ir2-4', 'ir2-5'],
-  ['ir3-1', 'ir3-2', 'ir3-3', 'ir3-4'],
-  ['ir4-1', 'ir4-2', 'ir4-3', 'ir4-4', 'ir4-5'],
+  ['ir3-1', 'ir3-2', 'ir3-3', 'ir3-4', 'ir3-5'],
+  ['ir4-1', 'ir4-2', 'ir4-3', 'ir4-4', 'ir4-5', 'ir4-6'],
 ]
 
 function Land({ era }: { era: number }) {

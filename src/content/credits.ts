@@ -22,7 +22,7 @@ function texture(id: string, use: Record<Language, string>, file: string): Credi
     author: AMBIENTCG,
     licence: CC0,
     source: `https://ambientcg.com/view?id=${id}`,
-    files: [`textures/${file}-color.jpg`, `textures/${file}-normal.jpg`],
+    files: [`textures/${file}-color.ktx2`, `textures/${file}-normal.ktx2`],
   }
 }
 
