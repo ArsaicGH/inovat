@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Box3, Raycaster, Vector2, Vector3, type Camera, type Intersection, type Object3D } from 'three'
 import { useMuseumStore, canUse } from '../state/useMuseumStore'
@@ -93,8 +93,16 @@ export default function Interaction() {
   const screenCentre = useMemo(() => new Vector2(0, 0), [])
   const tapPoint = useMemo(() => new Vector2(0, 0), [])
 
+  // Every target's outer box measured in one go once loading is over (behind the title
+  // screen, after the quality measurement), instead of the first time each room is
+  // entered: that cost about 30 ms there, a visible hitch on stepping into a room.
+  const measured = useRef(false)
   useFrame(({ camera }) => {
     const store = useMuseumStore.getState()
+    if (!measured.current && store.qualityChosen) {
+      measured.current = true
+      for (const target of aimTargets) outerBox(target)
+    }
     let aimed: string | null = null
     // (In the tutorial, aiming only starts at the "interact" step.)
     if (store.mode === 'exploring' && canUse(store.tutorial, 'interact')) {

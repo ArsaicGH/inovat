@@ -35,6 +35,7 @@ import EndingScene from './EndingScene'
 import { useFontsReady } from './fonts'
 import { SHADOW_LAYER } from './shadow-layer'
 import { skipWhileHidden } from './skip-while-hidden'
+import './shader-tweaks' // (before anything is drawn: lamps' light skipped where it does not arrive)
 
 // DEVELOPMENT-ONLY test switches in the address bar, to find what slows frames down:
 // ?dpr=1 (normal resolution), ?aa=0 (no edge smoothing), ?shadows=0 (no shadows),
@@ -53,6 +54,16 @@ const EFFECTS = testSwitches.get('fx') !== '0'
 const AO = testSwitches.get('ao') !== '0' && !IS_TOUCH
 // The screen's full sharpness, within the cap above.
 const FULL_RATIO = Math.min(window.devicePixelRatio, MAX_PIXEL_RATIO)
+// The resolution the game wants now (graphics level, automatic quality), changed only by
+// wantResolution. The 3D canvas is given it on every redraw of the page around it: given a
+// fixed value instead, it quietly went back to full sharpness whenever the interface around
+// it changed (pausing, the map, the language), so after resuming from the pause menu, where
+// the level is chosen, "medium" and "low" were drawn at full sharpness again.
+let wantedRatio = FULL_RATIO
+function wantResolution(setDpr: (dpr: number) => void, ratio: number) {
+  wantedRatio = ratio
+  setDpr(ratio)
+}
 
 // GRAPHICS LEVELS, chosen in the pause menu (or automatically, AdaptiveQuality below).
 // What stays at every level, because it IS the museum's look: all the lights, the bloom
@@ -68,8 +79,11 @@ const FULL_RATIO = Math.min(window.devicePixelRatio, MAX_PIXEL_RATIO)
 // - edge smoothing: SMAA at every level. (FXAA, about a third of the work, was tried for
 //   low and medium: it left large dark patches around bright lights, on the ceilings and
 //   across the boards.)
-// "High" is what every computer got before this menu existed, the museum as designed;
-// "ultra" goes beyond it. "Medium" and "low" are for weaker computers (budget and office
+// "High" is the museum as designed, drawn at 90% of the full sharpness: the extra tenth cost
+// a fifth of the frame on the leader's laptop (13.7 ms against 11.0 ms) for a softening
+// hardly visible on its sharp screen, and pushed "high" to the edge of 60 fps once the
+// laptop was warm (leader's decision, 2 November 2026; phones and tablets keep the full
+// sharpness, for readable boards on their small screens). "Ultra" goes beyond it. "Medium" and "low" are for weaker computers (budget and office
 // laptops): measured on the leader's laptop, drawing the lit rooms is about 90% of the work
 // and grows with the number of pixels, the effects only about 10%. So they mostly draw
 // fewer pixels (medium about two thirds of them, low about a third; medium's sharpness is
@@ -93,7 +107,7 @@ const GRAPHICS_LEVELS: Record<GraphicsLevel, GraphicsSettings> = {
   0: { sharpness: 0.5, ao: 'off', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 0, spotShadows: false }, // very low
   1: { sharpness: 0.6, ao: 'off', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 0, spotShadows: false }, // low
   2: { sharpness: 0.8, ao: 'off', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 4, spotShadows: false }, // medium
-  3: { sharpness: 1, ao: 'half', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 3, spotShadows: false }, // high
+  3: { sharpness: IS_TOUCH ? 1 : 0.9, ao: 'half', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 3, spotShadows: false }, // high
   4: { sharpness: 1, ao: 'full', shadowSize: 2048, shadowSoftness: 2, shadowEvery: 1, spotShadows: true }, // ultra
 }
 
@@ -647,11 +661,11 @@ function AdaptiveQuality() {
     }
     // No ambient occlusion and less than full sharpness: shown as "low" in the pause menu.
     if (level === 2 && next < ratio) level = 1
-    store.setAutoGraphics(level)
-    if (next !== ratio) setDpr(next)
     // A machine that needed a lower resolution keeps the same NUMBER of pixels if the
     // window is resized later (ResizeQuality).
     pixelBudget = next < ratio ? next * next * size.width * size.height : null
+    store.setAutoGraphics(level)
+    if (next !== ratio) wantResolution(setDpr, next)
     pixelRatioCeiling = next
 
     // Back to the start, as if nothing happened.
@@ -678,8 +692,10 @@ function GraphicsResolution() {
   const auto = useMuseumStore((state) => state.graphicsAuto)
   const level = useMuseumStore((state) => state.graphicsLevel)
   const apply = (width: number, height: number) => {
-    const next = auto ? autoPixelRatio(width, height) : FULL_RATIO * GRAPHICS_LEVELS[level].sharpness
-    if (Math.abs(next - get().viewport.dpr) > 0.01) setDpr(next)
+    // (Automatic "high" also draws at that level's share of the full sharpness.)
+    const share = FULL_RATIO * GRAPHICS_LEVELS[level].sharpness
+    const next = auto ? (level === 3 ? Math.min(autoPixelRatio(width, height), share) : autoPixelRatio(width, height)) : share
+    if (Math.abs(next - get().viewport.dpr) > 0.01) wantResolution(setDpr, next)
   }
   // A new level or mode: at once (the visitor is in the pause menu).
   useEffect(() => {
@@ -758,6 +774,13 @@ function tuneAmbientOcclusion(pass: N8AOPassInternals | null) {
   }
 }
 
+// Bloom first picks out what is brighter than white, in a full-size picture, then shrinks
+// and blurs it heavily. Picking it out at half size gives the same soft glow for a quarter
+// of that pass's work (about 0.3 ms per frame at "high" on the leader's laptop).
+function halfResolutionBrightPass(bloom: { luminancePass: { resolution: { scale: number } } } | null) {
+  if (bloom && bloom.luminancePass.resolution.scale !== 0.5) bloom.luminancePass.resolution.scale = 0.5
+}
+
 // The effects library adds a final full-screen copy whenever ambient occlusion is used,
 // even when the last effect can draw straight to the screen: a whole extra pass over every
 // pixel each frame. Remove it, so the last effect draws to the screen itself. Checked every
@@ -807,8 +830,9 @@ export default function Museum() {
       id={CANVAS_WRAPPER_ID}
       // "percentage" = PCF shadows; the newest Three.js dropped the older "soft" type.
       shadows={SHADOWS ? 'percentage' : false}
-      // Cap the pixel ratio at 1.5 (CLAUDE.md): sharp enough, but much cheaper on high-DPI screens.
-      dpr={[1, MAX_PIXEL_RATIO]}
+      // The resolution the game wants (wantedRatio), never above the pixel ratio cap of 1.5
+      // (CLAUDE.md): sharp enough, but much cheaper on high-DPI screens.
+      dpr={wantedRatio}
       camera={{ fov: 70, near: 0.1, far: 120 }}
       // Laptops with two graphics chips: ask for the faster one.
       // No multisampling on the page's own canvas when the effects run: every frame is drawn
@@ -870,7 +894,7 @@ export default function Museum() {
           ) : (
             <></>
           )}
-          <Bloom mipmapBlur luminanceThreshold={1} luminanceSmoothing={0.2} intensity={0.45} />
+          <Bloom mipmapBlur luminanceThreshold={1} luminanceSmoothing={0.2} intensity={0.45} ref={halfResolutionBrightPass} />
           {/* AgX: a natural, film-like way of turning light into screen colours. */}
           <ToneMapping mode={ToneMappingMode.AGX} />
           {/* Slightly darker corners, like a camera lens: a cinematic frame. */}

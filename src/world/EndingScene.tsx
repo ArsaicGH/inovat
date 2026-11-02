@@ -35,7 +35,7 @@ const ease = (u: number) => u * u * u * (u * (u * 6 - 15) + 10)
 
 export default function EndingScene({ running }: { running: boolean }) {
   const run = useMuseumStore((state) => state.endingRun)
-  const warm = useRef({ frames: 0, compiled: false, done: false, pieces: -1 })
+  const warm = useRef({ frames: 0, compiled: false, done: false, pieces: -1, settled: 0 })
   const warmTarget = useMemo(() => new WebGLRenderTarget(64, 64, { type: HalfFloatType }), [])
   useEffect(() => () => warmTarget.dispose(), [warmTarget])
   // (While hidden, its objects' places are not worked out every frame: skip-while-hidden.ts.)
@@ -116,12 +116,15 @@ export default function EndingScene({ running }: { running: boolean }) {
     if (!root) return
     const state = warm.current
     state.frames += 1
-    if (state.frames % 30 === 0 && (state.done || state.frames < 1000)) {
+    // (Once prepared and unchanged for a few counts, no longer counted.)
+    if (state.frames % 30 === 0 && state.settled < 3 && (state.done || state.frames < 1000)) {
       let pieces = 0
       root.traverse(() => void (pieces += 1))
+      if (pieces === state.pieces && state.done) state.settled += 1
       if (pieces !== state.pieces) {
         state.pieces = pieces
         state.frames = 0
+        state.settled = 0
         state.compiled = false
         state.done = false
       }

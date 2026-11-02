@@ -71,18 +71,21 @@ function buildShape(root: Group, meshes: Mesh[]): BufferGeometry | null {
 
 export function useShadowProxy(root: RefObject<Group | null>) {
   const proxy = useRef<Mesh | null>(null)
-  const state = useRef({ frames: 0, seen: '', built: '' })
+  // (Checks start at a different frame for each exhibit, so they never all fall in the same
+  // frame; after a shape has been built and stayed right for a few checks, they stop.)
+  const state = useRef({ frames: Math.floor(Math.random() * 30), seen: '', built: '', settled: 0 })
 
   useFrame(() => {
     const group = root.current
     // (After the museum has loaded and been drawn once: every model and every merging done.)
-    if (!group || !useMuseumStore.getState().warmedUp) return
+    if (!group || state.current.settled >= 3 || !useMuseumStore.getState().warmedUp) return
     // Checked twice a second: a model that arrives or changes later gets a new shape.
     if (++state.current.frames % 30 !== 0) return
     const meshes = collect(group, proxy.current)
     const now = signature(meshes)
     const stable = now === state.current.seen
     state.current.seen = now
+    if (stable && now === state.current.built) state.current.settled += 1
     if (!stable || now === state.current.built) return
     state.current.built = now
     const shape = buildShape(group, meshes)
