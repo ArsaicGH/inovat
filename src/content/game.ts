@@ -376,7 +376,7 @@ const vi = {
   goBack: 'Quay lại các phòng',
   goBackNote: 'Xem lại các phòng bất cứ lúc nào; tiến độ của bạn được giữ nguyên.',
   goBackHelp:
-    'Nút này mở bản đồ để bạn xem lại bất kỳ phòng nào, cả khi đang chơi (nó luôn nằm ở cuối khung trò chơi); tiến độ được giữ nguyên. Để trở lại đúng câu đang làm, nhấn phím R trên máy tính, hoặc bấm nút "Quay lại phòng trò chơi" ở cuối màn hình trên điện thoại và máy tính bảng.',
+    'Nút này mở bản đồ để bạn xem lại bất kỳ phòng nào, cả khi đang chơi (nó luôn nằm ở cuối khung trò chơi); tiến độ được giữ nguyên. Để trở lại đúng câu đang làm, nhấn phím R.',
   // While away in the rooms (a button at the bottom of the screen).
   returnToGame: 'Quay lại phòng trò chơi',
   returnKey: 'R',
@@ -453,7 +453,7 @@ const en: typeof vi = {
   goBack: 'Back to the rooms',
   goBackNote: 'Look around the rooms at any time; your progress is kept.',
   goBackHelp:
-    'This button opens the map so you can look around any room again, even mid-challenge (it is always at the bottom of the game); your progress is kept. To come back to the same question, press R on a computer, or tap the “Back to the Game Room” button at the bottom of the screen on a phone or tablet.',
+    'This button opens the map so you can look around any room again, even mid-challenge (it is always at the bottom of the game); your progress is kept. To come back to the same question, press R.',
   returnToGame: 'Back to the Game Room',
   returnKey: 'R',
   rounds: [
@@ -503,8 +503,10 @@ const noKeys = (text: string) => text.replace(/ \((Phím|Keys) [^)]*\)/, '')
 export const gameTouchText: Record<Language, Partial<GameText>> = {
   vi: {
     rounds: vi.rounds.map((r) => ({ ...r, task: noKeys(r.task) })),
+    goBackHelp: vi.goBackHelp.replace('nhấn phím R', 'bấm nút "Quay lại phòng trò chơi"'),
   },
   en: {
     rounds: en.rounds.map((r) => ({ ...r, task: noKeys(r.task) })),
+    goBackHelp: en.goBackHelp.replace('press R', 'tap the “Back to the Game Room” button'),
   },
 }
