@@ -132,11 +132,6 @@ export default function LoadingScreen() {
       <p className="loading-step">{stepText}</p>
       <p className="loading-bytes">{text.downloaded.replace('{loaded}', megabytes(loadedBytes)).replace('{total}', megabytes(__STARTUP_BYTES__))}</p>
       <div className="loading-tips">
-        <div className="title-ornament loading-ornament" aria-hidden="true">
-          <span />
-          <i />
-          <span />
-        </div>
         <p className="loading-tips-list">
           {text.tips.map((tip, i) => (
             <span key={tip}>

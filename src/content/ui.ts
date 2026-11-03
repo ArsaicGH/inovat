@@ -77,6 +77,12 @@ const vi = {
     toTitle: 'Về màn hình chính',
     clickHint: 'Nhấp vào khoảng trống hoặc nhấn Tiếp tục',
   },
+  // The title screen's settings (the gear beside the volume and language).
+  settings: {
+    title: 'Cài đặt',
+    open: 'Mở cài đặt',
+    close: 'Đóng',
+  },
   // While walking without the mouse captured (e.g. after resuming with Esc).
   clickToLook: 'Nhấp chuột để dùng chuột xoay góc nhìn',
   // KEY LIST: shown with Space while walking, in the order the tutorial teaches them.
@@ -283,6 +289,11 @@ const en: UiText = {
     resume: 'Continue',
     toTitle: 'Back to the title screen',
     clickHint: 'Click on blank space or press Continue',
+  },
+  settings: {
+    title: 'Settings',
+    open: 'Open settings',
+    close: 'Close',
   },
   clickToLook: 'Click to look around with the mouse',
   keyList: {

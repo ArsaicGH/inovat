@@ -5,7 +5,9 @@ import { useMuseumStore } from '../state/useMuseumStore'
 
 const QUALITY_NAMES = ['very low', 'low', 'medium', 'high', 'ultra']
 
-// DEVELOPMENT-ONLY diagnostic (never shown on the live site, so English is fine).
+// DIAGNOSTIC: always on while developing; on the live site only with ?stats in the address
+// (e.g. https://.../?stats), so testers on other devices can report what they see. Not
+// part of the game itself, so English is fine.
 // The FPS counter only shows an average; jitter comes from frames that take UNEVEN
 // time. This records every frame time and shows, every 2 seconds:
 //   avg   = average frame time (and FPS)
@@ -37,10 +39,22 @@ export default function FrameTimingProbe() {
     div.textContent = 'frame timing: measuring...'
     document.body.appendChild(div)
     box.current = div
-    return () => div.remove()
-  }, [])
+    // Count the drawing work of a whole frame (bloom, text and other steps each draw too),
+    // reset by hand below once per frame instead of at every drawing step.
+    renderer.info.autoReset = false
+    return () => {
+      div.remove()
+      renderer.info.autoReset = true
+    }
+  }, [renderer])
 
+  const calls = useRef(0)
+  const triangles = useRef(0)
   useFrame((_, delta) => {
+    // Last frame's totals (this runs before this frame's drawing).
+    calls.current = Math.max(calls.current, renderer.info.render.calls)
+    triangles.current = Math.max(triangles.current, renderer.info.render.triangles)
+    renderer.info.reset()
     times.current.push(delta * 1000)
     elapsed.current += delta
     if (elapsed.current < REPORT_EVERY_SECONDS || !box.current) return
@@ -71,6 +85,8 @@ export default function FrameTimingProbe() {
     debugStats.mouseMoves = 0
     times.current = []
     elapsed.current = 0
+    calls.current = 0
+    triangles.current = 0
   })
 
   return null

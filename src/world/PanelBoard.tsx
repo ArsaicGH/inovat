@@ -19,9 +19,9 @@ import { SharpText, recordText, type TextRun } from './sharp-text'
 // How the sharp letters are lit, like the paper they lie on (its material below).
 const PAPER = { lit: true, glow: 0.28, roughness: 0.9 }
 const SCREEN = { lit: true, glow: 0.9, roughness: 0.3 }
-// The hologram's sharp letters: unlit and a little brighter than their colour.
+// The hologram's sharp letters: unlit and a little brighter than their colour. (One look
+// whether aimed at or not: changing it rebuilt the letters, which blinked out meanwhile.)
 const HOLOGRAM = { lit: false, glow: 1.15 }
-const HOLOGRAM_AIMED = { lit: false, glow: 1.4 }
 
 const PIXELS_PER_METRE = 512 // sharp enough to read from a couple of metres away
 const FRAME = BOARD_FRAME // frame width (metres)
@@ -293,7 +293,7 @@ export default function PanelBoard({ exhibitId, width, height, aimed, theme }: P
           <planeGeometry args={[width, height]} />
         </mesh>
         {/* The letters: sharp, on top of their painted halos. */}
-        <SharpText runs={runs} pixels={pixels} face={glassFace} z={0.002} shading={aimed ? HOLOGRAM_AIMED : HOLOGRAM} />
+        <SharpText runs={runs} pixels={pixels} face={glassFace} z={0.002} shading={HOLOGRAM} />
         {/* Thin glowing edges along the top and bottom. */}
         {[-1, 1].map((s) => (
           <mesh key={s} position={[0, (s * height) / 2, 0]}>

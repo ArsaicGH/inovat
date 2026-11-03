@@ -1024,7 +1024,7 @@ export default function Museum() {
           <DevStats />
         </Suspense>
       )}
-      {import.meta.env.DEV && <FrameTimingProbe />}
+      {(import.meta.env.DEV || new URLSearchParams(window.location.search).has('stats')) && <FrameTimingProbe />}
     </Canvas>
   )
 }

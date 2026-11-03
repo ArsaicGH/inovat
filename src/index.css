@@ -1067,7 +1067,7 @@ body {
   font-variant-numeric: tabular-nums;
   color: #9a8a68;
 }
-/* The tips at the bottom, in the museum's gold: an ornament, then the
+/* The tips at the bottom, in the museum's gold: the
    two tips side by side with a diamond between them. */
 .loading-tips {
   position: absolute;
@@ -1078,9 +1078,6 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 8px;
-}
-.loading-ornament {
-  width: min(320px, 70vw);
 }
 .loading-tips-list {
   display: flex;
@@ -3273,4 +3270,31 @@ body {
   border-top: 1px solid rgba(154, 115, 48, 0.35);
   font-size: 13px;
   color: #8a7a62;
+}
+
+/* Title screen: the settings gear, to the right of the volume and language. */
+.title-settings {
+  position: absolute;
+  left: calc(100% + 20px);
+  bottom: 0;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border: 1px solid rgba(201, 162, 90, 0.55);
+  border-radius: 50%;
+  background: rgba(30, 24, 16, 0.75);
+  color: #e0c27e;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.4s;
+}
+.title-settings svg {
+  width: 26px;
+  height: 26px;
+}
+.title-settings:hover {
+  background: rgba(201, 162, 90, 0.22);
+  box-shadow: 0 0 20px rgba(201, 162, 90, 0.45);
+  transform: rotate(45deg);
 }
