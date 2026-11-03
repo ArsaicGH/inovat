@@ -1,304 +1,430 @@
-import { Suspense, lazy, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { Suspense, lazy, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { useContent } from '../content/use-content'
-import { CHALLENGES, INVENTION_IDS, MAKERS, eraOf, gameText, gameTouchText, type Era } from '../content/game'
-import { useMuseumStore } from '../state/useMuseumStore'
+import { gameText, gameTouchText, type Era } from '../content/game'
+import { PICTURES } from '../content/pictures'
+import { useMuseumStore, type GameRun } from '../state/useMuseumStore'
 import { resumeWalking } from '../world/pointer-lock'
-import { playEffect } from '../audio/sound'
 import { useScrollFades } from './scroll-fades'
 import { IS_TOUCH } from './touch'
+import {
+  MAX_POINTS,
+  STARS,
+  cardEra,
+  cardPoints,
+  choose,
+  goBackToRooms,
+  isPhoto,
+  moreClue,
+  mystery,
+  nextCard,
+  questionOf,
+  startRun,
+  starsFor,
+  townProblem,
+  tryAgain,
+  visitorOf,
+} from './game-run'
+import { TOWN_YEARS } from '../content/game-cards'
+import Town, { townStages } from './game-town'
+import VisitorFigure, { SceneBackdrop } from './game-visitor'
 
-// THE TIME MACHINE GAME (opened from the Game Room's lectern): four short rounds, each
-// relighting one power core; all four open the portal (quizPassed). A round can be retried
-// at once (new cards each time), and every wrong answer names the room to look again in.
+// THE TIME MACHINE REPAIR SHOP (opened from the Game Room's lectern). The first screen is the
+// workshop with the four power cores; each core is a different challenge:
+//   I   Lost in time: send each machine or picture through its era's door.
+//   II  The growing town: solve each era's problems so the town grows from 1760 to 2026.
+//   III Who am I?: guess a mystery from clues, the sooner the better.
+//   IV  Visitors from the past: give four visitors advice that fits their time.
+// Cores are lit in order; all four open the portal (quizPassed). A wrong answer asks whether to
+// go back to the rooms (the map opens; a button brings the visitor back to this very card) or
+// to answer again. The rules and the saved progress are in game-run.ts.
 
 const ModelViewer = lazy(() => import('../world/ModelViewer'))
 const ERA_COLOURS = ['#e0a050', '#ffd36a', '#6be08b', '#3fd0e0']
 const NUMERALS = ['I', 'II', 'III', 'IV']
-const NEED = [6, 4, 3, 4] // right answers needed in each round
-
-function shuffle<T>(list: T[]): T[] {
-  const copy = [...list]
-  for (let i = copy.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[copy[i], copy[j]] = [copy[j], copy[i]]
-  }
-  return copy
-}
-
-// Four machines drawn evenly from all 18, drawn again in the rare case that every one
-// comes from the same revolution.
-function pickMysteries(): string[] {
-  for (;;) {
-    const picks = shuffle(INVENTION_IDS).slice(0, 4)
-    if (new Set(picks.map(eraOf)).size > 1) return picks
-  }
-}
+const eraColour = (era: Era) => ({ '--era': ERA_COLOURS[era - 1] }) as CSSProperties
+const pickOf = <T,>(list: T[], seed: number) => list[seed % list.length]
 
 function useGame() {
   const content = useContent()
   const text = useMemo(() => ({ ...gameText[content.language], ...(IS_TOUCH ? gameTouchText[content.language] : {}) }), [content.language])
-  const room = (id: string) => content.roomNames[`ir${eraOf(id)}` as 'ir1'].name
+  const roomName = (era: Era) => content.roomNames[`ir${era}` as 'ir1'].name
+  const roomShort = (era: Era) => content.roomNames[`ir${era}` as 'ir1'].short
   const title = (id: string) => content.exhibit(id).title
-  return { ...content, g: text, room, title }
+  return { ...content, g: text, roomName, roomShort, title }
 }
 
-type Finish = (score: number) => void
+function useRun(): GameRun {
+  return useMuseumStore((state) => state.gameRun)!
+}
 
-// ---- Round 1: sort inventions into their revolution ----
-function TimelineRound({ onFinish }: { onFinish: Finish }) {
-  const { g, title } = useGame()
-  const cards = useMemo(() => shuffle(INVENTION_IDS).slice(0, 8), [])
-  const [chosen, setChosen] = useState<Record<string, Era>>({})
-  const [checked, setChecked] = useState(false)
-  const complete = cards.every((id) => chosen[id])
-  function check() {
-    setChecked(true)
-    onFinish(cards.filter((id) => chosen[id] === eraOf(id)).length)
-  }
+// Number keys choose (1-4 on the top row or the keypad); Enter goes on to the next card.
+function useKeys(count: number, onNumber: (i: number) => void) {
+  const handler = useRef(onNumber)
+  handler.current = onNumber
+  useEffect(() => {
+    function listen(event: KeyboardEvent) {
+      const top = ['Digit1', 'Digit2', 'Digit3', 'Digit4'].indexOf(event.code)
+      const pad = ['Numpad1', 'Numpad2', 'Numpad3', 'Numpad4'].indexOf(event.code)
+      const i = Math.max(top, pad)
+      if (i >= 0 && i < count) handler.current(i)
+      if (event.code === 'Enter' || event.code === 'NumpadEnter') nextCard()
+    }
+    window.addEventListener('keydown', listen)
+    return () => window.removeEventListener('keydown', listen)
+  }, [count])
+}
+
+function Stars({ n }: { n: number }) {
   return (
-    <>
-      <div className="game-cards">
-        {cards.map((id) => {
-          const right = chosen[id] === eraOf(id)
+    <span className="game-stars" aria-label={`${n}/3`}>
+      {'★'.repeat(n)}
+      <i>{'★'.repeat(3 - n)}</i>
+    </span>
+  )
+}
+
+// The bar above every card: where we are, and the points so far.
+function CardBar({ label, extra }: { label: ReactNode; extra?: ReactNode }) {
+  const { g } = useGame()
+  const run = useRun()
+  return (
+    <div className="game-bar">
+      <span>{label}</span>
+      {extra}
+      <strong>{g.points.replace('{n}', String(run.points))}</strong>
+    </div>
+  )
+}
+
+// A wrong answer: go back to the rooms, or answer again. (No answer is given away: the hint
+// only names the room, and not at all where the room would be the answer.)
+function WrongPrompt({ hintEra }: { hintEra?: Era }) {
+  const { g, roomName } = useGame()
+  return (
+    <div className="game-feedback is-wrong game-wrong">
+      <p>
+        <strong>{g.wrongTitle}</strong> {g.wrongAsk}
+        {hintEra && <span className="game-review"> {g.wrongHint.replace('{room}', roomName(hintEra))}</span>}
+      </p>
+      <span className="game-result-buttons">
+        <button className="game-close" onClick={goBackToRooms}>
+          {g.goBack}
+        </button>
+        <button className="game-primary" onClick={tryAgain}>
+          {g.tryAgain}
+        </button>
+      </span>
+    </div>
+  )
+}
+
+// After a right answer: what it means, and on to the next card.
+function RightNote({ children }: { children: ReactNode }) {
+  return (
+    <div className="game-feedback is-right">
+      <p>{children}</p>
+      <button className="game-primary" onClick={nextCard} aria-label="→">
+        →
+      </button>
+    </div>
+  )
+}
+
+// ---- Core I: Lost in time ----
+function LostRound() {
+  const { g, title, roomShort, language } = useGame()
+  const run = useRun()
+  const id = run.deck[run.index]
+  const era = cardEra(0, id)
+  useKeys(4, (i) => choose(String(i + 1)))
+  // A right answer moves on by itself after a moment (or at once with →).
+  useEffect(() => {
+    if (!run.solved) return
+    const timer = window.setTimeout(nextCard, 1600)
+    return () => window.clearTimeout(timer)
+  }, [run.solved, run.index])
+  const picture = isPhoto(id) ? PICTURES[id] : null
+  return (
+    <div className="lost">
+      <CardBar
+        label={g.cardOf.replace('{n}', String(run.index + 1)).replace('{total}', String(run.deck.length))}
+        extra={run.combo >= 2 && <strong className="game-combo">{g.combo.replace('{n}', String(run.combo))}</strong>}
+      />
+      <div className={`lost-stage${run.solved ? ' is-in' : run.asking ? ' is-out' : ''}`}>
+        <div key={id} className={`lost-object${picture ? ' is-photo' : ''}`}>
+          {picture ? (
+            <img src={`${import.meta.env.BASE_URL}${picture.file}`} alt="" draggable={false} />
+          ) : (
+            <Suspense fallback={null}>
+              <ModelViewer id={id} />
+            </Suspense>
+          )}
+        </div>
+        {/* A machine shows its name at once; a picture's caption only once it is sorted
+            (its dates would give the answer away). */}
+        {!picture && <p className="lost-title">{title(id)}</p>}
+        {picture && run.solved && <p className="lost-title">{picture.caption[language]}</p>}
+      </div>
+      {run.asking && <WrongPrompt />}
+      {run.solved && <RightNote>{g.rightDoor}</RightNote>}
+      <div className="lost-doors">
+        {([1, 2, 3, 4] as Era[]).map((door) => {
+          const tried = run.wrong.includes(String(door))
+          const state = run.solved && door === era ? ' is-answer' : tried ? ' is-wrong-door' : ''
           return (
-            <div key={id} className={`game-card${checked ? (right ? ' is-right' : ' is-wrong') : ''}`}>
-              <span className="game-card-title">{title(id)}</span>
-              <div className="game-eras">
-                {NUMERALS.map((numeral, i) => {
-                  const era = (i + 1) as Era
-                  const isAnswer = checked && era === eraOf(id)
-                  return (
-                    <button
-                      key={numeral}
-                      disabled={checked}
-                      className={`game-era${chosen[id] === era ? ' is-chosen' : ''}${isAnswer ? ' is-answer' : ''}`}
-                      style={{ '--era': ERA_COLOURS[i] } as React.CSSProperties}
-                      onClick={() => setChosen((previous) => ({ ...previous, [id]: era }))}
-                    >
-                      {numeral}
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
+            <button key={door} className={`lost-door${state}`} style={eraColour(door)} disabled={run.solved || run.asking || tried} onClick={() => choose(String(door))}>
+              <b>{NUMERALS[door - 1]}</b>
+              <small>{roomShort(door)}</small>
+            </button>
           )
         })}
-      </div>
-      {!checked && (
-        <button className="game-primary" disabled={!complete} onClick={check}>
-          {g.check}
-        </button>
-      )}
-    </>
-  )
-}
-
-// ---- Round 2: connect people and companies to their inventions ----
-function WireRound({ onFinish }: { onFinish: Finish }) {
-  const { g, language, title } = useGame()
-  const pairs = useMemo(() => shuffle(MAKERS).slice(0, 5), [])
-  const right = useMemo(() => shuffle(pairs.map((p) => p.id)), [pairs])
-  const [picked, setPicked] = useState<string | null>(null) // a left box (its invention id)
-  const [links, setLinks] = useState<Record<string, string>>({}) // left id -> right id
-  const [checked, setChecked] = useState(false)
-  const order = Object.keys(links)
-  const colourOf = (left: string) => ERA_COLOURS[order.indexOf(left) % 4]
-  function link(target: string) {
-    if (!picked || checked) return
-    // (A box already linked is unlinked first: each box has one partner.)
-    setLinks((previous) => {
-      const next = Object.fromEntries(Object.entries(previous).filter(([l, r]) => l !== picked && r !== target))
-      next[picked] = target
-      return next
-    })
-    setPicked(null)
-    playEffect('select', 0.4)
-  }
-  function check() {
-    setChecked(true)
-    onFinish(pairs.filter((p) => links[p.id] === p.id).length)
-  }
-  return (
-    <>
-      <div className="game-wire">
-        <div className="game-wire-column">
-          {pairs.map((p) => {
-            const linked = links[p.id]
-            return (
-              <button
-                key={p.id}
-                disabled={checked}
-                className={`game-wire-box${picked === p.id ? ' is-picked' : ''}${checked ? (linked === p.id ? ' is-right' : ' is-wrong') : ''}`}
-                style={linked ? ({ '--link': colourOf(p.id) } as React.CSSProperties) : undefined}
-                onClick={() => setPicked(p.id)}
-              >
-                {linked && <i className="game-wire-dot" />}
-                {p.who[language]}
-                {checked && linked !== p.id && <small>→ {title(p.id)}</small>}
-              </button>
-            )
-          })}
-        </div>
-        <div className="game-wire-column">
-          {right.map((id) => {
-            const from = Object.keys(links).find((l) => links[l] === id)
-            return (
-              <button
-                key={id}
-                disabled={checked || !picked}
-                className="game-wire-box"
-                style={from ? ({ '--link': colourOf(from) } as React.CSSProperties) : undefined}
-                onClick={() => link(id)}
-              >
-                {from && <i className="game-wire-dot" />}
-                {title(id)}
-              </button>
-            )
-          })}
-        </div>
-      </div>
-      {!checked && (
-        <button className="game-primary" disabled={Object.keys(links).length < pairs.length} onClick={check}>
-          {g.check}
-        </button>
-      )}
-    </>
-  )
-}
-
-// ---- Rounds 3 and 4: one question at a time, four choices ----
-interface Question {
-  answer: string
-  options: string[]
-  prompt: ReactNode
-  why?: string
-  visual?: (revealed: boolean) => ReactNode
-}
-function ChoiceRound({ questions, onFinish }: { questions: Question[]; onFinish: Finish }) {
-  const { g, room, title } = useGame()
-  const [index, setIndex] = useState(0)
-  const [picked, setPicked] = useState<string | null>(null)
-  const [score, setScore] = useState(0)
-  const q = questions[index]
-  const last = index === questions.length - 1
-  function choose(id: string) {
-    if (picked) return
-    setPicked(id)
-    const right = id === q.answer
-    playEffect(right ? 'correct' : 'wrong', 0.6)
-    const total = score + (right ? 1 : 0)
-    setScore(total)
-    if (last) onFinish(total)
-  }
-  useEffect(() => {
-    function onKey(event: KeyboardEvent) {
-      const n = ['Digit1', 'Digit2', 'Digit3', 'Digit4'].indexOf(event.code)
-      const pad = ['Numpad1', 'Numpad2', 'Numpad3', 'Numpad4'].indexOf(event.code)
-      const i = Math.max(n, pad)
-      if (i >= 0 && q.options[i]) choose(q.options[i])
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  })
-  return (
-    <div className="game-choice">
-      {q.visual && <div className="game-visual">{q.visual(Boolean(picked))}</div>}
-      <div className="game-choice-main">
-        <p className="game-progress">
-          {index + 1}/{questions.length}
-        </p>
-        <div className="game-prompt">{q.prompt}</div>
-        <div className="game-options">
-          {q.options.map((id, i) => {
-            const state = picked ? (id === q.answer ? ' is-right' : id === picked ? ' is-wrong' : ' is-dim') : ''
-            return (
-              <button key={id} className={`game-option${state}`} disabled={Boolean(picked)} onClick={() => choose(id)}>
-                <b>{i + 1}</b>
-                {title(id)}
-              </button>
-            )
-          })}
-        </div>
-        {picked && (
-          <div className={`game-feedback ${picked === q.answer ? 'is-right' : 'is-wrong'}`}>
-            {q.why && <p>{q.why}</p>}
-            {picked !== q.answer && <p className="game-review">{g.review.replace('{room}', room(q.answer))}</p>}
-            {!last && (
-              <button
-                className="game-primary"
-                onClick={() => {
-                  setIndex(index + 1)
-                  setPicked(null)
-                }}
-              >
-                →
-              </button>
-            )}
-          </div>
-        )}
       </div>
     </div>
   )
 }
 
-function MysteryRound({ onFinish }: { onFinish: Finish }) {
-  const { g, room, exhibit } = useGame()
-  const questions = useMemo<Question[]>(
-    () =>
-      pickMysteries().map((answer) => ({
-        answer,
-        options: shuffle([answer, ...shuffle(INVENTION_IDS.filter((id) => id !== answer)).slice(0, 3)]),
-        prompt: (
+// ---- Core II: The growing town ----
+function TownRound() {
+  const { g, language, title } = useGame()
+  const run = useRun()
+  const problem = townProblem(run.deck[run.index])
+  const eraIndex = Math.floor(run.index / 3)
+  const step = run.index % 3
+  const eraDone = run.solved && step === 2
+  useKeys(3, (i) => run.options[i] && choose(run.options[i]))
+  const stages = townStages(run)
+  return (
+    <div className="town-round">
+      <CardBar label={<>{g.townIn.replace('{year}', String(TOWN_YEARS[eraDone ? eraIndex + 1 : eraIndex]))} · {g.problemOf.replace('{n}', String(step + 1))}</>} />
+      <Town stages={stages} era={eraDone ? eraIndex + 1 : eraIndex} current={run.solved ? null : problem.spot} pending={run.deck.slice(run.index + 1, eraIndex * 3 + 3).map((id) => townProblem(id).spot)} />
+      <p className="town-problem">{problem.problem[language]}</p>
+      <div className="town-options">
+        {run.options.map((option, i) => {
+          const tried = run.wrong.includes(option)
+          const state = run.solved ? (option === problem.options[0] ? ' is-right' : ' is-dim') : tried ? ' is-wrong' : ''
+          return (
+            <button key={option} className={`game-option${state}`} disabled={run.solved || run.asking || tried} onClick={() => choose(option)}>
+              <b>{i + 1}</b>
+              {title(option)}
+            </button>
+          )
+        })}
+      </div>
+      {run.asking && <WrongPrompt hintEra={problem.era} />}
+      {run.solved && (
+        <RightNote>
+          {problem.fixed[language]}
+          {eraDone && <strong className="town-jump"> {g.eraJump}</strong>}
+        </RightNote>
+      )}
+    </div>
+  )
+}
+
+// ---- Core III: Who am I? ----
+function MysteryRound() {
+  const { g, language, title, roomName } = useGame()
+  const run = useRun()
+  const id = run.deck[run.index]
+  const m = mystery(id)
+  const isEra = /^ir\d$/.test(id)
+  const label = (option: string) => (/^ir\d$/.test(option) ? roomName(Number(option[2]) as Era) : title(option))
+  useKeys(4, (i) => run.options[i] && choose(run.options[i]))
+  return (
+    <div className="mystery">
+      <CardBar
+        label={
           <>
-            <p>{g.clueEra.replace('{room}', room(answer))}</p>
-            <p className="game-clue">{exhibit(answer).facts.find((f) => f.includes(':') && !/^(Nhân vật|Person|People|Pioneer|Công ty|Company)/.test(f))}</p>
+            {g.mysteryOf.replace('{n}', String(run.index + 1)).replace('{total}', String(run.deck.length))}
+            {isEra && ` · ${g.era}`}
           </>
-        ),
-        visual: (revealed: boolean) => (
-          // (A fresh view for each machine, so it is measured and centred anew.)
-          <Suspense key={answer} fallback={null}>
-            <ModelViewer id={answer} silhouette={!revealed} />
-          </Suspense>
-        ),
-      })),
-    // (New machines on every attempt; the texts follow the language.)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+        }
+        extra={!run.solved && <span className="mystery-worth">{g.worth.replace('{n}', String(cardPoints(run)))}</span>}
+      />
+      <div className="mystery-body">
+        <ol className="mystery-clues">
+          {m.clues.map((clue, k) =>
+            k < run.clues || run.solved ? (
+              <li key={k} className="mystery-clue">
+                <small>{g.clue.replace('{n}', String(k + 1))}</small>
+                {clue[language]}
+              </li>
+            ) : (
+              <li key={k} className="mystery-clue is-hidden">
+                {k === run.clues ? (
+                  <button className="game-hint" disabled={run.asking} onClick={moreClue}>
+                    {g.moreClue} (−1)
+                  </button>
+                ) : (
+                  <small>{g.clue.replace('{n}', String(k + 1))}</small>
+                )}
+              </li>
+            ),
+          )}
+        </ol>
+        <div className="mystery-options">
+          {run.options.map((option, i) => {
+            const tried = run.wrong.includes(option)
+            const state = run.solved ? (option === id ? ' is-right' : ' is-dim') : tried ? ' is-wrong' : ''
+            return (
+              <button key={option} className={`game-option${state}`} disabled={run.solved || run.asking || tried} onClick={() => choose(option)}>
+                <b>{i + 1}</b>
+                {label(option)}
+              </button>
+            )
+          })}
+        </div>
+      </div>
+      {run.asking && <WrongPrompt hintEra={isEra ? undefined : cardEra(2, id)} />}
+      {run.solved && <RightNote>{g.solved.replace('{n}', String(Math.max(0, 4 - Math.max(run.clues - 1, run.wrong.length))))}</RightNote>}
+    </div>
   )
-  return <ChoiceRound questions={questions} onFinish={onFinish} />
 }
 
-function FactoryRound({ onFinish }: { onFinish: Finish }) {
-  const { language } = useGame()
-  const questions = useMemo<Question[]>(
-    () =>
-      shuffle(CHALLENGES)
-        .slice(0, 5)
-        .map((c) => ({
-        answer: c.answer,
-        options: shuffle(c.options),
-        prompt: <p>{c.situation[language]}</p>,
-        why: c.why[language],
-      })),
-    [language],
+// ---- Core IV: Visitors from the past ----
+function VisitorRound() {
+  const { g, language } = useGame()
+  const run = useRun()
+  const qid = run.deck[run.index]
+  const visitor = visitorOf(qid)
+  const question = questionOf(qid)
+  const visitorNumber = Math.floor(run.index / 3)
+  const step = run.index % 3
+  useKeys(3, (i) => run.options[i] && choose(run.options[i]))
+  // What the visitor says: hello and the question, then their reaction.
+  const speech = run.solved ? (
+    `${pickOf(g.happy, visitorNumber + step)} ${step === 2 ? g.goodbye : ''}`
+  ) : run.asking ? (
+    <>
+      <strong>{pickOf(g.puzzled, run.index + run.wrong.length)}</strong> {question.ask[language]}
+    </>
+  ) : (
+    `${step === 0 && run.wrong.length === 0 ? `${visitor.hello[language]} ` : ''}${question.ask[language]}`
   )
-  return <ChoiceRound questions={questions} onFinish={onFinish} />
+  return (
+    <div className="visitor-round">
+      <CardBar label={<>{g.visitorOf.replace('{n}', String(visitorNumber + 1))} · <strong>{visitor.who[language]}</strong> · {g.adviceOf.replace('{n}', String(step + 1))}</>} />
+      <div className="visitor-scene">
+        <SceneBackdrop era={visitor.era} />
+        <VisitorFigure look={visitor.look} mood={run.solved ? 'happy' : run.asking ? 'puzzled' : 'asking'} key={visitor.id} />
+        <div className="visitor-speech">{speech}</div>
+      </div>
+      <div className="visitor-replies">
+        {run.options.map((option, i) => {
+          const tried = run.wrong.includes(option)
+          const state = run.solved ? (option === '0' ? ' is-right' : ' is-dim') : tried ? ' is-wrong' : ''
+          return (
+            <button key={option} className={`game-option${state}`} disabled={run.solved || run.asking || tried} onClick={() => choose(option)}>
+              <b>{i + 1}</b>
+              {question.replies[Number(option)][language]}
+            </button>
+          )
+        })}
+      </div>
+      {run.asking && <WrongPrompt hintEra={visitor.era} />}
+      {run.solved && <RightNote>{question.why[language]}</RightNote>}
+    </div>
+  )
 }
 
-const ROUNDS = [TimelineRound, WireRound, MysteryRound, FactoryRound]
-const TOTALS = [8, 5, 4, 5]
+// ---- The result of a core ----
+function Result({ onDone }: { onDone: () => void }) {
+  const { g } = useGame()
+  const run = useRun()
+  const stars = starsFor(run.round, run.points)
+  return (
+    <div className={`game-result ${stars > 0 ? 'is-right' : 'is-wrong'}`}>
+      <span>
+        <strong>{stars > 0 ? g.passed.replace('{n}', NUMERALS[run.round]) : g.failed}</strong>{' '}
+        {g.score.replace('{score}', String(run.points)).replace('{total}', String(MAX_POINTS[run.round])).replace('{need}', String(STARS[run.round][0]))}{' '}
+        {stars > 0 && <Stars n={stars} />}
+      </span>
+      <span className="game-result-buttons">
+        {stars > 0 ? (
+          <button className="game-primary" onClick={onDone}>
+            {g.next}
+          </button>
+        ) : (
+          <button className="game-primary" onClick={() => startRun(run.round)}>
+            {g.retry}
+          </button>
+        )}
+      </span>
+    </div>
+  )
+}
+
+// ---- The workshop: the four cores, their stars, and what to repair next ----
+function Workshop({ onPlay }: { onPlay: () => void }) {
+  const { g } = useGame()
+  const cores = useMuseumStore((state) => state.gameCores)
+  const stars = useMuseumStore((state) => state.coreStars)
+  const run = useMuseumStore((state) => state.gameRun)
+  // A core left half-way carries on where it was; any other starts afresh.
+  const play = (round: number) => {
+    if (!(run && run.round === round && !run.finished)) startRun(round)
+    onPlay()
+  }
+  const inProgress = (round: number) => run?.round === round && !run.finished
+  return (
+    <div className="workshop">
+      <p className="game-task">{g.hubIntro}</p>
+      <div className="workshop-cores">
+        {g.rounds.map((round, i) => {
+          const lit = i < cores
+          const next = i === cores
+          return (
+            <div key={i} className={`workshop-core${lit ? ' is-lit' : next ? ' is-next' : ' is-locked'}`} style={eraColour((i + 1) as Era)}>
+              <span className="workshop-orb">{NUMERALS[i]}</span>
+              <strong>{round.name}</strong>
+              {lit && <Stars n={stars[i]} />}
+              {inProgress(i) ? (
+                <button className="game-primary" onClick={() => play(i)}>
+                  {g.resume.replace('{n}', NUMERALS[i])}
+                </button>
+              ) : lit ? (
+                <button className="game-close" onClick={() => play(i)}>
+                  {g.replay}
+                </button>
+              ) : next ? (
+                <button className="game-primary" onClick={() => play(i)}>
+                  {g.repair.replace('{n}', NUMERALS[i])}
+                </button>
+              ) : (
+                <small>{g.locked}</small>
+              )}
+            </div>
+          )
+        })}
+      </div>
+      {cores >= 4 && (
+        <div className="game-done">
+          <h3>{g.doneTitle}</h3>
+          <p>{g.doneText}</p>
+          <button className="game-primary" onClick={() => void resumeWalking()}>
+            {g.finish}
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+const ROUNDS = [LostRound, TownRound, MysteryRound, VisitorRound]
 
 export default function TimeMachineGame() {
   const { g } = useGame()
   const cores = useMuseumStore((state) => state.gameCores)
-  const lightCore = useMuseumStore((state) => state.lightCore)
-  const [round, setRound] = useState(Math.min(cores, 3))
-  const [attempt, setAttempt] = useState(0)
-  const [score, setScore] = useState<number | null>(null)
-  const done = cores >= 4 && score === null
-  const scroll = useScrollFades<HTMLDivElement>(`${round}-${attempt}-${done}`)
+  const run = useMuseumStore((state) => state.gameRun)
+  // The workshop shows when no core is being played, or when the visitor steps back to it
+  // (the core in progress stays saved).
+  const [atWorkshop, setAtWorkshop] = useState(false)
+  const playing = run && !atWorkshop ? run : null
+  const scroll = useScrollFades<HTMLDivElement>(`${playing?.round}-${playing?.index}-${playing?.finished}`)
 
   useEffect(() => {
+    // Back from the rooms (by the button, or by walking up to the lectern): carry on.
+    if (useMuseumStore.getState().gameRun?.away) useMuseumStore.getState().patchGameRun({ away: false })
     function onKey(event: KeyboardEvent) {
       if (event.code === 'Escape') useMuseumStore.getState().setMode('paused')
     }
@@ -306,33 +432,34 @@ export default function TimeMachineGame() {
     return () => window.removeEventListener('keydown', onKey)
   }, [])
 
-  function finish(result: number) {
-    setScore(result)
-    if (result >= NEED[round]) {
-      lightCore(round)
-      playEffect('results', 0.6)
-    } else playEffect('wrong', 0.5)
+  const Round = playing && !playing.finished ? ROUNDS[playing.round] : null
+  function toWorkshop() {
+    // A finished core is done with; one in progress waits.
+    if (run?.finished) useMuseumStore.getState().setGameRun(null)
+    setAtWorkshop(true)
   }
-  const passed = score !== null && score >= NEED[round]
-  const Round = ROUNDS[round]
-
   return (
     <div className="overlay game-overlay">
       <div className="game-panel">
         <header className="game-header">
           <div>
             <h2>{g.title}</h2>
-            {!done && (
+            {playing && (
               <p className="game-round">
-                {g.roundOf.replace('{n}', String(round + 1))} · <strong>{g.rounds[round].name}</strong>
+                {g.roundOf.replace('{n}', String(playing.round + 1))} · <strong>{g.rounds[playing.round].name}</strong>
               </p>
             )}
           </div>
           <div className="game-cores" aria-label={g.cores}>
             {ERA_COLOURS.map((colour, i) => (
-              <i key={colour} className={i < cores ? 'is-lit' : ''} style={{ '--era': colour } as React.CSSProperties} />
+              <i key={colour} className={i < cores ? 'is-lit' : ''} style={{ '--era': colour } as CSSProperties} />
             ))}
           </div>
+          {playing && (
+            <button className="game-close" onClick={toWorkshop}>
+              {g.back}
+            </button>
+          )}
           <button className="game-close" onClick={() => void resumeWalking()}>
             {g.close}
           </button>
@@ -340,51 +467,15 @@ export default function TimeMachineGame() {
 
         {/* The round scrolls between the header and the result bar, which stay in view. */}
         <div ref={scroll} className="game-scroll scroll-fade">
-          {done ? (
-            <div className="game-done">
-              <h3>{g.doneTitle}</h3>
-              <p>{g.doneText}</p>
-              <button className="game-primary" onClick={() => void resumeWalking()}>
-                {g.finish}
-              </button>
-            </div>
-          ) : (
+          {!playing && <Workshop onPlay={() => setAtWorkshop(false)} />}
+          {playing && (
             <>
-              <p className="game-task">{g.rounds[round].task}</p>
-              <div className="game-body">
-                <Round key={`${round}-${attempt}`} onFinish={finish} />
-              </div>
+              <p className="game-task">{g.rounds[playing.round].task}</p>
+              <div className="game-body">{Round && <Round />}</div>
             </>
           )}
         </div>
-        {!done && score !== null && (
-          <footer className={`game-result ${passed ? 'is-right' : 'is-wrong'}`}>
-            <span>
-              <strong>{passed ? g.passed : g.failed}</strong> {g.score.replace('{score}', String(score)).replace('{total}', String(TOTALS[round])).replace('{need}', String(NEED[round]))}
-            </span>
-            {passed ? (
-              <button
-                className="game-primary"
-                onClick={() => {
-                  setScore(null)
-                  if (round < 3) setRound(round + 1)
-                }}
-              >
-                {round < 3 ? g.next : g.finish}
-              </button>
-            ) : (
-              <button
-                className="game-primary"
-                onClick={() => {
-                  setScore(null)
-                  setAttempt(attempt + 1)
-                }}
-              >
-                {g.retry}
-              </button>
-            )}
-          </footer>
-        )}
+        {playing?.finished && <Result onDone={toWorkshop} />}
       </div>
     </div>
   )

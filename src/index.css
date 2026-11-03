@@ -2673,3 +2673,492 @@ body {
     font-size: 12px;
   }
 }
+
+/* ---------- The Time Machine repair shop (TimeMachineGame.tsx, third version) ---------- */
+.game-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  width: 100%;
+  font-size: 14px;
+  color: #9a7330;
+}
+.game-bar > :first-child {
+  flex: 1;
+}
+.game-bar strong {
+  color: #2e261d;
+}
+.game-hint {
+  padding: 6px 14px;
+  border: 1px dashed #b8893d;
+  border-radius: 999px;
+  background: #fffaf0;
+  color: #7a5a24;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.game-hint:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.game-stars {
+  color: #d39a2a;
+  letter-spacing: 0.1em;
+  text-shadow: 0 0 6px rgba(240, 190, 80, 0.6);
+}
+.game-stars i {
+  font-style: normal;
+  color: #d8ccb4;
+  text-shadow: none;
+}
+.game-result-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.game-combo {
+  color: #c2453f !important;
+  animation: pop 0.4s ease-out;
+}
+@keyframes pop {
+  from {
+    transform: scale(1.6);
+  }
+}
+.game-wrong {
+  width: 100%;
+  box-sizing: border-box;
+  animation: pop-in 0.25s ease-out;
+}
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+.game-body > .game-feedback,
+.game-body .game-feedback {
+  width: 100%;
+  box-sizing: border-box;
+}
+.game-option:disabled {
+  cursor: default;
+}
+.game-option.is-wrong {
+  opacity: 0.6;
+  text-decoration: line-through;
+}
+
+/* The workshop: four cores in a row, the next one glowing. */
+.workshop {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.workshop-cores {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.workshop-core {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 10px;
+  border: 1px solid rgba(184, 137, 61, 0.45);
+  border-radius: 14px;
+  background: #fffdf8;
+  text-align: center;
+}
+.workshop-orb {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 3px solid color-mix(in srgb, var(--era) 70%, #9a7330);
+  background: #e9dfca;
+  color: #7a5a24;
+  font: 700 22px Georgia, serif;
+}
+.workshop-core.is-lit .workshop-orb {
+  background: radial-gradient(circle at 40% 35%, #fff, var(--era) 60%);
+  box-shadow: 0 0 22px var(--era);
+  color: #2e261d;
+}
+.workshop-core.is-next .workshop-orb {
+  animation: core-wait 1.6s ease-in-out infinite;
+}
+@keyframes core-wait {
+  50% {
+    box-shadow: 0 0 18px var(--era);
+  }
+}
+.workshop-core.is-locked {
+  opacity: 0.5;
+}
+
+/* Core I: the falling machine or picture, and the four era doors. */
+.lost {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+.lost-stage {
+  position: relative;
+  width: min(440px, 100%);
+  text-align: center;
+}
+.lost-object {
+  display: grid;
+  place-items: center;
+  height: 230px;
+  border-radius: 12px;
+  background: radial-gradient(ellipse at 50% 60%, #f7e7c0 0%, #d9bf86 60%, transparent 75%);
+  animation: lost-fall 0.7s cubic-bezier(0.3, 1.4, 0.6, 1) both;
+}
+.lost-object.is-photo {
+  background: none;
+}
+.lost-object img {
+  max-width: 100%;
+  max-height: 230px;
+  border: 6px solid #fffdf8;
+  box-shadow: 0 0 0 2px #b8893d, 0 8px 20px rgba(60, 40, 10, 0.3);
+  transform: rotate(-2deg);
+}
+@keyframes lost-fall {
+  from {
+    transform: translateY(-120px) rotate(-10deg);
+    opacity: 0;
+  }
+}
+.lost-stage.is-in .lost-object {
+  transition: transform 0.6s 0.6s ease-in, opacity 0.6s 0.6s ease-in;
+  transform: translateY(100px) scale(0.3);
+  opacity: 0;
+}
+.lost-stage.is-out .lost-object {
+  animation: lost-bounce 0.5s ease-out;
+}
+@keyframes lost-bounce {
+  30% {
+    transform: translateX(-14px) rotate(-6deg);
+  }
+  60% {
+    transform: translateX(12px) rotate(5deg);
+  }
+}
+.lost-title {
+  margin: 6px 0 0;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.lost-doors {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  width: 100%;
+}
+.lost-door {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 18px 6px 12px;
+  border: 3px solid color-mix(in srgb, var(--era) 75%, #9a7330);
+  border-radius: 60px 60px 10px 10px;
+  background: linear-gradient(color-mix(in srgb, var(--era) 30%, #fffdf8), #fffdf8);
+  color: #2e261d;
+  font: inherit;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.2s, opacity 0.2s;
+}
+.lost-door b {
+  font: 700 26px Georgia, serif;
+}
+.lost-door small {
+  color: #6a5a44;
+}
+.lost-door:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 0 18px var(--era);
+}
+.lost-door:disabled {
+  cursor: default;
+}
+.lost-door.is-answer {
+  box-shadow: 0 0 0 3px #2f9a5c, 0 0 22px var(--era);
+}
+.lost-door.is-wrong-door {
+  opacity: 0.35;
+  box-shadow: 0 0 0 3px #c2453f;
+}
+
+/* Core II: the growing town. */
+.town-round {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+.town {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  height: auto;
+  border: 2px solid #b8893d;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.town-spot {
+  animation: town-grow 0.7s ease-out;
+  transform-box: fill-box;
+}
+@keyframes town-grow {
+  from {
+    opacity: 0;
+  }
+}
+.town-mark {
+  animation: town-mark 1.2s ease-in-out infinite;
+}
+@keyframes town-mark {
+  50% {
+    opacity: 0.55;
+  }
+}
+.town-problem {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.town-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.town-jump {
+  color: #23794a;
+}
+
+/* Core III: clues on the left, answers on the right. */
+.mystery {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+.mystery-worth {
+  color: #c2453f;
+  font-weight: 600;
+}
+.mystery-body {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 16px;
+}
+.mystery-clues {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.mystery-clue {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 14px;
+  border: 1px solid rgba(184, 137, 61, 0.5);
+  border-radius: 10px;
+  background: #fffdf8;
+  font-size: 16px;
+  line-height: 1.45;
+  animation: pop-in 0.3s ease-out;
+}
+.mystery-clue small {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #9a7330;
+}
+.mystery-clue.is-hidden {
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border-style: dashed;
+  background: transparent;
+  animation: none;
+}
+.mystery-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Core IV: a visitor in their own time, speaking, and the replies below. */
+.visitor-round {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+.visitor-scene {
+  position: relative;
+  box-sizing: border-box;
+  height: 230px;
+  border: 2px solid #b8893d;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.scene-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.visitor-figure {
+  position: absolute;
+  left: 6%;
+  bottom: 6px;
+  height: 200px;
+  animation: visitor-in 0.6s ease-out;
+}
+@keyframes visitor-in {
+  from {
+    transform: translateX(-60px);
+    opacity: 0;
+  }
+}
+.visitor-head {
+  transform-origin: 40px 52px;
+  transition: transform 0.3s;
+}
+.visitor-figure.is-happy .visitor-head {
+  animation: nod 0.6s ease-in-out 2;
+}
+@keyframes nod {
+  50% {
+    transform: translateY(3px);
+  }
+}
+.visitor-figure.is-puzzled .visitor-head {
+  transform: rotate(-12deg);
+}
+.visitor-speech {
+  position: absolute;
+  left: calc(6% + 120px);
+  right: 16px;
+  top: 18px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: #fffdf8;
+  color: #2e261d;
+  font-size: 16px;
+  line-height: 1.5;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+  animation: pop-in 0.3s ease-out;
+}
+.visitor-speech::before {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: 30px;
+  border: 7px solid transparent;
+  border-right: 12px solid #fffdf8;
+}
+.visitor-replies {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* While away in the rooms mid-game: the way back, at the bottom of the screen. */
+.hud-return {
+  position: fixed;
+  left: 50%;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  z-index: 20;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 22px;
+  border: 1px solid #c9a25a;
+  border-radius: 999px;
+  background: linear-gradient(#e8c77e, #b8893d);
+  color: #2b2620;
+  font: inherit;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+  pointer-events: auto;
+  animation: core-wait 2s ease-in-out infinite;
+  --era: #ffd36a;
+}
+.hud-return kbd {
+  padding: 1px 8px;
+  border: 1px solid #7a5a24;
+  border-radius: 5px;
+  background: #fffaf0;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+@media (max-width: 760px) {
+  .game-header {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .game-header > div:first-child {
+    flex-basis: 100%;
+  }
+  .game-header h2 {
+    font-size: 22px;
+  }
+  .workshop-cores,
+  .lost-doors {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .town-options,
+  .mystery-body {
+    grid-template-columns: 1fr;
+  }
+  .visitor-scene {
+    height: 260px;
+  }
+  .visitor-figure {
+    height: 130px;
+    left: 2%;
+  }
+  .visitor-speech {
+    left: 84px;
+    top: 10px;
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+  .lost-object {
+    height: 180px;
+  }
+  .lost-object img {
+    max-height: 180px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .town-mark,
+  .hud-return,
+  .workshop-core.is-next .workshop-orb {
+    animation: none;
+  }
+}

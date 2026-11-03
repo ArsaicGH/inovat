@@ -7,6 +7,23 @@ import { IS_TOUCH } from '../ui/touch'
 // The app is always in exactly one mode (PLAN.md section 3). Only in "exploring"
 // is the mouse captured and walking allowed. (The quiz is played while exploring: it is
 // shown on the Game Room's back wall, see QuizWall.tsx.)
+// One core of the Time Machine game in progress (TimeMachineGame.tsx): the cards dealt, the
+// card being answered and what has happened on it so far.
+export interface GameRun {
+  round: number // 0-3
+  deck: string[] // card ids, in the order they are played
+  index: number // the card being answered
+  options: string[] // its answers, in the order shown
+  wrong: string[] // answers already tried on it, wrongly
+  clues: number // core III: clues open on it
+  solved: boolean // answered right (its explanation is showing)
+  asking: boolean // a wrong answer: "go back to the rooms, or answer again?" is showing
+  points: number // scored so far
+  combo: number // core I: right first time in a row
+  finished: boolean // every card done (the result is showing)
+  away: boolean // the visitor went back to the rooms mid-game
+}
+
 export type Mode = 'start' | 'exploring' | 'paused' | 'reading' | 'map' | 'ending' | 'game'
 
 // Mouse/touchpad sensitivity is a multiplier: 1 = default speed.
@@ -280,6 +297,14 @@ interface MuseumState {
   gameCores: number
   openGame: () => void
   lightCore: (round: number) => void
+  // The best stars earned on each core (0 = not yet). Kept for this visit only.
+  coreStars: number[]
+  setCoreStars: (round: number, stars: number) => void
+  // The core being played, saved here (not in the game window) so the visitor can leave to
+  // look around the rooms and come back to exactly where they were. null = none in progress.
+  gameRun: GameRun | null
+  setGameRun: (run: GameRun | null) => void
+  patchGameRun: (change: Partial<GameRun>) => void
   quizPassed: boolean // all four cores lit: the portal door in the back wall opens
 
   // THE ENDING (EndingScene.tsx, EndingScreen.tsx), after walking into the open portal.
@@ -382,6 +407,12 @@ export const useMuseumStore = create<MuseumState>((set, get) => ({
       const gameCores = Math.max(state.gameCores, round + 1)
       return { gameCores, quizPassed: state.quizPassed || gameCores >= 4 }
     }),
+  coreStars: [0, 0, 0, 0],
+  setCoreStars: (round, stars) =>
+    set((state) => ({ coreStars: state.coreStars.map((s, i) => (i === round ? Math.max(s, stars) : s)) })),
+  gameRun: null,
+  setGameRun: (run) => set({ gameRun: run }),
+  patchGameRun: (change) => set((state) => (state.gameRun ? { gameRun: { ...state.gameRun, ...change } } : state)),
   // (Local test build only: the portal starts open, to try the ending. Never on the live site.)
   quizPassed: import.meta.env.DEV,
 
@@ -425,6 +456,8 @@ export const useMuseumStore = create<MuseumState>((set, get) => ({
       visitedRooms: DEV_VISITED,
       tutorial: null,
       gameCores: 0,
+      coreStars: [0, 0, 0, 0],
+      gameRun: null,
       quizPassed: import.meta.env.DEV,
       aimedExhibitId: null,
       showKeyList: false,

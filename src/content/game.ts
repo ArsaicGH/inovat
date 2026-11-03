@@ -1,9 +1,12 @@
 import type { Language } from './language'
 
-// THE TIME MACHINE GAME in the Game Room (TimeMachineGame.tsx), in both languages.
-// Four short rounds, each relighting one core of the broken time machine; all four open the
-// portal. Every answer comes from the exhibit texts (exhibits.ts and their sources), and
-// a wrong answer always points to the room where the visitor can read about it.
+// THE TIME MACHINE GAME in the Game Room (TimeMachineGame.tsx), in both languages: the
+// "repair shop", four rounds that each play differently and relight one core of the broken
+// time machine; all four open the portal. The rounds' cards are in game-cards.ts. Every answer
+// comes from the exhibit texts (exhibits.ts and their sources), and a wrong answer points to
+// where the visitor can read about it.
+// (MAKERS and CHALLENGES are from the first version of the game, kept as material for cards;
+// the original game is saved in git under the tag minigame-v1.)
 
 type Both = Record<Language, string>
 export type Era = 1 | 2 | 3 | 4
@@ -343,40 +346,76 @@ const vi = {
   title: 'Cỗ máy thời gian',
   // On the lectern's screen in the room.
   consoleIntro:
-    'Cỗ máy thời gian đã hỏng: bốn lõi năng lượng của nó đã tắt. Vượt qua bốn thử thách để thắp sáng từng lõi và mở cánh cổng phía sau.',
+    'Cỗ máy thời gian đã hỏng: lịch sử bị xáo trộn và bốn lõi năng lượng đã tắt. Sửa từng lõi trong xưởng để mở cánh cổng phía sau.',
   consoleStart: 'Khởi động',
   consoleContinue: 'Tiếp tục sửa chữa',
   consoleDone: 'Cỗ máy đã hoạt động! Cánh cổng phía sau đã mở.',
   close: 'Đóng',
   cores: 'Lõi năng lượng',
-  roundOf: 'Thử thách {n}/4',
-  check: 'Kiểm tra',
-  next: 'Thử thách tiếp theo',
-  retry: 'Thử lại',
+  roundOf: 'Lõi {n}/4',
+  // The workshop (the game's first screen).
+  hubIntro: 'Mỗi lõi năng lượng là một thử thách khác nhau về bốn cuộc cách mạng. Thắp sáng cả bốn lõi để mở cánh cổng. Một sao là đủ để qua; ba sao dành cho người muốn chinh phục.',
+  repair: 'Sửa lõi {n}',
+  resume: 'Tiếp tục lõi {n}',
+  replay: 'Chơi lại',
+  locked: 'Chưa mở',
+  back: 'Về xưởng',
+  next: 'Tiếp tục',
+  retry: 'Thử lại với thẻ mới',
   finish: 'Hoàn tất',
-  passed: 'Lõi năng lượng đã sáng!',
-  failed: 'Chưa đủ để thắp sáng lõi. Hãy xem lại và thử lần nữa.',
-  score: 'Đúng {score}/{total} (cần {need})',
-  review: 'Xem lại: {room}',
+  passed: 'Lõi {n} đã sáng!',
+  failed: 'Chưa đủ điểm để thắp sáng lõi. Hãy xem lại các phòng và thử lần nữa.',
+  score: '{score}/{total} điểm (cần {need})',
+  points: 'Điểm: {n}',
+  placeholder: '[CẦN KIỂM TRA]',
+  // A wrong answer: go back to the rooms, or answer again.
+  wrongTitle: 'Chưa đúng.',
+  wrongAsk: 'Bạn có muốn quay lại các phòng để xem lại không?',
+  wrongHint: 'Gợi ý: câu trả lời nằm ở {room}.',
+  goBack: 'Quay lại các phòng',
+  tryAgain: 'Trả lời lại',
+  // While away in the rooms (a button at the bottom of the screen).
+  returnToGame: 'Quay lại phòng trò chơi',
+  returnKey: 'R',
   rounds: [
     {
-      name: 'Dòng thời gian',
-      task: 'Mỗi phát minh thuộc cuộc Cách mạng Công nghiệp nào? Chọn I, II, III hoặc IV cho từng thẻ rồi bấm Kiểm tra.',
+      name: 'Lạc giữa thời gian',
+      task: 'Các cỗ máy và bức ảnh đã rơi ra khỏi dòng thời gian. Đưa mỗi thứ về đúng cánh cửa của cuộc cách mạng của nó. (Phím 1-4 cũng chọn được.)',
     },
     {
-      name: 'Nối dây',
-      task: 'Nối mỗi người hoặc tổ chức với phát minh của họ: chọn một ô bên trái, rồi một ô bên phải.',
+      name: 'Thị trấn lớn lên',
+      task: 'Một thị trấn đi qua bốn cuộc cách mạng. Mỗi thời kỳ có ba vấn đề: chọn phát minh giải quyết từng vấn đề để thị trấn bước sang thời kỳ tiếp theo. (Phím 1-3 cũng chọn được.)',
     },
     {
-      name: 'Cỗ máy bí ẩn',
-      task: 'Chỉ còn lại cái bóng của một cỗ máy. Dựa vào hình dáng và gợi ý, đó là phát minh nào? (Phím 1-4 cũng chọn được.)',
+      name: 'Tôi là ai?',
+      task: 'Đoán điều bí ẩn từ các gợi ý. Đoán càng sớm, càng nhiều điểm; cần thì mở thêm gợi ý. (Phím 1-4 cũng chọn được.)',
     },
     {
-      name: 'Thử thách nhà máy',
-      task: 'Mỗi tình huống cần một phát minh. Chọn phát minh phù hợp nhất. (Phím 1-4 cũng chọn được.)',
+      name: 'Những vị khách từ quá khứ',
+      task: 'Bốn vị khách bước ra từ cỗ máy thời gian, mỗi người từ một thời kỳ. Hãy cho họ lời khuyên đúng với thời đại của họ. (Phím 1-3 cũng chọn được.)',
     },
   ],
-  clueEra: 'Thời kỳ: {room}',
+  // Core I
+  cardOf: 'Thẻ {n}/{total}',
+  combo: 'Chuỗi ×{n}',
+  rightDoor: 'Đúng chỗ!',
+  // Core II
+  townIn: 'Thị trấn năm {year}',
+  problemOf: 'Vấn đề {n}/3 của thời kỳ này',
+  eraJump: 'Thị trấn bước sang thời kỳ mới!',
+  // Core III
+  mysteryOf: 'Bí ẩn {n}/{total}',
+  clue: 'Gợi ý {n}',
+  moreClue: 'Mở gợi ý tiếp',
+  worth: 'Đoán ngay: {n} điểm',
+  solved: 'Chính xác! +{n} điểm',
+  era: 'Một cuộc cách mạng',
+  // Core IV
+  visitorOf: 'Vị khách {n}/4',
+  adviceOf: 'Lời khuyên {n}/3',
+  happy: ['Tuyệt quá, cảm ơn bạn!', 'À, ra là vậy! Tôi hiểu rồi.', 'Hay lắm, tôi sẽ làm theo!'],
+  puzzled: ['Hả? Tôi chưa nghe đến thứ đó bao giờ...', 'Hừm, nghe không ổn lắm...', 'Bạn chắc chứ? Tôi thấy lạ quá.'],
+  goodbye: 'Tạm biệt và cảm ơn nhé!',
   doneTitle: 'Cỗ máy thời gian đã hoạt động!',
   doneText: 'Cả bốn lõi năng lượng đã sáng. Cánh cổng phía sau Phòng trò chơi đã mở: hãy bước vào để du hành xuyên thời gian.',
 }
@@ -384,40 +423,69 @@ const vi = {
 const en: typeof vi = {
   title: 'The Time Machine',
   consoleIntro:
-    'The time machine is broken: its four power cores have gone dark. Pass four challenges to relight each core and open the portal at the back.',
+    'The time machine is broken: history is scrambled and its four power cores have gone dark. Repair each core in the workshop to open the portal at the back.',
   consoleStart: 'Start',
   consoleContinue: 'Continue the repair',
   consoleDone: 'The machine is running! The portal at the back is open.',
   close: 'Close',
   cores: 'Power cores',
-  roundOf: 'Challenge {n}/4',
-  check: 'Check',
-  next: 'Next challenge',
-  retry: 'Try again',
+  roundOf: 'Core {n}/4',
+  hubIntro: 'Each power core is a different challenge about the four revolutions. Light all four to open the portal. One star is enough to pass; three are for those who want to master it.',
+  repair: 'Repair core {n}',
+  resume: 'Continue core {n}',
+  replay: 'Replay',
+  locked: 'Locked',
+  back: 'Back to the workshop',
+  next: 'Continue',
+  retry: 'Try again with new cards',
   finish: 'Finish',
-  passed: 'The power core is lit!',
-  failed: 'Not enough to light the core yet. Look back and try again.',
-  score: '{score}/{total} right (need {need})',
-  review: 'Look again: {room}',
+  passed: 'Core {n} is lit!',
+  failed: 'Not enough points to light the core yet. Look around the rooms again and have another go.',
+  score: '{score}/{total} points (need {need})',
+  points: 'Points: {n}',
+  placeholder: '[NEEDS CHECKING]',
+  wrongTitle: 'Not quite.',
+  wrongAsk: 'Would you like to go back to the rooms and look again?',
+  wrongHint: 'Hint: the answer is in {room}.',
+  goBack: 'Back to the rooms',
+  tryAgain: 'Answer again',
+  returnToGame: 'Back to the Game Room',
+  returnKey: 'R',
   rounds: [
     {
-      name: 'Timeline',
-      task: 'Which Industrial Revolution does each invention belong to? Choose I, II, III or IV for every card, then press Check.',
+      name: 'Lost in time',
+      task: 'Machines and pictures have fallen out of the timeline. Send each one through the door of its own revolution. (Keys 1-4 also choose.)',
     },
     {
-      name: 'Wire it up',
-      task: 'Connect each person or company to their invention: choose a box on the left, then one on the right.',
+      name: 'The growing town',
+      task: 'A town lives through four revolutions. Each era brings three problems: choose the invention that solves each one, and the town moves on to the next era. (Keys 1-3 also choose.)',
     },
     {
-      name: 'Mystery machine',
-      task: 'Only the shadow of a machine is left. From its shape and the clue, which invention is it? (Keys 1-4 also choose.)',
+      name: 'Who am I?',
+      task: 'Guess the mystery from its clues. The sooner you guess, the more points you score; open another clue when you need one. (Keys 1-4 also choose.)',
     },
     {
-      name: 'Factory challenge',
-      task: 'Each situation needs one invention. Choose the one that fits best. (Keys 1-4 also choose.)',
+      name: 'Visitors from the past',
+      task: 'Four visitors step out of the time machine, each from a different era. Give them advice that fits their time. (Keys 1-3 also choose.)',
     },
   ],
-  clueEra: 'Era: {room}',
+  cardOf: 'Card {n}/{total}',
+  combo: 'Combo ×{n}',
+  rightDoor: 'Right door!',
+  townIn: 'The town in {year}',
+  problemOf: 'Problem {n}/3 of this era',
+  eraJump: 'The town moves into a new era!',
+  mysteryOf: 'Mystery {n}/{total}',
+  clue: 'Clue {n}',
+  moreClue: 'Open the next clue',
+  worth: 'Guess now: {n} points',
+  solved: 'Correct! +{n} points',
+  era: 'A revolution',
+  visitorOf: 'Visitor {n}/4',
+  adviceOf: 'Advice {n}/3',
+  happy: ['Wonderful, thank you!', 'Ah, so that’s how it is! I see.', 'Splendid, I’ll do just that!'],
+  puzzled: ['What? I’ve never heard of such a thing...', 'Hmm, that doesn’t sound right...', 'Are you sure? That seems odd to me.'],
+  goodbye: 'Goodbye, and thank you!',
   doneTitle: 'The time machine is running!',
   doneText: 'All four power cores are lit. The portal at the back of the Game Room is open: step through it to travel through time.',
 }
@@ -426,11 +494,8 @@ export type GameText = typeof vi
 export const gameText: Record<Language, GameText> = { vi, en }
 
 // Touch screens: the same texts without the keys.
+const noKeys = (text: string) => text.replace(/ \((Phím|Keys) [^)]*\)/, '')
 export const gameTouchText: Record<Language, Partial<GameText>> = {
-  vi: {
-    rounds: vi.rounds.map((r) => ({ ...r, task: r.task.replace(' (Phím 1-4 cũng chọn được.)', '') })),
-  },
-  en: {
-    rounds: en.rounds.map((r) => ({ ...r, task: r.task.replace(' (Keys 1-4 also choose.)', '') })),
-  },
+  vi: { rounds: vi.rounds.map((r) => ({ ...r, task: noKeys(r.task) })) },
+  en: { rounds: en.rounds.map((r) => ({ ...r, task: noKeys(r.task) })) },
 }

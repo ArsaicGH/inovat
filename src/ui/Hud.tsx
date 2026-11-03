@@ -4,6 +4,9 @@ import TutorialCard from './TutorialCard'
 import { isQuizTarget } from '../world/aim-targets'
 import { gameText } from '../content/game'
 import { PICTURES, isWallPicture } from '../content/pictures'
+import { useEffect } from 'react'
+import { returnToGame } from './game-run'
+import { IS_TOUCH } from './touch'
 
 // On-screen layer while walking: crosshair, exhibit prompt, room name, warnings.
 // Text comes from src/content/.
@@ -18,6 +21,16 @@ export default function Hud() {
   const mouseCaptured = useMuseumStore((state) => state.mouseCaptured)
   const showKeyList = useMuseumStore((state) => state.showKeyList)
   const cores = useMuseumStore((state) => state.gameCores)
+  // Left the Time Machine game to look around the rooms: a way back (R, or the button).
+  const awayFromGame = useMuseumStore((state) => state.gameRun?.away === true)
+  useEffect(() => {
+    if (!awayFromGame) return
+    function onKey(event: KeyboardEvent) {
+      if (event.code === 'KeyR' && !event.repeat) returnToGame()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [awayFromGame])
 
   return (
     <>
@@ -51,6 +64,13 @@ export default function Hud() {
           <strong>{isQuizTarget(aimedId) ? (cores > 0 ? gameText[language].consoleContinue : gameText[language].consoleStart) : isWallPicture(aimedId) ? PICTURES[aimedId]?.caption[language] : exhibit(aimedId).title}</strong>
           <span>{isQuizTarget(aimedId) ? ui.quiz.prompt : ui.prompt}</span>
         </div>
+      )}
+
+      {awayFromGame && (
+        <button type="button" className="hud-return" onClick={returnToGame}>
+          {gameText[language].returnToGame}
+          {!IS_TOUCH && <kbd>{gameText[language].returnKey}</kbd>}
+        </button>
       )}
 
       <header className="hud-title">
