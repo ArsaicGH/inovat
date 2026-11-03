@@ -240,7 +240,8 @@ export default function QuizWall() {
     ctx.fillText(label, w / 2, h / 2 + h * 0.02, w * 0.9)
   }
 
-  const label = cores === 0 ? g.consoleStart : cores < 4 ? g.consoleContinue : null
+  // (Once all four cores are lit, the button stays to replay any core for more stars.)
+  const label = cores === 0 ? g.consoleStart : cores < 4 ? g.consoleContinue : g.consoleReplay
   const isAimed = aimed === 'quiz-start'
   return (
     <group>
@@ -250,17 +251,15 @@ export default function QuizWall() {
         <group position={[0, SCREEN.y, 0.03]}>
           <Panel width={SCREEN.w} height={SCREEN.h} paint={paintScreen} paintKey={screenKey} />
         </group>
-        {label && (
-          <Target id="quiz-start" x={BIG_BUTTON.x} y={BIG_BUTTON.y}>
-            <Panel
-              width={BIG_BUTTON.w}
-              height={BIG_BUTTON.h}
-              paint={paintButton(label, isAimed)}
-              paintKey={`${label}|${isAimed}`}
-              glow={isAimed ? 1 : 0.86}
-            />
-          </Target>
-        )}
+        <Target id="quiz-start" x={BIG_BUTTON.x} y={BIG_BUTTON.y}>
+          <Panel
+            width={BIG_BUTTON.w}
+            height={BIG_BUTTON.h}
+            paint={paintButton(label, isAimed)}
+            paintKey={`${label}|${isAimed}`}
+            glow={isAimed ? 1 : 0.86}
+          />
+        </Target>
       </group>
     </group>
   )

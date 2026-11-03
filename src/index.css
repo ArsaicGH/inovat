@@ -692,10 +692,13 @@ body {
 }
 
 /* ---------- Title screen ---------- */
+/* Stacked buttons share one width (the widest), so they carry equal weight. */
 .start-buttons {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
+  width: fit-content;
+  margin: 0 auto;
   gap: 12px;
 }
 .title-overlay {
@@ -2971,9 +2974,13 @@ body {
   box-sizing: border-box;
   width: 100%;
   height: auto;
-  border: 2px solid #b8893d;
-  border-radius: 12px;
+  padding: 6px;
+  background: #1e1710;
+  border: 1px solid #c9a25a;
+  border-radius: 6px;
   overflow: hidden;
+  /* A dark mount and a thin inner gold line, like a print framed in the museum. */
+  box-shadow: inset 0 0 0 5px #1e1710, inset 0 0 0 6px rgba(201, 162, 90, 0.55), 0 8px 22px rgba(30, 20, 10, 0.25);
 }
 .town-spot {
   animation: town-grow 0.7s ease-out;
@@ -3074,15 +3081,18 @@ body {
   position: relative;
   box-sizing: border-box;
   height: 230px;
-  border: 2px solid #b8893d;
-  border-radius: 12px;
+  border: 1px solid #c9a25a;
+  border-radius: 6px;
   overflow: hidden;
+  /* A dark mount and a thin inner gold line, like a print framed in the museum. */
+  box-shadow: inset 0 0 0 5px #1e1710, inset 0 0 0 6px rgba(201, 162, 90, 0.55), 0 8px 22px rgba(30, 20, 10, 0.25);
+  background: #1e1710;
 }
 .scene-backdrop {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  inset: 6px;
+  width: calc(100% - 12px);
+  height: calc(100% - 12px);
 }
 .visitor-figure {
   position: absolute;
@@ -3118,12 +3128,13 @@ body {
   right: 16px;
   top: 18px;
   padding: 14px 18px;
-  border-radius: 14px;
-  background: #fffdf8;
+  border: 1px solid rgba(201, 162, 90, 0.7);
+  border-radius: 6px;
+  background: rgba(253, 248, 236, 0.96);
   color: #2e261d;
   font-size: 16px;
   line-height: 1.5;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
   animation: pop-in 0.3s ease-out;
 }
 .visitor-speech::before {
@@ -3132,7 +3143,7 @@ body {
   left: -12px;
   top: 30px;
   border: 7px solid transparent;
-  border-right: 12px solid #fffdf8;
+  border-right: 12px solid rgba(201, 162, 90, 0.9);
 }
 .visitor-replies {
   display: flex;

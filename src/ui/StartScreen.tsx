@@ -32,13 +32,12 @@ export default function StartScreen() {
 
         {!asking ? (
           <div className="start-buttons">
+            {/* Continuing comes first when this tab holds an earlier visit (e.g. after a reload);
+                both buttons look the same, so neither choice is pushed. */}
+            {hasSavedProgress() && <LockButton label={ui.start.continue} className="start-button" onBeforeLock={continueSavedVisit} />}
             <button type="button" className="start-button" onClick={() => setAsking(true)}>
               {hasSavedProgress() ? ui.start.newJourney : ui.start.button}
             </button>
-            {/* Only when this tab holds an earlier visit (e.g. after a reload). */}
-            {hasSavedProgress() && (
-              <LockButton label={ui.start.continue} className="start-button start-button-quiet" onBeforeLock={continueSavedVisit} />
-            )}
           </div>
         ) : (
           <div className="tutorial-question">

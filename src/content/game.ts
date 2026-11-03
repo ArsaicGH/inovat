@@ -349,6 +349,7 @@ const vi = {
     'Cỗ máy thời gian đã hỏng: lịch sử bị xáo trộn và bốn lõi năng lượng đã tắt. Sửa từng lõi trong xưởng để mở cánh cổng phía sau.',
   consoleStart: 'Khởi động',
   consoleContinue: 'Tiếp tục sửa chữa',
+  consoleReplay: 'Chơi lại',
   consoleDone: 'Cỗ máy đã hoạt động! Cánh cổng phía sau đã mở.',
   close: 'Đóng',
   cores: 'Lõi năng lượng',
@@ -376,7 +377,7 @@ const vi = {
   goBack: 'Quay lại các phòng',
   goBackNote: 'Xem lại các phòng bất cứ lúc nào; tiến độ của bạn được giữ nguyên.',
   goBackHelp:
-    'Nút này mở bản đồ để bạn xem lại bất kỳ phòng nào, cả khi đang chơi (nó luôn nằm ở cuối khung trò chơi); tiến độ được giữ nguyên. Để trở lại đúng câu đang làm, nhấn phím R.',
+    'Nút này mở bản đồ để bạn xem lại bất kỳ phòng nào, cả khi đang chơi. Sau đó, nhấn phím R để quay trở lại câu đang làm.',
   // While away in the rooms (a button at the bottom of the screen).
   returnToGame: 'Quay lại phòng trò chơi',
   returnKey: 'R',
@@ -395,7 +396,7 @@ const vi = {
     },
     {
       name: 'Những vị khách từ quá khứ',
-      task: 'Bốn vị khách bước ra từ cỗ máy thời gian, mỗi người từ một thời kỳ. Hãy cho họ lời khuyên đúng với thời đại của họ. (Phím 1-3 cũng chọn được.)',
+      task: 'Bốn vị khách bước ra từ cỗ máy thời gian, mỗi người từ một thời kỳ. Hãy cho họ biết những đổi thay ở thời của họ sẽ dẫn tới đâu và phải trả giá thế nào. (Phím 1-3 cũng chọn được.)',
     },
   ],
   // Core I
@@ -429,6 +430,7 @@ const en: typeof vi = {
     'The time machine is broken: history is scrambled and its four power cores have gone dark. Repair each core in the workshop to open the portal at the back.',
   consoleStart: 'Start',
   consoleContinue: 'Continue the repair',
+  consoleReplay: 'Play again',
   consoleDone: 'The machine is running! The portal at the back is open.',
   close: 'Close',
   cores: 'Power cores',
@@ -453,7 +455,7 @@ const en: typeof vi = {
   goBack: 'Back to the rooms',
   goBackNote: 'Look around the rooms at any time; your progress is kept.',
   goBackHelp:
-    'This button opens the map so you can look around any room again, even mid-challenge (it is always at the bottom of the game); your progress is kept. To come back to the same question, press R.',
+    'This button opens the map so you can look around any room again, even mid-challenge. Then press R to come back to the question you were on.',
   returnToGame: 'Back to the Game Room',
   returnKey: 'R',
   rounds: [
@@ -471,7 +473,7 @@ const en: typeof vi = {
     },
     {
       name: 'Visitors from the past',
-      task: 'Four visitors step out of the time machine, each from a different era. Give them advice that fits their time. (Keys 1-3 also choose.)',
+      task: 'Four visitors step out of the time machine, each from a different era. Tell them where the changes of their time will lead, and what they will cost. (Keys 1-3 also choose.)',
     },
   ],
   cardOf: 'Card {n}/{total}',

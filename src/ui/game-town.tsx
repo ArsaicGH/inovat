@@ -366,31 +366,61 @@ function transport(stage: number): ReactNode {
 
 const DRAW: Record<Spot, (stage: number) => ReactNode> = { power, making, message, home, office, transport }
 
+// The museum's look for the picture: every colour turned into a two-tone print, from deep
+// walnut in the shadows to pale gold in the light, like a gilded engraving on display.
+// (A filter on a still picture: worked out once when the town changes, not every frame.)
+export function GildFilter({ id }: { id: string }) {
+  return (
+    <filter id={id} colorInterpolationFilters="sRGB">
+      <feColorMatrix type="saturate" values="0" />
+      <feComponentTransfer>
+        <feFuncR type="table" tableValues="0.07 0.22 0.42 0.66 0.86" />
+        <feFuncG type="table" tableValues="0.05 0.15 0.30 0.50 0.72" />
+        <feFuncB type="table" tableValues="0.04 0.09 0.15 0.26 0.46" />
+      </feComponentTransfer>
+    </filter>
+  )
+}
+
 export default function Town({ stages, era, current, pending }: { stages: Stages; era: number; current: Spot | null; pending: Spot[] }) {
   return (
     <svg className="town" viewBox="0 0 600 240" role="img" aria-hidden="true">
-      <rect width="600" height={GROUND_Y} fill={SKY[era]} style={{ transition: 'fill 1s' }} />
-      {era === 2 && [60, 180, 330, 470, 560].map((x, k) => <circle key={x} cx={x} cy={20 + (k % 2) * 18} r="1.5" fill="#fff" />)}
-      <rect y={GROUND_Y} width="600" height="40" fill={GROUND[era]} />
-      {/* The river, until the town no longer needs it. */}
-      {stages.power === 0 && <path d="M0 206 C60 200 100 212 140 206 L140 212 L0 212Z" fill="#4a7aa8" />}
-      {SPOTS.map((spot) => (
-        <g key={`${spot}-${stages[spot]}`} className="town-spot">
-          {DRAW[spot](stages[spot])}
-        </g>
-      ))}
+      <defs>
+        <GildFilter id="town-gild" />
+        <radialGradient id="town-vignette" cx="50%" cy="50%" r="75%">
+          <stop offset="60%" stopColor="#140d07" stopOpacity="0" />
+          <stop offset="100%" stopColor="#140d07" stopOpacity="0.55" />
+        </radialGradient>
+      </defs>
+      <g filter="url(#town-gild)">
+        <rect width="600" height={GROUND_Y} fill={SKY[era]} style={{ transition: 'fill 1s' }} />
+        {era === 2 && [60, 180, 330, 470, 560].map((x, k) => <circle key={x} cx={x} cy={20 + (k % 2) * 18} r="1.5" fill="#fff" />)}
+        <rect y={GROUND_Y} width="600" height="40" fill={GROUND[era]} />
+        {/* The river, until the town no longer needs it. */}
+        {stages.power === 0 && <path d="M0 206 C60 200 100 212 140 206 L140 212 L0 212Z" fill="#4a7aa8" />}
+        {SPOTS.map((spot) => (
+          <g key={`${spot}-${stages[spot]}`} className="town-spot">
+            {DRAW[spot](stages[spot])}
+          </g>
+        ))}
+      </g>
+      {/* Darker edges, like an old print under gallery light. */}
+      <rect width="600" height="240" fill="url(#town-vignette)" />
+      {/* Markers in the museum's gold, outside the print: waiting problems faint, the
+          current one pulsing. */}
       {pending.map((spot, k) => (
-        <g key={`p${k}`} transform={`translate(${MARK[spot][0]} ${MARK[spot][1]})`} opacity="0.75">
-          <circle r="11" fill="#6a7276" />
-          <text y="5" textAnchor="middle" fontSize="14" fontWeight="700" fill="#fff">
+        <g key={`p${k}`} transform={`translate(${MARK[spot][0]} ${MARK[spot][1]})`} opacity="0.6">
+          <circle r="10" fill="#1e1710" stroke="#c9a25a" strokeWidth="1.2" />
+          <text y="4.5" textAnchor="middle" fontSize="13" fontWeight="700" fill="#c9a25a">
             !
           </text>
         </g>
       ))}
       {current && (
         <g transform={`translate(${MARK[current][0]} ${MARK[current][1]})`} className="town-mark">
-          <circle r="13" fill="#e0503a" />
-          <text y="5" textAnchor="middle" fontSize="16" fontWeight="700" fill="#fff">
+          <circle r="16" fill="none" stroke="#ffe3a0" strokeWidth="1" opacity="0.7" />
+          <circle r="12" fill="#1e1710" stroke="#ffd36a" strokeWidth="2" />
+          <text y="5.5" textAnchor="middle" fontSize="15" fontWeight="700" fill="#ffd36a">
             !
           </text>
         </g>

@@ -1,14 +1,20 @@
 import type { Era } from '../content/game'
 import type { Look } from '../content/game-cards'
+import { GildFilter } from './game-town'
 
 // THE VISITORS of the Time Machine game's fourth core, drawn in SVG: a backdrop for their era
-// (brick and smoke, iron and lamps, an office, a data grid) and a simple figure in the clothes
-// of their time (a top hat, a flat cap, a shirt and tie, a hoodie), who nods when pleased and
-// tilts their head when puzzled.
+// (brick and smoke, iron and lamps, an office, a data grid) printed in the museum's gilded
+// two tones, and the visitor as a dark silhouette in the clothes of their time (a top hat,
+// a flat cap, a shirt and tie, a hoodie), like a cut-paper portrait. They nod when pleased
+// and tilt their head when puzzled.
 
 export function SceneBackdrop({ era }: { era: Era }) {
   return (
     <svg className="scene-backdrop" viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <defs>
+        <GildFilter id="scene-gild" />
+      </defs>
+      <g filter="url(#scene-gild)">
       {era === 1 && (
         <>
           <rect width="160" height="90" fill="#8a6a4a" />
@@ -56,56 +62,44 @@ export function SceneBackdrop({ era }: { era: Era }) {
           ))}
         </>
       )}
+      </g>
     </svg>
   )
 }
 
-const CLOTHES: Record<Look, { coat: string; trousers: string }> = {
-  tophat: { coat: '#2a2a34', trousers: '#4a4038' },
-  cap: { coat: '#5a4a3a', trousers: '#3a3a40' },
-  tie: { coat: '#e8e8e4', trousers: '#3a4250' },
-  hoodie: { coat: '#2f6f8a', trousers: '#2a2e38' },
-}
+// One dark ink for the whole figure, edged in gold so it stands out from the print behind.
+const INK = '#17110b'
+const EDGE = { stroke: '#c9a25a', strokeWidth: 0.8, strokeOpacity: 0.55 }
 
 export default function VisitorFigure({ look, mood }: { look: Look; mood: 'asking' | 'happy' | 'puzzled' }) {
-  const c = CLOTHES[look]
   return (
     <svg className={`visitor-figure is-${mood}`} viewBox="0 0 80 160" aria-hidden="true">
-      {/* legs and body */}
-      <rect x="28" y="100" width="10" height="50" rx="3" fill={c.trousers} />
-      <rect x="42" y="100" width="10" height="50" rx="3" fill={c.trousers} />
-      <rect x="22" y="54" width="36" height="52" rx="8" fill={c.coat} />
-      {look === 'tie' && <path d="M40 56 L37 70 L40 90 L43 70Z" fill="#a8332e" />}
-      {look === 'hoodie' && <rect x="50" y="76" width="6" height="11" rx="1" fill="#111" />}
-      {/* arms */}
-      <rect x="14" y="58" width="9" height="40" rx="4" fill={c.coat} />
-      <rect x="57" y="58" width="9" height="40" rx="4" fill={c.coat} />
-      {/* head (it tilts with the mood) */}
-      <g className="visitor-head">
-        <circle cx="40" cy="38" r="15" fill="#e8c4a0" />
-        <circle cx="34" cy="36" r="1.8" fill="#2a1d14" />
-        <circle cx="46" cy="36" r="1.8" fill="#2a1d14" />
-        {mood === 'happy' ? (
-          <path d="M33 44 Q40 51 47 44" stroke="#2a1d14" strokeWidth="1.8" fill="none" />
-        ) : mood === 'puzzled' ? (
-          <path d="M34 47 Q40 43 46 47" stroke="#2a1d14" strokeWidth="1.8" fill="none" />
-        ) : (
-          <path d="M35 46 H45" stroke="#2a1d14" strokeWidth="1.8" />
-        )}
-        {look === 'tophat' && (
-          <>
-            <rect x="24" y="24" width="32" height="4" fill="#1a1a20" />
-            <rect x="29" y="4" width="22" height="21" fill="#1a1a20" />
-          </>
-        )}
-        {look === 'cap' && <path d="M25 30 Q40 14 55 30 L60 31 Z" fill="#4a3e30" />}
-        {look === 'tie' && <path d="M25 32 Q40 16 55 32 Q48 24 40 24 Q32 24 25 32Z" fill="#3a2a1a" />}
-        {look === 'hoodie' && <path d="M22 44 Q20 18 40 18 Q60 18 58 44 Q56 26 40 25 Q24 26 22 44Z" fill="#2f6f8a" />}
-        {mood === 'puzzled' && (
-          <text x="60" y="20" fontSize="18" fontWeight="700" fill="#ffd36a">
-            ?
-          </text>
-        )}
+      <g fill={INK} {...EDGE}>
+        {/* legs, arms and body */}
+        <rect x="28" y="100" width="10" height="50" rx="3" />
+        <rect x="42" y="100" width="10" height="50" rx="3" />
+        <rect x="14" y="58" width="9" height="40" rx="4" />
+        <rect x="57" y="58" width="9" height="40" rx="4" />
+        <rect x="22" y="54" width="36" height="52" rx="8" />
+        {look === 'tie' && <path d="M40 56 L37 70 L40 90 L43 70Z" fill="#8a6a32" stroke="none" />}
+        {/* head and hat (they tilt with the mood) */}
+        <g className="visitor-head">
+          <circle cx="40" cy="38" r="15" />
+          {look === 'tophat' && (
+            <>
+              <rect x="24" y="24" width="32" height="4" />
+              <rect x="29" y="4" width="22" height="21" />
+            </>
+          )}
+          {look === 'cap' && <path d="M25 30 Q40 14 55 30 L60 31 Z" />}
+          {look === 'tie' && <path d="M25 32 Q40 16 55 32 Q48 24 40 24 Q32 24 25 32Z" />}
+          {look === 'hoodie' && <path d="M22 44 Q20 18 40 18 Q60 18 58 44 Q56 26 40 25 Q24 26 22 44Z" />}
+          {mood === 'puzzled' && (
+            <text x="60" y="20" fontSize="18" fontWeight="700" fill="#ffd36a" stroke="none">
+              ?
+            </text>
+          )}
+        </g>
       </g>
     </svg>
   )

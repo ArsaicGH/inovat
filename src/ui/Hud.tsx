@@ -61,7 +61,7 @@ export default function Hud() {
       <div className={aimedId ? 'crosshair crosshair-active' : 'crosshair'} />
       {aimedId && (
         <div className="hud-prompt">
-          <strong>{isQuizTarget(aimedId) ? (cores > 0 ? gameText[language].consoleContinue : gameText[language].consoleStart) : isWallPicture(aimedId) ? PICTURES[aimedId]?.caption[language] : exhibit(aimedId).title}</strong>
+          <strong>{isQuizTarget(aimedId) ? (cores >= 4 ? gameText[language].consoleReplay : cores > 0 ? gameText[language].consoleContinue : gameText[language].consoleStart) : isWallPicture(aimedId) ? PICTURES[aimedId]?.caption[language] : exhibit(aimedId).title}</strong>
           <span>{isQuizTarget(aimedId) ? ui.quiz.prompt : ui.prompt}</span>
         </div>
       )}

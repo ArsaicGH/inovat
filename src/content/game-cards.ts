@@ -244,7 +244,7 @@ export const MYSTERIES: Mystery[] = [
   {
     id: 'ir1-1',
     clues: [
-      { vi: 'Tôi ra đời trong thời đại của hơi nước và máy móc.', en: 'I was born in the age of steam and machines.' },
+      { vi: 'Lĩnh vực của tôi: cơ khí và năng lượng.', en: 'My field: mechanical engineering and energy.' },
       { vi: 'Trước tôi, sản xuất dựa vào sức người, sức vật hoặc sức nước.', en: 'Before me, work relied on human or animal strength, or running water.' },
       { vi: 'Nhờ tôi, nhà máy, hầm mỏ và nhiều ngành khác được cơ giới hóa.', en: 'Thanks to me, factories, mines and many other industries were mechanised.' },
       { vi: 'Bí quyết của tôi là một bình ngưng tách riêng, đỡ phí nhiệt hơn hẳn.', en: 'My secret is a separate condenser, which wastes far less heat.' },
@@ -253,7 +253,7 @@ export const MYSTERIES: Mystery[] = [
   {
     id: 'ir1-2',
     clues: [
-      { vi: 'Tôi thuộc thời mà sản xuất rời khỏi những ngôi nhà để vào nhà máy.', en: 'I belong to the time when work left people’s homes for the factory.' },
+      { vi: 'Lĩnh vực của tôi: công nghiệp dệt.', en: 'My field: the textile industry.' },
       { vi: 'Tôi làm một việc của ngành dệt mà trước kia người ta làm bằng tay ở nhà.', en: 'I do a textile job that people once did by hand at home.' },
       { vi: 'Vì tôi cần nguồn động lực và chỗ đặt máy, các xưởng gom lại thành nhà máy tập trung.', en: 'Because I needed a power source and room, workshops gathered into centralised mills.' },
       { vi: 'Tôi chạy bằng sức nước, như chính tên tôi; Richard Arkwright làm ra tôi.', en: 'I ran on water power, as my name says; Richard Arkwright made me.' },
@@ -262,7 +262,7 @@ export const MYSTERIES: Mystery[] = [
   {
     id: 'ir1-3',
     clues: [
-      { vi: 'Tôi sinh ra khi than đá bắt đầu nuôi cả một nền công nghiệp.', en: 'I was born when coal began to feed a whole industry.' },
+      { vi: 'Lĩnh vực của tôi: luyện kim.', en: 'My field: metallurgy.' },
       { vi: 'Trước tôi, vật liệu tôi làm ra phụ thuộc vào than củi nên làm được rất ít.', en: 'Before me, the material I make depended on charcoal, so little could be made.' },
       { vi: 'Nhờ tôi, máy móc, cầu và đường ray có vật liệu rẻ và dồi dào hơn.', en: 'Thanks to me, machines, bridges and rails got a cheaper, more plentiful material.' },
       { vi: 'Công nhân khuấy gang nóng chảy trong lò của tôi để đốt cháy cacbon; Henry Cort được cấp bằng sáng chế cho tôi.', en: 'Workers stirred molten pig iron in my furnace to burn off the carbon; Henry Cort patented me.' },
@@ -271,7 +271,7 @@ export const MYSTERIES: Mystery[] = [
   {
     id: 'ir1-4',
     clues: [
-      { vi: 'Tôi chạy bằng nguồn động lực của cuộc cách mạng đầu tiên.', en: 'I run on the power of the first revolution.' },
+      { vi: 'Lĩnh vực của tôi: giao thông vận tải.', en: 'My field: transport.' },
       { vi: 'Trước tôi, hàng hóa và con người đi chậm, bằng sức ngựa.', en: 'Before me, goods and people travelled slowly, at the speed of horses.' },
       { vi: 'Tôi giúp nối các trung tâm sản xuất với thị trường.', en: 'I helped link centres of production with their markets.' },
       { vi: 'Tôi nổi tiếng nhờ một cuộc thi ở Rainhill, nước Anh.', en: 'I became famous at a contest at Rainhill, England.' },
@@ -280,7 +280,7 @@ export const MYSTERIES: Mystery[] = [
   {
     id: 'ir1-5',
     clues: [
-      { vi: 'Tôi xuất hiện khi đường sắt đang lan rộng.', en: 'I appeared while the railways were spreading.' },
+      { vi: 'Lĩnh vực của tôi: thông tin liên lạc.', en: 'My field: communication.' },
       { vi: 'Trước tôi, tin tức chỉ đi nhanh bằng người, ngựa hay con tàu mang nó.', en: 'Before me, news travelled only as fast as whoever carried it.' },
       { vi: 'Nhờ tôi, lần đầu tiên tin tức đi nhanh hơn cả đoàn tàu nhanh nhất.', en: 'Thanks to me, news for the first time outran the fastest train.' },
       { vi: 'Tôi biến mỗi chữ cái thành những tín hiệu ngắn và dài.', en: 'I turn each letter into short and long signals.' },
@@ -289,7 +289,7 @@ export const MYSTERIES: Mystery[] = [
   {
     id: 'ir2-1',
     clues: [
-      { vi: 'Tôi thuộc thời đại của sản xuất quy mô lớn.', en: 'I belong to the age of large-scale production.' },
+      { vi: 'Lĩnh vực của tôi: luyện kim.', en: 'My field: metallurgy.' },
       { vi: 'Trước tôi, vật liệu tôi làm ra được làm chậm, ít và rất đắt.', en: 'Before me, the material I make was produced slowly, in small amounts, at great cost.' },
       { vi: 'Nhờ tôi, đường ray, cầu, tàu thủy và nhà cao tầng mọc lên.', en: 'Thanks to me, rails, bridges, ships and tall buildings went up.' },
       { vi: 'Tôi thổi không khí qua gang nóng chảy trong một lò hình quả lê.', en: 'I blow air through molten pig iron in a pear-shaped vessel.' },
@@ -298,7 +298,7 @@ export const MYSTERIES: Mystery[] = [
   {
     id: 'ir2-2',
     clues: [
-      { vi: 'Tôi lớn lên cùng các nhà máy cuối thế kỷ XIX.', en: 'I grew up with the factories of the late 19th century.' },
+      { vi: 'Lĩnh vực của tôi: động lực, tức là làm ra sức kéo cho máy móc và xe cộ.', en: 'My field: engines, the power that drives machines and vehicles.' },
       { vi: 'Tôi nhỏ và nhẹ hơn động cơ hơi nước, vì không cần lò đốt và nồi hơi cồng kềnh.', en: 'I am smaller and lighter than a steam engine: no bulky firebox or boiler.' },
       { vi: 'Tôi đưa động lực lên xe tải, máy kéo, tàu thủy và sau này cả máy bay.', en: 'I brought power to lorries, tractors, ships and later aircraft.' },
       { vi: 'Tôi đốt nhiên liệu ngay trong xi-lanh; một chiếc xe ba bánh chạy xăng nổi tiếng dùng tôi.', en: 'I burn fuel inside my cylinder; a famous three-wheeled petrol car used me.' },
@@ -307,7 +307,7 @@ export const MYSTERIES: Mystery[] = [
   {
     id: 'ir2-3',
     clues: [
-      { vi: 'Tôi là ngôi sao của cuộc cách mạng thứ hai.', en: 'I am the star of the second revolution.' },
+      { vi: 'Lĩnh vực của tôi: điện.', en: 'My field: electricity.' },
       { vi: 'Trước tôi, đêm xuống là việc phải dừng, và cả xưởng quay theo một động cơ duy nhất.', en: 'Before me, work stopped at nightfall and a whole factory turned on one engine.' },
       { vi: 'Nhờ tôi, mỗi máy có thể có động cơ riêng, và thành phố sáng về đêm.', en: 'Thanks to me, each machine could have its own motor, and cities lit up at night.' },
       { vi: 'Đèn sợi đốt và động cơ xoay chiều là hai gương mặt của tôi.', en: 'The incandescent lamp and the AC motor are my two faces.' },
@@ -316,7 +316,7 @@ export const MYSTERIES: Mystery[] = [
   {
     id: 'ir2-4',
     clues: [
-      { vi: 'Tôi ra đời khi điện và kỹ thuật cơ khí thay đổi nhà máy.', en: 'I was born when electricity and engineering transformed the factory.' },
+      { vi: 'Lĩnh vực của tôi: tổ chức sản xuất công nghiệp.', en: 'My field: organising industrial production.' },
       { vi: 'Trước tôi, mỗi sản phẩm được làm chậm, từng chiếc một.', en: 'Before me, each product was built slowly, one at a time.' },
       { vi: 'Tôi làm hàng hóa rẻ hơn, nhưng làm nhiều công việc trở nên đơn điệu và lặp lại.', en: 'I made goods cheaper, but made much work monotonous and repetitive.' },
       { vi: 'Sản phẩm đi qua từng người, mỗi người làm một bước; chiếc Model T là ngôi sao của tôi.', en: 'The product moves past each worker doing one step; the Model T was my star.' },
@@ -325,7 +325,7 @@ export const MYSTERIES: Mystery[] = [
   {
     id: 'ir2-5',
     clues: [
-      { vi: 'Tôi thuộc thời đại của điện.', en: 'I belong to the age of electricity.' },
+      { vi: 'Lĩnh vực của tôi: viễn thông.', en: 'My field: telecommunications.' },
       { vi: 'Trước tôi, liên lạc từ xa chỉ là những tín hiệu phải dịch ra chữ.', en: 'Before me, long-distance messages were signals that had to be turned into words.' },
       { vi: 'Nhờ tôi, con người, doanh nghiệp và cơ quan liên hệ trực tiếp với nhau dễ dàng hơn nhiều.', en: 'Thanks to me, people, businesses and offices could reach each other directly, far more easily.' },
       { vi: 'Tôi mang giọng nói con người đi xa; tên tuổi tôi gắn với Alexander Graham Bell.', en: 'I carry the human voice far away; I am linked to Alexander Graham Bell.' },
@@ -334,7 +334,7 @@ export const MYSTERIES: Mystery[] = [
   {
     id: 'ir3-1',
     clues: [
-      { vi: 'Tôi thuộc thời đại của điện tử và máy tính.', en: 'I belong to the age of electronics and computers.' },
+      { vi: 'Tôi là một linh kiện nhỏ, không phải một cỗ máy hoàn chỉnh.', en: 'I am a tiny component, not a complete machine.' },
       { vi: 'Trước tôi, một bộ xử lý cần rất nhiều linh kiện riêng lẻ.', en: 'Before me, a processor needed many separate parts.' },
       { vi: 'Nhờ tôi, thiết bị điện tử ngày càng nhỏ và nhẹ.', en: 'Thanks to me, electronics became ever smaller and lighter.' },
       { vi: 'Tôi gói cả bộ xử lý trung tâm vào một con chip; Intel làm ra tôi.', en: 'I pack a whole central processor onto one chip; Intel made me.' },
@@ -343,7 +343,7 @@ export const MYSTERIES: Mystery[] = [
   {
     id: 'ir3-2',
     clues: [
-      { vi: 'Tôi ra đời trong nửa sau thế kỷ XX.', en: 'I was born in the second half of the 20th century.' },
+      { vi: 'Tôi là một chiếc máy hoàn chỉnh, đặt vừa trên bàn làm việc.', en: 'I am a complete machine that fits on a desk.' },
       { vi: 'Trước tôi, máy tính thuộc về các tổ chức lớn chứ không phải từng người.', en: 'Before me, computers belonged to big organisations, not to individuals.' },
       { vi: 'Tôi giúp soạn văn bản, tính toán và lưu dữ liệu, và kéo theo cả ngành phần mềm.', en: 'I helped with writing, calculating and storing data, and boosted the software industry.' },
       { vi: 'Một hãng máy tính lớn của Mỹ giới thiệu tôi năm 1981, cho văn phòng, trường học và gia đình.', en: 'A big American computer company launched me in 1981, for offices, schools and homes.' },
@@ -352,7 +352,7 @@ export const MYSTERIES: Mystery[] = [
   {
     id: 'ir3-3',
     clues: [
-      { vi: 'Tôi ra đời khi điện tử và lập trình bước vào nhà máy.', en: 'I was born when electronics and programming entered the factory.' },
+      { vi: 'Tôi làm việc trong nhà máy, trên dây chuyền sản xuất.', en: 'I work in factories, on the production line.' },
       { vi: 'Trước tôi, con người làm việc nặng và nguy hiểm, và đổi quy trình nghĩa là đi dây lại.', en: 'Before me, people did heavy, dangerous work, and changing a process meant rewiring.' },
       { vi: 'Tôi gồm hai phần, hai trụ cột của nhà máy tự động.', en: 'I come in two parts, the two pillars of the automated factory.' },
       { vi: 'Một nửa của tôi bắt đầu làm việc trong nhà máy General Motors năm 1961.', en: 'Half of me went to work in a General Motors factory in 1961.' },
@@ -361,7 +361,7 @@ export const MYSTERIES: Mystery[] = [
   {
     id: 'ir3-4',
     clues: [
-      { vi: 'Tôi ra đời khi các viện nghiên cứu đã có máy tính.', en: 'I was born when research sites already had computers.' },
+      { vi: 'Tôi không phải một cỗ máy, mà là mối nối giữa nhiều máy tính.', en: 'I am not a machine but a link between many computers.' },
       { vi: 'Trước tôi, máy tính ở những nơi khác nhau không trao đổi dữ liệu được với nhau.', en: 'Before me, computers in different places could not exchange data.' },
       { vi: 'Tôi là một trong những nền móng của Internet.', en: 'I am one of the foundations of the Internet.' },
       { vi: 'Một cơ quan nghiên cứu của Bộ Quốc phòng Hoa Kỳ đứng sau tôi.', en: 'A research agency of the US Department of Defense was behind me.' },
@@ -370,7 +370,7 @@ export const MYSTERIES: Mystery[] = [
   {
     id: 'ir3-5',
     clues: [
-      { vi: 'Tôi thuộc thời đại của thông tin.', en: 'I belong to the information age.' },
+      { vi: 'Tôi gồm hai phát minh: một thứ cầm trên tay, một thứ đọc trên màn hình.', en: 'I am two inventions: one you hold in your hand, one you read on a screen.' },
       { vi: 'Trước tôi, cuộc gọi nào cũng cần một sợi dây, và tài liệu không nối được với nhau.', en: 'Before me, every call needed a wire, and documents were not linked to one another.' },
       { vi: 'Nhờ tôi, thông tin, mua bán và trò chuyện theo con người đi khắp nơi.', en: 'Thanks to me, information, shopping and conversation followed people everywhere.' },
       { vi: 'Martin Cooper và Tim Berners-Lee là hai cha đẻ của tôi.', en: 'Martin Cooper and Tim Berners-Lee are my two parents.' },
@@ -379,7 +379,7 @@ export const MYSTERIES: Mystery[] = [
   {
     id: 'ir4-1',
     clues: [
-      { vi: 'Tôi thuộc cuộc cách mạng đang diễn ra hôm nay.', en: 'I belong to the revolution happening today.' },
+      { vi: 'Lĩnh vực của tôi: chế tạo đồ vật, nhưng không cắt gọt hay đúc khuôn.', en: 'My field: making objects, but without cutting or moulding them.' },
       { vi: 'Tôi biến một mô hình số trên máy tính thành vật thật.', en: 'I turn a digital model on a computer into a real object.' },
       { vi: 'Tôi làm nhanh mẫu thử và những hình dạng phức tạp, nhưng tốc độ, vật liệu và chi phí vẫn giới hạn tôi.', en: 'I make quick prototypes and complex shapes, but speed, materials and cost still limit me.' },
       { vi: 'Tôi đắp vật liệu lên từng lớp một.', en: 'I build up material one layer at a time.' },
@@ -388,7 +388,7 @@ export const MYSTERIES: Mystery[] = [
   {
     id: 'ir4-2',
     clues: [
-      { vi: 'Tôi thuộc cuộc cách mạng mà máy móc trao đổi thông tin với nhau.', en: 'I belong to the revolution in which machines share information with each other.' },
+      { vi: 'Lĩnh vực của tôi: cảm biến, mạng và tự động hóa trong nhà máy.', en: 'My field: sensors, networks and automation in the factory.' },
       { vi: 'Trước tôi, người ta chờ máy hỏng rồi mới sửa.', en: 'Before me, people waited for machines to break before fixing them.' },
       { vi: 'Tôi cảnh báo hỏng hóc từ trước, và để kỹ sư thử thay đổi trên một bản sao ảo.', en: 'I warn of breakdowns in advance, and let engineers try changes on a virtual copy.' },
       { vi: 'Cảm biến trên máy móc gửi dữ liệu cho tôi liên tục qua mạng.', en: 'Sensors on the machines send me data over the network all the time.' },
@@ -397,7 +397,7 @@ export const MYSTERIES: Mystery[] = [
   {
     id: 'ir4-3',
     clues: [
-      { vi: 'Tôi phát triển vượt bậc trong cuộc cách mạng hiện nay.', en: 'I have leapt ahead in the present revolution.' },
+      { vi: 'Lĩnh vực của tôi: khoa học máy tính.', en: 'My field: computer science.' },
       { vi: 'Thay vì chỉ làm theo quy tắc viết sẵn, tôi học từ rất nhiều dữ liệu.', en: 'Instead of only following rules written in advance, I learn from vast amounts of data.' },
       { vi: 'Tôi nhận dạng, dự đoán, quyết định và sáng tạo, nhưng vẫn có thể sai và cần con người giám sát.', en: 'I recognise, predict, decide and create, but I can still be wrong and need human oversight.' },
       { vi: 'ChatGPT đưa một dạng của tôi đến với hàng trăm triệu người.', en: 'ChatGPT brought one form of me to hundreds of millions of people.' },
@@ -406,7 +406,7 @@ export const MYSTERIES: Mystery[] = [
   {
     id: 'ir4-4',
     clues: [
-      { vi: 'Tôi là một phần của cuộc cách mạng thứ tư, dù hiếm ai được tận mắt nhìn thấy tôi.', en: 'I am part of the fourth revolution, though few people ever see me with their own eyes.' },
+      { vi: 'Lĩnh vực của tôi: trung tâm dữ liệu và mạng Internet.', en: 'My field: data centres and the Internet.' },
       { vi: 'Trước tôi, mỗi doanh nghiệp phải tự mua và vận hành máy chủ.', en: 'Before me, every business had to buy and run its own servers.' },
       { vi: 'Người ta thuê tôi qua Internet, dùng bao nhiêu trả bấy nhiêu; AI được huấn luyện trong tôi.', en: 'People rent me over the Internet, paying for what they use; AI is trained inside me.' },
       { vi: 'Amazon Web Services mở đường cho tôi năm 2006.', en: 'Amazon Web Services opened the way for me in 2006.' },
@@ -415,7 +415,7 @@ export const MYSTERIES: Mystery[] = [
   {
     id: 'ir4-5',
     clues: [
-      { vi: 'Tôi thuộc thời đại máy móc biết nhìn và cảm nhận.', en: 'I belong to the age of machines that can see and feel.' },
+      { vi: 'Lĩnh vực của tôi: những cỗ máy cử động trong sản xuất thông minh.', en: 'My field: machines that move, in smart manufacturing.' },
       { vi: 'Tổ tiên của tôi làm việc sau hàng rào và lặp lại đúng một chuỗi động tác.', en: 'My ancestors worked behind a fence, repeating exactly one sequence of moves.' },
       { vi: 'Với camera và cảm biến lực, tôi có thể làm việc ngay cạnh con người.', en: 'With cameras and force sensors, I can work right beside people.' },
       { vi: 'Một nhánh của gia đình tôi được gọi là "cobot".', en: 'One branch of my family is called the “cobot”.' },
@@ -424,7 +424,7 @@ export const MYSTERIES: Mystery[] = [
   {
     id: 'ir4-6',
     clues: [
-      { vi: 'Tôi là một phần của cuộc cách mạng đang diễn ra hôm nay.', en: 'I am part of the revolution happening today.' },
+      { vi: 'Lĩnh vực của tôi: sinh học, y học và nông nghiệp.', en: 'My field: biology, medicine and agriculture.' },
       { vi: 'Máy tính giúp tôi đọc một khối dữ liệu khổng lồ bên trong mỗi con người.', en: 'Computers help me read a huge mass of data inside every person.' },
       { vi: 'Tôi mở ra những cách chữa bệnh mới, nhưng đặt ra câu hỏi lớn về đạo đức và an toàn.', en: 'I open new ways to treat disease, but raise big questions of ethics and safety.' },
       { vi: '"Chiếc kéo di truyền" CRISPR-Cas9 và vắc-xin mRNA là thành tựu của tôi.', en: 'The “genetic scissors” CRISPR-Cas9 and mRNA vaccines are my achievements.' },
@@ -469,10 +469,10 @@ export const MYSTERIES: Mystery[] = [
 ]
 
 // ---- Core IV: Visitors from the past ----
-// Two possible visitors from each era (one is chosen each game); each asks for advice three
-// times, from a pool of four or five questions. The first reply is the right one: it fits
-// what their era could do, needed next, or cost. The others are from the wrong time, or
-// misunderstand the era.
+// Two possible visitors from each era (one is chosen each game); each asks two questions,
+// from a pool of three to five, about where the changes of their own time will lead and what
+// they will cost (not which invention solves a problem: that is core II). The first reply
+// is the right one; the others belong to another time, or misjudge the era.
 export type Look = 'tophat' | 'cap' | 'tie' | 'hoodie'
 export interface Visitor {
   id: string
@@ -497,26 +497,6 @@ export const VISITORS: Visitor[] = [
     hello: { vi: 'Chào bạn! Nghe nói bạn đến từ tương lai. Tôi đang cần lời khuyên cho xưởng của mình.', en: 'Hello! They say you come from the future. I need some advice for my mill.' },
     questions: [
       {
-        ask: { vi: 'Xưởng của tôi phải đặt cạnh sông để quay máy. Mùa khô nước cạn, máy dừng cả. Tôi nên làm gì?', en: 'My mill has to sit by the river to turn its machines. In the dry season the water drops and everything stops. What should I do?' },
-        replies: [
-          { vi: 'Dùng động cơ hơi nước cải tiến, đốt than để quay máy.', en: 'Use an improved steam engine, burning coal to drive the machines.' },
-          { vi: 'Gắn một động cơ điện riêng cho từng máy.', en: 'Fit each machine with its own electric motor.' },
-          { vi: 'Đợi mùa mưa rồi làm bù cho đủ.', en: 'Wait for the rains and catch up then.' },
-        ],
-        why: { vi: 'Động cơ hơi nước của Watt cho động lực ở bất cứ đâu có than. Động cơ điện chỉ đến ở cuộc cách mạng thứ hai.', en: 'Watt’s steam engine gave power wherever there was coal. Electric motors only came with the second revolution.' },
-        from: 'ir1-1',
-      },
-      {
-        ask: { vi: 'Tôi muốn làm ra nhiều sợi hơn hẳn. Nên tổ chức việc sản xuất thế nào?', en: 'I want to make far more thread. How should I organise the work?' },
-        replies: [
-          { vi: 'Gom máy kéo sợi vào một nhà máy chung, dùng chung một nguồn động lực.', en: 'Gather spinning machines in one mill, sharing one power source.' },
-          { vi: 'Để mỗi gia đình kéo sợi tại nhà như trước.', en: 'Let each family keep spinning at home as before.' },
-          { vi: 'Đặt các máy dọc một dây chuyền di động, mỗi người một bước.', en: 'Line the machines along a moving line, one step per worker.' },
-        ],
-        why: { vi: 'Máy Water Frame cần nguồn động lực và chỗ đặt máy, nên các xưởng gom lại thành nhà máy tập trung. Dây chuyền di động thuộc cuộc cách mạng thứ hai.', en: 'The Water Frame needed power and room, so workshops gathered into centralised mills. The moving line belongs to the second revolution.' },
-        from: 'ir1-2',
-      },
-      {
         ask: { vi: 'Công nhân của tôi làm việc rất nhiều giờ, xưởng thì ngột ngạt khói than. Thời của bạn nhìn lại chuyện này thế nào?', en: 'My workers labour very long hours, and the mill is choked with coal smoke. How does your time look back on this?' },
         replies: [
           { vi: 'Đó là mặt trái của thời đại: điều kiện lao động khắc nghiệt và ô nhiễm.', en: 'It is the dark side of the age: harsh working conditions and pollution.' },
@@ -536,6 +516,26 @@ export const VISITORS: Visitor[] = [
         why: { vi: 'Nhà máy kéo người lao động về thành phố: đô thị phát triển nhanh chóng là một hệ quả của cuộc cách mạng thứ nhất.', en: 'Factories drew workers into the towns: fast-growing cities were one result of the first revolution.' },
         from: 'ir1-overview',
       },
+      {
+        ask: { vi: 'Tôi vừa lắp một động cơ hơi nước kiểu mới của ông Watt. Nó sẽ thay đổi điều gì?', en: 'I have just installed one of Mr Watt’s new steam engines. What will it change?' },
+        replies: [
+          { vi: 'Xưởng không còn phụ thuộc vào dòng sông, và sẽ có thêm nhiều ngành được cơ giới hóa.', en: 'My mill no longer depends on the river, and many more industries will be mechanised.' },
+          { vi: 'Chẳng bao lâu nữa mỗi máy sẽ có một động cơ điện riêng.', en: 'Soon every machine will have its own electric motor.' },
+          { vi: 'Không có gì nhiều: đó chỉ là một bánh xe nước tốt hơn.', en: 'Nothing much: it is only a better water wheel.' },
+        ],
+        why: { vi: 'Động cơ của Watt tiết kiệm nhiên liệu hơn, được dùng rộng rãi trong nhà máy và hầm mỏ, đưa sản xuất từ sức người, sức vật và sức nước sang máy móc. Động cơ điện riêng cho từng máy chỉ đến ở cuộc cách mạng thứ hai.', en: 'Watt’s engine used less fuel and spread through factories and mines, moving production from human, animal and water power to machines. A motor for every machine only came with the second revolution.' },
+        from: 'ir1-1',
+      },
+      {
+        ask: { vi: 'Máy Water Frame của tôi giờ đã quay trong một nhà máy lớn. Những người kéo sợi tại nhà rồi sẽ ra sao?', en: 'My Water Frames now spin together in one big mill. What will become of people spinning at home?' },
+        replies: [
+          { vi: 'Công việc thủ công trong các gia đình dần nhường chỗ cho sản xuất tập trung trong nhà máy.', en: 'Hand work in family homes will slowly give way to centralised production in factories.' },
+          { vi: 'Các gia đình sẽ kéo sợi tại nhà nhiều hơn bao giờ hết.', en: 'Families will spin at home more than ever.' },
+          { vi: 'Họ sẽ đứng dọc một dây chuyền di động, mỗi người một bước.', en: 'They will stand along a moving assembly line, one step each.' },
+        ],
+        why: { vi: 'Water Frame cần nguồn động lực và chỗ đặt máy, nên các xưởng gom lại thành nhà máy, dần thay thế việc làm thủ công tại nhà. Dây chuyền di động thuộc cuộc cách mạng thứ hai.', en: 'The Water Frame needed power and room, so workshops gathered into factories, slowly replacing hand work at home. The moving line belongs to the second revolution.' },
+        from: 'ir1-2',
+      },
     ],
   },
   {
@@ -546,36 +546,6 @@ export const VISITORS: Visitor[] = [
     hello: { vi: 'Rất vui được gặp bạn! Tôi đang xây một tuyến đường mới và có vài câu muốn hỏi.', en: 'Delighted to meet you! I am building a new line and have a few questions.' },
     questions: [
       {
-        ask: { vi: 'Than từ mỏ tới nhà máy vẫn đi bằng xe ngựa, chậm và chở ít. Tôi nên xây gì?', en: 'Coal still goes from the mine to the mills by horse and cart, slowly and in small loads. What should I build?' },
-        replies: [
-          { vi: 'Một tuyến đường sắt với đầu máy hơi nước.', en: 'A railway with steam locomotives.' },
-          { vi: 'Một đường lớn cho ô tô chạy xăng.', en: 'A wide road for petrol cars.' },
-          { vi: 'Một đường dây điện báo từ mỏ tới nhà máy.', en: 'A telegraph line from the mine to the mills.' },
-        ],
-        why: { vi: 'Đầu máy hơi nước như Rocket kéo đoàn tàu chở nhiều hàng, nhanh hơn xe ngựa. Ô tô chỉ ra đời ở cuộc cách mạng thứ hai; điện báo chở tin, không chở than.', en: 'Steam locomotives such as Rocket pulled heavy trains, faster than horses. Cars only came with the second revolution; the telegraph carries news, not coal.' },
-        from: 'ir1-4',
-      },
-      {
-        ask: { vi: 'Đường ray và cầu cần rất nhiều sắt. Tôi lấy đâu ra đủ sắt?', en: 'Rails and bridges need a great deal of iron. Where will I get enough?' },
-        replies: [
-          { vi: 'Từ lò khuấy đốt than đá, rồi cán thành thanh.', en: 'From coal-fired puddling furnaces, then rolled into bars.' },
-          { vi: 'Từ lò thổi Bessemer, rẻ và nhanh.', en: 'From Bessemer converters, cheap and fast.' },
-          { vi: 'Từ lò luyện dùng than củi, như xưa nay vẫn làm.', en: 'From charcoal furnaces, as it has always been done.' },
-        ],
-        why: { vi: 'Lò khuấy của Henry Cort cho ra sắt rèn với số lượng lớn bằng than đá. Than củi giới hạn sản lượng; lò Bessemer thuộc cuộc cách mạng thứ hai.', en: 'Henry Cort’s puddling furnace made wrought iron in quantity with coal. Charcoal limited output; the Bessemer converter belongs to the second revolution.' },
-        from: 'ir1-3',
-      },
-      {
-        ask: { vi: 'Làm sao báo cho ga sau rằng đoàn tàu đã chạy, để hai tàu không đâm nhau?', en: 'How can I tell the next station that a train has left, so two trains never collide?' },
-        replies: [
-          { vi: 'Kéo một đường dây điện báo dọc đường ray.', en: 'Run a telegraph line along the track.' },
-          { vi: 'Gọi điện thoại cho trưởng ga.', en: 'Telephone the stationmaster.' },
-          { vi: 'Cử người cưỡi ngựa phóng thật nhanh tới ga sau.', en: 'Send a rider to gallop to the next station.' },
-        ],
-        why: { vi: 'Điện báo của Cooke và Wheatstone được dùng dọc đường sắt, giúp điều phối tàu an toàn hơn. Ngựa chậm hơn tàu; điện thoại ra đời sau đó nhiều năm.', en: 'Cooke and Wheatstone’s telegraph was used along railways, helping to run trains more safely. A horse is slower than the train; the telephone came many years later.' },
-        from: 'ir1-5',
-      },
-      {
         ask: { vi: 'Bạn nghĩ đường sắt sẽ thay đổi điều gì?', en: 'What do you think the railways will change?' },
         replies: [
           { vi: 'Hàng hóa và con người đi nhanh hơn; nơi sản xuất nối liền với thị trường.', en: 'Goods and people will travel faster; places of production will be linked to markets.' },
@@ -584,6 +554,26 @@ export const VISITORS: Visitor[] = [
         ],
         why: { vi: 'Đường sắt giúp người và hàng hóa đi nhanh hơn, nối các trung tâm sản xuất với thị trường, thúc đẩy thương mại và công nghiệp.', en: 'Railways let people and goods move faster and linked centres of production with their markets, boosting trade and industry.' },
         from: 'ir1-4',
+      },
+      {
+        ask: { vi: 'Lò luyện của ông Cort giờ làm ra sắt rèn với số lượng lớn. Thứ sắt ấy sẽ được dùng vào việc gì?', en: 'Mr Cort’s puddling furnaces now make wrought iron in quantity. What will that iron become?' },
+        replies: [
+          { vi: 'Vật liệu chính của máy móc, cầu, khung nhà máy và đường ray.', en: 'The main material of machines, bridges, factory frames and rails.' },
+          { vi: 'Những tòa nhà chọc trời bằng thép giá rẻ.', en: 'Skyscrapers of cheap steel.' },
+          { vi: 'Chẳng vào đâu: sắt vẫn sẽ hiếm như trước.', en: 'Very little: iron will stay as scarce as before.' },
+        ],
+        why: { vi: 'Lò luyện đốt than giúp làm sắt rèn nhiều và rẻ hơn, nên sắt thành vật liệu chính của cuộc cách mạng thứ nhất. Thép rẻ cho nhà cao tầng chỉ đến với phương pháp Bessemer ở cuộc cách mạng thứ hai.', en: 'Coal-fired puddling made wrought iron cheaper and more plentiful, so iron became the main material of the first revolution. Cheap steel for tall buildings only came with the Bessemer process in the second.' },
+        from: 'ir1-3',
+      },
+      {
+        ask: { vi: 'Dây điện báo giờ đã chạy dọc tuyến đường sắt của tôi. Ngoài đường sắt, nó sẽ thay đổi điều gì?', en: 'Telegraph wires now run along my line. Beyond the railway, what will they change?' },
+        replies: [
+          { vi: 'Tin tức sẽ đi nhanh hơn cả đoàn tàu nhanh nhất, phục vụ cả báo chí và thương mại.', en: 'News will outrun the fastest train, serving newspapers and trade as well.' },
+          { vi: 'Mọi người sẽ trò chuyện bằng giọng nói với nhau khắp đất nước.', en: 'People will talk to each other by voice across the country.' },
+          { vi: 'Không gì cả: nó chỉ dùng để báo tàu.', en: 'Nothing: it is only for railway signals.' },
+        ],
+        why: { vi: 'Điện báo gửi tin gần như tức thì và phục vụ đường sắt, báo chí và thương mại. Truyền giọng nói đi xa là việc của điện thoại, ở cuộc cách mạng thứ hai.', en: 'The telegraph sent messages almost instantly and served railways, newspapers and trade. Carrying the voice far away was the telephone’s work, in the second revolution.' },
+        from: 'ir1-5',
       },
     ],
   },
@@ -595,26 +585,6 @@ export const VISITORS: Visitor[] = [
     hello: { vi: 'Chào bạn! Nhà máy của tôi đang bận rộn lắm, nhưng tôi muốn nghe ý kiến của người đến từ tương lai.', en: 'Hello! My factory is very busy, but I would like the opinion of someone from the future.' },
     questions: [
       {
-        ask: { vi: 'Cả xưởng tôi quay theo một động cơ hơi nước với những dây curoa dài. Có cách nào tốt hơn không?', en: 'My whole works turns on one steam engine with long belts. Is there a better way?' },
-        replies: [
-          { vi: 'Gắn động cơ điện cho từng máy, đặt máy ở nơi cần.', en: 'Give each machine an electric motor and place machines where they are needed.' },
-          { vi: 'Mua một động cơ hơi nước to hơn nữa.', en: 'Buy an even bigger steam engine.' },
-          { vi: 'Điều khiển máy móc bằng bộ điều khiển lập trình (PLC).', en: 'Control the machines with programmable controllers (PLCs).' },
-        ],
-        why: { vi: 'Với động cơ điện, nhà máy không còn phụ thuộc vào một động cơ hơi nước duy nhất. PLC chỉ xuất hiện từ cuối thập niên 1960.', en: 'With electric motors, a factory no longer depended on a single steam engine. PLCs only appeared from the late 1960s.' },
-        from: 'ir2-3',
-      },
-      {
-        ask: { vi: 'Chúng tôi lắp ô tô từng chiếc một, quá chậm và quá đắt. Làm sao nhanh hơn?', en: 'We build cars one at a time, far too slowly and expensively. How can we go faster?' },
-        replies: [
-          { vi: 'Cho xe di chuyển qua các công nhân, mỗi người làm một bước.', en: 'Move the cars past the workers, each doing one step.' },
-          { vi: 'Để robot công nghiệp lắp hết.', en: 'Let industrial robots assemble everything.' },
-          { vi: 'Thuê những người thợ giỏi làm trọn cả chiếc xe.', en: 'Hire master craftsmen to build each whole car.' },
-        ],
-        why: { vi: 'Dây chuyền lắp ráp di động của Ford làm chiếc Model T nhanh và rẻ hơn hẳn. Robot công nghiệp đầu tiên chỉ vào nhà máy năm 1961.', en: 'Ford’s moving assembly line made the Model T far faster and cheaper. The first industrial robot only went to work in 1961.' },
-        from: 'ir2-4',
-      },
-      {
         ask: { vi: 'Dây chuyền chạy tốt, nhưng công nhân than phiền. Họ khó chịu vì điều gì?', en: 'The line runs well, but the workers complain. What troubles them?' },
         replies: [
           { vi: 'Công việc lặp lại, đơn điệu và bị tổ chức rất chặt chẽ.', en: 'The work is repetitive, monotonous and very tightly organised.' },
@@ -625,14 +595,34 @@ export const VISITORS: Visitor[] = [
         from: 'ir2-overview',
       },
       {
-        ask: { vi: 'Tôi cần bàn ngay hôm nay với nhà cung cấp thép ở thành phố khác. Làm cách nào?', en: 'I must talk today with our steel supplier in another city. How?' },
+        ask: { vi: 'Chúng tôi vừa bắt đầu lắp xe Model T trên một dây chuyền di động. Sản lượng của chúng tôi sẽ ra sao?', en: 'We have just started building the Model T on a moving line. What will happen to our output?' },
         replies: [
-          { vi: 'Gọi điện thoại cho họ.', en: 'Telephone them.' },
-          { vi: 'Gửi cho họ một thư điện tử.', en: 'Send them an email.' },
-          { vi: 'Gửi một lá thư theo chuyến tàu sáng mai.', en: 'Send a letter on tomorrow morning’s train.' },
+          { vi: 'Sản lượng tăng và thời gian lắp ráp giảm: sản xuất hàng loạt bắt đầu.', en: 'Output will rise and assembly time will fall: mass production begins.' },
+          { vi: 'Mỗi chiếc xe sẽ lâu hơn, vì được hoàn thiện bằng tay.', en: 'Each car will take longer, as it is finished by hand.' },
+          { vi: 'Máy móc sẽ tự học từ dữ liệu để sắp xếp lại dây chuyền.', en: 'The machines will learn from data to rearrange the line themselves.' },
         ],
-        why: { vi: 'Điện thoại giúp các doanh nghiệp liên hệ trực tiếp bằng giọng nói. Thư theo tàu thì chậm; mạng máy tính chỉ đến ở cuộc cách mạng thứ ba.', en: 'The telephone let businesses talk directly by voice. A letter by train is slow; computer networks only came with the third revolution.' },
-        from: 'ir2-5',
+        why: { vi: 'Dây chuyền di động của Ford làm tăng sản lượng, giảm thời gian lắp ráp và trở thành biểu tượng của sản xuất hàng loạt. Máy học từ dữ liệu thuộc cuộc cách mạng thứ tư.', en: 'Ford’s moving line raised output, cut assembly time and became the symbol of mass production. Machines that learn from data belong to the fourth revolution.' },
+        from: 'ir2-4',
+      },
+      {
+        ask: { vi: 'Xưởng của tôi đã thay một động cơ hơi nước bằng các động cơ điện. Bên trong nhà máy sẽ thay đổi thế nào?', en: 'My works has swapped its one steam engine for electric motors. What will change inside the factory?' },
+        replies: [
+          { vi: 'Có thể đặt động cơ ở bất cứ chỗ nào cần, nên cách tổ chức nhà máy thay đổi.', en: 'Motors can go wherever they are needed, so the factory can be organised differently.' },
+          { vi: 'Mọi máy vẫn phải nối dây curoa về một động cơ chung.', en: 'Every machine must still be belted to one shared engine.' },
+          { vi: 'Robot sẽ làm thay toàn bộ việc hàn.', en: 'Robots will take over all the welding.' },
+        ],
+        why: { vi: 'Động cơ điện xoay chiều biến điện năng thành chuyển động, nên nhà máy không còn phụ thuộc vào một động cơ hơi nước duy nhất. Robot hàn chỉ đến ở cuộc cách mạng thứ ba.', en: 'The AC motor turns electricity into motion, so a factory no longer depends on one steam engine. Welding robots only came with the third revolution.' },
+        from: 'ir2-3',
+      },
+      {
+        ask: { vi: 'Loại động cơ chạy xăng như của ông Benz đang ngày càng phổ biến. Rồi nó sẽ được dùng ở đâu?', en: 'Petrol engines like Mr Benz’s are catching on. Where will they end up?' },
+        replies: [
+          { vi: 'Trong ô tô, xe tải, máy kéo, tàu thủy và sau này là máy bay.', en: 'In cars, lorries, tractors, ships and later aircraft.' },
+          { vi: 'Chỉ trong nhà máy, vì nó quá nặng để di chuyển.', en: 'Only in factories, as it is too heavy to move.' },
+          { vi: 'Chỉ trong đầu máy xe lửa chạy trên ray.', en: 'Only in railway locomotives.' },
+        ],
+        why: { vi: 'Động cơ đốt trong đốt nhiên liệu ngay trong xi-lanh nên nhỏ và nhẹ hơn động cơ hơi nước, đưa động lực đến ô tô, xe tải, máy kéo, tàu thủy và sau này là máy bay.', en: 'An internal combustion engine burns its fuel inside the cylinder, so it is smaller and lighter than a steam engine, bringing power to cars, lorries, tractors, ships and later aircraft.' },
+        from: 'ir2-2',
       },
     ],
   },
@@ -644,36 +634,6 @@ export const VISITORS: Visitor[] = [
     hello: { vi: 'Xin chào! Thành phố của tôi đang lớn rất nhanh. Bạn giúp tôi vài ý kiến nhé?', en: 'Good day! My city is growing very fast. Could you give me some advice?' },
     questions: [
       {
-        ask: { vi: 'Đêm xuống là phố xá chìm trong bóng tối. Thành phố nên làm gì?', en: 'At night the streets fall into darkness. What should the city do?' },
-        replies: [
-          { vi: 'Lắp đèn điện sợi đốt và xây mạng lưới cấp điện.', en: 'Install incandescent electric lamps and build a power network.' },
-          { vi: 'Phát thêm nến cho mọi nhà.', en: 'Hand out more candles to every home.' },
-          { vi: 'Lắp đèn thông minh nối mạng Internet.', en: 'Install smart lamps connected to the Internet.' },
-        ],
-        why: { vi: 'Đèn sợi đốt giúp con người làm việc và sinh hoạt sau khi trời tối, và thúc đẩy xây dựng mạng lưới cấp điện. Internet chỉ đến rất lâu sau.', en: 'The incandescent lamp let people work and live after dark, and drove the building of power networks. The Internet came much later.' },
-        from: 'ir2-3',
-      },
-      {
-        ask: { vi: 'Chúng tôi muốn xây những cây cầu lớn và tòa nhà cao hơn bao giờ hết. Cần vật liệu gì?', en: 'We want to build bigger bridges and taller buildings than ever. What material do we need?' },
-        replies: [
-          { vi: 'Thép giá rẻ làm bằng phương pháp Bessemer.', en: 'Cheap steel made by the Bessemer process.' },
-          { vi: 'Gỗ thật dày.', en: 'Very thick timber.' },
-          { vi: 'In cả tòa nhà bằng máy in 3D bê tông.', en: 'Print the whole building with a concrete 3D printer.' },
-        ],
-        why: { vi: 'Thép rẻ từ lò Bessemer thúc đẩy xây dựng đường sắt, cầu, tàu thủy và nhà cao tầng. In 3D thuộc cuộc cách mạng thứ tư.', en: 'Cheap Bessemer steel drove the building of railways, bridges, ships and tall buildings. 3D printing belongs to the fourth revolution.' },
-        from: 'ir2-1',
-      },
-      {
-        ask: { vi: 'Toà thị chính nhận rất nhiều điện báo; phải chờ người dịch mã rất lâu. Có cách nào nhanh hơn?', en: 'City hall receives piles of telegrams; decoding them takes ages. Is there a faster way?' },
-        replies: [
-          { vi: 'Lắp tổng đài và máy điện thoại để nói chuyện trực tiếp.', en: 'Install a switchboard and telephones to talk directly.' },
-          { vi: 'Phát cho mỗi nhân viên một điện thoại di động.', en: 'Give every clerk a mobile phone.' },
-          { vi: 'Tuyển thêm người cưỡi ngựa đưa thư.', en: 'Hire more riders to carry letters.' },
-        ],
-        why: { vi: 'Điện thoại mang giọng nói đi xa, giúp các cơ quan trao đổi trực tiếp; mạng lưới điện thoại dần mở rộng. Điện thoại di động thuộc cuộc cách mạng thứ ba.', en: 'The telephone carried the voice far away, letting offices talk directly, and telephone networks spread. Mobile phones belong to the third revolution.' },
-        from: 'ir2-5',
-      },
-      {
         ask: { vi: 'Nhà máy trong thành phố muốn sản xuất nhiều và rẻ hơn. Đâu là chìa khóa của thời đại này?', en: 'The city’s factories want to produce more, and more cheaply. What is the key of this age?' },
         replies: [
           { vi: 'Điện năng và sản xuất hàng loạt.', en: 'Electric power and mass production.' },
@@ -682,6 +642,36 @@ export const VISITORS: Visitor[] = [
         ],
         why: { vi: 'Cuộc cách mạng thứ hai dựa trên điện năng, kỹ thuật cơ khí và tiến bộ khoa học, đưa nhà máy lên quy mô sản xuất lớn.', en: 'The second revolution rested on electricity, engineering and science, taking factories to large-scale production.' },
         from: 'ir2-overview',
+      },
+      {
+        ask: { vi: 'Thành phố đang lắp đèn điện cho đường phố và nhà dân. Điều đó sẽ thay đổi gì?', en: 'The city is putting electric lamps in its streets and homes. What will that change?' },
+        replies: [
+          { vi: 'Người dân làm việc và sinh hoạt sau khi trời tối dễ dàng hơn, và mạng lưới cấp điện sẽ được xây dựng.', en: 'People can work and live more easily after dark, and power networks will be built.' },
+          { vi: 'Không có gì: thành phố vẫn sẽ chìm trong bóng tối.', en: 'Nothing: the city will stay dark at night.' },
+          { vi: 'Đèn sẽ tự bật tắt nhờ học thói quen của người dân.', en: 'The lamps will switch themselves on by learning people’s habits.' },
+        ],
+        why: { vi: 'Đèn sợi đốt giúp con người làm việc và sinh hoạt sau khi trời tối, và thúc đẩy việc xây dựng mạng lưới cấp điện. Thiết bị tự học thói quen thuộc cuộc cách mạng thứ tư.', en: 'The incandescent lamp let people work and live after dark, and drove the building of power networks. Devices that learn habits belong to the fourth revolution.' },
+        from: 'ir2-3',
+      },
+      {
+        ask: { vi: 'Thép Bessemer giá rẻ đang về thành phố với số lượng lớn. Chúng ta sẽ xây được gì?', en: 'Cheap Bessemer steel is arriving in quantity. What will it let us build?' },
+        replies: [
+          { vi: 'Đường sắt, cầu, tàu thủy và những tòa nhà cao tầng.', en: 'Railways, bridges, ships and tall buildings.' },
+          { vi: 'Chỉ những dụng cụ nhỏ, vì thép vẫn rất đắt.', en: 'Only small tools, as steel is still too costly.' },
+          { vi: 'Những đồ vật được in từng lớp từ mô hình trên máy tính.', en: 'Objects printed layer by layer from a computer model.' },
+        ],
+        why: { vi: 'Phương pháp Bessemer làm ra thép nhanh, nhiều và rẻ, thúc đẩy xây dựng đường sắt, cầu, tàu thủy, máy móc và nhà cao tầng. In 3D thuộc cuộc cách mạng thứ tư.', en: 'The Bessemer process made steel quickly, plentifully and cheaply, driving the building of railways, bridges, ships, machines and tall buildings. 3D printing belongs to the fourth revolution.' },
+        from: 'ir2-1',
+      },
+      {
+        ask: { vi: 'Các công ty trong thành phố đang lắp điện thoại. Điều đó sẽ mang lại gì?', en: 'Businesses in the city are installing telephones. What will that bring?' },
+        replies: [
+          { vi: 'Con người, doanh nghiệp và cơ quan liên lạc trực tiếp với nhau, chia sẻ thông tin nhanh hơn.', en: 'People, businesses and offices can reach each other directly and share information faster.' },
+          { vi: 'Tin nhắn vẫn phải được giải mã từ các tín hiệu ngắn và dài.', en: 'Messages will still have to be decoded from short and long signals.' },
+          { vi: 'Mỗi người dân sẽ mang một chiếc điện thoại trong túi.', en: 'Every citizen will carry a telephone in their pocket.' },
+        ],
+        why: { vi: 'Điện thoại giúp con người, doanh nghiệp và cơ quan liên lạc trực tiếp dễ dàng hơn, đặt nền móng cho viễn thông hiện đại. Điện thoại di động cầm tay chỉ ra đời năm 1973.', en: 'The telephone made direct contact between people, businesses and institutions far easier, laying the foundations of modern telecommunications. The handheld mobile phone only came in 1973.' },
+        from: 'ir2-5',
       },
     ],
   },
@@ -692,16 +682,6 @@ export const VISITORS: Visitor[] = [
     who: { vi: 'Một nhân viên văn phòng, năm 1985', en: 'An office worker, 1985' },
     hello: { vi: 'Ồ, chào bạn! Văn phòng chúng tôi vừa có nhiều thứ mới lạ. Bạn giải thích giúp tôi nhé?', en: 'Oh, hello! Our office has just got lots of new things. Could you explain a few?' },
     questions: [
-      {
-        ask: { vi: 'Ngày trước tôi phải chờ đến lượt dùng chiếc máy tính lớn của cả công ty. Giờ có gì thay đổi?', en: 'I used to wait my turn for the company’s one big computer. What has changed now?' },
-        replies: [
-          { vi: 'Máy tính cá nhân: mỗi người một chiếc trên bàn làm việc.', en: 'The personal computer: one on every desk.' },
-          { vi: 'Thuê máy chủ trên điện toán đám mây.', en: 'Renting servers in the cloud.' },
-          { vi: 'Một máy đánh chữ chạy bằng điện cho mỗi người.', en: 'An electric typewriter for everyone.' },
-        ],
-        why: { vi: 'Máy tính cá nhân như IBM 5150 đưa máy tính đến từng văn phòng, trường học và người dùng. Điện toán đám mây chỉ mở đường từ năm 2006.', en: 'Personal computers like the IBM 5150 brought computers to offices, schools and individuals. Cloud computing only began in 2006.' },
-        from: 'ir3-2',
-      },
       {
         ask: { vi: 'Vì sao máy tính bây giờ lại nhỏ gọn được như vậy?', en: 'Why can computers be so small now?' },
         replies: [
@@ -723,13 +703,23 @@ export const VISITORS: Visitor[] = [
         from: 'ir3-overview',
       },
       {
-        ask: { vi: 'Tôi cần gửi số liệu cho đồng nghiệp ở một viện nghiên cứu xa. Máy tính có giúp được không?', en: 'I need to send figures to a colleague at a distant research centre. Can computers help?' },
+        ask: { vi: 'Công ty vừa đặt máy tính cá nhân IBM lên bàn của mỗi người. Chúng sẽ thay đổi công việc thế nào?', en: 'The company has just put an IBM personal computer on every desk. How will they change our work?' },
         replies: [
-          { vi: 'Có: mạng máy tính nối các nơi để trao đổi dữ liệu, như ARPANET đã mở đường.', en: 'Yes: computer networks link places to exchange data, as ARPANET pioneered.' },
-          { vi: 'Không: máy tính ở hai nơi không bao giờ nói chuyện được với nhau.', en: 'No: computers in two places can never talk to each other.' },
-          { vi: 'Có: nhờ AI tạo sinh tự gửi giúp bạn.', en: 'Yes: generative AI will send it for you.' },
+          { vi: 'Viết, tính toán và lưu trữ dữ liệu hiệu quả hơn, và ngành phần mềm phát triển mạnh.', en: 'Writing, calculating and storing data become more efficient, and the software industry booms.' },
+          { vi: 'Máy tính sẽ lại to bằng cả căn phòng như trước.', en: 'Computers will go back to filling whole rooms.' },
+          { vi: 'Máy tính sẽ tự viết báo cáo cho chúng ta nhờ AI tạo sinh.', en: 'The computers will write our reports for us with generative AI.' },
         ],
-        why: { vi: 'ARPANET cho máy tính ở các nơi khác nhau trao đổi dữ liệu, chuẩn bị nền móng cho mạng máy tính hiện đại. AI tạo sinh chỉ phổ biến từ năm 2022.', en: 'ARPANET let computers in different places exchange data, preparing the ground for modern networks. Generative AI only spread from 2022.' },
+        why: { vi: 'Máy tính cá nhân giúp việc viết, tính toán, lưu trữ dữ liệu và quản lý công việc hiệu quả hơn, và thúc đẩy ngành phần mềm. AI tạo sinh chỉ phổ biến từ năm 2022.', en: 'Personal computers made writing, calculating, storing data and managing work more efficient, and boosted the software industry. Generative AI only spread from 2022.' },
+        from: 'ir3-2',
+      },
+      {
+        ask: { vi: 'Những mạng như ARPANET đã nối máy tính của các trung tâm nghiên cứu. Rồi chúng sẽ dẫn tới đâu?', en: 'Networks like ARPANET now link the computers of research centres. Where might they lead?' },
+        replies: [
+          { vi: 'Tới Internet: chia sẻ thông tin vượt qua giới hạn địa lý.', en: 'Towards the Internet: sharing information beyond the limits of geography.' },
+          { vi: 'Trở lại việc gửi số liệu bằng thư tay.', en: 'Back to sending figures by post.' },
+          { vi: 'Không đâu cả: máy tính ở xa nhau không bao giờ trao đổi được dữ liệu.', en: 'Nowhere: distant computers will never exchange data.' },
+        ],
+        why: { vi: 'ARPANET cho máy tính ở những nơi khác nhau trao đổi dữ liệu, và là một trong những nền móng quan trọng của Internet.', en: 'ARPANET let computers in different places exchange data, and is one of the key foundations of the Internet.' },
         from: 'ir3-4',
       },
     ],
@@ -741,26 +731,6 @@ export const VISITORS: Visitor[] = [
     who: { vi: 'Kỹ sư một nhà máy ô tô, năm 1970', en: 'A car-plant engineer, 1970' },
     hello: { vi: 'Chào bạn! Nhà máy của tôi đang tự động hóa. Tôi muốn hỏi ý kiến bạn vài việc.', en: 'Hi! My plant is automating. I would like your view on a few things.' },
     questions: [
-      {
-        ask: { vi: 'Nâng và hàn những tấm thân xe nặng là việc nặng nhọc và nguy hiểm cho công nhân. Nên làm gì?', en: 'Lifting and welding heavy body panels is exhausting and dangerous for the workers. What should we do?' },
-        replies: [
-          { vi: 'Dùng robot công nghiệp làm các động tác lặp lại đã lập trình.', en: 'Use industrial robots to repeat programmed movements.' },
-          { vi: 'Dùng robot cộng tác có camera, làm ngay cạnh công nhân.', en: 'Use camera-equipped collaborative robots beside the workers.' },
-          { vi: 'Thêm một ca làm đêm dưới ánh đèn điện.', en: 'Add a night shift under electric light.' },
-        ],
-        why: { vi: 'Robot Unimate làm việc lặp lại, mang vác nặng và đưa công nhân tránh xa chỗ nguy hiểm. Robot cộng tác có camera thuộc cuộc cách mạng thứ tư.', en: 'The Unimate robot did repetitive, heavy work and kept workers away from danger. Camera-equipped cobots belong to the fourth revolution.' },
-        from: 'ir3-3',
-      },
-      {
-        ask: { vi: 'Mỗi lần đổi mẫu xe, chúng tôi phải đi dây lại tủ điều khiển, mất hàng tuần. Có cách nào không?', en: 'Every new car model means rewiring the control cabinets, which takes weeks. Is there a way out?' },
-        replies: [
-          { vi: 'Dùng bộ điều khiển lập trình (PLC): chỉ cần sửa chương trình.', en: 'Use a programmable logic controller (PLC): just edit the program.' },
-          { vi: 'Thử trước trên bản sao số của nhà máy.', en: 'Test it first on a digital twin of the plant.' },
-          { vi: 'Thuê thêm thật nhiều thợ điện.', en: 'Hire many more electricians.' },
-        ],
-        why: { vi: 'PLC thay các hệ thống điều khiển đi dây cứng: khi quy trình đổi, kỹ sư sửa chương trình thay vì đi dây lại. Bản sao số thuộc cuộc cách mạng thứ tư.', en: 'The PLC replaced hard-wired control: when a process changed, engineers edited a program instead of rewiring. Digital twins belong to the fourth revolution.' },
-        from: 'ir3-3',
-      },
       {
         ask: { vi: 'Robot của chúng tôi có thể đứng làm việc ngay cạnh công nhân không?', en: 'Can our robot work right beside the workers?' },
         replies: [
@@ -779,6 +749,26 @@ export const VISITORS: Visitor[] = [
           { vi: 'Chúng tự học từ dữ liệu giống như AI.', en: 'They learn from data on their own, like AI.' },
         ],
         why: { vi: 'Điện tử và lập trình bắt đầu tự động hóa nhà máy: robot và PLC là hai trụ cột của nhà máy tự động. Chúng làm theo chương trình chứ không tự học.', en: 'Electronics and programming began to automate the factory: robots and PLCs are its two pillars. They follow programs; they do not learn by themselves.' },
+        from: 'ir3-3',
+      },
+      {
+        ask: { vi: 'Robot Unimate vừa nhận việc hàn trên dây chuyền của chúng tôi. Điều đó có ý nghĩa gì với công nhân?', en: 'A Unimate robot has just taken over welding on our line. What does it mean for my workers?' },
+        replies: [
+          { vi: 'Họ tránh được một số việc nặng và nguy hiểm, nhưng công việc và kỹ năng họ cần sẽ thay đổi.', en: 'They are spared some heavy, dangerous work, but the jobs and skills they need will change.' },
+          { vi: 'Không gì thay đổi: họ vẫn làm đúng công việc cũ.', en: 'Nothing changes: they will do exactly the same jobs.' },
+          { vi: 'Họ sẽ phải chuyển sang kéo sợi bằng tay.', en: 'They will have to go back to spinning by hand.' },
+        ],
+        why: { vi: 'Unimate làm những việc lặp lại với vật liệu nặng và giúp công nhân tránh một số điều kiện nguy hiểm; công nghệ của cuộc cách mạng thứ ba cũng thay đổi công việc và kỹ năng người lao động cần.', en: 'Unimate took on repetitive work with heavy materials and kept workers away from some dangerous conditions; the third revolution’s technology also changed the jobs and skills workers needed.' },
+        from: 'ir3-3',
+      },
+      {
+        ask: { vi: 'Chúng tôi đã thay tủ điều khiển đi dây cứng bằng PLC. Điều đó sẽ thay đổi gì?', en: 'We have replaced our hard-wired control cabinets with PLCs. What will that change?' },
+        replies: [
+          { vi: 'Khi quy trình thay đổi, kỹ sư sửa chương trình thay vì đi dây lại hàng tuần.', en: 'When a process changes, engineers edit a program instead of rewiring for weeks.' },
+          { vi: 'Mỗi mẫu xe mới sẽ cần nhiều dây điện hơn nữa.', en: 'Each new car model will need even more wiring.' },
+          { vi: 'Dây chuyền sẽ chạy bằng một động cơ hơi nước chung.', en: 'The line will run from one shared steam engine.' },
+        ],
+        why: { vi: 'PLC điều khiển máy móc bằng một chương trình có thể thay đổi, nên khi quy trình đổi, kỹ sư sửa chương trình thay vì đi dây lại.', en: 'A PLC controls machines with a program that can be changed, so when a process changes, engineers edit the program instead of rewiring.' },
         from: 'ir3-3',
       },
     ],
@@ -821,16 +811,6 @@ export const VISITORS: Visitor[] = [
         from: 'ir4-4',
       },
       {
-        ask: { vi: 'Chiếc điện thoại thông minh của em là sự kết hợp của những gì?', en: 'What came together to make my smartphone?' },
-        replies: [
-          { vi: 'Điện thoại di động và World Wide Web.', en: 'The mobile phone and the World Wide Web.' },
-          { vi: 'Điện báo và máy hát.', en: 'The telegraph and the phonograph.' },
-          { vi: 'Robot công nghiệp và máy in 3D.', en: 'The industrial robot and the 3D printer.' },
-        ],
-        why: { vi: 'Khi điện thoại di động gặp Web trong chiếc điện thoại thông minh, thông tin, mua bán và trò chuyện theo con người đi khắp nơi.', en: 'When the mobile phone and the Web met in the smartphone, information, shopping and conversation followed people everywhere.' },
-        from: 'ir3-5',
-      },
-      {
         ask: { vi: 'Chỉnh sửa gen nghe thật tuyệt. Có điều gì cần thận trọng không ạ?', en: 'Gene editing sounds amazing. Is there anything to be careful about?' },
         replies: [
           { vi: 'Có: nó đặt ra câu hỏi nghiêm túc về đạo đức và an toàn, nên phải được quản lý chặt chẽ.', en: 'Yes: it raises serious ethical and safety questions, so it must be tightly regulated.' },
@@ -839,6 +819,16 @@ export const VISITORS: Visitor[] = [
         ],
         why: { vi: 'Chỉnh sửa gen đặt ra những câu hỏi nghiêm túc về đạo đức và an toàn, nhất là khi dùng trên con người, nên cần được quản lý cẩn thận.', en: 'Gene editing raises serious ethical and safety questions, above all when used on people, so it must be carefully regulated.' },
         from: 'ir4-6',
+      },
+      {
+        ask: { vi: 'Ông bà tôi bảo đời sống trước khi có điện thoại thông minh rất khác. Nó đã thay đổi điều gì?', en: 'My grandparents say life before smartphones was very different. What did they change?' },
+        replies: [
+          { vi: 'Thông tin, mua bán và trò chuyện theo con người đi khắp nơi.', en: 'Information, shopping and conversation now follow people everywhere.' },
+          { vi: 'Mọi người phải ngồi cạnh dây điện thoại để gọi.', en: 'People have to sit by a telephone wire to make a call.' },
+          { vi: 'Chẳng có gì: chỉ là chiếc điện thoại bàn nhỏ hơn.', en: 'Nothing: it is just a smaller desk telephone.' },
+        ],
+        why: { vi: 'Điện thoại di động giải phóng chiếc điện thoại khỏi sợi dây; khi nó gặp World Wide Web trong chiếc điện thoại thông minh, thông tin, mua bán và trò chuyện theo con người đi khắp nơi.', en: 'The mobile phone freed the telephone from its wire; when it met the World Wide Web in the smartphone, information, shopping and conversation followed people everywhere.' },
+        from: 'ir3-5',
       },
     ],
   },
@@ -849,26 +839,6 @@ export const VISITORS: Visitor[] = [
     who: { vi: 'Giám đốc một nhà máy thông minh, năm 2026', en: 'A smart-factory director, 2026' },
     hello: { vi: 'Chào bạn! Nhà máy của tôi kết nối đủ thứ, nhưng tôi vẫn muốn nghe một góc nhìn khác.', en: 'Hello! My factory has everything connected, but I would still like another view.' },
     questions: [
-      {
-        ask: { vi: 'Máy hỏng bất ngờ làm cả dây chuyền dừng. Làm sao tránh được?', en: 'Sudden breakdowns stop the whole line. How can I avoid them?' },
-        replies: [
-          { vi: 'Dùng dữ liệu từ cảm biến để dự báo hỏng hóc trước khi xảy ra.', en: 'Use sensor data to predict breakdowns before they happen.' },
-          { vi: 'Cứ chờ máy hỏng rồi sửa thật nhanh.', en: 'Wait for machines to break, then fix them fast.' },
-          { vi: 'Mua thêm một động cơ hơi nước dự phòng.', en: 'Buy a spare steam engine.' },
-        ],
-        why: { vi: 'Bảo trì dự đoán phân tích dữ liệu cảm biến để cảnh báo khi nguy cơ hỏng hóc tăng, thay vì chờ máy dừng.', en: 'Predictive maintenance analyses sensor data to warn when a breakdown is becoming likely, instead of waiting for the machine to stop.' },
-        from: 'ir4-2',
-      },
-      {
-        ask: { vi: 'Tôi muốn thử bố trí lại dây chuyền mà không phải dừng sản xuất.', en: 'I want to try rearranging the line without stopping production.' },
-        replies: [
-          { vi: 'Thử trước trên bản sao số của dây chuyền.', en: 'Try it first on a digital twin of the line.' },
-          { vi: 'Dừng nhà máy một tháng để thử.', en: 'Shut the factory for a month to test it.' },
-          { vi: 'Đi dây lại tủ điều khiển rồi xem sao.', en: 'Rewire the control cabinets and see.' },
-        ],
-        why: { vi: 'Bản sao số phản chiếu trạng thái của dây chuyền thật, để kỹ sư thử thay đổi trước khi làm thật.', en: 'A digital twin mirrors the real line, so engineers can test changes before making them for real.' },
-        from: 'ir4-2',
-      },
       {
         ask: { vi: 'Nhà máy kết nối mạng hết rồi. Có rủi ro gì tôi cần biết không?', en: 'Everything in the factory is networked now. Are there risks I should know?' },
         replies: [
@@ -890,14 +860,34 @@ export const VISITORS: Visitor[] = [
         from: 'ir4-5',
       },
       {
-        ask: { vi: 'Dữ liệu từ hàng nghìn cảm biến quá lớn so với máy tính của công ty. Tôi nên làm gì?', en: 'Data from thousands of sensors is too much for the company’s computers. What should I do?' },
+        ask: { vi: 'Chúng tôi đã lắp cảm biến dự báo hỏng hóc. Tôi có thể tin hoàn toàn vào chúng không?', en: 'We have fitted sensors that predict breakdowns. Can I trust them completely?' },
         replies: [
-          { vi: 'Lưu trữ và phân tích trên điện toán đám mây.', en: 'Store and analyse it in the cloud.' },
-          { vi: 'Mua thêm vài chiếc máy tính cá nhân.', en: 'Buy a few more personal computers.' },
-          { vi: 'In dữ liệu ra giấy để cất giữ.', en: 'Print the data out on paper and file it.' },
+          { vi: 'Không: dự báo vẫn có thể sai, nên con người vẫn cần kiểm tra.', en: 'No: predictions can still be wrong, so people still need to check.' },
+          { vi: 'Có: máy sẽ không bao giờ hỏng nữa.', en: 'Yes: the machines will never break down again.' },
+          { vi: 'Có, miễn là áp suất hơi nước luôn ổn định.', en: 'Yes, as long as the steam pressure stays steady.' },
         ],
-        why: { vi: 'Dữ liệu lớn quá sức một máy tính thông thường; đám mây cung cấp chỗ lưu trữ và sức tính để phân tích nó.', en: 'Big data is too large for an ordinary computer; the cloud provides the storage and power to analyse it.' },
+        why: { vi: 'Bảo trì dự đoán cảnh báo trước khi máy hỏng, nhưng dự báo vẫn có thể sai.', en: 'Predictive maintenance warns before a machine breaks down, but predictions can still be wrong.' },
+        from: 'ir4-2',
+      },
+      {
+        ask: { vi: 'Chúng tôi đang chuyển toàn bộ dữ liệu lên đám mây. Tôi cần cân nhắc những gì?', en: 'We are moving all our data to the cloud. What should I weigh up?' },
+        replies: [
+          { vi: 'Tiết kiệm chi phí ban đầu, nhưng có thách thức về năng lượng, bảo mật dữ liệu và sự phụ thuộc vào mạng.', en: 'Lower upfront costs, but challenges of energy, data security and dependence on the network.' },
+          { vi: 'Không có mặt trái nào cả.', en: 'There are no downsides at all.' },
+          { vi: 'Chúng tôi sẽ phải tự mua thêm rất nhiều máy chủ.', en: 'We will have to buy many more servers of our own.' },
+        ],
+        why: { vi: 'Đám mây giúp doanh nghiệp không phải tự mua và vận hành máy chủ, tiết kiệm chi phí ban đầu, nhưng đặt ra thách thức về năng lượng, bảo mật dữ liệu và sự phụ thuộc vào kết nối mạng.', en: 'The cloud spares businesses from buying and running their own servers and saves upfront costs, but raises challenges of energy, data security and dependence on the network.' },
         from: 'ir4-4',
+      },
+      {
+        ask: { vi: 'Chúng tôi đang thử in 3D linh kiện thay thế. Liệu nó có thay được mọi máy móc của chúng tôi?', en: 'We are trying 3D printing for spare parts. Will it replace all our machines?' },
+        replies: [
+          { vi: 'Chưa: tốc độ, vật liệu và chi phí vẫn quyết định khi nào nó hơn cách làm truyền thống.', en: 'Not yet: speed, materials and cost still decide when it beats traditional methods.' },
+          { vi: 'Có: nó nhanh hơn và rẻ hơn cho mọi thứ.', en: 'Yes: it is faster and cheaper for everything.' },
+          { vi: 'Không, vì nó chỉ in được những hình phẳng.', en: 'No, because it can only print flat shapes.' },
+        ],
+        why: { vi: 'In 3D làm được hình dạng phức tạp, mẫu thử nhanh và linh kiện theo yêu cầu, nhưng tốc độ, vật liệu và chi phí vẫn quyết định khi nào nó hơn cách làm truyền thống.', en: '3D printing makes complex shapes, quick prototypes and parts to order, but speed, materials and cost still decide when it beats traditional methods.' },
+        from: 'ir4-1',
       },
     ],
   },
