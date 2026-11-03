@@ -407,22 +407,27 @@ body {
   box-shadow: inset 0 0 0 1.4cqw var(--paper), inset 0 0 0 1.75cqw var(--rule), inset 0 0 0 2.2cqw var(--paper),
     inset 0 0 0 2.55cqw var(--rule);
 }
-/* CMCN 2: steel frame, white enamel sign with a wide navy border. */
+/* CMCN 2: the enamel sign itself, with its wide brown border (no outer steel frame). */
 .board-look-enamel .board-frame {
-  background: linear-gradient(135deg, #8a929b, #4f565e 50%, #6d757e);
+  padding: 0;
+  background: transparent;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.65);
 }
 .board-look-enamel .board-paper {
-  box-shadow: inset 0 0 0 1.7cqw var(--paper), inset 0 0 0 4.2cqw var(--title);
-  padding: clamp(20px, 5cqw, 44px) clamp(22px, 6.5cqw, 56px);
+  box-shadow: inset 0 0 0 4.2cqw var(--title);
+  padding: clamp(30px, 8cqw, 68px) clamp(32px, 9cqw, 76px);
 }
-/* CMCN 3: beige computer case around a glowing green screen with scan lines. */
+/* CMCN 3: a glowing green screen with scan lines and a thin neon edge (no beige case). */
 .board-look-screen .board-frame {
-  padding: calc(var(--frame) * 1.6);
-  border-radius: 2cqw;
-  background: linear-gradient(180deg, #e6dcc2, #c9bc9c);
+  padding: 0;
+  border-radius: 1.5cqw;
+  background: transparent;
+  border: 1px solid var(--title);
+  box-shadow: 0 0 30px rgba(107, 224, 139, 0.4), inset 0 0 40px rgba(107, 224, 139, 0.15);
 }
 .board-look-screen .board-paper {
   border-radius: 1.5cqw;
+  padding: clamp(24px, 6cqw, 52px) clamp(24px, 7cqw, 60px);
   background:
     repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.22) 0 1.5px, transparent 1.5px 4px),
     radial-gradient(ellipse at center, rgba(60, 140, 80, 0.2), transparent 70%),
@@ -1059,7 +1064,7 @@ body {
   font-variant-numeric: tabular-nums;
   color: #9a8a68;
 }
-/* The tips at the bottom, in the museum's gold: an ornament, a small spaced title, then the
+/* The tips at the bottom, in the museum's gold: an ornament, then the
    two tips side by side with a diamond between them. */
 .loading-tips {
   position: absolute;
@@ -1073,14 +1078,6 @@ body {
 }
 .loading-ornament {
   width: min(320px, 70vw);
-}
-.loading-tips-title {
-  margin: 0;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.32em;
-  text-transform: uppercase;
-  color: #c9a25a;
 }
 .loading-tips-list {
   display: flex;
@@ -2687,7 +2684,8 @@ body {
   border-color: #1d1b19;
 }
 .picture-zoom.board-look-screen .board-diagram {
-  border-color: #b9bec4;
+  border: 1px solid var(--title);
+  box-shadow: 0 0 30px rgba(107, 224, 139, 0.4);
 }
 .picture-zoom.board-look-hologram .board-diagram {
   border: 1px solid var(--rule);
@@ -2701,7 +2699,8 @@ body {
   border-color: #1d1b19;
 }
 .picture-zoom.board-look-screen img {
-  border-color: #b9bec4;
+  border: 1px solid var(--title);
+  box-shadow: 0 0 30px rgba(107, 224, 139, 0.4);
 }
 .picture-zoom.board-look-hologram img {
   border: 1px solid var(--rule);

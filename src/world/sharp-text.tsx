@@ -64,18 +64,15 @@ export interface TextRun {
 // drawn on top of it, exactly in place, so it reads as neon light around them. (Painting
 // the letters themselves under the sharp ones doubled them; letters left only painted, made
 // to glow by the bloom, came out smeared.)
-export function recordText(ctx: CanvasRenderingContext2D, runs: TextRun[], glow?: string) {
+export function recordText(ctx: CanvasRenderingContext2D, runs: TextRun[], alsoPaint = false) {
   const paint = ctx.fillText.bind(ctx)
   ctx.fillText = (text: string, x: number, y: number, maxWidth?: number) => {
-    if (glow && text) {
-      const px = Number(/([\d.]+)px/.exec(ctx.font)?.[1] ?? 16)
-      const scale = Math.hypot(ctx.getTransform().c, ctx.getTransform().d) || 1
-      ctx.save()
-      ctx.fillStyle = glow
-      ctx.globalAlpha = 0.95
-      ctx.filter = `blur(${Math.max(1.5, px * scale * 0.16)}px)`
+    // (Painted softly blurred: a glow around the sharp letters, not a second set of them.)
+    if (alsoPaint) {
+      const filter = ctx.filter
+      ctx.filter = `blur(${Math.max(1, Number(/([\d.]+)px/.exec(ctx.font)?.[1] ?? 16) * 0.07).toFixed(1)}px)`
       paint(text, x, y, maxWidth)
-      ctx.restore()
+      ctx.filter = filter
     }
     if (!text) return
     // (The browser rewrites the font: weight 700 as "bold", and 400 left out.)

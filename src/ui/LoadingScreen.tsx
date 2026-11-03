@@ -137,7 +137,6 @@ export default function LoadingScreen() {
           <i />
           <span />
         </div>
-        <p className="loading-tips-title">{text.tipTitle}</p>
         <p className="loading-tips-list">
           {text.tips.map((tip, i) => (
             <span key={tip}>

@@ -36,18 +36,18 @@ const PANEL_OFFSET = 2.3 // text panel distance from the centre of its plinth
 // A room with six inventions (CMCN 4) has a pair in the middle of the hall: this far either
 // side of the middle line, a little in front of the centre, each turned outwards by this
 // angle (radians).
-const MIDDLE_PAIR = 2.1
+const MIDDLE_PAIR = 1.8
 const MIDDLE_FORWARD = 0.6
-const MIDDLE_TURN = 0.6
+const MIDDLE_TURN = 0.35
 // With five inventions, the one in the middle of the hall is the room's headline exhibit
 // (the same as `primary` in room-themes.ts); the others take the corners in walking order.
 const CENTRE_EXHIBIT: Partial<Record<RoomId, number>> = { ir1: 1, ir2: 3, ir3: 1 }
 
-// THE SPOTLIGHT EXHIBIT: artificial intelligence, the centre of attention today, stands on a
-// larger plinth (scaled up) in the middle of CMCN 4's hall, the left one of its middle pair.
+// THE SPOTLIGHT EXHIBIT: artificial intelligence, the centre of attention today, stands
+// in the middle of CMCN 4's hall, the left one of its middle pair.
 export const SPOTLIGHT_ID = 'ir4-3'
-export const SPOTLIGHT_SCALE = 1.4
-export const panelOffset = (id: string) => (id === SPOTLIGHT_ID ? 2.9 : PANEL_OFFSET)
+export const SPOTLIGHT_SCALE = 1 // same size as the others (leader, 2026-11-03); it keeps the brightest spotlight
+export const panelOffset = (_id: string) => PANEL_OFFSET
 
 // THE ENTRANCE ROOM of each era room (leader's plan): a small room just inside the door
 // with the introduction (overview board, hanging era sculpture, floor medallion), opening
