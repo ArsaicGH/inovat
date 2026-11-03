@@ -13,6 +13,7 @@ import {
   cardPoints,
   choose,
   goBackToRooms,
+  PER_ERA,
   isPhoto,
   moreClue,
   mystery,
@@ -21,7 +22,6 @@ import {
   startRun,
   starsFor,
   townProblem,
-  tryAgain,
   visitorOf,
 } from './game-run'
 import { TOWN_YEARS } from '../content/game-cards'
@@ -96,25 +96,16 @@ function CardBar({ label, extra }: { label: ReactNode; extra?: ReactNode }) {
   )
 }
 
-// A wrong answer: go back to the rooms, or answer again. (No answer is given away: the hint
-// only names the room, and not at all where the room would be the answer.)
-function WrongPrompt({ hintEra }: { hintEra?: Era }) {
+// A wrong answer: crossed out, with a hint at which room to look in. Nothing blocks the other
+// answers; the way back to the rooms is always at the bottom of the game. (No answer is given
+// away: the hint only names the room, and not at all where the room would be the answer.)
+function WrongNote({ hintEra }: { hintEra?: Era }) {
   const { g, roomName } = useGame()
   return (
-    <div className="game-feedback is-wrong game-wrong">
-      <p>
-        <strong>{g.wrongTitle}</strong> {g.wrongAsk}
-        {hintEra && <span className="game-review"> {g.wrongHint.replace('{room}', roomName(hintEra))}</span>}
-      </p>
-      <span className="game-result-buttons">
-        <button className="game-close" onClick={goBackToRooms}>
-          {g.goBack}
-        </button>
-        <button className="game-primary" onClick={tryAgain}>
-          {g.tryAgain}
-        </button>
-      </span>
-    </div>
+    <p className="game-wrong-note">
+      <strong>{g.wrongTitle}</strong> {g.wrongTryOther}
+      {hintEra && <span className="game-review"> {g.wrongHint.replace('{room}', roomName(hintEra))}</span>}
+    </p>
   )
 }
 
@@ -150,7 +141,7 @@ function LostRound() {
         label={g.cardOf.replace('{n}', String(run.index + 1)).replace('{total}', String(run.deck.length))}
         extra={run.combo >= 2 && <strong className="game-combo">{g.combo.replace('{n}', String(run.combo))}</strong>}
       />
-      <div className={`lost-stage${run.solved ? ' is-in' : run.asking ? ' is-out' : ''}`}>
+      <div className={`lost-stage${run.solved ? ' is-in' : run.wrong.length ? ' is-out' : ''}`}>
         <div key={id} className={`lost-object${picture ? ' is-photo' : ''}`}>
           {picture ? (
             <img src={`${import.meta.env.BASE_URL}${picture.file}`} alt="" draggable={false} />
@@ -165,14 +156,14 @@ function LostRound() {
         {!picture && <p className="lost-title">{title(id)}</p>}
         {picture && run.solved && <p className="lost-title">{picture.caption[language]}</p>}
       </div>
-      {run.asking && <WrongPrompt />}
+      {run.wrong.length > 0 && !run.solved && <WrongNote />}
       {run.solved && <RightNote>{g.rightDoor}</RightNote>}
       <div className="lost-doors">
         {([1, 2, 3, 4] as Era[]).map((door) => {
           const tried = run.wrong.includes(String(door))
           const state = run.solved && door === era ? ' is-answer' : tried ? ' is-wrong-door' : ''
           return (
-            <button key={door} className={`lost-door${state}`} style={eraColour(door)} disabled={run.solved || run.asking || tried} onClick={() => choose(String(door))}>
+            <button key={door} className={`lost-door${state}`} style={eraColour(door)} disabled={run.solved || tried} onClick={() => choose(String(door))}>
               <b>{NUMERALS[door - 1]}</b>
               <small>{roomShort(door)}</small>
             </button>
@@ -188,29 +179,29 @@ function TownRound() {
   const { g, language, title } = useGame()
   const run = useRun()
   const problem = townProblem(run.deck[run.index])
-  const eraIndex = Math.floor(run.index / 3)
-  const step = run.index % 3
-  const eraDone = run.solved && step === 2
+  const eraIndex = Math.floor(run.index / PER_ERA)
+  const step = run.index % PER_ERA
+  const eraDone = run.solved && step === PER_ERA - 1
   useKeys(3, (i) => run.options[i] && choose(run.options[i]))
   const stages = townStages(run)
   return (
     <div className="town-round">
-      <CardBar label={<>{g.townIn.replace('{year}', String(TOWN_YEARS[eraDone ? eraIndex + 1 : eraIndex]))} · {g.problemOf.replace('{n}', String(step + 1))}</>} />
-      <Town stages={stages} era={eraDone ? eraIndex + 1 : eraIndex} current={run.solved ? null : problem.spot} pending={run.deck.slice(run.index + 1, eraIndex * 3 + 3).map((id) => townProblem(id).spot)} />
+      <CardBar label={<>{g.townIn.replace('{year}', String(TOWN_YEARS[eraDone ? eraIndex + 1 : eraIndex]))} · {g.problemOf.replace('{n}', String(step + 1)).replace('{total}', String(PER_ERA))}</>} />
+      <Town stages={stages} era={eraDone ? eraIndex + 1 : eraIndex} current={run.solved ? null : problem.spot} pending={run.deck.slice(run.index + 1, (eraIndex + 1) * PER_ERA).map((id) => townProblem(id).spot)} />
       <p className="town-problem">{problem.problem[language]}</p>
       <div className="town-options">
         {run.options.map((option, i) => {
           const tried = run.wrong.includes(option)
           const state = run.solved ? (option === problem.options[0] ? ' is-right' : ' is-dim') : tried ? ' is-wrong' : ''
           return (
-            <button key={option} className={`game-option${state}`} disabled={run.solved || run.asking || tried} onClick={() => choose(option)}>
+            <button key={option} className={`game-option${state}`} disabled={run.solved || tried} onClick={() => choose(option)}>
               <b>{i + 1}</b>
               {title(option)}
             </button>
           )
         })}
       </div>
-      {run.asking && <WrongPrompt hintEra={problem.era} />}
+      {run.wrong.length > 0 && !run.solved && <WrongNote hintEra={problem.era} />}
       {run.solved && (
         <RightNote>
           {problem.fixed[language]}
@@ -252,7 +243,7 @@ function MysteryRound() {
             ) : (
               <li key={k} className="mystery-clue is-hidden">
                 {k === run.clues ? (
-                  <button className="game-hint" disabled={run.asking} onClick={moreClue}>
+                  <button className="game-hint" onClick={moreClue}>
                     {g.moreClue} (−1)
                   </button>
                 ) : (
@@ -267,7 +258,7 @@ function MysteryRound() {
             const tried = run.wrong.includes(option)
             const state = run.solved ? (option === id ? ' is-right' : ' is-dim') : tried ? ' is-wrong' : ''
             return (
-              <button key={option} className={`game-option${state}`} disabled={run.solved || run.asking || tried} onClick={() => choose(option)}>
+              <button key={option} className={`game-option${state}`} disabled={run.solved || tried} onClick={() => choose(option)}>
                 <b>{i + 1}</b>
                 {label(option)}
               </button>
@@ -275,7 +266,7 @@ function MysteryRound() {
           })}
         </div>
       </div>
-      {run.asking && <WrongPrompt hintEra={isEra ? undefined : cardEra(2, id)} />}
+      {run.wrong.length > 0 && !run.solved && <WrongNote hintEra={isEra ? undefined : cardEra(2, id)} />}
       {run.solved && <RightNote>{g.solved.replace('{n}', String(Math.max(0, 4 - Math.max(run.clues - 1, run.wrong.length))))}</RightNote>}
     </div>
   )
@@ -288,13 +279,14 @@ function VisitorRound() {
   const qid = run.deck[run.index]
   const visitor = visitorOf(qid)
   const question = questionOf(qid)
-  const visitorNumber = Math.floor(run.index / 3)
-  const step = run.index % 3
+  const visitorNumber = Math.floor(run.index / PER_ERA)
+  const step = run.index % PER_ERA
+  const puzzled = run.wrong.length > 0 && !run.solved
   useKeys(3, (i) => run.options[i] && choose(run.options[i]))
   // What the visitor says: hello and the question, then their reaction.
   const speech = run.solved ? (
-    `${pickOf(g.happy, visitorNumber + step)} ${step === 2 ? g.goodbye : ''}`
-  ) : run.asking ? (
+    `${pickOf(g.happy, visitorNumber + step)} ${step === PER_ERA - 1 ? g.goodbye : ''}`
+  ) : puzzled ? (
     <>
       <strong>{pickOf(g.puzzled, run.index + run.wrong.length)}</strong> {question.ask[language]}
     </>
@@ -303,10 +295,10 @@ function VisitorRound() {
   )
   return (
     <div className="visitor-round">
-      <CardBar label={<>{g.visitorOf.replace('{n}', String(visitorNumber + 1))} · <strong>{visitor.who[language]}</strong> · {g.adviceOf.replace('{n}', String(step + 1))}</>} />
+      <CardBar label={<>{g.visitorOf.replace('{n}', String(visitorNumber + 1))} · <strong>{visitor.who[language]}</strong> · {g.adviceOf.replace('{n}', String(step + 1)).replace('{total}', String(PER_ERA))}</>} />
       <div className="visitor-scene">
         <SceneBackdrop era={visitor.era} />
-        <VisitorFigure look={visitor.look} mood={run.solved ? 'happy' : run.asking ? 'puzzled' : 'asking'} key={visitor.id} />
+        <VisitorFigure look={visitor.look} mood={run.solved ? 'happy' : puzzled ? 'puzzled' : 'asking'} key={visitor.id} />
         <div className="visitor-speech">{speech}</div>
       </div>
       <div className="visitor-replies">
@@ -314,14 +306,14 @@ function VisitorRound() {
           const tried = run.wrong.includes(option)
           const state = run.solved ? (option === '0' ? ' is-right' : ' is-dim') : tried ? ' is-wrong' : ''
           return (
-            <button key={option} className={`game-option${state}`} disabled={run.solved || run.asking || tried} onClick={() => choose(option)}>
+            <button key={option} className={`game-option${state}`} disabled={run.solved || tried} onClick={() => choose(option)}>
               <b>{i + 1}</b>
               {question.replies[Number(option)][language]}
             </button>
           )
         })}
       </div>
-      {run.asking && <WrongPrompt hintEra={visitor.era} />}
+      {run.wrong.length > 0 && !run.solved && <WrongNote hintEra={visitor.era} />}
       {run.solved && <RightNote>{question.why[language]}</RightNote>}
     </div>
   )
@@ -369,6 +361,12 @@ function Workshop({ onPlay }: { onPlay: () => void }) {
   return (
     <div className="workshop">
       <p className="game-task">{g.hubIntro}</p>
+      <p className="workshop-help">
+        <button className="game-close workshop-help-button" onClick={goBackToRooms}>
+          {g.goBack}
+        </button>{' '}
+        {g.goBackHelp}
+      </p>
       <div className="workshop-cores">
         {g.rounds.map((round, i) => {
           const lit = i < cores
@@ -424,7 +422,7 @@ export default function TimeMachineGame() {
 
   useEffect(() => {
     // Back from the rooms (by the button, or by walking up to the lectern): carry on.
-    if (useMuseumStore.getState().gameRun?.away) useMuseumStore.getState().patchGameRun({ away: false })
+    useMuseumStore.getState().setAwayFromGame(false)
     function onKey(event: KeyboardEvent) {
       if (event.code === 'Escape') useMuseumStore.getState().setMode('paused')
     }
@@ -476,6 +474,15 @@ export default function TimeMachineGame() {
           )}
         </div>
         {playing?.finished && <Result onDone={toWorkshop} />}
+        {/* Always there during a core: look around the rooms, and come back to the same card. */}
+        {playing && !playing.finished && (
+          <footer className="game-footer">
+            <button className="game-close" onClick={goBackToRooms}>
+              {g.goBack}
+            </button>
+            <span>{g.goBackNote}</span>
+          </footer>
+        )}
       </div>
     </div>
   )

@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import type { Spot } from '../content/game-cards'
 import type { GameRun } from '../state/useMuseumStore'
-import { townProblem } from './game-run'
+import { PER_ERA, townProblem } from './game-run'
 
 // THE GROWING TOWN of the Time Machine game's second core: one small picture drawn in SVG,
 // with six places (power, workshop, messages, homes, the big building, and the road along the
@@ -14,12 +14,12 @@ const SPOTS: Spot[] = ['power', 'making', 'transport', 'message', 'home', 'offic
 
 // Where each place stands, from what the visitor has solved so far.
 export function townStages(run: GameRun): Stages {
-  const eraIndex = Math.floor(run.index / 3)
+  const eraIndex = Math.floor(run.index / PER_ERA)
   const stages = Object.fromEntries(SPOTS.map((spot) => [spot, eraIndex])) as Stages
-  const solvedHere = run.deck.slice(eraIndex * 3, run.index + (run.solved ? 1 : 0))
+  const solvedHere = run.deck.slice(eraIndex * PER_ERA, run.index + (run.solved ? 1 : 0))
   for (const id of solvedHere) stages[townProblem(id).spot] = eraIndex + 1
   // The last problem of an era solved: the whole town moves on.
-  if (run.solved && run.index % 3 === 2) for (const spot of SPOTS) stages[spot] = eraIndex + 1
+  if (run.solved && run.index % PER_ERA === PER_ERA - 1) for (const spot of SPOTS) stages[spot] = eraIndex + 1
   return stages
 }
 

@@ -17,11 +17,9 @@ export interface GameRun {
   wrong: string[] // answers already tried on it, wrongly
   clues: number // core III: clues open on it
   solved: boolean // answered right (its explanation is showing)
-  asking: boolean // a wrong answer: "go back to the rooms, or answer again?" is showing
   points: number // scored so far
   combo: number // core I: right first time in a row
   finished: boolean // every card done (the result is showing)
-  away: boolean // the visitor went back to the rooms mid-game
 }
 
 export type Mode = 'start' | 'exploring' | 'paused' | 'reading' | 'map' | 'ending' | 'game'
@@ -305,6 +303,9 @@ interface MuseumState {
   gameRun: GameRun | null
   setGameRun: (run: GameRun | null) => void
   patchGameRun: (change: Partial<GameRun>) => void
+  // The visitor left the game to look around the rooms (a button brings them back).
+  awayFromGame: boolean
+  setAwayFromGame: (away: boolean) => void
   quizPassed: boolean // all four cores lit: the portal door in the back wall opens
 
   // THE ENDING (EndingScene.tsx, EndingScreen.tsx), after walking into the open portal.
@@ -412,6 +413,8 @@ export const useMuseumStore = create<MuseumState>((set, get) => ({
     set((state) => ({ coreStars: state.coreStars.map((s, i) => (i === round ? Math.max(s, stars) : s)) })),
   gameRun: null,
   setGameRun: (run) => set({ gameRun: run }),
+  awayFromGame: false,
+  setAwayFromGame: (away) => set({ awayFromGame: away }),
   patchGameRun: (change) => set((state) => (state.gameRun ? { gameRun: { ...state.gameRun, ...change } } : state)),
   // (Local test build only: the portal starts open, to try the ending. Never on the live site.)
   quizPassed: import.meta.env.DEV,
@@ -458,6 +461,7 @@ export const useMuseumStore = create<MuseumState>((set, get) => ({
       gameCores: 0,
       coreStars: [0, 0, 0, 0],
       gameRun: null,
+      awayFromGame: false,
       quizPassed: import.meta.env.DEV,
       aimedExhibitId: null,
       showKeyList: false,

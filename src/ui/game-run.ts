@@ -11,14 +11,17 @@ import { playEffect } from '../audio/sound'
 // to exactly the same card.
 
 // Points needed for one, two and three stars in each core, and the most possible.
+// Each game deals a short set of cards from a much larger pool (core I: 6 of the 21
+// inventions; II: 2 of each era's 5-8 town problems; III: 4 of 25 mysteries; IV: one of two
+// visitors per era, 2 of their 4-5 questions), so a replay meets mostly new cards.
 export const STARS: [number, number, number][] = [
-  [12, 15, 18],
-  [14, 18, 22],
-  [10, 13, 16],
-  [14, 18, 22],
+  [7, 9, 11],
+  [10, 12, 14],
+  [8, 10, 13],
+  [10, 12, 14],
 ]
-export const MAX_POINTS = [20, 24, 20, 24]
-export const CARDS = [10, 12, 5, 12]
+export const MAX_POINTS = [12, 16, 16, 16]
+export const PER_ERA = 2 // cores II and IV: cards per era (problems, or questions per visitor)
 
 export function shuffle<T>(list: T[]): T[] {
   const copy = [...list]
@@ -56,24 +59,24 @@ export function cardEra(round: number, id: string): Era {
 function deal(round: number): string[] {
   const eras = [1, 2, 3, 4] as Era[]
   if (round === 0) {
-    // Two machines from each era, then two more of any era. (Only the inventions: the gallery
+    // One machine from each era, then two more of any era. (Only the inventions: the gallery
     // photos were once mixed in, but many show curiosities, not what an era is about.)
-    const firsts = eras.flatMap((era) => shuffle(INVENTION_IDS.filter((id) => eraOf(id) === era)).slice(0, 2))
+    const firsts = eras.map((era) => shuffle(INVENTION_IDS.filter((id) => eraOf(id) === era))[0])
     const rest = shuffle(INVENTION_IDS.filter((id) => !firsts.includes(id))).slice(0, 2)
     return shuffle([...firsts, ...rest])
   }
-  if (round === 1) return eras.flatMap((era) => shuffle(TOWN.filter((p) => p.era === era)).slice(0, 3).map((p) => p.id))
+  if (round === 1) return eras.flatMap((era) => shuffle(TOWN.filter((p) => p.era === era)).slice(0, PER_ERA).map((p) => p.id))
   if (round === 2) {
-    // Five mysteries from at least three different eras.
+    // Four mysteries from at least three different eras.
     for (;;) {
-      const picks = shuffle(MYSTERIES.map((m) => m.id)).slice(0, 5)
+      const picks = shuffle(MYSTERIES.map((m) => m.id)).slice(0, 4)
       if (new Set(picks.map((id) => cardEra(2, id))).size >= 3) return picks
     }
   }
-  // Core IV: one of the two visitors of each era, three of their questions, oldest era first.
+  // Core IV: one of the two visitors of each era, two of their questions, oldest era first.
   return eras.flatMap((era) => {
     const visitor = shuffle(VISITORS.filter((v) => v.era === era))[0]
-    return shuffle(visitor.questions.map((_, k) => `${visitor.id}:${k}`)).slice(0, 3)
+    return shuffle(visitor.questions.map((_, k) => `${visitor.id}:${k}`)).slice(0, PER_ERA)
   })
 }
 
@@ -121,31 +124,25 @@ export function startRun(round: number) {
     wrong: [],
     clues: 1,
     solved: false,
-    asking: false,
     points: 0,
     combo: 0,
     finished: false,
-    away: false,
   })
 }
 
 export function choose(option: string) {
   const r = run()
-  if (r.solved || r.asking || r.finished || r.wrong.includes(option)) return
+  if (r.solved || r.finished || r.wrong.includes(option)) return
   const id = r.deck[r.index]
   if (option === answerOf(r.round, id)) {
     playEffect('correct', 0.6)
     store().patchGameRun({ solved: true, points: r.points + cardPoints(r), combo: r.wrong.length === 0 ? r.combo + 1 : 0 })
   } else {
     playEffect('wrong', 0.6)
-    store().patchGameRun({ wrong: [...r.wrong, option], asking: true, combo: 0 })
+    // A wrong answer is crossed out; the visitor simply chooses again (core III: the next clue
+    // opens by itself).
+    store().patchGameRun({ wrong: [...r.wrong, option], combo: 0, clues: r.round === 2 ? Math.min(4, r.clues + 1) : r.clues })
   }
-}
-
-// After a wrong answer: answer again (core III: with the next clue open).
-export function tryAgain() {
-  const r = run()
-  store().patchGameRun({ asking: false, clues: r.round === 2 ? Math.min(4, r.clues + 1) : r.clues })
 }
 
 // Core III: open one more clue (it costs a point).
@@ -154,15 +151,15 @@ export function moreClue() {
   if (r.clues < 4 && !r.solved) store().patchGameRun({ clues: r.clues + 1 })
 }
 
-// After a wrong answer: go and look around the rooms. The map opens; the game waits, and a
-// button at the bottom of the screen brings the visitor back (returnToGame).
+// At any time (the button at the bottom of a core, or in the workshop): go and look around the
+// rooms. The map opens; the game waits, and a button at the bottom of the screen brings the
+// visitor back (returnToGame), to the same card if a core is in progress.
 export function goBackToRooms() {
-  const r = run()
-  store().patchGameRun({ asking: false, away: true, clues: r.round === 2 ? Math.min(4, r.clues + 1) : r.clues })
+  store().setAwayFromGame(true)
   store().setMode('map')
 }
 export function returnToGame() {
-  store().patchGameRun({ away: false })
+  store().setAwayFromGame(false)
   store().requestTeleport('quiz')
   store().openGame() // the mode changes first...
   releasePointer() // ...so releasing the mouse is not taken as a pause
@@ -174,7 +171,7 @@ export function nextCard() {
   if (!r.solved) return
   if (r.index + 1 < r.deck.length) {
     const index = r.index + 1
-    store().patchGameRun({ index, options: optionsFor(r.round, r.deck[index]), wrong: [], clues: 1, solved: false, asking: false })
+    store().patchGameRun({ index, options: optionsFor(r.round, r.deck[index]), wrong: [], clues: 1, solved: false })
     return
   }
   store().patchGameRun({ finished: true })

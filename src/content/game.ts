@@ -368,12 +368,15 @@ const vi = {
   score: '{score}/{total} điểm (cần {need})',
   points: 'Điểm: {n}',
   placeholder: '[CẦN KIỂM TRA]',
-  // A wrong answer: go back to the rooms, or answer again.
+  // A wrong answer (crossed out; the visitor chooses again).
   wrongTitle: 'Chưa đúng.',
-  wrongAsk: 'Bạn có muốn quay lại các phòng để xem lại không?',
+  wrongTryOther: 'Hãy chọn lại.',
   wrongHint: 'Gợi ý: câu trả lời nằm ở {room}.',
+  // The way back to the rooms, always at the bottom of the game during a core.
   goBack: 'Quay lại các phòng',
-  tryAgain: 'Trả lời lại',
+  goBackNote: 'Xem lại các phòng bất cứ lúc nào; tiến độ của bạn được giữ nguyên.',
+  goBackHelp:
+    'Nút này mở bản đồ để bạn xem lại bất kỳ phòng nào, cả khi đang chơi (nó luôn nằm ở cuối khung trò chơi); tiến độ được giữ nguyên. Để trở lại đúng câu đang làm, nhấn phím R trên máy tính, hoặc bấm nút "Quay lại phòng trò chơi" ở cuối màn hình trên điện thoại và máy tính bảng.',
   // While away in the rooms (a button at the bottom of the screen).
   returnToGame: 'Quay lại phòng trò chơi',
   returnKey: 'R',
@@ -384,7 +387,7 @@ const vi = {
     },
     {
       name: 'Thị trấn lớn lên',
-      task: 'Một thị trấn đi qua bốn cuộc cách mạng. Mỗi thời kỳ có ba vấn đề: chọn phát minh giải quyết từng vấn đề để thị trấn bước sang thời kỳ tiếp theo. (Phím 1-3 cũng chọn được.)',
+      task: 'Một thị trấn đi qua bốn cuộc cách mạng. Mỗi thời kỳ có hai vấn đề: chọn phát minh giải quyết từng vấn đề để thị trấn bước sang thời kỳ tiếp theo. (Phím 1-3 cũng chọn được.)',
     },
     {
       name: 'Tôi là ai?',
@@ -401,7 +404,7 @@ const vi = {
   rightDoor: 'Đúng chỗ!',
   // Core II
   townIn: 'Thị trấn năm {year}',
-  problemOf: 'Vấn đề {n}/3 của thời kỳ này',
+  problemOf: 'Vấn đề {n}/{total} của thời kỳ này',
   eraJump: 'Thị trấn bước sang thời kỳ mới!',
   // Core III
   mysteryOf: 'Bí ẩn {n}/{total}',
@@ -412,7 +415,7 @@ const vi = {
   era: 'Một cuộc cách mạng',
   // Core IV
   visitorOf: 'Vị khách {n}/4',
-  adviceOf: 'Lời khuyên {n}/3',
+  adviceOf: 'Lời khuyên {n}/{total}',
   happy: ['Tuyệt quá, cảm ơn bạn!', 'À, ra là vậy! Tôi hiểu rồi.', 'Hay lắm, tôi sẽ làm theo!'],
   puzzled: ['Hả? Tôi chưa nghe đến thứ đó bao giờ...', 'Hừm, nghe không ổn lắm...', 'Bạn chắc chứ? Tôi thấy lạ quá.'],
   goodbye: 'Tạm biệt và cảm ơn nhé!',
@@ -445,10 +448,12 @@ const en: typeof vi = {
   points: 'Points: {n}',
   placeholder: '[NEEDS CHECKING]',
   wrongTitle: 'Not quite.',
-  wrongAsk: 'Would you like to go back to the rooms and look again?',
+  wrongTryOther: 'Choose again.',
   wrongHint: 'Hint: the answer is in {room}.',
   goBack: 'Back to the rooms',
-  tryAgain: 'Answer again',
+  goBackNote: 'Look around the rooms at any time; your progress is kept.',
+  goBackHelp:
+    'This button opens the map so you can look around any room again, even mid-challenge (it is always at the bottom of the game); your progress is kept. To come back to the same question, press R on a computer, or tap the “Back to the Game Room” button at the bottom of the screen on a phone or tablet.',
   returnToGame: 'Back to the Game Room',
   returnKey: 'R',
   rounds: [
@@ -458,7 +463,7 @@ const en: typeof vi = {
     },
     {
       name: 'The growing town',
-      task: 'A town lives through four revolutions. Each era brings three problems: choose the invention that solves each one, and the town moves on to the next era. (Keys 1-3 also choose.)',
+      task: 'A town lives through four revolutions. Each era brings two problems: choose the invention that solves each one, and the town moves on to the next era. (Keys 1-3 also choose.)',
     },
     {
       name: 'Who am I?',
@@ -473,7 +478,7 @@ const en: typeof vi = {
   combo: 'Combo ×{n}',
   rightDoor: 'Right door!',
   townIn: 'The town in {year}',
-  problemOf: 'Problem {n}/3 of this era',
+  problemOf: 'Problem {n}/{total} of this era',
   eraJump: 'The town moves into a new era!',
   mysteryOf: 'Mystery {n}/{total}',
   clue: 'Clue {n}',
@@ -482,7 +487,7 @@ const en: typeof vi = {
   solved: 'Correct! +{n} points',
   era: 'A revolution',
   visitorOf: 'Visitor {n}/4',
-  adviceOf: 'Advice {n}/3',
+  adviceOf: 'Advice {n}/{total}',
   happy: ['Wonderful, thank you!', 'Ah, so that’s how it is! I see.', 'Splendid, I’ll do just that!'],
   puzzled: ['What? I’ve never heard of such a thing...', 'Hmm, that doesn’t sound right...', 'Are you sure? That seems odd to me.'],
   goodbye: 'Goodbye, and thank you!',
@@ -496,6 +501,10 @@ export const gameText: Record<Language, GameText> = { vi, en }
 // Touch screens: the same texts without the keys.
 const noKeys = (text: string) => text.replace(/ \((Phím|Keys) [^)]*\)/, '')
 export const gameTouchText: Record<Language, Partial<GameText>> = {
-  vi: { rounds: vi.rounds.map((r) => ({ ...r, task: noKeys(r.task) })) },
-  en: { rounds: en.rounds.map((r) => ({ ...r, task: noKeys(r.task) })) },
+  vi: {
+    rounds: vi.rounds.map((r) => ({ ...r, task: noKeys(r.task) })),
+  },
+  en: {
+    rounds: en.rounds.map((r) => ({ ...r, task: noKeys(r.task) })),
+  },
 }
