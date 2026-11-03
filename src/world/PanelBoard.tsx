@@ -19,8 +19,6 @@ import { SharpText, recordText, type TextRun } from './sharp-text'
 // How the sharp letters are lit, like the paper they lie on (its material below).
 const PAPER = { lit: true, glow: 0.28, roughness: 0.9 }
 const SCREEN = { lit: true, glow: 0.9, roughness: 0.3 }
-const HOLOGRAM = { lit: false, glow: 1.3 }
-const HOLOGRAM_AIMED = { lit: false, glow: 1.7 }
 
 const PIXELS_PER_METRE = 512 // sharp enough to read from a couple of metres away
 const FRAME = BOARD_FRAME // frame width (metres)
@@ -165,8 +163,6 @@ export default function PanelBoard({ exhibitId, width, height, aimed, theme }: P
   const faceWidth = width - 2 * FRAME
   const faceHeight = height - 2 * FRAME
   const face = useMemo(() => [faceWidth, faceHeight] as const, [faceWidth, faceHeight])
-  // (The hologram glass has no frame: its picture covers all of it.)
-  const glassFace = useMemo(() => [width, height] as const, [width, height])
 
   const { texture, runs, pixels } = useMemo(() => {
     const runs: TextRun[] = []
@@ -289,7 +285,8 @@ export default function PanelBoard({ exhibitId, width, height, aimed, theme }: P
         <mesh material={glass}>
           <planeGeometry args={[width, height]} />
         </mesh>
-        <SharpText runs={runs} pixels={pixels} face={glassFace} z={0.002} shading={aimed ? HOLOGRAM_AIMED : HOLOGRAM} />
+        {/* (No sharp text layer here: the letters are painted into the glass itself, so the
+            bloom makes them glow, the original look. A sharp copy on top doubled them.) */}
         {/* Thin glowing edges along the top and bottom. */}
         {[-1, 1].map((s) => (
           <mesh key={s} position={[0, (s * height) / 2, 0]}>

@@ -320,6 +320,8 @@ Testing: manual checklists (the acceptance criteria above) before every merge; `
 
 **Important:** the repository is private (leader's decision, 2026-10-28). On Vercel's free Hobby plan a private repository deploys only from its owner's pushes (collaboration on private repositories needs a paid plan), which is fine while the leader is the only one pushing. The Hobby plan is for non-commercial personal use, which fits a school project. Never commit passwords or keys.
 
+**Reminder for the official release (do it only once the game is finished and no longer updated often):** faster repeat visits. Today the site's files are served with `Cache-Control: public, max-age=0, must-revalidate`, so on every visit or refresh the browser asks the server again about each of its ~150 files (cheap in data, but many round trips on a slow network). At release, add a `vercel.json` with a `headers` rule giving the big files (`/models/`, `/textures/`, `/pictures/`, `/sounds/`, `/fonts/`, `/basis/`) `Cache-Control: public, max-age=3600` (leader's decision: conservative, reused without asking for **one hour at most**). The catch: a file changed on the server may show its old version for up to an hour. Measure a repeat load on a slow simulated connection before and after.
+
 ---
 
 ## 7. Anticipated problems
