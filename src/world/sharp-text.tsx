@@ -64,13 +64,7 @@ export interface TextRun {
 export function recordText(ctx: CanvasRenderingContext2D, runs: TextRun[], alsoPaint = false) {
   const paint = ctx.fillText.bind(ctx)
   ctx.fillText = (text: string, x: number, y: number, maxWidth?: number) => {
-    // (Painted softly blurred: a glow around the sharp letters, not a second set of them.)
-    if (alsoPaint) {
-      const filter = ctx.filter
-      ctx.filter = `blur(${Math.max(1, Number(/([\d.]+)px/.exec(ctx.font)?.[1] ?? 16) * 0.07).toFixed(1)}px)`
-      paint(text, x, y, maxWidth)
-      ctx.filter = filter
-    }
+    if (alsoPaint) paint(text, x, y, maxWidth)
     if (!text) return
     // (The browser rewrites the font: weight 700 as "bold", and 400 left out.)
     const named = /\b(bold|[1-9]00)\b/.exec(ctx.font)?.[1]

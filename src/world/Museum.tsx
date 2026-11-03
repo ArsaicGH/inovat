@@ -77,6 +77,8 @@ function resizeEffects() {
 // effects library also sizes some of its pictures itself (when a graphics level adds or
 // rebuilds an effect), at the canvas's full size.
 const canvasPixels = new Vector2()
+// The effects chain's steps as last sized (see RenderScale).
+const sizedChain = new WeakMap<object, unknown[]>()
 // (The scaling is installed once per effects composer, and asks for the current share each
 // time: re-installing it after a code reload while developing multiplied the scales.)
 type ScaledComposer = Composer & { renderShare?: () => number; scaledSetSize?: boolean }
@@ -105,16 +107,29 @@ function RenderScale({ composer }: { composer: RefObject<Composer | null> }) {
     }
     gl.getDrawingBufferSize(canvasPixels)
     if (Math.abs(effects.inputBuffer.width - Math.round(canvasPixels.x * effects.renderShare())) > 1) resizeEffects()
+    // The library also sizes every step to the FULL screen whenever it rebuilds the chain (a
+    // graphics level changing an effect, the text step being made again), without touching
+    // the pictures above. Ambient occlusion then believed its depth picture was full size
+    // and darkened the wrong places: dark copies of nearby shapes on the walls. So after
+    // every rebuild, all steps are sized again to the picture really drawn.
+    const sized = sizedChain.get(effects)
+    if (!sized || sized.length !== effects.passes.length || effects.passes.some((pass, i) => pass !== sized[i])) {
+      sizedChain.set(effects, [...effects.passes])
+      resizeEffects()
+    }
     // The sharp-text step draws the finished picture onto the screen itself, so it must be
-    // the last step. With ambient occlusion ("high") the effects library adds a plain copy
-    // to the screen after it: then the text was drawn into the smaller picture instead
-    // (blurred, and compared with the scene's depth at the wrong places: text through
-    // walls, letters missing). Anything after it is switched off.
+    // the last step. With ambient occlusion ("high") the effects library adds a copy step
+    // after it: then the text was drawn into the smaller picture instead (blurred, and
+    // compared with the scene's depth at the wrong places: text through walls, letters
+    // missing). The text step is moved to the end, after that copy, which now copies into
+    // the next picture instead of the screen. (Switching the copy off instead left the
+    // effects reading an old picture: ghostly doubled walls.)
     const passes = effects.passes
-    const last = passes.findIndex((pass) => pass instanceof SharpTextPass)
-    if (last >= 0 && !passes[last].renderToScreen) {
-      for (let i = last + 1; i < passes.length; i++) passes[i].enabled = false
-      passes[last].renderToScreen = true
+    const text = passes.findIndex((pass) => pass instanceof SharpTextPass)
+    if (text >= 0 && text !== passes.length - 1) {
+      const [step] = passes.splice(text, 1)
+      passes.push(step)
+      passes.forEach((pass) => (pass.renderToScreen = pass === step))
     }
   })
   return null
