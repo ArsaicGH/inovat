@@ -36,8 +36,11 @@ const PANEL_OFFSET = 2.3 // text panel distance from the centre of its plinth
 // A room with six inventions (CMCN 4) has a pair in the middle of the hall: this far either
 // side of the middle line, a little in front of the centre, each turned outwards by this
 // angle (radians).
-const MIDDLE_PAIR = 1.8
+const MIDDLE_PAIR = 1.5
 const MIDDLE_FORWARD = 0.6
+// ...and staggered (leader's sketch): the left one this much further forward, so the pair
+// stands on a diagonal instead of side by side.
+const MIDDLE_STAGGER = 1.6
 const MIDDLE_TURN = 0.35
 // With five inventions, the one in the middle of the hall is the room's headline exhibit
 // (the same as `primary` in room-themes.ts); the others take the corners in walking order.
@@ -386,7 +389,7 @@ function buildSpots(): ExhibitSpot[] {
       places[count].forEach(([su, sv], i) => {
         const middle = sv === 0
         const u = middle ? su : su * (room.width / 2 - CORNER_INSET)
-        const v = sv > 0 ? room.vHall + CORNER_INSET : sv < 0 ? room.vBack - CORNER_INSET : centreV - (su === 0 ? 0 : MIDDLE_FORWARD)
+        const v = sv > 0 ? room.vHall + CORNER_INSET : sv < 0 ? room.vBack - CORNER_INSET : centreV - (su === 0 ? 0 : MIDDLE_FORWARD + (su < 0 ? MIDDLE_STAGGER : 0))
         const [x, z] = at(u, v)
         const [cx, cz] = at(0, centreV)
         // The middle pair (leader's sketch) stand side by side in a shallow V: each faces the

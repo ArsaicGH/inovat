@@ -55,7 +55,8 @@ export const BOARD_THEMES: Record<RoomId, BoardTheme> = {
   hall: CLASSIC,
   quiz: CLASSIC,
   ir1: { look: 'brass', paper: '#e8d9b5', title: '#3b2414', ink: '#4a3220', muted: '#7a5c3a', rule: '#8a5a2b', frame: '#a87a3a' },
-  ir2: { look: 'enamel', paper: '#efe3cc', title: '#4a2a17', ink: '#3a2a1e', muted: '#7a5a40', rule: '#a5662f', frame: '#5a3a22' },
+  // White enamel with a navy border, the room's electric blue (leader: room 2 is blue).
+  ir2: { look: 'enamel', paper: '#f1eee6', title: '#1d3557', ink: '#22303f', muted: '#4f6378', rule: '#2f5d8a', frame: '#1d3557' },
   ir3: { look: 'screen', paper: '#0e1a12', title: '#a8ffbf', ink: '#6be08b', muted: '#3f9a5c', rule: '#6be08b', frame: '#d9cdb0' },
   ir4: { look: 'hologram', paper: 'rgba(6, 34, 46, 0.93)' /* nearly opaque: see-through glass made the text hard to read (leader) */, title: '#e6fdff', ink: '#aef3ff', muted: '#6fd3e6', rule: '#3fd0e0', frame: '#3fd0e0' },
 }

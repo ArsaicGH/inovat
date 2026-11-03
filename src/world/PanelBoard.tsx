@@ -20,8 +20,8 @@ import { SharpText, recordText, type TextRun } from './sharp-text'
 const PAPER = { lit: true, glow: 0.28, roughness: 0.9 }
 const SCREEN = { lit: true, glow: 0.9, roughness: 0.3 }
 // The hologram's sharp letters: unlit and a little brighter than their colour.
-const HOLOGRAM = { lit: false, glow: 1.3 }
-const HOLOGRAM_AIMED = { lit: false, glow: 1.7 }
+const HOLOGRAM = { lit: false, glow: 1.15 }
+const HOLOGRAM_AIMED = { lit: false, glow: 1.4 }
 
 const PIXELS_PER_METRE = 512 // sharp enough to read from a couple of metres away
 const FRAME = BOARD_FRAME // frame width (metres)
@@ -177,7 +177,9 @@ export default function PanelBoard({ exhibitId, width, height, aimed, theme }: P
     canvas.width = Math.round(faceWidth * PIXELS_PER_METRE)
     canvas.height = Math.round(faceHeight * PIXELS_PER_METRE)
     const ctx = canvas.getContext('2d')
-    if (ctx) recordText(ctx, runs, look === 'hologram')
+    // (No painted blur under the hologram's letters: it read as smeared double text. The
+    // bloom alone gives the sharp letters their glow.)
+    if (ctx) recordText(ctx, runs)
     if (ctx) {
       const w = canvas.width
       const h = canvas.height

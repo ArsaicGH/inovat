@@ -15,7 +15,7 @@ import type { RoomId } from '../types'
 const ModelViewer = lazy(() => import('../world/ModelViewer'))
 
 // Era colour of the model viewer's background gradient (like the era numbers on the walls).
-const ERA_GLOW: Record<string, string> = { ir1: '#e0a050', ir2: '#ffd36a', ir3: '#6be08b', ir4: '#3fd0e0' }
+const ERA_GLOW: Record<string, string> = { ir1: '#e0a050', ir2: '#4f86d1', ir3: '#6be08b', ir4: '#3fd0e0' }
 
 // How long the shrink-away animation plays after closing (must match index.css).
 const CLOSE_ANIMATION_MS = 220
