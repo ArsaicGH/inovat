@@ -13,6 +13,19 @@ const vi = {
     tutorialYes: 'Có, hướng dẫn tôi',
     tutorialNo: 'Không, vào tham quan',
   },
+  // The loading screen at the start: what is happening, in general terms, and how much has
+  // downloaded. {loaded}/{total} = megabytes. Then two tips under a gold ornament.
+  loading: {
+    steps: {
+      download: 'Đang tải hiện vật và hình ảnh',
+      rooms: 'Đang dựng các phòng trưng bày',
+      lights: 'Đang thắp đèn khắp bảo tàng',
+      ready: 'Bảo tàng đã sẵn sàng',
+    },
+    downloaded: 'Đã tải {loaded} / {total} MB',
+    tipTitle: 'Mẹo',
+    tips: ['Nhấn F11 để chơi toàn màn hình', 'Đeo tai nghe để có trải nghiệm tốt nhất'],
+  },
   // Guided tutorial (chosen on the start screen). {n} = step number, {total} = number of steps.
   tutorial: {
     progress: 'Hướng dẫn {n}/{total}',
@@ -214,6 +227,17 @@ const en: UiText = {
     tutorialQuestion: 'Would you like a quick guide to the controls?',
     tutorialYes: 'Yes, show me',
     tutorialNo: 'No, start exploring',
+  },
+  loading: {
+    steps: {
+      download: 'Loading the exhibits and pictures',
+      rooms: 'Setting up the exhibition rooms',
+      lights: 'Turning on the lights',
+      ready: 'The museum is ready',
+    },
+    downloaded: '{loaded} / {total} MB downloaded',
+    tipTitle: 'Tips',
+    tips: ['Press F11 to play in full screen', 'Wear headphones for the best experience'],
   },
   tutorial: {
     progress: 'Tutorial {n}/{total}',

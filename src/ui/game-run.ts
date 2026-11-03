@@ -30,7 +30,7 @@ export function shuffle<T>(list: T[]): T[] {
 }
 
 // ---- What each card is ----
-// Core I: an invention ('ir2-3') or a gallery photo ('wall-ir2-3'), sorted by era.
+// Core I: an invention ('ir2-3'), sorted by era. (Photo cards, 'wall-ir2-3', are still understood.)
 export const PHOTOS = (['ir1', 'ir2', 'ir3', 'ir4'] as const).flatMap((room) => {
   const g = WALL_GALLERY[room]
   return [...g.ante, ...g.eraWall, ...g.sides, ...g.doorway]
@@ -56,12 +56,10 @@ export function cardEra(round: number, id: string): Era {
 function deal(round: number): string[] {
   const eras = [1, 2, 3, 4] as Era[]
   if (round === 0) {
-    // One machine and one picture from each era, then two more of anything.
-    const firsts = eras.flatMap((era) => [
-      shuffle(INVENTION_IDS.filter((id) => eraOf(id) === era))[0],
-      shuffle(PHOTOS.filter((id) => photoEra(id) === era))[0],
-    ])
-    const rest = shuffle([...INVENTION_IDS, ...PHOTOS].filter((id) => !firsts.includes(id))).slice(0, 2)
+    // Two machines from each era, then two more of any era. (Only the inventions: the gallery
+    // photos were once mixed in, but many show curiosities, not what an era is about.)
+    const firsts = eras.flatMap((era) => shuffle(INVENTION_IDS.filter((id) => eraOf(id) === era)).slice(0, 2))
+    const rest = shuffle(INVENTION_IDS.filter((id) => !firsts.includes(id))).slice(0, 2)
     return shuffle([...firsts, ...rest])
   }
   if (round === 1) return eras.flatMap((era) => shuffle(TOWN.filter((p) => p.era === era)).slice(0, 3).map((p) => p.id))

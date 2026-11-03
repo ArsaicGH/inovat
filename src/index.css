@@ -1025,9 +1025,15 @@ body {
   position: fixed;
   inset: 0;
   z-index: 40;
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 0 24px;
   background: #000;
+  color: #d9c79e;
+  text-align: center;
   transition: opacity 500ms ease-out;
 }
 .loading-done {
@@ -1040,6 +1046,58 @@ body {
   border-radius: 4px;
   background: rgba(201, 162, 90, 0.15);
   overflow: hidden;
+}
+.loading-step {
+  margin: 6px 0 0;
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  color: #e8d6a8;
+}
+.loading-bytes {
+  margin: 0;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: #9a8a68;
+}
+/* The tips at the bottom, in the museum's gold: an ornament, a small spaced title, then the
+   two tips side by side with a diamond between them. */
+.loading-tips {
+  position: absolute;
+  bottom: calc(40px + env(safe-area-inset-bottom, 0px));
+  left: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.loading-ornament {
+  width: min(320px, 70vw);
+}
+.loading-tips-title {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: #c9a25a;
+}
+.loading-tips-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 0;
+  margin: 0;
+  font-size: 15px;
+  letter-spacing: 0.03em;
+  color: #e8d6a8;
+}
+.loading-tips-list i {
+  margin: 0 16px;
+  font-style: normal;
+  font-size: 9px;
+  vertical-align: 2px;
+  color: #c9a25a;
 }
 .loading-bar span {
   display: block;

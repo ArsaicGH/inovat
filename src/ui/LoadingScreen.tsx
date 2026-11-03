@@ -3,8 +3,10 @@ import { useLoadProgress } from './load-progress'
 import { useMuseumStore } from '../state/useMuseumStore'
 import { PART_COUNT } from '../world/layout'
 import { useFontsReady } from '../world/fonts'
+import { useContent } from '../content/use-content'
 
-// LOADING SCREEN: a single gold progress bar on black. It waits for everything that would
+// LOADING SCREEN: a gold progress bar on black, with what is happening (in general terms) and
+// how many megabytes have arrived under it, and two tips at the bottom. It waits for everything that would
 // otherwise make the first seconds stutter: the pictures (textures), the museum font,
 // each part of the museum being prepared for the graphics card, and one hidden drawing of
 // the whole museum (Museum.tsx). Then it
@@ -18,6 +20,36 @@ import { useFontsReady } from '../world/fonts'
 // and the automatic graphics choice ran during the visit, freezing it for many seconds.)
 const GIVE_UP_AFTER = 20000
 
+// Megabytes downloaded so far of the files the loading screen waits for (their total is
+// worked out when the site is built: vite.config.ts). Counted from the browser's own list of
+// finished downloads; a file the browser already kept from an earlier visit counts too.
+const STARTUP_PATHS = __STARTUP_FOLDERS__.map((folder) => `/${folder}/`)
+function useDownloadedBytes() {
+  const [bytes, setBytes] = useState(0)
+  useEffect(() => {
+    // (The browser keeps only 250 entries in that list by default.)
+    performance.setResourceTimingBufferSize?.(2000)
+    const counted = new Set<string>()
+    let sum = 0
+    const add = (entries: PerformanceEntryList) => {
+      let changed = false
+      for (const entry of entries as PerformanceResourceTiming[]) {
+        const path = new URL(entry.name).pathname
+        if (counted.has(path) || !STARTUP_PATHS.some((start) => path.startsWith(start))) continue
+        counted.add(path)
+        sum += entry.decodedBodySize || entry.encodedBodySize || entry.transferSize || 0
+        changed = true
+      }
+      if (changed) setBytes(Math.min(sum, __STARTUP_BYTES__))
+    }
+    add(performance.getEntriesByType('resource'))
+    const observer = new PerformanceObserver((list) => add(list.getEntries()))
+    observer.observe({ type: 'resource', buffered: true })
+    return () => observer.disconnect()
+  }, [])
+  return bytes
+}
+
 export default function LoadingScreen() {
   const { progress, active, total } = useLoadProgress() // pictures being downloaded (0-100)
   const parts = useMuseumStore((state) => state.partsPrepared)
@@ -28,6 +60,9 @@ export default function LoadingScreen() {
   const setWorldReady = useMuseumStore((state) => state.setWorldReady)
   const fontsReady = useFontsReady()
   const [gone, setGone] = useState(false)
+  const { ui, language } = useContent()
+  const text = ui.loading
+  const bytes = useDownloadedBytes()
 
   // Pictures count for most of the bar, preparing the parts for the rest. The bar never
   // moves backwards (new downloads can briefly lower the picture percentage).
@@ -41,6 +76,22 @@ export default function LoadingScreen() {
   const done = parts >= PART_COUNT && warmedUp && qualityChosen && endingPrepared && fontsReady && !active
   // Anything that moves the loading forward (the next picture, part or step).
   const step = `${Math.round(target)}|${fontsReady}|${active}`
+  // What is happening now, in the order the loading goes through it. Like the bar, it only
+  // moves forward (the closing film fetches a few last files after the graphics measurement).
+  const rawStage =
+    done || worldReady ? 5 : qualityChosen ? 4 : warmedUp ? 3 : parts >= PART_COUNT ? 2 : parts > 0 ? 1 : 0
+  const [stage, setStage] = useState(0)
+  if (rawStage > stage) setStage(rawStage)
+  const stepText = stage === 0 ? text.steps.download : stage < 3 ? text.steps.rooms : stage < 5 ? text.steps.lights : text.steps.ready
+  const megabytes = (n: number) => {
+    const value = (n / 1048576).toFixed(1)
+    return language === 'vi' ? value.replace('.', ',') : value
+  }
+  // (Once the rooms are prepared, every file is in: the count shows the whole, as some files
+  // may have been counted short. It never goes down.)
+  const [loadedBytes, setLoadedBytes] = useState(0)
+  const nowBytes = stage >= 2 ? __STARTUP_BYTES__ : bytes
+  if (nowBytes > loadedBytes) setLoadedBytes(nowBytes)
 
   useEffect(() => {
     if (!done || worldReady) return
@@ -77,6 +128,24 @@ export default function LoadingScreen() {
     <div className={worldReady ? 'loading-screen loading-done' : 'loading-screen'} aria-busy={!worldReady}>
       <div className="loading-bar" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(shown)}>
         <span style={{ width: `${worldReady ? 100 : shown}%` }} />
+      </div>
+      <p className="loading-step">{stepText}</p>
+      <p className="loading-bytes">{text.downloaded.replace('{loaded}', megabytes(loadedBytes)).replace('{total}', megabytes(__STARTUP_BYTES__))}</p>
+      <div className="loading-tips">
+        <div className="title-ornament loading-ornament" aria-hidden="true">
+          <span />
+          <i />
+          <span />
+        </div>
+        <p className="loading-tips-title">{text.tipTitle}</p>
+        <p className="loading-tips-list">
+          {text.tips.map((tip, i) => (
+            <span key={tip}>
+              {i > 0 && <i aria-hidden="true">◆</i>}
+              {tip}
+            </span>
+          ))}
+        </p>
       </div>
     </div>
   )

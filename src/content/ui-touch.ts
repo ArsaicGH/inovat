@@ -19,6 +19,7 @@ interface TouchText {
   quizIntro: string
   infoCloseHint: string
   mapCloseHint: string
+  loadingTips: string[]
 }
 
 const vi: TouchText = {
@@ -41,6 +42,7 @@ const vi: TouchText = {
   quizIntro: 'Câu hỏi và bốn đáp án sẽ hiện trên bảng này. Chạm vào đáp án quý khách chọn. Trả lời đúng ít nhất một nửa để mở cánh cửa phía sau.',
   infoCloseHint: 'Chạm vào khoảng trống để đóng',
   mapCloseHint: 'Chạm vào khoảng trống để đóng',
+  loadingTips: ['Xoay ngang thiết bị để có góc nhìn rộng nhất', 'Đeo tai nghe để có trải nghiệm tốt nhất'],
 }
 
 const en: TouchText = {
@@ -63,6 +65,7 @@ const en: TouchText = {
   quizIntro: 'The questions and their four answers appear on this panel. Tap the answer you choose. Get at least half right to open the door at the back.',
   infoCloseHint: 'Tap on blank space to close',
   mapCloseHint: 'Tap on blank space to close',
+  loadingTips: ['Turn your device sideways for the widest view', 'Wear headphones for the best experience'],
 }
 
 const touchText: Record<Language, TouchText> = { vi, en }
@@ -81,5 +84,6 @@ export function withTouch(ui: UiText, language: Language): UiText {
     quiz: { ...ui.quiz, prompt: t.quizPrompt, intro: t.quizIntro },
     infoPanel: { ...ui.infoPanel, closeHint: t.infoCloseHint },
     map: { ...ui.map, closeHint: t.mapCloseHint },
+    loading: { ...ui.loading, tips: t.loadingTips },
   }
 }

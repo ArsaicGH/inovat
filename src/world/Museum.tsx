@@ -154,7 +154,7 @@ function SharpTextStep() {
 //   picture pixels), and how often they are redrawn (every Nth frame; 0 = only when the
 //   key light moves, so turning prototypes keep a still shadow). At ultra the museum
 //   spotlights cast shadows too, not just the one key light;
-// - edge smoothing: SMAA, except at "low" (see smoothing below). (FXAA, about a third of the work, was tried for
+// - edge smoothing: SMAA at every level. (FXAA, about a third of the work, was tried for
 //   low and medium: it left large dark patches around bright lights, on the ceilings and
 //   across the boards.)
 // "High" is the museum as designed, drawn at 90% of the full sharpness: the extra tenth cost
@@ -177,17 +177,17 @@ interface GraphicsSettings {
   shadowSoftness: number
   shadowEvery: number
   spotShadows: boolean // the museum spotlights cast shadows too (ultra only)
-  // Edge smoothing (SMAA). Not at the lowest levels: drawn with so few pixels, the picture is
-  // stretched to the screen and its edges come out soft anyway, and the smoothing's two passes
-  // over the whole picture are a real share of the work on an office laptop's graphics chip.
+  // Edge smoothing (SMAA). Once left out at the two lowest levels to save its two passes,
+  // but their stretched, jagged edges looked unacceptable (leader, 3 November 2026); at their
+  // few pixels the passes are cheap.
   smoothing: boolean
 }
 // How many museum spotlights may cast shadows at the ultra level.
 const SPOT_SHADOWS = 4
 
 const GRAPHICS_LEVELS: Record<GraphicsLevel, GraphicsSettings> = {
-  0: { sharpness: 0.5, ao: 'off', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 0, spotShadows: false, smoothing: false }, // very low
-  1: { sharpness: 0.6, ao: 'off', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 0, spotShadows: false, smoothing: false }, // low
+  0: { sharpness: 0.5, ao: 'off', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 0, spotShadows: false, smoothing: true }, // very low
+  1: { sharpness: 0.6, ao: 'off', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 0, spotShadows: false, smoothing: true }, // low
   2: { sharpness: 0.8, ao: 'off', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 4, spotShadows: false, smoothing: true }, // medium
   3: { sharpness: IS_TOUCH ? 1 : 0.9, ao: 'half', shadowSize: 1024, shadowSoftness: 1, shadowEvery: 3, spotShadows: false, smoothing: true }, // high
   4: { sharpness: 1, ao: 'full', shadowSize: 2048, shadowSoftness: 2, shadowEvery: 1, spotShadows: true, smoothing: true }, // ultra
@@ -705,7 +705,7 @@ function AdaptiveQuality() {
   const size = useThree((state) => state.size)
   const phase = useRef<'waiting' | 'settling' | 'measuring' | 'done'>('waiting')
   const time = useRef(0)
-  const frames = useRef(0)
+  const frames = useRef<number[]>([]) // the measured frames' times
   const level = useRef<GraphicsLevel>(3) // the level being measured
   const moved = useRef(false) // the camera was moved for the measurement
   const visitedBefore = useRef<RoomId[]>([])
@@ -747,12 +747,18 @@ function AdaptiveQuality() {
       if (time.current < SETTLE) return
       phase.current = 'measuring'
       time.current = 0
-      frames.current = 0
+      frames.current = []
       return
     }
-    frames.current += 1
+    // A hidden or minimised window draws slowly or not at all: that says nothing about the
+    // computer, so the measurement starts again once the window is back.
+    if (document.hidden) return measureAgain()
+    frames.current.push(delta)
     if (time.current < MEASURE) return
-    const fps = frames.current / time.current
+    // The typical frame (the median), not the average: one long hitch while something new is
+    // prepared for drawing must not make a fast computer look slow.
+    const sorted = [...frames.current].sort((a, b) => a - b)
+    const fps = 1 / sorted[Math.floor(sorted.length / 2)]
 
     if (fps >= ENOUGH_FPS) return finish(store)
     if (level.current === 3 && wantedRatio === FULL_RATIO) {

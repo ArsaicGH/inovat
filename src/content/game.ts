@@ -380,7 +380,7 @@ const vi = {
   rounds: [
     {
       name: 'Lạc giữa thời gian',
-      task: 'Các cỗ máy và bức ảnh đã rơi ra khỏi dòng thời gian. Đưa mỗi thứ về đúng cánh cửa của cuộc cách mạng của nó. (Phím 1-4 cũng chọn được.)',
+      task: 'Các cỗ máy đã rơi ra khỏi dòng thời gian. Đưa mỗi cỗ máy về đúng cánh cửa của cuộc cách mạng của nó. (Phím 1-4 cũng chọn được.)',
     },
     {
       name: 'Thị trấn lớn lên',
@@ -454,7 +454,7 @@ const en: typeof vi = {
   rounds: [
     {
       name: 'Lost in time',
-      task: 'Machines and pictures have fallen out of the timeline. Send each one through the door of its own revolution. (Keys 1-4 also choose.)',
+      task: 'Machines have fallen out of the timeline. Send each one through the door of its own revolution. (Keys 1-4 also choose.)',
     },
     {
       name: 'The growing town',
