@@ -60,11 +60,23 @@ export interface TextRun {
 }
 
 // Makes a canvas note its text instead of painting it (everything else is painted as usual).
-// alsoPaint: paint it too (the hologram glass: the painted letters give the glow around them).
-export function recordText(ctx: CanvasRenderingContext2D, runs: TextRun[], alsoPaint = false) {
+// glow: paint a soft halo where each letter is (the hologram glass): the sharp letters are
+// drawn on top of it, exactly in place, so it reads as neon light around them. (Painting
+// the letters themselves under the sharp ones doubled them; letters left only painted, made
+// to glow by the bloom, came out smeared.)
+export function recordText(ctx: CanvasRenderingContext2D, runs: TextRun[], glow?: string) {
   const paint = ctx.fillText.bind(ctx)
   ctx.fillText = (text: string, x: number, y: number, maxWidth?: number) => {
-    if (alsoPaint) paint(text, x, y, maxWidth)
+    if (glow && text) {
+      const px = Number(/([\d.]+)px/.exec(ctx.font)?.[1] ?? 16)
+      const scale = Math.hypot(ctx.getTransform().c, ctx.getTransform().d) || 1
+      ctx.save()
+      ctx.fillStyle = glow
+      ctx.globalAlpha = 0.95
+      ctx.filter = `blur(${Math.max(1.5, px * scale * 0.16)}px)`
+      paint(text, x, y, maxWidth)
+      ctx.restore()
+    }
     if (!text) return
     // (The browser rewrites the font: weight 700 as "bold", and 400 left out.)
     const named = /\b(bold|[1-9]00)\b/.exec(ctx.font)?.[1]

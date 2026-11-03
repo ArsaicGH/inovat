@@ -19,6 +19,10 @@ import { SharpText, recordText, type TextRun } from './sharp-text'
 // How the sharp letters are lit, like the paper they lie on (its material below).
 const PAPER = { lit: true, glow: 0.28, roughness: 0.9 }
 const SCREEN = { lit: true, glow: 0.9, roughness: 0.3 }
+// The hologram's sharp letters: unlit and a little brighter than their colour.
+const HOLOGRAM = { lit: false, glow: 1.2 }
+const HOLOGRAM_AIMED = { lit: false, glow: 1.45 }
+const HOLOGRAM_HALO = '#7fe8ff' // the soft neon halo painted under them
 
 const PIXELS_PER_METRE = 512 // sharp enough to read from a couple of metres away
 const FRAME = BOARD_FRAME // frame width (metres)
@@ -163,6 +167,8 @@ export default function PanelBoard({ exhibitId, width, height, aimed, theme }: P
   const faceWidth = width - 2 * FRAME
   const faceHeight = height - 2 * FRAME
   const face = useMemo(() => [faceWidth, faceHeight] as const, [faceWidth, faceHeight])
+  // (The hologram glass has no frame: its picture covers all of it.)
+  const glassFace = useMemo(() => [width, height] as const, [width, height])
 
   const { texture, runs, pixels } = useMemo(() => {
     const runs: TextRun[] = []
@@ -172,7 +178,7 @@ export default function PanelBoard({ exhibitId, width, height, aimed, theme }: P
     canvas.width = Math.round(faceWidth * PIXELS_PER_METRE)
     canvas.height = Math.round(faceHeight * PIXELS_PER_METRE)
     const ctx = canvas.getContext('2d')
-    if (ctx) recordText(ctx, runs, look === 'hologram')
+    if (ctx) recordText(ctx, runs, look === 'hologram' ? HOLOGRAM_HALO : undefined)
     if (ctx) {
       const w = canvas.width
       const h = canvas.height
@@ -266,15 +272,15 @@ export default function PanelBoard({ exhibitId, width, height, aimed, theme }: P
     return () => texture.dispose()
   }, [gl, texture])
 
-  // Hologram glass: unlit and brighter than white where the text is, so the bloom makes
-  // the letters glow; the faint tint stays below the glow threshold.
+  // Hologram glass: unlit, its halos a little brighter than white so the bloom softens them
+  // further; the faint tint stays below the glow threshold.
   const glass = useMemo(() => {
     if (look !== 'hologram') return null
     return new MeshBasicMaterial({ map: texture, transparent: true, depthWrite: false, side: DoubleSide, toneMapped: false })
   }, [look, texture])
   useEffect(() => {
     // (Restrained: a brighter glow made the letters bleed and harder to read.)
-    if (glass) glass.color.setScalar(aimed ? 1.7 : 1.3)
+    if (glass) glass.color.setScalar(aimed ? 1.6 : 1.35)
   }, [glass, aimed])
   useEffect(() => () => glass?.dispose(), [glass])
 
@@ -285,8 +291,8 @@ export default function PanelBoard({ exhibitId, width, height, aimed, theme }: P
         <mesh material={glass}>
           <planeGeometry args={[width, height]} />
         </mesh>
-        {/* (No sharp text layer here: the letters are painted into the glass itself, so the
-            bloom makes them glow, the original look. A sharp copy on top doubled them.) */}
+        {/* The letters: sharp, on top of their painted halos. */}
+        <SharpText runs={runs} pixels={pixels} face={glassFace} z={0.002} shading={aimed ? HOLOGRAM_AIMED : HOLOGRAM} />
         {/* Thin glowing edges along the top and bottom. */}
         {[-1, 1].map((s) => (
           <mesh key={s} position={[0, (s * height) / 2, 0]}>
