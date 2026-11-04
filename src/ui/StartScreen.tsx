@@ -7,8 +7,9 @@ import VolumeSlider from './VolumeSlider'
 import SensitivitySlider from './SensitivitySlider'
 import GraphicsSlider from './GraphicsSlider'
 
-// First screen: the decorated INOVAT title and a start button. After "Bắt đầu" the visitor
-// chooses whether to take the guided tutorial; either choice captures the mouse and the
+// First screen: the decorated INOVAT title and a start button. On a first visit "Bắt đầu"
+// starts the guided tutorial at once; after an earlier visit, "new journey" asks whether to
+// take it; either choice captures the mouse and the
 // Player then switches to "exploring".
 export default function StartScreen() {
   const { ui, site } = useContent()
@@ -38,9 +39,15 @@ export default function StartScreen() {
             {/* Continuing comes first when this tab holds an earlier visit (e.g. after a reload);
                 both buttons look the same, so neither choice is pushed. */}
             {hasSavedProgress() && <LockButton label={ui.start.continue} className="start-button" onBeforeLock={continueSavedVisit} />}
-            <button type="button" className="start-button" onClick={() => setAsking(true)}>
-              {hasSavedProgress() ? ui.start.newJourney : ui.start.button}
-            </button>
+            {/* A first visit starts straight into the tutorial; a new journey after an earlier
+                visit asks first (the visitor may already know the controls). */}
+            {hasSavedProgress() ? (
+              <button type="button" className="start-button" onClick={() => setAsking(true)}>
+                {ui.start.newJourney}
+              </button>
+            ) : (
+              <LockButton label={ui.start.button} className="start-button" onBeforeLock={() => setTutorial('intro')} />
+            )}
           </div>
         ) : (
           <div className="tutorial-question">

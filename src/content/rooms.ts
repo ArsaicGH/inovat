@@ -17,10 +17,10 @@ const vi: RoomNames = {
 const en: RoomNames = {
   rotunda: { name: 'Central Hall', short: 'Central Hall' },
   hall: { name: 'Introduction Hall', short: 'Introduction Hall' },
-  ir1: { name: 'First Industrial Revolution', short: 'IR 1' },
-  ir2: { name: 'Second Industrial Revolution', short: 'IR 2' },
-  ir3: { name: 'Third Industrial Revolution', short: 'IR 3' },
-  ir4: { name: 'Fourth Industrial Revolution', short: 'IR 4' },
+  ir1: { name: 'First Industrial Revolution', short: 'Industry 1.0' },
+  ir2: { name: 'Second Industrial Revolution', short: 'Industry 2.0' },
+  ir3: { name: 'Third Industrial Revolution', short: 'Industry 3.0' },
+  ir4: { name: 'Fourth Industrial Revolution', short: 'Industry 4.0' },
   quiz: { name: 'Game Room', short: 'Game Room' },
 }
 

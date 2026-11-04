@@ -417,22 +417,22 @@ body {
   box-shadow: inset 0 0 0 4.2cqw var(--title);
   padding: clamp(30px, 8cqw, 68px) clamp(32px, 9cqw, 76px);
 }
-/* CMCN 3: a glowing green screen with scan lines and a thin neon edge (no beige case). */
+/* CMCN 1-3: a dark screen with scan lines and a thin glowing edge, in the era's colour. */
 .board-look-screen .board-frame {
   padding: 0;
   border-radius: 1.5cqw;
   background: transparent;
   border: 1px solid var(--title);
-  box-shadow: 0 0 30px rgba(107, 224, 139, 0.4), inset 0 0 40px rgba(107, 224, 139, 0.15);
+  box-shadow: 0 0 30px rgba(var(--glow), 0.4), inset 0 0 40px rgba(var(--glow), 0.15);
 }
 .board-look-screen .board-paper {
   border-radius: 1.5cqw;
   padding: clamp(24px, 6cqw, 52px) clamp(24px, 7cqw, 60px);
   background:
     repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.22) 0 1.5px, transparent 1.5px 4px),
-    radial-gradient(ellipse at center, rgba(60, 140, 80, 0.2), transparent 70%),
+    radial-gradient(ellipse at center, rgba(var(--glow), 0.16), transparent 70%),
     var(--paper);
-  text-shadow: 0 0 6px rgba(107, 224, 139, 0.55);
+  text-shadow: 0 0 6px rgba(var(--glow), 0.55);
 }
 /* CMCN 4: see-through glass with glowing cyan edges and text. */
 .board-look-hologram .board-frame {
@@ -2662,7 +2662,7 @@ body {
   text-underline-offset: 2px;
 }
 .board-look-screen .board-figure img {
-  box-shadow: 0 0 0 1px var(--rule), 0 0 14px rgba(107, 224, 139, 0.35);
+  box-shadow: 0 0 0 1px var(--rule), 0 0 14px rgba(var(--glow), 0.35);
 }
 .board-look-hologram .board-figure img {
   box-shadow: 0 0 0 1px var(--rule), 0 0 18px rgba(63, 208, 224, 0.45);
@@ -2712,7 +2712,7 @@ body {
 }
 .picture-zoom.board-look-screen .board-diagram {
   border: 1px solid var(--title);
-  box-shadow: 0 0 30px rgba(107, 224, 139, 0.4);
+  box-shadow: 0 0 30px rgba(var(--glow), 0.4);
 }
 .picture-zoom.board-look-hologram .board-diagram {
   border: 1px solid var(--rule);
@@ -2727,7 +2727,7 @@ body {
 }
 .picture-zoom.board-look-screen img {
   border: 1px solid var(--title);
-  box-shadow: 0 0 30px rgba(107, 224, 139, 0.4);
+  box-shadow: 0 0 30px rgba(var(--glow), 0.4);
 }
 .picture-zoom.board-look-hologram img {
   border: 1px solid var(--rule);

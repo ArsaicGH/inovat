@@ -150,6 +150,7 @@ export default function InfoPanel() {
     '--rule': theme.rule,
     '--frame-colour': theme.frame,
     '--era-glow': ERA_GLOW[room] ?? '#c9a25a',
+    '--glow': theme.glow ?? '201, 162, 90',
   } as CSSProperties
 
   return (

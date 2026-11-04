@@ -92,17 +92,17 @@ const ENTRIES: Record<string, Entry> = {
     facts: [],
     short: {
       vi: 'Bốn phòng trưng bày, mỗi phòng dành cho một cuộc Cách mạng Công nghiệp, nằm quanh Sảnh trung tâm. Quý khách đi lần lượt từ CMCN 1 đến CMCN 4, theo mũi tên trên bản đồ, rồi đến Phòng trò chơi.',
-      en: 'Four exhibition rooms, one for each Industrial Revolution, lie around the Central Hall. Visit them in order from IR 1 to IR 4, following the arrow on the map, then go on to the Game Room.',
+      en: 'Four exhibition rooms, one for each Industrial Revolution, lie around the Central Hall. Visit them in order from Industry 1.0 to Industry 4.0, following the arrow on the map, then go on to the Game Room.',
     },
     long: {
       vi: 'Bốn phòng trưng bày, mỗi phòng dành cho một cuộc Cách mạng Công nghiệp, nằm quanh Sảnh trung tâm. CMCN 1 (khoảng giữa thế kỷ XVIII - giữa thế kỷ XIX): hơi nước và máy móc cơ khí, bắt đầu tại Anh. CMCN 2 (cuối thế kỷ XIX - đầu thế kỷ XX): điện năng và sản xuất hàng loạt. CMCN 3 (nửa sau thế kỷ XX): điện tử, máy tính và tự động hóa. CMCN 4 (đầu thế kỷ XXI đến nay): trí tuệ nhân tạo, Internet vạn vật và dữ liệu. Mỗi phòng có một bảng tổng quan và từ bốn đến sáu phát minh tiêu biểu. Mỗi bảng chữ đều có thể phóng to để đọc toàn văn. Sau khi tham quan cả bốn phòng, Phòng trò chơi sẽ mở cửa.',
-      en: 'Four exhibition rooms, one for each Industrial Revolution, lie around the Central Hall. IR 1 (about the mid-18th to the mid-19th century): steam and mechanical machinery, beginning in Britain. IR 2 (the late 19th to the early 20th century): electricity and mass production. IR 3 (the second half of the 20th century): electronics, computers and automation. IR 4 (the early 21st century to today): artificial intelligence, the Internet of Things and data. Each room has an overview board and four to six landmark inventions. Every board can be enlarged to read its full text. Once you have visited all four rooms, the Game Room opens.',
+      en: 'Four exhibition rooms, one for each Industrial Revolution, lie around the Central Hall. Industry 1.0 (about the mid-18th to the mid-19th century): steam and mechanical machinery, beginning in Britain. Industry 2.0 (the late 19th to the early 20th century): electricity and mass production. Industry 3.0 (the second half of the 20th century): electronics, computers and automation. Industry 4.0 (the early 21st century to today): artificial intelligence, the Internet of Things and data. Each room has an overview board and four to six landmark inventions. Every board can be enlarged to read its full text. Once you have visited all four rooms, the Game Room opens.',
     },
     sources: [BRITANNICA_IR, WEF],
   },
   // ---------- CMCN 1 ----------
   'ir1-overview': {
-    title: { vi: 'Tổng quan CMCN 1', en: 'IR 1 Overview' },
+    title: { vi: 'Tổng quan CMCN 1', en: 'Industry 1.0 Overview' },
     facts: [['period', { vi: 'Khoảng giữa thế kỷ XVIII - giữa thế kỷ XIX', en: 'About the mid-18th to the mid-19th century' }]],
     long: {
       vi: 'Cuộc Cách mạng Công nghiệp lần thứ nhất bắt đầu tại Anh vào nửa sau thế kỷ XVIII. Sản xuất trước đó chủ yếu dựa vào sức người và công cụ thủ công. Sự phát triển của máy móc và năng lượng hơi nước đã thúc đẩy sự ra đời của nhà máy, tăng năng suất và cải thiện giao thông. Tuy nhiên, quá trình công nghiệp hóa cũng dẫn đến điều kiện lao động khó khăn, ô nhiễm và sự phát triển nhanh chóng của đô thị.',
@@ -239,7 +239,7 @@ const ENTRIES: Record<string, Entry> = {
   },
   // ---------- CMCN 2 ----------
   'ir2-overview': {
-    title: { vi: 'Tổng quan CMCN 2', en: 'IR 2 Overview' },
+    title: { vi: 'Tổng quan CMCN 2', en: 'Industry 2.0 Overview' },
     facts: [['period', { vi: 'Cuối thế kỷ XIX - đầu thế kỷ XX', en: 'The late 19th to the early 20th century' }]],
     long: {
       vi: 'Cuộc Cách mạng Công nghiệp lần thứ hai phát triển mạnh vào cuối thế kỷ XIX và đầu thế kỷ XX. Điện năng, kỹ thuật cơ khí và các tiến bộ khoa học giúp nhà máy sản xuất với quy mô lớn hơn. Động cơ điện, dây chuyền lắp ráp và điện thoại làm thay đổi sản xuất, giao thông thông tin và đời sống. Tuy nhiên, sản xuất hàng loạt cũng khiến nhiều công việc trở nên lặp lại và đòi hỏi tổ chức lao động chặt chẽ.',
@@ -396,7 +396,7 @@ const ENTRIES: Record<string, Entry> = {
 
   // ---------- CMCN 3 ----------
   'ir3-overview': {
-    title: { vi: 'Tổng quan CMCN 3', en: 'IR 3 Overview' },
+    title: { vi: 'Tổng quan CMCN 3', en: 'Industry 3.0 Overview' },
     facts: [['period', { vi: 'Nửa sau thế kỷ XX', en: 'The second half of the 20th century' }]],
     long: {
       vi: 'Cuộc Cách mạng Công nghiệp lần thứ ba gắn liền với sự phát triển của điện tử, máy tính và công nghệ thông tin từ nửa sau thế kỷ XX. Máy tính giúp xử lý dữ liệu, robot thực hiện các thao tác lặp lại và hệ thống điều khiển lập trình tự động hóa nhà máy. Mạng máy tính mở rộng khả năng trao đổi thông tin. Những công nghệ này tăng độ chính xác và năng suất, nhưng cũng làm thay đổi nhu cầu việc làm và kỹ năng của người lao động.',
@@ -540,7 +540,7 @@ const ENTRIES: Record<string, Entry> = {
   },
   // ---------- CMCN 4 ----------
   'ir4-overview': {
-    title: { vi: 'Tổng quan CMCN 4', en: 'IR 4 Overview' },
+    title: { vi: 'Tổng quan CMCN 4', en: 'Industry 4.0 Overview' },
     facts: [['period', { vi: 'Đầu thế kỷ XXI đến nay', en: 'The early 21st century to today' }]],
     long: {
       vi: 'Cuộc Cách mạng Công nghiệp lần thứ tư kết hợp thế giới vật lý, số và sinh học: trí tuệ nhân tạo, Internet vạn vật, điện toán đám mây và dữ liệu lớn, robot tiên tiến, in 3D và công nghệ sinh học. Máy móc không chỉ tự động thực hiện nhiệm vụ mà còn thu thập dữ liệu, học từ dữ liệu và hỗ trợ ra quyết định. Các công nghệ này giúp tăng chất lượng, giảm lãng phí và mở ra những phương pháp chữa bệnh mới, nhưng đặt ra thách thức về bảo mật, năng lượng, việc làm, kỹ năng lao động và đạo đức.',

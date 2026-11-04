@@ -419,7 +419,7 @@ const en: UiText = {
       'Machines that learn, everything connected: and the story is still being written, by all of us.',
     ],
     skip: 'Skip',
-    screen: ['] LIST', '10 REM *** INOVAT ***', '20 FOR I = 1 TO 4', '30 PRINT "IR "; I', '40 NEXT I', '] RUN', 'IR 1', 'IR 2', 'IR 3', 'IR 4', ']'],
+    screen: ['] LIST', '10 REM *** INOVAT ***', '20 FOR I = 1 TO 4', '30 PRINT "INDUSTRY "; I; ".0"', '40 NEXT I', '] RUN', 'INDUSTRY 1.0', 'INDUSTRY 2.0', 'INDUSTRY 3.0', 'INDUSTRY 4.0', ']'],
     title: 'Thank you for visiting!',
     text: 'You have just travelled through four Industrial Revolutions: from steam and mechanical machinery to electricity, computers, robots and artificial intelligence. That story is still being written, and today’s generation will help shape its next chapter.',
     replay: 'Replay the journey',

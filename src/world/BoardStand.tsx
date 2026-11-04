@@ -120,7 +120,7 @@ export default function BoardStand({ exhibitId, width, height, centreY, aimed, t
       {isHologram ? (
         <Emitter colour={theme.rule} top={bottom - 0.1} />
       ) : (
-        <Posts width={width} top={bottom + height * 0.35} look={theme.look} />
+        <Posts width={width} top={bottom + height * 0.35} look={theme.stand ?? theme.look} />
       )}
       <group ref={isHologram ? floating : undefined} position={[0, centreY, 0]}>
         <PanelBoard exhibitId={exhibitId} width={width} height={height} aimed={aimed} theme={theme} />

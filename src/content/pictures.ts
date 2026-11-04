@@ -35,7 +35,7 @@ function photo(id: string, aspect: number, caption: Text, author: Text, licence:
 }
 
 // THE ENTRANCE ROOMS' DIAGRAMS. The eras' names and periods, as on their overview boards.
-const ERA_NAME: Record<Language, string[]> = { vi: ['CMCN 1', 'CMCN 2', 'CMCN 3', 'CMCN 4'], en: ['IR 1', 'IR 2', 'IR 3', 'IR 4'] }
+const ERA_NAME: Record<Language, string[]> = { vi: ['CMCN 1', 'CMCN 2', 'CMCN 3', 'CMCN 4'], en: ['Industry 1.0', 'Industry 2.0', 'Industry 3.0', 'Industry 4.0'] }
 const ERA_PERIOD: Record<Language, string[]> = {
   vi: ['Khoảng giữa thế kỷ XVIII - giữa thế kỷ XIX', 'Cuối thế kỷ XIX - đầu thế kỷ XX', 'Nửa sau thế kỷ XX', 'Đầu thế kỷ XXI đến nay'],
   en: ['About the mid-18th to the mid-19th century', 'The late 19th to the early 20th century', 'The second half of the 20th century', 'The early 21st century to today'],
@@ -298,10 +298,10 @@ export const PICTURES: Record<string, Picture> = {
         'CMCN 4', 'Đầu thế kỷ XXI đến nay', 'Trí tuệ nhân tạo, Internet vạn vật và dữ liệu',
       ],
       en: [
-        'IR 1', 'About the mid-18th to the mid-19th century', 'Steam and mechanical machinery',
-        'IR 2', 'Late 19th to early 20th century', 'Electricity and mass production',
-        'IR 3', 'Second half of the 20th century', 'Electronics, computers and automation',
-        'IR 4', 'Early 21st century to today', 'AI, the Internet of Things and data',
+        'Industry 1.0', 'About the mid-18th to the mid-19th century', 'Steam and mechanical machinery',
+        'Industry 2.0', 'Late 19th to early 20th century', 'Electricity and mass production',
+        'Industry 3.0', 'Second half of the 20th century', 'Electronics, computers and automation',
+        'Industry 4.0', 'Early 21st century to today', 'AI, the Internet of Things and data',
       ],
     },
   },

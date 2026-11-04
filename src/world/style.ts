@@ -24,10 +24,11 @@ export const BOARD_SIZE = {
 // TEXT BOARD STYLES: each era room dresses its boards like the room itself. The same
 // colours paint the 3D board (PanelBoard.tsx) and its on-screen enlargement (InfoPanel.tsx).
 // classic  = wooden frame, cream paper (hall, rotunda, quiz room)
-// brass    = CMCN 1: aged parchment in a riveted brass frame, cast-iron stand
-// enamel   = CMCN 2: white enamel factory sign with a navy border, steel frame and posts
-// screen   = CMCN 3: green-on-black computer screen in a beige plastic case
-// hologram = CMCN 4: see-through floating glass with glowing cyan text
+// screen   = CMCN 1-3: a dark board with glowing letters and a thin glowing edge, in the
+//            era's colour (amber, electric blue, green; leader: room 3's look is the best,
+//            the other rooms take it in their own colours), with the era's own stand
+// hologram = CMCN 4: floating glass with glowing cyan text
+// (brass and enamel: the earlier CMCN 1 and 2 boards, kept for their stands.)
 export type BoardLook = 'classic' | 'brass' | 'enamel' | 'screen' | 'hologram'
 
 export interface BoardTheme {
@@ -38,6 +39,9 @@ export interface BoardTheme {
   muted: string // source line
   rule: string // short line under the title, borders
   frame: string // frame / case colour
+  glow?: string // the glow's colour as "r, g, b" (the screen and hologram looks)
+  tint?: string // how a photo is tinted on the board in the room, to match the era's colours
+  stand?: BoardLook // the stand's style, if not the board's own
 }
 
 const CLASSIC: BoardTheme = {
@@ -54,12 +58,14 @@ export const BOARD_THEMES: Record<RoomId, BoardTheme> = {
   rotunda: CLASSIC,
   hall: CLASSIC,
   quiz: CLASSIC,
-  ir1: { look: 'brass', paper: '#e8d9b5', title: '#3b2414', ink: '#4a3220', muted: '#7a5c3a', rule: '#8a5a2b', frame: '#a87a3a' },
-  // White enamel with a navy border, the room's electric blue (leader: room 2 is blue).
-  ir2: { look: 'enamel', paper: '#f1eee6', title: '#1d3557', ink: '#22303f', muted: '#4f6378', rule: '#2f5d8a', frame: '#1d3557' },
+  // Amber on a dark bronze board, on the brass stand (photos in amber, like old sepia prints).
+  ir1: { look: 'screen', stand: 'brass', paper: '#1a120a', title: '#ffc978', ink: '#e09a3e', muted: '#a8743c', rule: '#e0a050', frame: '#21170d', glow: '224, 160, 80', tint: 'grayscale(1) sepia(1) saturate(1.7) brightness(0.9)' },
+  // Electric blue on a dark navy board, on the steel posts (leader: room 2 is blue).
+  ir2: { look: 'screen', stand: 'enamel', paper: '#0b1424', title: '#bcd8ff', ink: '#6fa3ea', muted: '#5577a8', rule: '#4f86d1', frame: '#111a29', glow: '79, 134, 209', tint: 'grayscale(1) sepia(1) hue-rotate(180deg) saturate(2.2) brightness(0.9)' },
   // A dark screen with a thin neon-green edge, like the enlarged board (leader: no beige case).
-  ir3: { look: 'screen', paper: '#0e1a12', title: '#a8ffbf', ink: '#6be08b', muted: '#3f9a5c', rule: '#6be08b', frame: '#151d18' },
-  ir4: { look: 'hologram', paper: 'rgba(6, 34, 46, 0.93)' /* nearly opaque: see-through glass made the text hard to read (leader) */, title: '#e6fdff', ink: '#aef3ff', muted: '#6fd3e6', rule: '#3fd0e0', frame: '#3fd0e0' },
+  ir3: { look: 'screen', paper: '#0e1a12', title: '#a8ffbf', ink: '#6be08b', muted: '#3f9a5c', rule: '#6be08b', frame: '#151d18', glow: '107, 224, 139', tint: 'grayscale(1) sepia(1) hue-rotate(75deg) saturate(2.4) brightness(0.85)' },
+  // (Nearly opaque: see-through glass made the text hard to read; a little more so again, leader.)
+  ir4: { look: 'hologram', paper: 'rgba(6, 34, 46, 0.97)', title: '#e6fdff', ink: '#aef3ff', muted: '#6fd3e6', rule: '#3fd0e0', frame: '#3fd0e0', glow: '63, 208, 224', tint: 'grayscale(1) sepia(1) hue-rotate(150deg) saturate(2.2) brightness(0.75)' },
 }
 export const BOARD_FRAME = 0.06
 

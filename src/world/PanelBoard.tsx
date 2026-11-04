@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import { useContent } from '../content/use-content'
 import { useThree } from '@react-three/fiber'
-import { CanvasTexture, DoubleSide, MeshBasicMaterial, SRGBColorSpace } from 'three'
+import { CanvasTexture, MeshBasicMaterial, SRGBColorSpace } from 'three'
 import { BOARD_FRAME, type BoardTheme } from './style'
 import { drawWrappedText, paintFont, useFontsReady } from './fonts'
 import { PICTURES, type Picture } from '../content/pictures'
@@ -82,7 +82,7 @@ function paintPaper(ctx: CanvasRenderingContext2D, theme: BoardTheme, w: number,
   } else if (look === 'screen') {
     // Old monitor: a faint glow in the middle.
     const glow = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, Math.max(w, h) * 0.7)
-    glow.addColorStop(0, 'rgba(60, 140, 80, 0.18)')
+    glow.addColorStop(0, `rgba(${theme.glow ?? '60, 140, 80'}, 0.16)`)
     glow.addColorStop(1, 'rgba(0, 0, 0, 0)')
     ctx.fillStyle = glow
     ctx.fillRect(0, 0, w, h)
@@ -104,8 +104,8 @@ function paintBoardPicture(
   font: string,
   language: Language,
   colours: DiagramColours,
-  look: BoardTheme['look'],
   captionMaxLines: number,
+  tint: string | undefined,
 ) {
   ctx.font = `500 ${captionSize}px ${font}`
   const lines = captionMaxLines > 0 ? captionLines(ctx, picture.caption[language], w, captionMaxLines) : []
@@ -119,10 +119,9 @@ function paintBoardPicture(
     paintDiagram(ctx, picture.diagram, px, y, pw, ph, picture.labels?.[language] ?? [], font, colours, picture.era)
   } else if (image) {
     ctx.save()
-    // On the green computer screen the photo shows in green too; on the hologram glass it
-    // is dimmed, as the glass is drawn brighter than white so its letters glow.
-    if (look === 'screen') ctx.filter = 'grayscale(1) sepia(1) hue-rotate(75deg) saturate(2.4) brightness(0.85)'
-    if (look === 'hologram') ctx.filter = 'brightness(0.7)'
+    // The photo takes the board's colours (amber, blue, green, cyan: style.ts tint); the
+    // enlarged board shows it in its own colours.
+    if (tint) ctx.filter = tint
     ctx.drawImage(image, px, y, pw, ph)
     ctx.restore()
     ctx.strokeStyle = colours.muted
@@ -247,10 +246,10 @@ export default function PanelBoard({ exhibitId, width, height, aimed, theme }: P
         const colours = { ink: theme.ink, accent: look === 'screen' || look === 'hologram' ? theme.title : theme.rule, muted: theme.muted }
         if (beside) {
           const left = pad + maxWidth * 0.62
-          paintBoardPicture(ctx, picture, image, left, belowTitle, maxWidth * 0.38, bottom - belowTitle, unit * 0.6, font, language, colours, look, 2)
+          paintBoardPicture(ctx, picture, image, left, belowTitle, maxWidth * 0.38, bottom - belowTitle, unit * 0.6, font, language, colours, 2, theme.tint)
         } else {
           const top = y < 0 ? textBottom : Math.min(y, textBottom) + unit * 0.2
-          paintBoardPicture(ctx, picture, image, pad, top, maxWidth, bottom - top, unit * 0.6, font, language, colours, look, 0)
+          paintBoardPicture(ctx, picture, image, pad, top, maxWidth, bottom - top, unit * 0.6, font, language, colours, 0, theme.tint)
         }
       }
 
@@ -277,7 +276,7 @@ export default function PanelBoard({ exhibitId, width, height, aimed, theme }: P
   // the letters glow; the faint tint stays below the glow threshold.
   const glass = useMemo(() => {
     if (look !== 'hologram') return null
-    return new MeshBasicMaterial({ map: texture, transparent: true, depthWrite: false, side: DoubleSide, toneMapped: false })
+    return new MeshBasicMaterial({ map: texture, transparent: true, depthWrite: false, toneMapped: false })
   }, [look, texture])
   useEffect(() => {
     // (Restrained: a brighter glow made the letters bleed and harder to read.)
@@ -291,6 +290,11 @@ export default function PanelBoard({ exhibitId, width, height, aimed, theme }: P
       <group>
         <mesh material={glass}>
           <planeGeometry args={[width, height]} />
+        </mesh>
+        {/* Its back: plain tinted glass (it showed the letters mirrored). */}
+        <mesh rotation={[0, Math.PI, 0]} position={[0, 0, -0.001]}>
+          <planeGeometry args={[width, height]} />
+          <meshBasicMaterial color={theme.rule} transparent opacity={0.12} depthWrite={false} toneMapped={false} />
         </mesh>
         {/* The letters: sharp, on top of their painted halos. */}
         <SharpText runs={runs} pixels={pixels} face={glassFace} z={0.002} shading={HOLOGRAM} />

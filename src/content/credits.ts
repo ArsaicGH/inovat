@@ -58,27 +58,27 @@ export const credits: Credit[] = [
   texture('Tiles139', { vi: 'sàn gạch ô', en: 'tiled floor' }, 'tiles'),
 
   // 3D models of inventions (the other prototypes are built from shapes by the team).
-  model('36e57c231b6546b7bdd19bf4dba8063d', { vi: 'Mô hình "Model of the Watt Steam Engine with animation" - CMCN 1', en: 'Model "Model of the Watt Steam Engine with animation" - IR 1' }, 'Virtual Museums of Małopolska', 'ir1/watt-steam-engine.glb'),
-  model('1cd9aa31c6a34ab9b7023aaf5ba593f2', { vi: 'Mô hình "Stephensons Rocket Steam Engine" - CMCN 1', en: 'Model "Stephensons Rocket Steam Engine" - IR 1' }, 'Railmonsterinc', 'ir1/rocket-locomotive.glb'),
-  model('aeb0e4832f04463280510e550e2cdbd5', { vi: 'Mô hình "Edison Light Bulb" - CMCN 2', en: 'Model "Edison Light Bulb" - IR 2' }, 'Fishboe', 'ir2/edison-light-bulb.glb'),
-  model('028ff3c03a284216801eb05623c5b2a3', { vi: 'Mô hình "Ford Model T v2 Downloadable" - CMCN 2', en: 'Model "Ford Model T v2 Downloadable" - IR 2' }, 'Libau Media', 'ir2/ford-model-t-v2.glb'),
+  model('36e57c231b6546b7bdd19bf4dba8063d', { vi: 'Mô hình "Model of the Watt Steam Engine with animation" - CMCN 1', en: 'Model "Model of the Watt Steam Engine with animation" - Industry 1.0' }, 'Virtual Museums of Małopolska', 'ir1/watt-steam-engine.glb'),
+  model('1cd9aa31c6a34ab9b7023aaf5ba593f2', { vi: 'Mô hình "Stephensons Rocket Steam Engine" - CMCN 1', en: 'Model "Stephensons Rocket Steam Engine" - Industry 1.0' }, 'Railmonsterinc', 'ir1/rocket-locomotive.glb'),
+  model('aeb0e4832f04463280510e550e2cdbd5', { vi: 'Mô hình "Edison Light Bulb" - CMCN 2', en: 'Model "Edison Light Bulb" - Industry 2.0' }, 'Fishboe', 'ir2/edison-light-bulb.glb'),
+  model('028ff3c03a284216801eb05623c5b2a3', { vi: 'Mô hình "Ford Model T v2 Downloadable" - CMCN 2', en: 'Model "Ford Model T v2 Downloadable" - Industry 2.0' }, 'Libau Media', 'ir2/ford-model-t-v2.glb'),
   {
-    item: { vi: 'Mô hình "Erster Dreirad-Motorwagen von Carl Benz" (bản quét xe Benz Patent-Motorwagen) - CMCN 2', en: 'Model "Erster Dreirad-Motorwagen von Carl Benz" (a scan of the Benz Patent-Motorwagen) - IR 2' },
+    item: { vi: 'Mô hình "Erster Dreirad-Motorwagen von Carl Benz" (bản quét xe Benz Patent-Motorwagen) - CMCN 2', en: 'Model "Erster Dreirad-Motorwagen von Carl Benz" (a scan of the Benz Patent-Motorwagen) - Industry 2.0' },
     author: 'Deutsches Museum | Digital (Sketchfab)',
     // Share-alike: this changed copy (simplified for the web) keeps the same licence.
     licence: { vi: 'CC BY-SA 4.0 (ghi công tác giả, chia sẻ tương tự; đã thu gọn cho web)', en: 'CC BY-SA 4.0 (attribution, share-alike; simplified for the web)' },
     source: 'https://sketchfab.com/3d-models/47df0cb894a34d33a09361f3cb182070',
     files: ['models/ir2/benz-motorwagen.glb'],
   },
-  model('4d6396e8dc164f4d8da7821eb139160d', { vi: 'Mô hình "Alexander Graham Bell Telephone 1876" - CMCN 2', en: 'Model "Alexander Graham Bell Telephone 1876" - IR 2' }, 'Fabuleo8796', 'ir2/bell-telephone-1876.glb'),
-  model('815dd2ba92474299a387faeeaac83fd4', { vi: 'Mô hình "CPU Intel 4004" - CMCN 3', en: 'Model "CPU Intel 4004" - IR 3' }, 'Nadya Sarieva', 'ir3/intel-4004.glb'),
-  model('556af16d476d4144bab11ed744a849e6', { vi: 'Mô hình "IBM PC XT 5150" - CMCN 3', en: 'Model "IBM PC XT 5150" - IR 3' }, 'denisstephane', 'ir3/ibm-pc-5150.glb'),
-  model('e695ca5586014c0cbe6878492259a210', { vi: 'Mô hình "DEC PDP-11" - CMCN 3', en: 'Model "DEC PDP-11" - IR 3' }, 'maxdragonn', 'ir3/dec-pdp-11.glb'),
-  model('83a800f6ca824d37859f575e4b505e31', { vi: 'Mô hình "SIMATIC S7-1200, CPU2" (bộ điều khiển PLC) - CMCN 3', en: 'Model "SIMATIC S7-1200, CPU2" (a PLC) - IR 3' }, 'MaaB', 'ir3/siemens-s7-1200.glb'),
-  model('0e825a8d48b14bee883a131fe029d4fc', { vi: 'Mô hình "3D Printer" - CMCN 4', en: 'Model "3D Printer" - IR 4' }, 'Gregsterius', 'ir4/3d-printer.glb'),
-  model('31968bd4ec5943f785cdf028facfba5c', { vi: 'Mô hình "Universal Robots UR3 Animated Cobot" - CMCN 4', en: 'Model "Universal Robots UR3 Animated Cobot" - IR 4' }, 'kerwink', 'ir4/ur3-cobot.glb'),
-  model('048b9dc3095e44c0883b6b7944ad4916', { vi: 'Mô hình "Electric Motor (high poly)" - CMCN 4', en: 'Model "Electric Motor (high poly)" - IR 4' }, 'Scarecrow_original', 'ir4/electric-motor.glb'),
-  model('29da4e10eb6c427cb72f3ebdf822f89e', { vi: 'Mô hình "Nvidia GeForce RTX 3070 - UPDATED" - CMCN 4', en: 'Model "Nvidia GeForce RTX 3070 - UPDATED" - IR 4' }, 'DatSketch', 'ir4/gpu-rtx-3070.glb'),
+  model('4d6396e8dc164f4d8da7821eb139160d', { vi: 'Mô hình "Alexander Graham Bell Telephone 1876" - CMCN 2', en: 'Model "Alexander Graham Bell Telephone 1876" - Industry 2.0' }, 'Fabuleo8796', 'ir2/bell-telephone-1876.glb'),
+  model('815dd2ba92474299a387faeeaac83fd4', { vi: 'Mô hình "CPU Intel 4004" - CMCN 3', en: 'Model "CPU Intel 4004" - Industry 3.0' }, 'Nadya Sarieva', 'ir3/intel-4004.glb'),
+  model('556af16d476d4144bab11ed744a849e6', { vi: 'Mô hình "IBM PC XT 5150" - CMCN 3', en: 'Model "IBM PC XT 5150" - Industry 3.0' }, 'denisstephane', 'ir3/ibm-pc-5150.glb'),
+  model('e695ca5586014c0cbe6878492259a210', { vi: 'Mô hình "DEC PDP-11" - CMCN 3', en: 'Model "DEC PDP-11" - Industry 3.0' }, 'maxdragonn', 'ir3/dec-pdp-11.glb'),
+  model('83a800f6ca824d37859f575e4b505e31', { vi: 'Mô hình "SIMATIC S7-1200, CPU2" (bộ điều khiển PLC) - CMCN 3', en: 'Model "SIMATIC S7-1200, CPU2" (a PLC) - Industry 3.0' }, 'MaaB', 'ir3/siemens-s7-1200.glb'),
+  model('0e825a8d48b14bee883a131fe029d4fc', { vi: 'Mô hình "3D Printer" - CMCN 4', en: 'Model "3D Printer" - Industry 4.0' }, 'Gregsterius', 'ir4/3d-printer.glb'),
+  model('31968bd4ec5943f785cdf028facfba5c', { vi: 'Mô hình "Universal Robots UR3 Animated Cobot" - CMCN 4', en: 'Model "Universal Robots UR3 Animated Cobot" - Industry 4.0' }, 'kerwink', 'ir4/ur3-cobot.glb'),
+  model('048b9dc3095e44c0883b6b7944ad4916', { vi: 'Mô hình "Electric Motor (high poly)" - CMCN 4', en: 'Model "Electric Motor (high poly)" - Industry 4.0' }, 'Scarecrow_original', 'ir4/electric-motor.glb'),
+  model('29da4e10eb6c427cb72f3ebdf822f89e', { vi: 'Mô hình "Nvidia GeForce RTX 3070 - UPDATED" - CMCN 4', en: 'Model "Nvidia GeForce RTX 3070 - UPDATED" - Industry 4.0' }, 'DatSketch', 'ir4/gpu-rtx-3070.glb'),
 
   // Sounds (M8b). Converted to small .ogg files; listed per source pack.
   {
