@@ -378,7 +378,8 @@ document.addEventListener('visibilitychange', () => {
 // THE ENDING'S MUSIC ("Flight Hymn" by Ross Bugden), from the moment the visitor steps
 // into the portal. The file is cut so that its climax (3:42 in the full piece) falls exactly
 // where the closing title appears; the film follows the music's clock (EndingScene.tsx).
-const ENDING_MUSIC = '/sounds/music/ending.ogg'
+// (The trailer, ?trailer, plays its own track through the same player instead.)
+const ENDING_MUSIC = new URLSearchParams(window.location.search).has('trailer') ? '/sounds/music/trailer.ogg' : '/sounds/music/ending.ogg'
 const ENDING_LEVEL = 0.5 // the same level as the other music (all files are normalized)
 export function playEndingMusic(at = 0) {
   if (!context) return

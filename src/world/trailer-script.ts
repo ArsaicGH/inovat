@@ -1,11 +1,10 @@
-import { START, TITLE_AT } from './ending-shots'
+import { START } from './ending-shots'
 import { EXHIBIT_SPOTS, QUIZ_STAND, roomById, toWorld, type ExhibitSpot } from './layout'
 import type { Vec3, Pose } from './ending-shots'
 import type { RoomId } from '../types'
 
 // THE TRAILER (30 seconds, for the team's presentation): opened with ?trailer in the address.
-// Every cut falls on a beat of 150 beats a minute (0.4 s), so a soundtrack made to that
-// tempo lands on the picture (see PRESENTATION.md for the music brief).
+// Every cut falls on a beat of its own soundtrack (150 beats a minute: 0.4 s).
 // Cut like a film trailer: a quiet opening, the four eras one by one, a fast montage of every
 // invention, the Time Machine, then through the portal into a glimpse of the ending film, a
 // beat of black, and the title on the music's climax. The camera flies through the real
@@ -13,10 +12,12 @@ import type { RoomId } from '../types'
 // choosing exact moments of it. Gold titles, cinema bars, grain and flashes are drawn on top
 // (TrailerScreen.tsx). Recorded by the team with a screen recorder.
 
-export const TRAILER_LENGTH = 30 // the closing title appears here, on the music's climax, and stays
-// The music (for now the ending film's, until the trailer's own track arrives) starts so that
-// its climax lands on the closing title.
-export const MUSIC_START = TITLE_AT - TRAILER_LENGTH
+// The trailer's own track (public/sounds/music/trailer.ogg, made for it with an AI music
+// generator) starts with the picture. Its landmarks, measured from the file: a swell at
+// 3.2 s, a steady build from 6.4 s, a quiet break from 17.2 s, the drop at 19.2 s, an accent
+// at 25.6 s and the final hit at 32.0 s, ringing out until 36.4 s. The cuts below sit on them.
+export const TRAILER_LENGTH = 32 // the closing title appears here, on the final hit, and stays
+export const MUSIC_START = 0
 
 export const TRAILER = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('trailer')
 
@@ -126,7 +127,7 @@ const standV = (quiz.r.vFront + quiz.r.vBack) / 2 - QUIZ_STAND.z // (the room's 
 const wall = -quiz.r.width / 2
 const gearsShot: Segment = {
   kind: 'museum',
-  duration: 0.8,
+  duration: 1.6,
   fov: 48,
   linear: true,
   from: [quiz.at(wall + 2.3, quiz.mid - 2.6, 2.2), quiz.at(wall, quiz.mid - 1.2, 2.5)],
@@ -138,34 +139,37 @@ const consolePose: Pose = [quiz.at(-0.3, standV - 1.9, 1.75), quiz.at(0, standV,
 const rocket = spot('ir1-4')
 const rocketPose: Pose = [near(rocket, 3.0, 0.8, 1.6), [rocket.x, 1.2, rocket.z]]
 
-// A quick montage at the drop: eight more inventions, one per beat.
-const MONTAGE = ['ir1-3', 'ir1-5', 'ir2-1', 'ir2-5', 'ir3-3', 'ir3-5', 'ir4-1', 'ir4-6']
+// A quick montage at the drop: twelve more inventions, one per beat.
+const MONTAGE = ['ir1-2', 'ir1-3', 'ir1-5', 'ir2-1', 'ir2-3', 'ir2-5', 'ir3-1', 'ir3-3', 'ir3-5', 'ir4-1', 'ir4-4', 'ir4-6']
 
 export const SEGMENTS: Segment[] = [
-  // I. OPENING (0-6.4): a gold card on black, the intro hall, the rotunda.
+  // I. OPENING (0-6.4): a gold card on black, the intro hall (on the swell), the rotunda.
   { kind: 'black', duration: 1.6 },
   hallShot,
   rotundaShot,
-  // II. THE FOUR ERAS (6.4-16.0): one sweeping move through each hall.
+  // II. THE FOUR ERAS (6.4-16.8): one sweeping move through each hall, as the music builds;
+  // the last one, around AI, rides the crescendo.
   era1,
   era2,
   era3,
-  era4,
-  // III. THE DROP (16.0-22.8): eight inventions on the beat, then an exhibit opened up.
+  { ...era4, duration: 3.2 },
+  // III. THE BREAK (16.8-19.2): in the music's quiet moment, an exhibit's board opens.
+  { kind: 'reading', duration: 2.4, exhibit: 'ir1-4', pose: rocketPose },
+  // IV. THE DROP (19.2-24.0): twelve inventions, one per beat.
   ...MONTAGE.map((id, k) => glimpse(id, k)),
-  { kind: 'reading', duration: 3.6, exhibit: 'ir1-4', pose: rocketPose },
-  // IV. THE TIME MACHINE (22.8-25.6): the clockwork, then its window with all four cores lit.
+  // V. THE TIME MACHINE (24.0-27.2): the clockwork, then its window with all four cores lit,
+  // opening on the music's accent at 25.6.
   gearsShot,
-  { kind: 'game', duration: 2.0, pose: consolePose },
-  // V. THROUGH THE PORTAL (25.6-28.8): three moments of the ending film.
-  { kind: 'film', duration: 0.8, at: START.rocket + 1.5, speed: 1.2 },
-  { kind: 'film', duration: 1.2, at: START.grid + 1.0, speed: 1.4 },
-  { kind: 'film', duration: 1.2, at: START.mind + 1.4, speed: 1.2 },
-  // VI. A beat of black (28.8-30.0), then the title over the film's finale landscape, which
-  // drifts for four seconds and then holds still.
-  { kind: 'black', duration: 1.2 },
-  { kind: 'film', duration: 4, at: START.timeline + 3.0, speed: 0.5 },
-  { kind: 'film', duration: 600, at: START.timeline + 5.0, speed: 0 },
+  { kind: 'game', duration: 1.6, pose: consolePose },
+  // VI. THROUGH THE PORTAL (27.2-31.6): three moments of the ending film.
+  { kind: 'film', duration: 1.2, at: START.rocket + 1.5, speed: 1.2 },
+  { kind: 'film', duration: 1.6, at: START.grid + 1.0, speed: 1.3 },
+  { kind: 'film', duration: 1.6, at: START.mind + 1.4, speed: 1.1 },
+  // VII. A breath of black (31.6-32.0), then the title on the final hit, over the end of the
+  // film's pull-back from the four eras' columns, which settles on all four and holds still.
+  { kind: 'black', duration: 0.4 },
+  { kind: 'film', duration: 4, at: START.timeline + 8.0, speed: 0.75 },
+  { kind: 'film', duration: 600, at: START.hold, speed: 0 },
 ]
 
 export const SEGMENT_START: number[] = []
@@ -191,15 +195,15 @@ export interface TrailerTitle {
 }
 export const TITLES: TrailerTitle[] = [
   { text: 0, from: 0.15, to: 1.5, place: 'card' },
-  { text: 1, from: 4.2, to: 6.3, place: 'lower' },
+  { text: 1, from: 4.4, to: 6.3, place: 'lower' },
   { text: 2, from: 6.8, to: 8.7, place: 'lower' },
   { text: 3, from: 9.2, to: 11.1, place: 'lower' },
   { text: 4, from: 11.6, to: 13.5, place: 'lower' },
-  { text: 5, from: 14.0, to: 15.9, place: 'lower' },
-  { text: 6, from: 16.1, to: 19.1, place: 'centre' },
-  { text: 7, from: 19.5, to: 22.7, place: 'bar' },
-  { text: 8, from: 22.9, to: 25.5, place: 'bar' },
-  { text: 9, from: 25.8, to: 28.7, place: 'lower' },
+  { text: 5, from: 14.0, to: 16.6, place: 'lower' },
+  { text: 7, from: 17.0, to: 19.1, place: 'bar' },
+  { text: 6, from: 19.3, to: 23.2, place: 'centre' },
+  { text: 8, from: 24.2, to: 27.1, place: 'bar' },
+  { text: 9, from: 27.4, to: 31.5, place: 'lower' },
   { text: 10, from: TRAILER_LENGTH, to: Infinity, place: 'final' }, // (stays)
 ]
 
@@ -209,8 +213,8 @@ export const FLASHES: { at: number; colour: string; length: number }[] = [
   { at: 8.8, colour: '#ffe9b8', length: 0.35 },
   { at: 11.2, colour: '#c8ffd8', length: 0.35 },
   { at: 13.6, colour: '#d8f8ff', length: 0.35 },
-  { at: 16.0, colour: '#ffe2a8', length: 0.3 },
-  { at: 19.2, colour: '#ffe2a8', length: 0.3 },
-  { at: 22.8, colour: '#ffe2a8', length: 0.3 },
-  { at: 25.6, colour: '#ffffff', length: 0.7 },
+  { at: 16.8, colour: '#ffe2a8', length: 0.3 },
+  { at: 19.2, colour: '#ffe2a8', length: 0.4 },
+  { at: 24.0, colour: '#ffe2a8', length: 0.3 },
+  { at: 27.2, colour: '#ffffff', length: 0.7 },
 ]

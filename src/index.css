@@ -3469,7 +3469,7 @@ body {
   --bar: max(0px, calc((100vh - 100vw / 2.39) / 2));
   position: fixed;
   inset: 0;
-  z-index: 40;
+  z-index: 60; /* above the enlarged board and the game window, so the titles show */
   pointer-events: none;
   cursor: none;
   overflow: hidden;
@@ -3791,4 +3791,21 @@ body {
    game window fits itself: TimeMachineGame.tsx). */
 html.trailer-on .info-panel {
   zoom: 0.74;
+}
+/* ...and both push in slowly, so these shots keep moving like the rest. */
+html.trailer-on .info-panel,
+html.trailer-on .game-panel {
+  animation: trailer-push 2.4s cubic-bezier(0.25, 0.6, 0.3, 1) both;
+}
+@keyframes trailer-push {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(2%);
+  }
+  18% {
+    opacity: 1;
+  }
+  to {
+    transform: scale(1.03);
+  }
 }

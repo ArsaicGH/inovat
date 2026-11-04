@@ -153,6 +153,13 @@ export const credits: Credit[] = [
     files: ['sounds/ui/step-done.ogg'],
   },
   {
+    item: { vi: 'Nhạc trailer, do nhóm tạo bằng DiffRhythm', en: 'Trailer music, generated with DiffRhythm by the team' },
+    author: 'INOVAT',
+    licence: { vi: 'Sản phẩm của nhóm (tạo bằng AI)', en: 'Our own work (AI-generated)' },
+    source: 'https://diffrhythm.ai',
+    files: ['sounds/music/trailer.ogg', 'sounds/music/trailer.m4a'],
+  },
+  {
     item: { vi: 'Nhạc phòng trò chơi: "Prelude in F# Minor"', en: 'Game Room music: "Prelude in F# Minor"' },
     author: 'Kistol (OpenGameArt)',
     licence: CC0,
