@@ -16,6 +16,8 @@ export default function ModelViewer({ id, silhouette = false }: { id: string; si
     <Canvas
       className="model-viewer-canvas"
       dpr={[1, 1.5]}
+      // (Sized by its box's layout size, so a zoomed or moving window does not shrink it.)
+      resize={{ offsetSize: true }}
       camera={{ fov: 35, position: [0, 0.7, 4.8] }}
       gl={{ alpha: true, antialias: true, powerPreference: 'high-performance' }}
     >

@@ -295,7 +295,7 @@ function fadeOutAmbience(now: number) {
 // Play the loop of `room` (cross-fading from the previous one), or fade to silence in an
 // area without a loop.
 export function setAmbience(room: RoomId) {
-  if (silenced) return
+  if (silenced || IN_TRAILER) return // (the trailer has only its own music)
   if (!context || !ambienceBus || room === ambienceRoom) return
   const url = AMBIENCE[room]
   const buffer = url && !isMusic(url) ? buffers.get(url) : undefined
@@ -335,7 +335,7 @@ let welcomed = false
 // was then skipped for good. Now it starts anyway and is heard as soon as sound is on
 // (or, if the browser refuses, on the next tap, like the music).
 export function playWelcome() {
-  if (welcomed || !context) return
+  if (welcomed || !context || IN_TRAILER) return
   if (context.state === 'suspended') void context.resume()
   const welcome = stream(WELCOME, false)
   if (!welcome) return
@@ -378,10 +378,25 @@ document.addEventListener('visibilitychange', () => {
 // THE ENDING'S MUSIC ("Flight Hymn" by Ross Bugden), from the moment the visitor steps
 // into the portal. The file is cut so that its climax (3:42 in the full piece) falls exactly
 // where the closing title appears; the film follows the music's clock (EndingScene.tsx).
-// (The trailer, ?trailer, plays its own track through the same player instead.)
-const ENDING_MUSIC = new URLSearchParams(window.location.search).has('trailer') ? '/sounds/music/trailer.ogg' : '/sounds/music/ending.ogg'
+const ENDING_MUSIC = '/sounds/music/ending.ogg'
+// THE TRAILER (?trailer) plays its own track on a plain audio player of its own, outside the
+// game's sound system, so that nothing there (room music changing as the camera flies
+// through the rooms, ducking, a tab or overlay pausing the sound system) can quieten it.
+const IN_TRAILER = new URLSearchParams(window.location.search).has('trailer')
+let trailerMusic: HTMLAudioElement | null = null
+function trailerTrack() {
+  trailerMusic ??= Object.assign(new Audio(fileFor('/sounds/music/trailer.ogg')), { preload: 'auto', volume: 0.8 })
+  return trailerMusic
+}
+if (IN_TRAILER && typeof Audio !== 'undefined') trailerTrack() // start downloading it at once
 const ENDING_LEVEL = 0.5 // the same level as the other music (all files are normalized)
 export function playEndingMusic(at = 0) {
+  if (IN_TRAILER) {
+    const track = trailerTrack()
+    track.currentTime = at
+    void track.play()
+    return
+  }
   if (!context) return
   const music = stream(ENDING_MUSIC, false)
   if (!music) return
@@ -402,13 +417,13 @@ export function stopEndingMusic() {
 }
 // Holds the ending's music where it is (the trailer's pause, for screenshots), or goes on.
 export function setEndingMusicPaused(paused: boolean) {
-  const music = streams.get(ENDING_MUSIC)
+  const music = IN_TRAILER ? { element: trailerTrack() } : streams.get(ENDING_MUSIC)
   if (!music) return
   if (paused) music.element.pause()
   else void music.element.play()
 }
 // Seconds into the ending's music, or null while it is not playing.
 export function endingMusicTime(): number | null {
-  const music = streams.get(ENDING_MUSIC)
+  const music = IN_TRAILER ? { element: trailerTrack() } : streams.get(ENDING_MUSIC)
   return music && !music.element.paused ? music.element.currentTime : null
 }

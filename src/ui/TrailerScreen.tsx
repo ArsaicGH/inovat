@@ -1,15 +1,16 @@
 import { useEffect, useState, type CSSProperties } from 'react'
 import { useContent } from '../content/use-content'
+import { gameText } from '../content/game'
 import { useMuseumStore } from '../state/useMuseumStore'
 import { playEndingMusic, setEndingMusicPaused, unlockAudio } from '../audio/sound'
-import { FLASHES, MUSIC_START, TITLES, TRAILER_FROM, segmentAt, trailerClock } from '../world/trailer-script'
+import { FLASHES, GAME_SHOTS, GAME_SHOT_LENGTH, MUSIC_START, TITLES, TRAILER_FROM, segmentAt, trailerClock } from '../world/trailer-script'
 
 // THE TRAILER'S SCREEN (?trailer, trailer-script.ts): first a quiet "click to play" (so the
 // team can start their screen recorder), then everything drawn over the camera's flight:
 // cinema bars edged in gold, a fine film grain, flashes of light on the cuts, black beats,
 // and the gold titles, ending on the closing title.
 export default function TrailerScreen() {
-  const { ui, site } = useContent()
+  const { ui, site, language } = useContent()
   const mode = useMuseumStore((state) => state.mode)
   const [t, setT] = useState(-1)
 
@@ -51,6 +52,8 @@ export default function TrailerScreen() {
           trailerClock.t = TRAILER_FROM
           useMuseumStore.getState().setMode('trailer')
           playEndingMusic(MUSIC_START + TRAILER_FROM)
+          // The 3D model views of the board and the game, fetched now so they appear at once.
+          void import('../world/ModelViewer')
         }}
       >
         {ui.trailer.start}
@@ -58,13 +61,23 @@ export default function TrailerScreen() {
     )
   }
 
-  const black = t < 0 || segmentAt(t).segment.kind === 'black'
+  const now = t < 0 ? null : segmentAt(t)
+  const black = !now || now.segment.kind === 'black'
+  const gameShot = now?.segment.kind === 'game' ? Math.min(GAME_SHOTS.length - 1, Math.floor(now.into / GAME_SHOT_LENGTH)) : null
   const titles = TITLES.filter((title) => t >= title.from && t < title.to)
   const flash = FLASHES.find((f) => t >= f.at - f.length * 0.4 && t < f.at + f.length)
   return (
     <div className="trailer" aria-live="polite">
       <div className={black ? 'trailer-black is-on' : 'trailer-black'} />
       {flash && <div key={flash.at} className="trailer-flash" style={{ '--flash': flash.colour, '--length': `${flash.length * 1.4}s` } as CSSProperties} />}
+      {/* The Time Machine's shots: a sweep of gold light across the window in each. */}
+      {gameShot !== null && <div key={gameShot} className="trailer-sheen" />}
+      {gameShot !== null && (
+        <div key={`tag-${gameShot}`} className="trailer-core-tag">
+          <span>{['I', 'II', 'III', 'IV'][GAME_SHOTS[gameShot].round]}</span>
+          {gameText[language].rounds[GAME_SHOTS[gameShot].round].name}
+        </div>
+      )}
       <div className="trailer-grain" />
       <div className="trailer-vignette" />
       {titles.map((title) => {

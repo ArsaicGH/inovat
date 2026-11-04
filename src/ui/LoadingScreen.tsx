@@ -133,7 +133,14 @@ export default function LoadingScreen() {
       {loadedBytes < __STARTUP_BYTES__ ? (
         <p className="loading-bytes">{text.downloaded.replace('{loaded}', megabytes(loadedBytes)).replace('{total}', megabytes(__STARTUP_BYTES__))}</p>
       ) : (
-        <p className="loading-bytes">{text.preparing}</p>
+        <p className="loading-bytes">
+          {text.preparing}
+          <span className="loading-dots" aria-hidden="true">
+            <i>.</i>
+            <i>.</i>
+            <i>.</i>
+          </span>
+        </p>
       )}
       <div className="loading-tips">
         <p className="loading-tips-list">

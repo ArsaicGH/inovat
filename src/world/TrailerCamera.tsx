@@ -4,7 +4,7 @@ import { endingMusicTime } from '../audio/sound'
 import { useMuseumStore, type Mode } from '../state/useMuseumStore'
 import { film, mixPose, smooth } from './ending-shots'
 import { startRun } from '../ui/game-run'
-import { GAME_FRAMES, MUSIC_START, segmentAt, trailerClock } from './trailer-script'
+import { GAME_SHOTS, GAME_SHOT_LENGTH, MUSIC_START, segmentAt, trailerClock } from './trailer-script'
 
 // THE TRAILER'S CAMERA (trailer-script.ts): while the trailer plays, it places the camera
 // segment by segment, and switches the game into the ending film (for its glimpse) or the
@@ -13,7 +13,8 @@ import { GAME_FRAMES, MUSIC_START, segmentAt, trailerClock } from './trailer-scr
 // (Only mounted with ?trailer.)
 const NORMAL_FOV = 70
 const TRAILER_MODES: Mode[] = ['trailer', 'game', 'ending', 'reading']
-let gameFrame = -1 // the Time Machine moment on screen (GAME_FRAMES)
+let gameShot = -1 // the Time Machine shot on screen (GAME_SHOTS)
+let gameStep = 0 // how far it has been played
 
 export default function TrailerCamera() {
   useFrame(({ camera }, delta) => {
@@ -25,8 +26,10 @@ export default function TrailerCamera() {
 
     // The ending film draws itself; the trailer only chooses its moment.
     // (A black beat keeps whatever is behind it, so the film is not stopped and restarted.)
+    const preparing = segment.kind === 'museum' && segment.prepareGame === true
+    document.documentElement.classList.toggle('trailer-preparing', preparing)
     const wanted: Mode =
-      segment.kind === 'film' ? 'ending' : segment.kind === 'game' ? 'game' : segment.kind === 'reading' ? 'reading' : segment.kind === 'black' ? store.mode : 'trailer'
+      segment.kind === 'film' ? 'ending' : segment.kind === 'game' || preparing ? 'game' : segment.kind === 'reading' ? 'reading' : segment.kind === 'black' ? store.mode : 'trailer'
     if (store.mode !== wanted) {
       if (segment.kind === 'reading') store.openExhibit(segment.exhibit)
       else {
@@ -35,17 +38,43 @@ export default function TrailerCamera() {
         store.setMode(wanted)
       }
     }
-    // The Time Machine: quick moments from the middle of its cores, one per beat.
-    if (segment.kind === 'game') {
-      const frame = Math.min(GAME_FRAMES.length - 1, Math.floor(into / 0.4))
-      if (frame !== gameFrame) {
-        gameFrame = frame
-        const [round, solved] = GAME_FRAMES[frame]
-        startRun(round)
-        if (solved) store.patchGameRun({ solved: true, points: 2, clues: 3 })
-        else if (round === 2) store.patchGameRun({ clues: 2 })
+    // The Time Machine: four shots, each a core played live (GAME_SHOTS). The window's
+    // camera-like move for each shot is chosen by html[data-game-shot] (index.css).
+    if (segment.kind === 'game' || preparing) {
+      const index = preparing ? 0 : Math.min(GAME_SHOTS.length - 1, Math.floor(into / GAME_SHOT_LENGTH))
+      const shot = GAME_SHOTS[index]
+      const at = preparing ? 0 : into - index * GAME_SHOT_LENGTH
+      if (index !== gameShot) {
+        gameShot = index
+        gameStep = 0
+        document.documentElement.dataset.gameShot = String(index)
+        startRun(shot.round)
+        if (shot.card) {
+          const run = useMuseumStore.getState().gameRun!
+          store.patchGameRun({ deck: [shot.card, ...run.deck.filter((id) => id !== shot.card)] })
+        }
       }
-    } else gameFrame = -1
+      // The window's framing for this moment of the shot (eased like a camera move).
+      const panel = document.querySelector<HTMLElement>('.game-panel')
+      if (panel) {
+        const k = smooth(0, GAME_SHOT_LENGTH, at)
+        const f = (key: keyof (typeof shot)['from']) => shot.from[key] + (shot.to[key] - shot.from[key]) * k
+        panel.style.transformOrigin = shot.origin
+        panel.style.transform = `translate(${f('x')}%, ${f('y')}%) rotateX(${f('turnX')}deg) rotateY(${f('turnY')}deg) scale(${f('scale')})`
+      }
+      if (shot.solveAt !== undefined && gameStep === 0 && at >= shot.solveAt) {
+        gameStep = 1
+        store.patchGameRun({ solved: true, points: 2, combo: 1 })
+      }
+      const clues = (shot.cluesAt ?? []).filter((time) => at >= time).length
+      if (shot.cluesAt && clues > gameStep) {
+        gameStep = clues
+        store.patchGameRun({ clues: 1 + clues })
+      }
+    } else if (gameShot !== -1) {
+      gameShot = -1
+      delete document.documentElement.dataset.gameShot
+    }
     // The enlarged board: its text scrolls down to the sources at the end.
     if (segment.kind === 'reading') {
       const scroller = document.querySelector('.info-panel .board-scroll')

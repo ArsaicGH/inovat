@@ -1056,11 +1056,43 @@ body {
   overflow: hidden;
 }
 /* Once everything is downloaded: a short spaced gold word with three dots breathing. */
+/* In gold leaf, like the museum's titles: a light-to-deep gold gradient through the letters. */
 .loading-bytes {
   margin: 10px 0 0;
-  font-size: 13px;
+  background: linear-gradient(180deg, #fff3cf 0%, #e8c77e 45%, #b8893d 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
   font-variant-numeric: tabular-nums;
-  color: #c9a25a;
+  filter: drop-shadow(0 1px 6px rgba(201, 162, 90, 0.25));
+}
+/* "Preparing...": three dots that softly brighten in turn. */
+.loading-dots i {
+  /* (Each dot carries its own gold, so it can fade on its own.) */
+  background: linear-gradient(180deg, #fff3cf 0%, #e8c77e 45%, #b8893d 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-style: normal;
+  animation: loading-dot 1.4s ease-in-out infinite;
+}
+.loading-dots i:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.loading-dots i:nth-child(3) {
+  animation-delay: 0.4s;
+}
+@keyframes loading-dot {
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+  40% {
+    opacity: 1;
+  }
 }
 /* The tips at the bottom, in the museum's gold: the
    two tips side by side with a diamond between them. */
@@ -3521,6 +3553,13 @@ body {
 .trailer-title.is-lower {
   bottom: calc(var(--bar) + 5vh);
 }
+.trailer-title.is-lower::before {
+  content: '';
+  position: absolute;
+  inset: -40% 15%;
+  z-index: -1;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.62) 0%, rgba(0, 0, 0, 0.35) 45%, transparent 72%);
+}
 .trailer-title.is-centre {
   top: 50%;
   transform: translateY(-50%);
@@ -3746,20 +3785,101 @@ body {
   overflow: visible;
 }
 
-/* A caption set in the lower cinema bar (over the enlarged board or the game window). */
-.trailer-title.is-bar {
-  bottom: 0;
-  height: var(--bar);
-  justify-content: center;
-  gap: 2px;
-}
-.trailer-title.is-bar .trailer-heading {
-  font-size: clamp(16px, 1.9vw, 30px);
-}
 /* While the trailer plays, the enlarged board shrinks to sit inside the cinema frame (the
    game window fits itself: TimeMachineGame.tsx). */
 html.trailer-on .info-panel {
-  zoom: 0.74;
+  zoom: 0.8;
+}
+/* (No Close button on film; raised a little, leaving the lower part to the gold title.) */
+html.trailer-on .info-overlay .board-actions {
+  display: none;
+}
+html.trailer-on .info-overlay {
+  padding-bottom: 9vh;
+  background: radial-gradient(ellipse at 50% 40%, rgba(10, 9, 7, 0.35), rgba(0, 0, 0, 0.85) 80%);
+}
+
+/* THE TIME MACHINE IN THE TRAILER (TrailerCamera.tsx, GAME_SHOTS): the museum stays visible
+   behind, softly out of focus, and the game window floats in it like a filmed screen; each
+   shot moves it differently, as a camera would: a slide past it at an angle, the other way,
+   a close-up drifting down, and a pull back. */
+html.trailer-on .game-overlay {
+  overflow: hidden;
+  background: radial-gradient(ellipse at 50% 45%, rgba(12, 10, 7, 0.25), rgba(0, 0, 0, 0.88) 78%);
+  backdrop-filter: blur(5px) brightness(0.75);
+  perspective: 1500px;
+}
+html.trailer-on .game-panel {
+  animation: none; /* (its own opening animation would override the framing) */
+  box-shadow: 0 40px 120px rgba(0, 0, 0, 0.75), 0 0 60px rgba(201, 162, 90, 0.25);
+}
+/* (Each shot's camera-like framing of the window is set frame by frame: TrailerCamera.tsx.) */
+/* (Opened unseen during the shot before, so its 3D view is ready: TrailerCamera.tsx.) */
+html.trailer-preparing .game-overlay {
+  opacity: 0;
+}
+/* The core's number and name, a gold chapter tag at the top of each shot. */
+.trailer-core-tag {
+  position: absolute;
+  top: calc(var(--bar) + 4vh);
+  left: 5vw;
+  display: flex;
+  align-items: center;
+  gap: 0.9vw;
+  padding: 0.5em 1.3em 0.5em 0.6em;
+  border: 1px solid rgba(217, 181, 110, 0.7);
+  border-radius: 999px;
+  background: rgba(10, 8, 5, 0.6);
+  backdrop-filter: blur(4px);
+  color: #f0d595;
+  font-size: clamp(12px, 1.25vw, 20px);
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  animation: trailer-tag 0.8s ease-out both;
+}
+.trailer-core-tag span {
+  display: grid;
+  place-items: center;
+  width: 2em;
+  height: 2em;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff3cf, #c9a25a 60%, #8a6428);
+  color: #2a1d0b;
+  font-family: Georgia, 'Times New Roman', serif;
+  letter-spacing: 0;
+}
+@keyframes trailer-tag {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  30% {
+    opacity: 1;
+    transform: none;
+  }
+  85% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+/* A band of gold light sweeping across the window in each shot (TrailerScreen.tsx). */
+.trailer-sheen {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 35%, rgba(255, 226, 168, 0.22) 47%, rgba(255, 246, 220, 0.38) 50%, rgba(255, 226, 168, 0.22) 53%, transparent 65%);
+  mix-blend-mode: screen;
+  animation: trailer-sheen 0.8s ease-in-out both;
+}
+@keyframes trailer-sheen {
+  from {
+    transform: translateX(-70%);
+  }
+  to {
+    transform: translateX(70%);
+  }
 }
 /* ...and its content pushes in slowly, so the shot keeps moving like the rest. (Its inner row,
    not the board itself: the board's own opening animation starts the 3D model when it ends.) */

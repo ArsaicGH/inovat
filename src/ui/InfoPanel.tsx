@@ -11,6 +11,7 @@ import { paintDiagram } from '../world/diagrams'
 import { paintFont, useFontsReady } from '../world/fonts'
 import type { RoomId } from '../types'
 import { assetUrl } from '../asset-url'
+import { TRAILER } from '../world/trailer-script'
 
 // The turning 3D model beside invention boards (part of the 3D download, so loaded on first use).
 const ModelViewer = lazy(() => import('../world/ModelViewer'))
@@ -169,7 +170,8 @@ export default function InfoPanel() {
           {spot?.kind === 'corner' && (
             <div className="model-viewer">
               <Suspense fallback={null}>
-                {modelReady && <ModelViewer id={shownId} />}
+                {/* (In the trailer at once: the shot is short.) */}
+                {(modelReady || TRAILER) && <ModelViewer id={shownId} />}
               </Suspense>
             </div>
           )}

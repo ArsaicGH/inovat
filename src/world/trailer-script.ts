@@ -34,7 +34,7 @@ export const TRAILER_FROM = Number(new URLSearchParams(typeof window !== 'undefi
 // reading: an exhibit's enlarged board is open (its text, sources and turning 3D model).
 // black: nothing (the screen is black).
 export type Segment =
-  | { kind: 'museum'; duration: number; from: Pose; to: Pose; fov?: number; linear?: boolean }
+  | { kind: 'museum'; duration: number; from: Pose; to: Pose; fov?: number; linear?: boolean; prepareGame?: boolean }
   | { kind: 'film'; duration: number; at: number; speed?: number }
   | { kind: 'game'; duration: number; pose: Pose }
   | { kind: 'reading'; duration: number; exhibit: string; pose: Pose }
@@ -53,8 +53,8 @@ function near(s: ExhibitSpot, d: number, side: number, y: number): Vec3 {
 function glimpse(id: string, k: number): Segment {
   const s = spot(id)
   const side = k % 2 === 0 ? 1 : -1
-  const look: Vec3 = [s.x, 1.3, s.z]
-  return { kind: 'museum', duration: 0.4, fov: 46, linear: true, from: [near(s, 2.7, 1.3 * side, 1.7), look], to: [near(s, 2.2, -0.3 * side, 1.55), look] }
+  const look: Vec3 = [s.x, 1.2, s.z]
+  return { kind: 'museum', duration: 0.4, fov: 50, linear: true, from: [near(s, 3.1, 1.4 * side, 1.8), look], to: [near(s, 2.6, -0.2 * side, 1.6), look] }
 }
 
 // A room's own coordinates: across (u), from the museum's centre (v), up (y).
@@ -125,8 +125,11 @@ const era4: Segment = {
 const quiz = inRoom('quiz')
 const standV = (quiz.r.vFront + quiz.r.vBack) / 2 - QUIZ_STAND.z // (the room's own z points back towards its door)
 const wall = -quiz.r.width / 2
+// (Behind it, the game window is already open, unseen: its first core's 3D view takes a
+// moment to start, and must be turning when the cut lands.)
 const gearsShot: Segment = {
   kind: 'museum',
+  prepareGame: true,
   duration: 0.8,
   fov: 48,
   linear: true,
@@ -139,8 +142,8 @@ const consolePose: Pose = [quiz.at(-0.3, standV - 1.9, 1.75), quiz.at(0, standV,
 const rocket = spot('ir1-4')
 const rocketPose: Pose = [near(rocket, 3.0, 0.8, 1.6), [rocket.x, 1.2, rocket.z]]
 
-// A quick montage at the drop: twelve more inventions, one per beat.
-const MONTAGE = ['ir1-2', 'ir1-3', 'ir1-5', 'ir2-1', 'ir2-3', 'ir2-5', 'ir3-1', 'ir3-3', 'ir3-5', 'ir4-1', 'ir4-4', 'ir4-6']
+// A quick montage at the drop: ten more inventions, one per beat.
+const MONTAGE = ['ir1-2', 'ir1-3', 'ir2-4', 'ir2-3', 'ir2-5', 'ir3-2', 'ir3-3', 'ir4-1', 'ir4-5', 'ir4-6']
 
 export const SEGMENTS: Segment[] = [
   // I. OPENING (0-6.4): a gold card on black, the intro hall (on the swell), the rotunda.
@@ -155,12 +158,12 @@ export const SEGMENTS: Segment[] = [
   { ...era4, duration: 3.2 },
   // III. THE BREAK (16.8-19.2): in the music's quiet moment, an exhibit's board opens.
   { kind: 'reading', duration: 2.4, exhibit: 'ir1-4', pose: rocketPose },
-  // IV. THE DROP (19.2-24.0): twelve inventions, one per beat.
+  // IV. THE DROP (19.2-23.2): ten inventions, one per beat.
   ...MONTAGE.map((id, k) => glimpse(id, k)),
-  // V. THE TIME MACHINE (24.0-27.2): the clockwork, then its window: six quick moments from
-  // the middle of its cores, one per beat (GAME_FRAMES).
+  // V. THE TIME MACHINE (23.2-27.2): the clockwork, then the game itself in four shots, its
+  // window floating in the dark like a filmed screen, each core played live (GAME_SHOTS).
   gearsShot,
-  { kind: 'game', duration: 2.4, pose: consolePose },
+  { kind: 'game', duration: 3.2, pose: consolePose },
   // VI. THROUGH THE PORTAL (27.2-31.6): three moments of the ending film.
   { kind: 'film', duration: 1.2, at: START.rocket + 1.5, speed: 1.2 },
   { kind: 'film', duration: 1.6, at: START.grid + 1.0, speed: 1.3 },
@@ -172,14 +175,29 @@ export const SEGMENTS: Segment[] = [
   { kind: 'film', duration: 600, at: START.hold, speed: 0 },
 ]
 
-// The Time Machine's moments: [core (0-3), shown answered right?].
-export const GAME_FRAMES: [number, boolean][] = [
-  [0, false],
-  [1, false],
-  [1, true],
-  [2, false],
-  [3, false],
-  [3, true],
+// The Time Machine's four shots (0.8 s each, one per core). Each core is dealt fresh, then
+// played on screen: answered right at `solveAt` seconds into the shot, or (core III) its
+// clues opening one by one. The window's camera-like move for each is in index.css
+// (html[data-game-shot]). card: the card to show first (core I: the Benz car, a model that
+// reads well small).
+export const GAME_SHOT_LENGTH = 0.8
+// The window is filmed like a screen: `from` and `to` are its framing at the start and end
+// of the shot: scale, shift (% of its size), tilt (degrees), around `origin` (% of the
+// window): a close-up on the machine pulling back as its door lights, a pan across the
+// growing town, a tilt down the clue cards as they open, a pull back from the visitor to
+// the whole window and its four cores.
+export interface Framing {
+  scale: number
+  x: number
+  y: number
+  turnX: number
+  turnY: number
+}
+export const GAME_SHOTS: { round: number; card?: string; solveAt?: number; cluesAt?: number[]; origin: string; from: Framing; to: Framing }[] = [
+  { round: 0, card: 'ir2-2', solveAt: 0.5, origin: '30% 52%', from: { scale: 2.4, x: 0, y: 0, turnX: 0, turnY: -10 }, to: { scale: 1.5, x: 0, y: 0, turnX: 0, turnY: -3 } },
+  { round: 1, solveAt: 0.45, origin: '50% 42%', from: { scale: 1.85, x: -7, y: 0, turnX: 0, turnY: 6 }, to: { scale: 1.65, x: 6, y: 0, turnX: 0, turnY: -4 } },
+  { round: 2, cluesAt: [0.15, 0.4], origin: '28% 50%', from: { scale: 1.9, x: 2, y: 9, turnX: 9, turnY: 0 }, to: { scale: 1.6, x: 0, y: -6, turnX: 2, turnY: 0 } },
+  { round: 3, solveAt: 0.35, origin: '50% 36%', from: { scale: 2.0, x: 0, y: 0, turnX: -4, turnY: 0 }, to: { scale: 0.95, x: 0, y: 0, turnX: 5, turnY: -3 } },
 ]
 
 export const SEGMENT_START: number[] = []
@@ -195,13 +213,12 @@ export function segmentAt(t: number): { segment: Segment; index: number; into: n
 // ---------- Titles and flashes (TrailerScreen.tsx) ----------
 // Each title is ui.trailer.titles[text] in the visitor's language: a small spaced line in gold
 // (kicker) over a larger gold title. card: on black; lower: low on the picture; centre: over
-// the montage; bar: in the lower cinema bar (over the enlarged board and the game window,
-// which it must not cover); final: the closing title.
+// the montage; final: the closing title.
 export interface TrailerTitle {
   text: number
   from: number
   to: number
-  place: 'card' | 'lower' | 'centre' | 'bar' | 'final'
+  place: 'card' | 'lower' | 'centre' | 'final'
 }
 export const TITLES: TrailerTitle[] = [
   { text: 0, from: 0.15, to: 1.5, place: 'card' },
@@ -210,9 +227,9 @@ export const TITLES: TrailerTitle[] = [
   { text: 3, from: 9.2, to: 11.1, place: 'lower' },
   { text: 4, from: 11.6, to: 13.5, place: 'lower' },
   { text: 5, from: 14.0, to: 16.6, place: 'lower' },
-  { text: 7, from: 17.0, to: 19.1, place: 'bar' },
-  { text: 6, from: 19.3, to: 23.2, place: 'centre' },
-  { text: 8, from: 24.2, to: 27.1, place: 'bar' },
+  { text: 7, from: 17.0, to: 19.1, place: 'lower' },
+  { text: 6, from: 19.3, to: 23.0, place: 'centre' },
+  { text: 8, from: 24.1, to: 27.1, place: 'lower' },
   { text: 9, from: 27.4, to: 31.5, place: 'lower' },
   { text: 10, from: TRAILER_LENGTH, to: Infinity, place: 'final' }, // (stays)
 ]
@@ -225,6 +242,10 @@ export const FLASHES: { at: number; colour: string; length: number }[] = [
   { at: 13.6, colour: '#d8f8ff', length: 0.35 },
   { at: 16.8, colour: '#ffe2a8', length: 0.3 },
   { at: 19.2, colour: '#ffe2a8', length: 0.4 },
-  { at: 24.8, colour: '#ffe2a8', length: 0.3 },
+  { at: 23.2, colour: '#ffe2a8', length: 0.3 },
+  { at: 24.0, colour: '#fff1cf', length: 0.35 },
+  { at: 24.8, colour: '#ffe2a8', length: 0.25 },
+  { at: 25.6, colour: '#fff1cf', length: 0.4 },
+  { at: 26.4, colour: '#ffe2a8', length: 0.25 },
   { at: 27.2, colour: '#ffffff', length: 0.7 },
 ]
