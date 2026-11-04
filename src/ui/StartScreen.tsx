@@ -44,11 +44,15 @@ export default function StartScreen() {
         </div>
 
         <div className="start-buttons">
-          {/* Continuing comes first when this tab holds an earlier visit (e.g. after a reload);
-              both buttons look the same, so neither choice is pushed. */}
+          {/* Continuing comes first when this tab holds an earlier visit (e.g. after a reload),
+              and stands out; starting afresh is the quieter choice beside it. */}
           {hasSavedProgress() && <LockButton label={ui.start.continue} className="start-button" onBeforeLock={continueSavedVisit} />}
           {/* Every new game starts with the tutorial (leader: not optional). */}
-          <LockButton label={hasSavedProgress() ? ui.start.newJourney : ui.start.button} className="start-button" onBeforeLock={() => setTutorial('intro')} />
+          <LockButton
+            label={hasSavedProgress() ? ui.start.newJourney : ui.start.button}
+            className={hasSavedProgress() ? 'start-button start-button-quiet' : 'start-button'}
+            onBeforeLock={() => setTutorial('intro')}
+          />
         </div>
       </div>
       {/* Near the bottom of the screen, out of the way of the title. */}
