@@ -14,9 +14,10 @@ import type { RoomId } from '../types'
 
 // The trailer's own track (public/sounds/music/trailer.ogg, made for it with an AI music
 // generator) starts with the picture. Its landmarks, measured from the file: a swell at
-// 3.2 s, a steady build from 6.4 s, a quiet break from 17.2 s, the drop at 19.2 s, an accent
-// at 25.6 s and the final hit at 32.0 s, ringing out until 36.4 s. The cuts below sit on them.
-export const TRAILER_LENGTH = 32 // the closing title appears here, on the final hit, and stays
+// 3.2 s, an accent at 6.4 s and a steady build, a dip at 16.4 s, its loudest stretch from
+// 25.2 s, a calm from 27.2 s, and the final hit at 31.6 s, ringing out until 36.4 s. The cuts
+// below sit on them: the eras on the build, the portal into the calm, the title on the hit.
+export const TRAILER_LENGTH = 31.6 // the closing title appears here, on the final hit, and stays
 export const MUSIC_START = 0
 
 export const TRAILER = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('trailer')
@@ -164,13 +165,12 @@ export const SEGMENTS: Segment[] = [
   // shots, its window floating in the dark like a filmed screen, played live (GAME_SHOTS).
   gearsShot,
   { kind: 'game', duration: 4.0, pose: consolePose },
-  // VI. THROUGH THE PORTAL (27.2-31.6): three moments of the ending film.
+  // VI. THROUGH THE PORTAL (27.2-31.6): three moments of the ending film, in the music's calm.
   { kind: 'film', duration: 1.2, at: START.rocket + 1.5, speed: 1.2 },
   { kind: 'film', duration: 1.6, at: START.grid + 1.0, speed: 1.3 },
   { kind: 'film', duration: 1.6, at: START.mind + 1.4, speed: 1.1 },
-  // VII. A breath of black (31.6-32.0), then the title on the final hit, over the end of the
-  // film's pull-back from the four eras' columns, which settles on all four and holds still.
-  { kind: 'black', duration: 0.4 },
+  // VII. The title on the final hit, over the end of the film's pull-back from the four eras'
+  // columns, which settles on all four and holds still.
   { kind: 'film', duration: 4, at: START.timeline + 8.0, speed: 0.75 },
   { kind: 'film', duration: 600, at: START.hold, speed: 0 },
 ]

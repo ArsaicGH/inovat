@@ -44,7 +44,7 @@ exploring a museum, not by reading a slideshow, and you prove it by repairing a 
    remembered. Then open `https://inovat-museum.vercel.app/?trailer` and wait for loading.
 2. Press F11 for full screen.
 3. Start the recorder: Win+Alt+R (Xbox Game Bar, records the browser and its sound), or OBS.
-4. Click once: the trailer plays (32 s with its own music; the closing title then stays and
+4. Click once: the trailer plays (31.6 s with its own music; the closing title then stays and
    the music rings out until 36 s). Space pauses and resumes it.
 5. Stop the recorder; trim the start and end in the Photos app or CapCut.
 6. For the English version, switch the language on the normal site first, then repeat.
@@ -64,5 +64,5 @@ screenshot buttons.
 ## Trailer soundtrack
 
 `public/sounds/music/trailer.ogg` (and `.m4a`), made with DiffRhythm and loudness-matched to
-the other music. Its landmarks (swell 3.2 s, break 17.2 s, drop 19.2 s, accent 25.6 s, final
-hit 32.0 s) are written at the top of `src/world/trailer-script.ts`; the cuts sit on them.
+the other music. Its landmarks (swell 3.2 s, build from 6.4 s, peak 25.2 s, calm 27.2 s, final
+hit 31.6 s) are written at the top of `src/world/trailer-script.ts`; the cuts sit on them.
