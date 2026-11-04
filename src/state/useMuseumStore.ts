@@ -1,3 +1,4 @@
+import { DEV_MODE } from '../dev-mode'
 import { create } from 'zustand'
 import { roomById, toWorld } from '../world/layout'
 import { ERA_ROOMS, type RoomId } from '../types'
@@ -56,7 +57,7 @@ function saveSensitivity(value: number) {
 // belongs to this tab only, so a new visit in a new tab starts fresh.
 // Development build only: every room counts as visited, so the map can reach all of them
 // (the portal is open too, see quizPassed) for testing.
-const DEV_VISITED: RoomId[] = import.meta.env.DEV ? ['hall', 'rotunda', 'ir1', 'ir2', 'ir3', 'ir4', 'quiz'] : []
+const DEV_VISITED: RoomId[] = DEV_MODE ? ['hall', 'rotunda', 'ir1', 'ir2', 'ir3', 'ir4', 'quiz'] : []
 const PROGRESS_STORAGE_KEY = 'inovat-progress'
 
 export interface Pose {
@@ -200,7 +201,7 @@ export type Control = 'look' | 'move' | 'sprint' | 'interact' | 'map' | 'keys'
 // (Development build: always, so every part of the game can be reached for testing; the
 // tutorial cards still show and advance.)
 export function canUse(tutorial: TutorialStep | null, control: Control): boolean {
-  return import.meta.env.DEV || tutorial === null || TUTORIAL_STEPS.indexOf(tutorial) >= TUTORIAL_STEPS.indexOf(control)
+  return DEV_MODE || tutorial === null || TUTORIAL_STEPS.indexOf(tutorial) >= TUTORIAL_STEPS.indexOf(control)
 }
 
 interface MuseumState {
@@ -417,7 +418,7 @@ export const useMuseumStore = create<MuseumState>((set, get) => ({
   setAwayFromGame: (away) => set({ awayFromGame: away }),
   patchGameRun: (change) => set((state) => (state.gameRun ? { gameRun: { ...state.gameRun, ...change } } : state)),
   // (Local test build only: the portal starts open, to try the ending. Never on the live site.)
-  quizPassed: import.meta.env.DEV,
+  quizPassed: DEV_MODE,
 
   endingRun: 0,
   endingStage: 0,
@@ -462,7 +463,7 @@ export const useMuseumStore = create<MuseumState>((set, get) => ({
       coreStars: [0, 0, 0, 0],
       gameRun: null,
       awayFromGame: false,
-      quizPassed: import.meta.env.DEV,
+      quizPassed: DEV_MODE,
       aimedExhibitId: null,
       showKeyList: false,
       teleport: { roomId: 'hall', pose: undefined, count: state.teleport.count + 1 },

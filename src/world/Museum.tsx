@@ -1,3 +1,4 @@
+import { DEV_MODE } from '../dev-mode'
 import { Suspense, lazy, useLayoutEffect, useEffect, useMemo, useRef, type ReactNode, type RefObject } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Bloom, EffectComposer, N8AO, SMAA, ToneMapping, Vignette } from '@react-three/postprocessing'
@@ -23,7 +24,7 @@ DefaultLoadingManager.onProgress = (_item, loaded, total) => reportFileProgress(
 DefaultLoadingManager.onLoad = () => reportFilesDone()
 
 // FPS counter while developing only (loaded on demand, so the live site never downloads it).
-const DevStats = import.meta.env.DEV ? lazy(() => import('@react-three/drei').then((drei) => ({ default: drei.Stats }))) : null
+const DevStats = DEV_MODE ? lazy(() => import('@react-three/drei').then((drei) => ({ default: drei.Stats }))) : null
 import { CHANDELIER_Y, COLLISION_BOXES, DOORS, EXHIBIT_SPOTS, PART_COUNT, ROOMS, roomById, toWorld } from './layout'
 import { isPartVisible } from './door-state'
 import { ROOM_THEMES } from './room-themes'
@@ -41,8 +42,8 @@ import './shader-tweaks' // (before anything is drawn: lamps' light skipped wher
 // DEVELOPMENT-ONLY test switches in the address bar, to find what slows frames down:
 // ?dpr=1 (normal resolution), ?aa=0 (no edge smoothing), ?shadows=0 (no shadows),
 // ?fx=0 (no bloom glow), ?ao=0 (no ambient occlusion). They can be combined: ?dpr=1&fx=0.
-// Ignored on the live site.
-const testSwitches = new URLSearchParams(import.meta.env.DEV ? window.location.search : '')
+// Ignored on the live site unless ?devmode is in the address too (dev-mode.ts).
+const testSwitches = new URLSearchParams(DEV_MODE ? window.location.search : '')
 // Phones and tablets may go up to 2: their screens have far fewer pixels than a laptop's
 // but are very sharp, so a low factor makes text on the boards blurry.
 const MAX_PIXEL_RATIO = testSwitches.get('dpr') === '1' ? 1 : IS_TOUCH ? 2 : 1.5
@@ -1024,7 +1025,7 @@ export default function Museum() {
           <DevStats />
         </Suspense>
       )}
-      {(import.meta.env.DEV || new URLSearchParams(window.location.search).has('stats')) && <FrameTimingProbe />}
+      {(DEV_MODE || new URLSearchParams(window.location.search).has('stats')) && <FrameTimingProbe />}
     </Canvas>
   )
 }
