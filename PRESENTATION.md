@@ -46,6 +46,9 @@ exploring a museum, not by reading a slideshow, and you prove it by repairing a 
 3. Start the recorder: Win+Alt+R (Xbox Game Bar, records the browser and its sound), or OBS.
 4. Click once: the trailer plays (31.6 s with its own music; the closing title then stays and
    the music rings out until 36 s). Space pauses and resumes it.
+   Press **R** at any time to play it again from the start after a 3-2-1 countdown on black.
+   Record the second take: by then every room and the ending film have been drawn once, so
+   it plays most smoothly.
 5. Stop the recorder; trim the start and end in the Photos app or CapCut.
 6. For the English version, switch the language on the normal site first, then repeat.
 

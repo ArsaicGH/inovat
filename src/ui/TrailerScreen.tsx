@@ -26,11 +26,36 @@ export default function TrailerScreen() {
     return () => cancelAnimationFrame(frame)
   }, [mode])
 
+  // R (hidden): play the trailer again from the start, after a 3-2-1 countdown on black, for
+  // another take of the screen recording. (A second take is also the smoothest: by then every
+  // room and the ending film have been drawn once, so nothing is prepared mid-shot.)
+  const [countdown, setCountdown] = useState<number | null>(null)
+  useEffect(() => {
+    if (countdown === null) return
+    const timer = window.setTimeout(() => {
+      if (countdown > 1) return setCountdown(countdown - 1)
+      setCountdown(null)
+      trailerClock.t = 0
+      trailerClock.paused = false
+      playEndingMusic(MUSIC_START)
+    }, 1000)
+    return () => window.clearTimeout(timer)
+  }, [countdown])
+
   // Space holds the trailer (picture and music) for screenshots, and lets it go on.
   useEffect(() => {
     if (mode === 'start') return
     const onKey = (event: KeyboardEvent) => {
-      if (event.code !== 'Space') return
+      if (event.code === 'KeyR' && !event.repeat) {
+        setEndingMusicPaused(true)
+        trailerClock.t = -1 // (black, and the camera waits)
+        trailerClock.paused = true
+        useMuseumStore.setState({ openExhibitId: null, gameRun: null })
+        useMuseumStore.getState().setMode('trailer')
+        setCountdown(3)
+        return
+      }
+      if (event.code !== 'Space' || trailerClock.t < 0) return
       event.preventDefault()
       trailerClock.paused = !trailerClock.paused
       setEndingMusicPaused(trailerClock.paused)
@@ -69,6 +94,11 @@ export default function TrailerScreen() {
   return (
     <div className="trailer" aria-live="polite">
       <div className={black ? 'trailer-black is-on' : 'trailer-black'} />
+      {countdown !== null && (
+        <div key={countdown} className="trailer-countdown">
+          {countdown}
+        </div>
+      )}
       {flash && <div key={flash.at} className="trailer-flash" style={{ '--flash': flash.colour, '--length': `${flash.length * 1.4}s` } as CSSProperties} />}
       {/* The Time Machine's shots: a sweep of gold light across the window in each. */}
       {gameShot !== null && <div key={gameShot} className="trailer-sheen" />}
