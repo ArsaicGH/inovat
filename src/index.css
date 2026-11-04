@@ -1596,22 +1596,6 @@ body {
     opacity: 0.85;
   }
 }
-.ending-skip {
-  position: absolute;
-  right: 24px;
-  bottom: 24px;
-  padding: 8px 18px;
-  border: 1px solid rgba(201, 162, 90, 0.5);
-  border-radius: 999px;
-  background: rgba(20, 16, 12, 0.5);
-  color: #d9ccb2;
-  font-family: inherit;
-  font-size: 14px;
-  cursor: pointer;
-}
-.ending-skip:hover {
-  background: rgba(201, 162, 90, 0.2);
-}
 /* In the lower part of the screen, below the sunrise on the horizon. */
 .ending-panel {
   position: absolute;
@@ -2200,9 +2184,6 @@ body {
 }
 .ending .ending-journey {
   top: calc(8vh + 18px);
-}
-.ending .ending-skip {
-  bottom: calc(8vh + 16px);
 }
 .ending-title {
   position: absolute;
@@ -3990,15 +3971,24 @@ html.trailer-reading .info-panel .board-row {
   box-shadow: inset 0 0 0 3px rgba(14, 11, 7, 0.6), inset 0 0 0 4px rgba(201, 162, 90, 0.6), 0 0 30px rgba(201, 162, 90, 0.4);
 }
 
-/* The way back from the trailer to the title screen (TrailerScreen.tsx): the picture behind
-   the closing title fades to black, then the whole trailer screen fades away. */
-.trailer.is-darken .trailer-black,
-.trailer.is-reveal .trailer-black {
-  transition: opacity 1s ease-in-out;
+/* The way back from the trailer to the title screen (TrailerScreen.tsx): a short fade to
+   black over everything, then the title screen fades in from it. */
+.trailer-fade {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+}
+.trailer.is-darken .trailer-fade,
+.trailer.is-reveal .trailer-fade {
+  opacity: 1;
+  transition: opacity 0.7s ease-in;
 }
 .trailer.is-reveal {
   opacity: 0;
-  transition: opacity 1.6s ease-in-out;
+  transition: opacity 0.6s ease-out;
 }
 
 /* THE GAME'S RULES (TimeMachineGame.tsx Rules): numbered points in gold medallions, each with

@@ -43,9 +43,6 @@ export default function EndingScreen() {
               <p>{ui.ending.moods[stage - 1]}</p>
             </div>
           )}
-          <button className="ending-skip" onClick={() => useMuseumStore.getState().setEndingStage(6)}>
-            {ui.ending.skip}
-          </button>
         </>
       ) : (
         <div ref={titleScroll} className="ending-title scroll-fade">

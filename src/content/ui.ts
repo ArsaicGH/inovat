@@ -11,9 +11,6 @@ const vi = {
     continue: 'Tiếp tục hành trình trước',
     // (Instead of the plain start button, when an earlier visit can be continued.)
     newJourney: 'Bắt đầu hành trình mới',
-    tutorialQuestion: 'Quý khách có muốn xem hướng dẫn điều khiển không?',
-    tutorialYes: 'Có, hướng dẫn tôi',
-    tutorialNo: 'Không, vào tham quan',
   },
   // The loading screen at the start: what is happening, in general terms, and how much has
   // downloaded. {loaded}/{total} = megabytes. Then two tips under a gold ornament.
@@ -214,7 +211,6 @@ const vi = {
       'Những con chip nhỏ bé mở ra thế giới số: máy tính, rô-bốt và mạng lưới nối liền con người khắp hành tinh.',
       'Máy móc biết học hỏi, vạn vật được kết nối: và câu chuyện ấy vẫn đang được viết tiếp, bởi chính chúng ta.',
     ],
-    skip: 'Bỏ qua',
     // The program typed on the computer screen in the film's third act (an old BASIC program
     // that counts the four revolutions).
     screen: ['] LIST', '10 REM *** INOVAT ***', '20 FOR I = 1 TO 4', '30 PRINT "CMCN "; I', '40 NEXT I', '] RUN', 'CMCN 1', 'CMCN 2', 'CMCN 3', 'CMCN 4', ']'],
@@ -246,9 +242,6 @@ const en: UiText = {
     trailer: 'Play trailer',
     continue: 'Continue previous visit',
     newJourney: 'Start a new journey',
-    tutorialQuestion: 'Would you like a quick guide to the controls?',
-    tutorialYes: 'Yes, show me',
-    tutorialNo: 'No, start exploring',
   },
   loading: {
     downloaded: '{loaded} / {total} MB downloaded',
@@ -421,7 +414,6 @@ const en: UiText = {
       'Tiny chips opened a digital world: computers, robots and networks linking people across the planet.',
       'Machines that learn, everything connected: and the story is still being written, by all of us.',
     ],
-    skip: 'Skip',
     screen: ['] LIST', '10 REM *** INOVAT ***', '20 FOR I = 1 TO 4', '30 PRINT "INDUSTRY "; I; ".0"', '40 NEXT I', '] RUN', 'INDUSTRY 1.0', 'INDUSTRY 2.0', 'INDUSTRY 3.0', 'INDUSTRY 4.0', ']'],
     title: 'Thank you for visiting!',
     text: 'You have just travelled through four Industrial Revolutions: from steam and mechanical machinery to electricity, computers, robots and artificial intelligence. That story is still being written, and today’s generation will help shape its next chapter.',

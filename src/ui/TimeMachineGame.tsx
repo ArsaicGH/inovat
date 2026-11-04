@@ -474,7 +474,8 @@ export default function TimeMachineGame() {
   // (the core in progress stays saved).
   const [atWorkshop, setAtWorkshop] = useState(false)
   // The workshop's two pages: the rules (first), then the four cores.
-  const [rules, setRules] = useState(!rulesSeen)
+  // (Carrying on, with a core lit or in progress: straight to the four cores.)
+  const [rules, setRules] = useState(!rulesSeen && cores === 0 && !run)
   const playing = run && !atWorkshop ? run : null
   const scroll = useScrollFades<HTMLDivElement>(`${playing?.round}-${playing?.index}-${playing?.finished}`)
 

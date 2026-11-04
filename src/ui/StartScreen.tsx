@@ -9,13 +9,10 @@ import GraphicsSlider from './GraphicsSlider'
 import { startTrailer } from './trailer-run'
 import { preloadTrailerMusic } from '../audio/sound'
 
-// First screen: the decorated INOVAT title and a start button. On a first visit "Bắt đầu"
-// starts the guided tutorial at once; after an earlier visit, "new journey" asks whether to
-// take it; either choice captures the mouse and the
-// Player then switches to "exploring".
+// First screen: the decorated INOVAT title and a start button, which starts the guided
+// tutorial (every new game) and captures the mouse; the Player then switches to "exploring".
 export default function StartScreen() {
   const { ui, site } = useContent()
-  const [asking, setAsking] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const setTutorial = useMuseumStore((state) => state.setTutorial)
   const continueSavedVisit = useMuseumStore((state) => state.continueSavedVisit)
@@ -46,30 +43,13 @@ export default function StartScreen() {
           <span />
         </div>
 
-        {!asking ? (
-          <div className="start-buttons">
-            {/* Continuing comes first when this tab holds an earlier visit (e.g. after a reload);
-                both buttons look the same, so neither choice is pushed. */}
-            {hasSavedProgress() && <LockButton label={ui.start.continue} className="start-button" onBeforeLock={continueSavedVisit} />}
-            {/* A first visit starts straight into the tutorial; a new journey after an earlier
-                visit asks first (the visitor may already know the controls). */}
-            {hasSavedProgress() ? (
-              <button type="button" className="start-button" onClick={() => setAsking(true)}>
-                {ui.start.newJourney}
-              </button>
-            ) : (
-              <LockButton label={ui.start.button} className="start-button" onBeforeLock={() => setTutorial('intro')} />
-            )}
-          </div>
-        ) : (
-          <div className="tutorial-question">
-            <p>{ui.start.tutorialQuestion}</p>
-            <div className="button-row">
-              <LockButton label={ui.start.tutorialYes} className="start-button" onBeforeLock={() => setTutorial('intro')} />
-              <LockButton label={ui.start.tutorialNo} className="start-button start-button-quiet" onBeforeLock={() => setTutorial(null)} />
-            </div>
-          </div>
-        )}
+        <div className="start-buttons">
+          {/* Continuing comes first when this tab holds an earlier visit (e.g. after a reload);
+              both buttons look the same, so neither choice is pushed. */}
+          {hasSavedProgress() && <LockButton label={ui.start.continue} className="start-button" onBeforeLock={continueSavedVisit} />}
+          {/* Every new game starts with the tutorial (leader: not optional). */}
+          <LockButton label={hasSavedProgress() ? ui.start.newJourney : ui.start.button} className="start-button" onBeforeLock={() => setTutorial('intro')} />
+        </div>
       </div>
       {/* Near the bottom of the screen, out of the way of the title. */}
       <div className="language-bottom">

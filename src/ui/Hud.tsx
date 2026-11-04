@@ -22,7 +22,8 @@ export default function Hud() {
   const showKeyList = useMuseumStore((state) => state.showKeyList)
   const cores = useMuseumStore((state) => state.gameCores)
   // Left the Time Machine game to look around the rooms: a way back (R, or the button).
-  const awayFromGame = useMuseumStore((state) => state.awayFromGame)
+  // (Only outside the Game Room: inside it, the console itself is the way back.)
+  const awayFromGame = useMuseumStore((state) => state.awayFromGame && state.currentRoom !== 'quiz')
   useEffect(() => {
     if (!awayFromGame) return
     function onKey(event: KeyboardEvent) {

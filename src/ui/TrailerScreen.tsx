@@ -6,12 +6,11 @@ import { playEndingMusic, setEndingMusicPaused } from '../audio/sound'
 import { FLASHES, GAME_SHOTS, GAME_SHOT_LENGTH, MUSIC_START, TITLES, TRAILER_FROM, TRAILER_LENGTH, TRAILER_PAGE, segmentAt, trailerClock } from '../world/trailer-script'
 import { closeTrailer, leaveTrailer, startTrailer, trailerFromMenu } from './trailer-run'
 
-// From the title screen: how long the closing title holds before the way back, and the two
-// steps of it (the picture behind the title fades to black; then the trailer's screen fades
-// away, its gold INOVAT dissolving into the title screen's own).
+// From the title screen: how long the closing title holds before the way back: a short fade
+// to black (title and all), then the title screen fades in from black.
 const HOLD = 3.6
-const DARKEN_MS = 1000
-const REVEAL_MS = 1600
+const DARKEN_MS = 700
+const REVEAL_MS = 600
 
 // THE TRAILER'S SCREEN (?trailer, trailer-script.ts): first a quiet "click to play" (so the
 // team can start their screen recorder), then everything drawn over the camera's flight:
@@ -167,6 +166,8 @@ export default function TrailerScreen() {
           </div>
         )
       })}
+      {/* The way back to the title screen: black over everything. */}
+      <div className="trailer-fade" />
       {/* Cinema bars (2.39:1) with a fine gold line on their inner edge. */}
       <div className="trailer-bar is-top" />
       <div className="trailer-bar is-bottom" />
