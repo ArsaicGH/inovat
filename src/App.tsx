@@ -48,12 +48,12 @@ function App() {
       {/* The title screen waits until everything has loaded (LoadingScreen). */}
       {/* (With ?trailer: the trailer instead of the title screen.) */}
       {mode === 'start' && worldReady && !TRAILER && <StartScreen />}
-      {TRAILER && worldReady && (mode === 'start' || mode === 'trailer') && <TrailerScreen />}
+      {TRAILER && worldReady && <TrailerScreen />}
       {mode === 'paused' && <PauseScreen />}
       {/* Always mounted: it animates in when an exhibit opens and out when it closes. */}
       <InfoPanel />
       {mode === 'map' && <MapMenu />}
-      {mode === 'ending' && <EndingScreen />}
+      {mode === 'ending' && !TRAILER && <EndingScreen />}
       {mode === 'game' && <TimeMachineGame />}
       <LoadingScreen />
       <SoundDirector />

@@ -210,7 +210,8 @@ export default function EndingScene({ running }: { running: boolean }) {
       // The film follows the music's clock, so the title lands on its climax. (Without
       // sound, or while it is still loading, the film keeps its own time.)
       const music = endingMusicTime()
-      film.t = music !== null ? Math.max(music, film.t) : film.t + Math.min(delta, 0.1)
+      if (film.override !== null) film.t = film.override
+      else film.t = music !== null ? Math.max(music, film.t) : film.t + Math.min(delta, 0.1)
     }
     film.ready = state.ready
     const index = shotIndexAt(film.t)

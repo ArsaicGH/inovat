@@ -1,25 +1,33 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
 import { useContent } from '../content/use-content'
 import { useMuseumStore } from '../state/useMuseumStore'
 import { playEndingMusic, setEndingMusicPaused, unlockAudio } from '../audio/sound'
-import { MUSIC_START, SHOTS_END, TRAILER_LENGTH, shotAt, trailerClock } from '../world/trailer-script'
-
-// A brief dip to black around each cut: it hides the instant a new room's lights come on.
-const DIP = 0.12 // seconds on each side of the cut
+import { FLASHES, MUSIC_START, TITLES, TRAILER_FROM, segmentAt, trailerClock } from '../world/trailer-script'
 
 // THE TRAILER'S SCREEN (?trailer, trailer-script.ts): first a quiet "click to play" (so the
-// team can start their screen recorder), then the captions over the camera's flight, a fade
-// to black, and the closing card on the music's climax.
+// team can start their screen recorder), then everything drawn over the camera's flight:
+// cinema bars edged in gold, a fine film grain, flashes of light on the cuts, black beats,
+// and the gold titles, ending on the closing title.
 export default function TrailerScreen() {
   const { ui, site } = useContent()
   const mode = useMuseumStore((state) => state.mode)
-  const [caption, setCaption] = useState(-1)
-  const [phase, setPhase] = useState<'shots' | 'fade' | 'card'>('shots')
-  const [cut, setCut] = useState(false)
+  const [t, setT] = useState(-1)
+
+  // Follow the trailer's clock (kept by TrailerCamera).
+  useEffect(() => {
+    if (mode === 'start') return
+    let frame = 0
+    const tick = () => {
+      setT(trailerClock.t)
+      frame = requestAnimationFrame(tick)
+    }
+    frame = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(frame)
+  }, [mode])
 
   // Space holds the trailer (picture and music) for screenshots, and lets it go on.
   useEffect(() => {
-    if (mode !== 'trailer') return
+    if (mode === 'start') return
     const onKey = (event: KeyboardEvent) => {
       if (event.code !== 'Space') return
       event.preventDefault()
@@ -30,35 +38,18 @@ export default function TrailerScreen() {
     return () => window.removeEventListener('keydown', onKey)
   }, [mode])
 
-  // Follow the trailer's clock (kept by TrailerCamera) for the captions.
-  useEffect(() => {
-    if (mode !== 'trailer') return
-    let frame = 0
-    const tick = () => {
-      const t = trailerClock.t
-      if (t >= TRAILER_LENGTH) setPhase('card')
-      else if (t >= SHOTS_END) setPhase('fade')
-      else setPhase('shots')
-      const now = shotAt(Math.max(0, t))
-      const into = now.progress * now.shot.duration
-      setCut(t > DIP && (into < DIP || now.shot.duration - into < DIP) && t < SHOTS_END - DIP)
-      setCaption(t < 0 ? -1 : now.shot.caption)
-      frame = requestAnimationFrame(tick)
-    }
-    frame = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(frame)
-  }, [mode])
-
-  if (mode !== 'trailer') {
+  if (mode === 'start') {
     return (
       <button
         type="button"
         className="trailer-start"
         onClick={() => {
           unlockAudio()
-          trailerClock.t = 0
+          // Everything open and lit for the camera: all four cores, the portal.
+          useMuseumStore.setState({ quizPassed: true, gameCores: 4, coreStars: [3, 3, 3, 3] })
+          trailerClock.t = TRAILER_FROM
           useMuseumStore.getState().setMode('trailer')
-          playEndingMusic(MUSIC_START)
+          playEndingMusic(MUSIC_START + TRAILER_FROM)
         }}
       >
         {ui.trailer.start}
@@ -66,33 +57,50 @@ export default function TrailerScreen() {
     )
   }
 
+  const black = t < 0 || segmentAt(t).segment.kind === 'black'
+  const titles = TITLES.filter((title) => t >= title.from && t < title.to)
+  const flash = FLASHES.find((f) => t >= f.at - f.length * 0.4 && t < f.at + f.length)
   return (
-    <div className={`trailer is-${phase}${cut ? ' is-cut' : ''}`} aria-live="polite">
-      {phase === 'shots' && caption >= 0 && (
-        <p key={caption} className="trailer-caption">
-          {ui.trailer.captions[caption]}
-        </p>
-      )}
-      <div className="trailer-veil" />
-      {phase === 'card' && (
-        <div className="trailer-card">
-          <div className="title-block">
-          <div className="title-ornament" aria-hidden="true">
-            <span />
-            <i />
-            <span />
+    <div className="trailer" aria-live="polite">
+      <div className={black ? 'trailer-black is-on' : 'trailer-black'} />
+      {flash && <div key={flash.at} className="trailer-flash" style={{ '--flash': flash.colour, '--length': `${flash.length * 1.4}s` } as CSSProperties} />}
+      <div className="trailer-grain" />
+      <div className="trailer-vignette" />
+      {titles.map((title) => {
+        const text = ui.trailer.titles[title.text]
+        const style = { '--length': `${Math.min(title.to - title.from, 60)}s` } as CSSProperties
+        if (title.place === 'final') {
+          return (
+            <div key={title.text} className="trailer-final" style={style}>
+              <div className="trailer-final-shade" />
+              <div className="trailer-final-text">
+                <p className="trailer-kicker">{text.kicker}</p>
+                <h1 className="trailer-logo">{site.name}</h1>
+                <p className="trailer-subtitle">{site.subtitle}</p>
+                <div className="trailer-rule" aria-hidden="true">
+                  <span />
+                  <i />
+                  <span />
+                </div>
+                <p className="trailer-url">{ui.trailer.url}</p>
+              </div>
+            </div>
+          )
+        }
+        return (
+          <div key={title.text} className={`trailer-title is-${title.place}`} style={style}>
+            <p className="trailer-kicker">
+              <span />
+              {text.kicker}
+              <span />
+            </p>
+            <p className="trailer-heading">{text.title}</p>
           </div>
-          <h1 className="game-title">{site.name}</h1>
-          <p className="game-subtitle">{site.subtitle}</p>
-          <div className="title-ornament" aria-hidden="true">
-            <span />
-            <i />
-            <span />
-          </div>
-          <p className="trailer-url">{ui.trailer.url}</p>
-          </div>
-        </div>
-      )}
+        )
+      })}
+      {/* Cinema bars (2.39:1) with a fine gold line on their inner edge. */}
+      <div className="trailer-bar is-top" />
+      <div className="trailer-bar is-bottom" />
     </div>
   )
 }

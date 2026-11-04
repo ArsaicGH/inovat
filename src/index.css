@@ -3432,70 +3432,248 @@ body {
   cursor: pointer;
 }
 .trailer {
+  --bar: max(0px, calc((100vh - 100vw / 2.39) / 2));
   position: fixed;
   inset: 0;
   z-index: 40;
   pointer-events: none;
   cursor: none;
+  overflow: hidden;
 }
-/* Caption: low on the screen in the museum's gold, each one fading in. */
-.trailer-caption {
+.trailer-black {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+}
+.trailer-black.is-on {
+  opacity: 1;
+}
+/* A flash of light over a cut: it swells, then fades. */
+.trailer-flash {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 45%, var(--flash) 0%, color-mix(in srgb, var(--flash) 55%, transparent) 45%, transparent 85%);
+  mix-blend-mode: screen;
+  animation: trailer-flash var(--length) ease-out both;
+}
+@keyframes trailer-flash {
+  from {
+    opacity: 0;
+  }
+  28% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+/* Film grain: a noise tile shifted a few times a second (moved, not redrawn). */
+.trailer-grain {
+  position: absolute;
+  inset: -50%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  opacity: 0.09;
+  mix-blend-mode: overlay;
+  animation: trailer-grain 0.5s steps(4) infinite;
+}
+@keyframes trailer-grain {
+  25% {
+    transform: translate(-3%, 2%);
+  }
+  50% {
+    transform: translate(2%, -4%);
+  }
+  75% {
+    transform: translate(-2%, -1%);
+  }
+}
+.trailer-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, 0.6));
+}
+/* Cinema bars, each with a fine gold line where it meets the picture. */
+.trailer-bar {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 12vh;
-  margin: 0;
-  text-align: center;
-  color: #f3e7cf;
-  font-size: clamp(20px, 3.2vw, 44px);
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.85), 0 0 2px rgba(0, 0, 0, 0.9);
-  animation: trailer-caption 3s ease-out both;
+  height: var(--bar);
+  background: #000;
 }
-@keyframes trailer-caption {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-    letter-spacing: 0.16em;
-  }
-  25% {
-    opacity: 1;
-    transform: none;
-  }
+.trailer-bar.is-top {
+  top: 0;
+  box-shadow: 0 1px 0 rgba(201, 162, 90, 0.35);
 }
-/* Darker corners all the time, black for the closing card. */
-.trailer-veil {
+.trailer-bar.is-bottom {
+  bottom: 0;
+  box-shadow: 0 -1px 0 rgba(201, 162, 90, 0.35);
+}
+
+/* The titles: a small spaced gold line between two fine rules, over a large title in a gold
+   gradient. They rise in, open their letter spacing, and fade out. */
+.trailer-title {
   position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.55));
-  transition: background-color 1s ease-in;
-}
-.trailer.is-fade .trailer-veil,
-.trailer.is-card .trailer-veil {
-  background-color: #000;
-}
-/* The dip at a cut: quick in and out. */
-.trailer.is-cut .trailer-veil {
-  background-color: #000;
-  transition: background-color 0.15s;
-}
-.trailer-card {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
+  left: 0;
+  right: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  animation: title-in 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  gap: 0.5vw;
+  text-align: center;
+  animation: trailer-title var(--length) cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
-.trailer-card .title-ornament {
-  width: min(560px, 70vw);
+.trailer-title.is-lower {
+  bottom: calc(var(--bar) + 5vh);
+}
+.trailer-title.is-centre {
+  top: 50%;
+  transform: translateY(-50%);
+}
+.trailer-title.is-card {
+  top: 50%;
+  transform: translateY(-50%);
+}
+@keyframes trailer-title {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+  }
+  14% {
+    opacity: 1;
+    filter: blur(0);
+  }
+  84% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+.trailer-kicker {
+  display: flex;
+  align-items: center;
+  gap: 1.2vw;
+  margin: 0;
+  color: #d9b56e;
+  font-size: clamp(11px, 1.05vw, 17px);
+  font-weight: 600;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.9);
+}
+.trailer-kicker span {
+  width: 5vw;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #c9a25a);
+}
+.trailer-kicker span:last-child {
+  background: linear-gradient(90deg, #c9a25a, transparent);
+}
+.trailer-heading {
+  margin: 0;
+  padding: 0 4vw;
+  background: linear-gradient(180deg, #fff3cf 0%, #e8c77e 45%, #b8893d 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-size: clamp(22px, 3.4vw, 58px);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.15;
+  filter: drop-shadow(0 2px 14px rgba(0, 0, 0, 0.85));
+  animation: trailer-track var(--length) ease-out both;
+}
+@keyframes trailer-track {
+  from {
+    letter-spacing: 0.01em;
+  }
+  to {
+    letter-spacing: 0.07em;
+  }
+}
+
+/* The closing title, over the ending film's landscape. */
+.trailer-final {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+.trailer-final-shade {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.8) 75%);
+  animation: trailer-fade-in 1.4s ease-out both;
+}
+.trailer-final-text {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2vw;
+  text-align: center;
+}
+.trailer-final .trailer-kicker {
+  animation: trailer-fade-in 1.2s 1s ease-out both;
+}
+.trailer-logo {
+  margin: 0;
+  background: linear-gradient(180deg, #fff6d8 0%, #f0cf86 40%, #b8893d 75%, #e8c77e 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-size: clamp(56px, 11vw, 190px);
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  line-height: 1;
+  filter: drop-shadow(0 4px 30px rgba(201, 162, 90, 0.35));
+  animation: trailer-logo 2.4s cubic-bezier(0.15, 0.7, 0.2, 1) both;
+}
+@keyframes trailer-logo {
+  from {
+    opacity: 0;
+    letter-spacing: 0.6em;
+    filter: blur(14px) drop-shadow(0 4px 30px rgba(201, 162, 90, 0));
+  }
+}
+.trailer-subtitle {
+  margin: 0;
+  color: #f3e7cf;
+  font-size: clamp(14px, 1.9vw, 30px);
+  letter-spacing: 0.14em;
+  animation: trailer-fade-in 1.2s 0.6s ease-out both;
+}
+.trailer-rule {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: min(560px, 60vw);
+  animation: trailer-fade-in 1.2s 0.8s ease-out both;
+}
+.trailer-rule span {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #c9a25a);
+}
+.trailer-rule span:last-child {
+  background: linear-gradient(90deg, #c9a25a, transparent);
+}
+.trailer-rule i {
+  width: 9px;
+  height: 9px;
+  border: 1px solid #c9a25a;
+  transform: rotate(45deg);
 }
 .trailer-url {
-  margin: 18px 0 0;
+  margin: 0;
   color: #c9a25a;
-  font-size: clamp(14px, 1.6vw, 22px);
-  letter-spacing: 0.18em;
+  font-size: clamp(12px, 1.3vw, 20px);
+  letter-spacing: 0.24em;
+  animation: trailer-fade-in 1.2s 1.4s ease-out both;
+}
+@keyframes trailer-fade-in {
+  from {
+    opacity: 0;
+  }
 }

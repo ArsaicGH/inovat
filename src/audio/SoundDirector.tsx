@@ -3,6 +3,7 @@ import { AUDIO_ENABLED } from '../features'
 import { useMuseumStore } from '../state/useMuseumStore'
 import { ERA_ROOMS } from '../types'
 import { playEndingMusic, stopEndingMusic, duckAmbience, loadSounds, playEffect, playWelcome, setAmbience, setSilenced, setVolumes, stopWelcome, unlockAudio } from './sound'
+import { TRAILER } from '../world/trailer-script'
 
 // Listens to what happens in the game (the shared store) and plays the matching sound.
 // Footsteps and doors are played from Player.tsx and Doors.tsx, where they happen.
@@ -34,7 +35,10 @@ export default function SoundDirector() {
       }
 
       // Menus and panels.
-      if (state.mode !== before.mode) {
+      // (The trailer switches modes as it cuts: no menu sounds, no room music, and its
+      // music runs on.)
+      if (state.mode !== before.mode && TRAILER) duckAmbience(0)
+      else if (state.mode !== before.mode) {
         // Leaving the start screen (after the tutorial question): the welcome sound, once.
         // (Only when the visit starts in the intro hall.)
         if (before.mode === 'start' && state.currentRoom === 'hall') playWelcome()
@@ -61,7 +65,7 @@ export default function SoundDirector() {
 
       // A new era room visited: a soft chime.
       const newEra = state.visitedRooms.find((room) => !before.visitedRooms.includes(room) && ERA_ROOMS.includes(room))
-      if (newEra && state.mode !== 'trailer') playEffect('newRoom', 0.5)
+      if (newEra && !TRAILER) playEffect('newRoom', 0.5)
 
       // The locked Game Room door, when you walk up to it.
       if (state.nearLockedDoor && !before.nearLockedDoor) playEffect('locked', 0.6)

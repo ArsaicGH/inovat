@@ -217,7 +217,8 @@ function litRoom(here: RoomId, x: number, z: number): RoomId {
 
 // How long a change of lit room takes: the old room's lights fade out, then the new
 // room's fade in (seconds each), instead of popping.
-const LIGHT_FADE = 0.3
+// (The trailer cuts between rooms faster than that: there, at once.)
+const LIGHT_FADE = TRAILER ? 0.01 : 0.3
 
 // The rotunda's soft fill light: generous, the hall is meant to feel grand and welcoming.
 const ROTUNDA_FILL = 0.3

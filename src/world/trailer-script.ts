@@ -1,110 +1,194 @@
-import { TITLE_AT } from './ending-shots'
-import { EXHIBIT_SPOTS, QUIZ_STAND, ROTUNDA_SPAWN, roomById, toWorld, type ExhibitSpot } from './layout'
+import { START, TITLE_AT } from './ending-shots'
+import { EXHIBIT_SPOTS, QUIZ_STAND, roomById, toWorld, type ExhibitSpot } from './layout'
 import type { Vec3, Pose } from './ending-shots'
+import type { RoomId } from '../types'
 
 // THE TRAILER (30 seconds, for the team's presentation): opened with ?trailer in the address.
-// A scripted camera flies through the real museum (TrailerCamera.tsx) while captions show
-// (TrailerScreen.tsx) and the ending film's music plays. The music starts 30 s before its
-// climax (TITLE_AT, where the ending film shows its closing title), so the trailer's closing
-// card lands on the same beat. Recorded by the team with a screen recorder.
+// Every cut falls on a beat of 150 beats a minute (0.4 s), so a soundtrack made to that
+// tempo lands on the picture (see PRESENTATION.md for the music brief).
+// Cut like a film trailer: a quiet opening, the four eras one by one, a fast montage of every
+// invention, the Time Machine, then through the portal into a glimpse of the ending film, a
+// beat of black, and the title on the music's climax. The camera flies through the real
+// museum (TrailerCamera.tsx); for the ending glimpse it borrows the ending film itself,
+// choosing exact moments of it. Gold titles, cinema bars, grain and flashes are drawn on top
+// (TrailerScreen.tsx). Recorded by the team with a screen recorder.
 
-export const TRAILER_LENGTH = 30 // the closing card appears here
-export const TRAILER_HOLD = 6 // and stays this long, as the music rings out
+export const TRAILER_LENGTH = 30 // the closing title appears here, on the music's climax, and stays
+// The music (for now the ending film's, until the trailer's own track arrives) starts so that
+// its climax lands on the closing title.
 export const MUSIC_START = TITLE_AT - TRAILER_LENGTH
 
 export const TRAILER = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('trailer')
 
-// The trailer's clock (seconds since it began), advanced by TrailerCamera from the music.
-// paused: held with Space, so the team can take full-size screenshots of any shot.
+// The trailer's clock (seconds since it began), kept by TrailerCamera from the music.
+// paused: held with Space, for full-size screenshots of any moment.
 export const trailerClock = { t: -1, paused: false }
+// ?trailer&from=16 starts at that second (to check or record one part again).
+export const TRAILER_FROM = Number(new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '').get('from') ?? 0) || 0
 
-export interface TrailerShot {
-  caption: number // index into ui.trailer.captions (-1: none)
-  duration: number
-  from: Pose
-  to: Pose
-  fov?: number
-}
+// ---------- Shots ----------
+// museum: the camera moves through the museum from one pose to another.
+// film: a moment of the ending film, from `at` seconds into it, played at `speed`.
+// game: the camera holds while the Time Machine's window is open.
+// black: nothing (the screen is black).
+export type Segment =
+  | { kind: 'museum'; duration: number; from: Pose; to: Pose; fov?: number; linear?: boolean }
+  | { kind: 'film'; duration: number; at: number; speed?: number }
+  | { kind: 'game'; duration: number; pose: Pose }
+  | { kind: 'black'; duration: number }
 
 const spot = (id: string) => EXHIBIT_SPOTS.find((s) => s.id === id) as ExhibitSpot
 
-// A slow push in towards an exhibit: from `far` metres in front of it (and `side` to its
-// right) to `near`, looking at it at `lookY` metres up.
-function pushIn(id: string, far: number, near: number, side: number, fromY: number, toY: number, lookY = 1.2): Pick<TrailerShot, 'from' | 'to'> {
-  const s = spot(id)
+// Around an exhibit: `d` metres in front, `side` metres to its right, `y` up.
+function near(s: ExhibitSpot, d: number, side: number, y: number): Vec3 {
   const front = [Math.sin(s.yaw), Math.cos(s.yaw)]
   const right = [Math.cos(s.yaw), -Math.sin(s.yaw)]
-  const place = (d: number, sd: number, y: number): Vec3 => [s.x + front[0] * d + right[0] * sd, y, s.z + front[1] * d + right[1] * sd]
-  const look: Vec3 = [s.x, lookY, s.z]
-  return { from: [place(far, side, fromY), look], to: [place(near, side * 0.4, toY), look] }
+  return [s.x + front[0] * d + right[0] * side, y, s.z + front[1] * d + right[1] * side]
 }
 
-// Half a turn around an exhibit at `radius` metres.
-function orbit(id: string, radius: number, y: number, a0: number, a1: number, lookY = 1.1): Pick<TrailerShot, 'from' | 'to'> {
+// A push in on an exhibit, sweeping a little sideways (a hero shot).
+function hero(id: string, duration: number, side: number, lookY: number, fov = 50): Segment {
   const s = spot(id)
-  const at = (a: number): Vec3 => [s.x + Math.sin(s.yaw + a) * radius, y, s.z + Math.cos(s.yaw + a) * radius]
-  const look: Vec3 = [s.x, lookY, s.z]
-  return { from: [at(a0), look], to: [at(a1), look] }
-}
-
-// The rotunda: from its entrance side, the camera rises and tilts up to the dome.
-const [rx, rz] = ROTUNDA_SPAWN
-const rotunda: Pick<TrailerShot, 'from' | 'to'> = {
-  from: [[rx * 0.95, 1.6, rz * 0.95], [0, 2.4, 0]],
-  to: [[rx * 0.55, 2.4, rz * 0.55], [0, 7.5, 0]],
-}
-
-// The Game Room: towards the Time Machine console on its platform, past the clockwork panels.
-const quiz = roomById('quiz')!
-const centreV = (quiz.vFront + quiz.vBack) / 2
-const standV = centreV - QUIZ_STAND.z // (the room's local z points back towards its door)
-const quizAt = (u: number, v: number, y: number): Vec3 => {
-  const [x, z] = toWorld(quiz.frame, u, v)
-  return [x, y, z]
-}
-const gameRoom: Pick<TrailerShot, 'from' | 'to'> = {
-  from: [quizAt(-1.6, standV - 5.5, 2.3), quizAt(0, standV, 1.2)],
-  to: [quizAt(-0.35, standV - 1.9, 1.75), quizAt(0, standV, 1.05)],
-}
-
-// A board up close: CMCN 2's telephone board (white enamel, navy border), sliding along it.
-function board(id: string): Pick<TrailerShot, 'from' | 'to'> {
-  const s = spot(id)
-  const front = [Math.sin(s.yaw), Math.cos(s.yaw)]
-  const right = [Math.cos(s.yaw), -Math.sin(s.yaw)]
-  const d = s.panelSide * 2.3 // where the board stands beside the plinth (layout.ts PANEL_OFFSET)
-  const bx = s.x + right[0] * d
-  const bz = s.z + right[1] * d
-  const at = (dist: number, slide: number, y: number): Vec3 => [bx + front[0] * dist + right[0] * slide, y, bz + front[1] * dist + right[1] * slide]
-  return { from: [at(3.4, -1.0, 1.9), [bx, 1.7, bz]], to: [at(2.7, 0.5, 1.7), [bx, 1.55, bz]] }
-}
-
-// In order; each caption is ui.trailer.captions[n] in the visitor's language.
-export const TRAILER_SHOTS: TrailerShot[] = [
-  { caption: 0, duration: 3.4, ...rotunda, fov: 66 },
-  { caption: 1, duration: 3.2, ...pushIn('ir1-1', 7.5, 3.6, 1.6, 2.4, 1.7, 1.4) },
-  { caption: 2, duration: 3.2, ...pushIn('ir2-3', 7, 3.4, -1.6, 2.6, 1.7, 1.3) },
-  { caption: 3, duration: 3.2, ...pushIn('ir3-1', 6.5, 3.2, 1.4, 2.2, 1.6, 1.1) },
-  { caption: 4, duration: 3.6, ...pushIn('ir4-3', 8, 3.8, -1.2, 3.0, 1.9, 1.6) },
-  { caption: 5, duration: 3.2, ...orbit('ir1-4', 4.2, 1.5, -0.9, 0.6, 1.0), fov: 55 },
-  { caption: 6, duration: 3.0, ...board('ir2-5'), fov: 55 },
-  { caption: 7, duration: 3.0, ...gameRoom, fov: 60 },
-  // Back in the rotunda, drawing away from the dome: the whole journey in one view.
-  { caption: 8, duration: 3.2, from: rotunda.to, to: rotunda.from, fov: 70 },
-  // (The last 1.0 s: the picture fades to black for the closing card.)
-]
-// The shots fill 28.0 s; the fade to the closing card fills the rest of the 30.
-export const SHOTS_END = TRAILER_SHOTS.reduce((sum, shot) => sum + shot.duration, 0)
-
-// Which shot is playing at trailer time t, and how far into it (0-1).
-export function shotAt(t: number): { shot: TrailerShot; index: number; progress: number } {
-  let start = 0
-  for (let index = 0; index < TRAILER_SHOTS.length; index++) {
-    const shot = TRAILER_SHOTS[index]
-    if (t < start + shot.duration || index === TRAILER_SHOTS.length - 1) {
-      return { shot, index, progress: Math.min(1, Math.max(0, (t - start) / shot.duration)) }
-    }
-    start += shot.duration
+  return {
+    kind: 'museum',
+    duration,
+    fov,
+    from: [near(s, 4.4, side, lookY + 0.9), [s.x, lookY, s.z]],
+    to: [near(s, 2.3, side * 0.25, lookY + 0.3), [s.x, lookY + 0.05, s.z]],
   }
-  return { shot: TRAILER_SHOTS[0], index: 0, progress: 0 }
 }
+
+// A fast, close move across an exhibit for the montage (alternating sides).
+function glimpse(id: string, k: number): Segment {
+  const s = spot(id)
+  const side = k % 2 === 0 ? 1 : -1
+  const look: Vec3 = [s.x, 1.3, s.z]
+  return { kind: 'museum', duration: 0.4, fov: 46, linear: true, from: [near(s, 2.7, 1.3 * side, 1.7), look], to: [near(s, 2.2, -0.3 * side, 1.55), look] }
+}
+
+// The entrance room of an era: a crane up from its overview board to the hanging sculpture.
+function entrance(room: RoomId, duration: number): Segment {
+  const s = spot(`${room}-overview`)
+  return { kind: 'museum', duration, fov: 60, from: [near(s, 6.2, -1.6, 1.5), [s.x, 2.0, s.z]], to: [near(s, 5.2, 1.0, 1.4), [s.x, 4.3, s.z]] }
+}
+
+// A room's own coordinates: across (u), from the museum's centre (v), up (y).
+function inRoom(room: RoomId) {
+  const r = roomById(room)!
+  const at = (u: number, v: number, y: number): Vec3 => {
+    const [x, z] = toWorld(r.frame, u, v)
+    return [x, y, z]
+  }
+  return { r, at }
+}
+
+// The intro hall: slowly towards the INOVAT sign on its back wall.
+const hall = inRoom('hall')
+const hallShot: Segment = {
+  kind: 'museum',
+  duration: 2.4,
+  fov: 55,
+  from: [hall.at(0, hall.r.vFront + 1.2, 1.5), hall.at(0, hall.r.vBack, 2.4)],
+  to: [hall.at(0, hall.r.vFront + hall.r.depth * 0.45, 1.7), hall.at(0, hall.r.vBack, 2.7)],
+}
+
+// The rotunda: from its floor, rising and tilting up to the dome and its chandelier.
+const rotundaShot: Segment = { kind: 'museum', duration: 2.4, fov: 62, from: [[6.5, 1.5, 6.5], [0, 2.6, 0]], to: [[3.6, 2.6, 3.6], [0, 8.5, 0]] }
+
+// The Game Room: past the clockwork panels, to the console, then the portal.
+const quiz = inRoom('quiz')
+const centreV = (quiz.r.vFront + quiz.r.vBack) / 2
+const standV = centreV - QUIZ_STAND.z // (the room's own z points back towards its door)
+const wall = -quiz.r.width / 2
+const gearsShot: Segment = {
+  kind: 'museum',
+  duration: 0.8,
+  fov: 45,
+  linear: true,
+  from: [quiz.at(wall + 2.0, centreV - 1.4, 2.2), quiz.at(wall, centreV - 0.4, 2.5)],
+  to: [quiz.at(wall + 1.6, centreV + 0.2, 2.4), quiz.at(wall, centreV + 0.6, 2.5)],
+}
+const consolePose: Pose = [quiz.at(-0.3, standV - 1.9, 1.75), quiz.at(0, standV, 1.05)]
+const consoleShot: Segment = { kind: 'museum', duration: 0.4, fov: 50, from: [quiz.at(-1.4, standV - 4.0, 2.1), quiz.at(0, standV, 1.1)], to: consolePose }
+const portalFrom: Pose = [quiz.at(0, quiz.r.vBack - 6.5, 1.6), quiz.at(0, quiz.r.vBack, 1.5)]
+const portalShot: Segment = { kind: 'museum', duration: 0.4, fov: 55, linear: true, from: portalFrom, to: [quiz.at(0, quiz.r.vBack - 1.4, 1.5), quiz.at(0, quiz.r.vBack, 1.45)] }
+
+// Every invention not given a hero shot, in walking order (17 of the 21).
+const MONTAGE = ['ir1-2', 'ir1-3', 'ir1-4', 'ir1-5', 'ir2-1', 'ir2-2', 'ir2-4', 'ir2-5', 'ir3-2', 'ir3-3', 'ir3-4', 'ir3-5', 'ir4-1', 'ir4-2', 'ir4-4', 'ir4-5', 'ir4-6']
+
+export const SEGMENTS: Segment[] = [
+  // I. OPENING (0-6.4): a gold card on black, the intro hall, the rotunda.
+  { kind: 'black', duration: 1.6 },
+  hallShot,
+  rotundaShot,
+  // II. THE FOUR ERAS (6.4-16.0): each its entrance room, then its headline exhibit.
+  entrance('ir1', 0.8),
+  hero('ir1-1', 1.6, 1.4, 1.3),
+  entrance('ir2', 0.8),
+  hero('ir2-3', 1.6, -1.4, 1.3),
+  entrance('ir3', 0.8),
+  hero('ir3-1', 1.6, 1.2, 1.1),
+  entrance('ir4', 0.8),
+  hero('ir4-3', 1.6, -1.2, 1.6, 55),
+  // III. MONTAGE (16.0-22.8): every other invention, 0.4 s each, cut on the beat.
+  ...MONTAGE.map((id, k) => glimpse(id, k)),
+  // IV. THE TIME MACHINE (22.8-25.6): clockwork, console, its window, the open portal.
+  gearsShot,
+  consoleShot,
+  { kind: 'game', duration: 0.8, pose: consolePose },
+  { kind: 'museum', duration: 0.4, fov: 55, linear: true, from: consolePose, to: portalFrom },
+  portalShot,
+  // V. THROUGH THE PORTAL (25.6-28.8): four moments of the ending film.
+  { kind: 'film', duration: 0.8, at: START.rocket + 1.5, speed: 1.2 },
+  { kind: 'film', duration: 0.8, at: START.grid + 1.2, speed: 1.6 },
+  { kind: 'film', duration: 0.8, at: START.die + 0.3, speed: 1.0 },
+  { kind: 'film', duration: 0.8, at: START.mind + 1.6, speed: 1.4 },
+  // VI. A beat of black (28.8-30.0), then the title over the film's finale landscape.
+  { kind: 'black', duration: 1.2 },
+  { kind: 'film', duration: 600, at: START.timeline + 3.0, speed: 0.5 },
+]
+
+export const SEGMENT_START: number[] = []
+SEGMENTS.reduce((t, segment) => (SEGMENT_START.push(t), t + segment.duration), 0)
+
+// Which segment plays at trailer time t, and how far into it (seconds).
+export function segmentAt(t: number): { segment: Segment; index: number; into: number } {
+  let index = 0
+  while (index < SEGMENTS.length - 1 && t >= SEGMENT_START[index + 1]) index++
+  return { segment: SEGMENTS[index], index, into: t - SEGMENT_START[index] }
+}
+
+// ---------- Titles and flashes (TrailerScreen.tsx) ----------
+// Each title is ui.trailer.titles[text] in the visitor's language: a small spaced line in gold
+// (kicker) over a larger gold title. card: on black; lower: low on the picture; centre: over
+// the montage; final: the closing title.
+export interface TrailerTitle {
+  text: number
+  from: number
+  to: number
+  place: 'card' | 'lower' | 'centre' | 'final'
+}
+export const TITLES: TrailerTitle[] = [
+  { text: 0, from: 0.15, to: 1.5, place: 'card' },
+  { text: 1, from: 4.2, to: 6.3, place: 'lower' },
+  { text: 2, from: 7.2, to: 8.8, place: 'lower' },
+  { text: 3, from: 9.6, to: 11.2, place: 'lower' },
+  { text: 4, from: 12.0, to: 13.6, place: 'lower' },
+  { text: 5, from: 14.4, to: 16.0, place: 'lower' },
+  { text: 6, from: 16.4, to: 18.8, place: 'centre' },
+  { text: 7, from: 19.8, to: 22.6, place: 'centre' },
+  { text: 8, from: 22.9, to: 24.0, place: 'lower' },
+  { text: 9, from: 25.8, to: 28.7, place: 'lower' },
+  { text: 10, from: TRAILER_LENGTH, to: Infinity, place: 'final' }, // (stays)
+]
+
+// Flashes of light over cuts: gold light leaks into each era, white through the portal.
+export const FLASHES: { at: number; colour: string; length: number }[] = [
+  { at: 6.4, colour: '#ffd9a0', length: 0.35 },
+  { at: 8.8, colour: '#ffe9b8', length: 0.35 },
+  { at: 11.2, colour: '#c8ffd8', length: 0.35 },
+  { at: 13.6, colour: '#d8f8ff', length: 0.35 },
+  { at: 16.0, colour: '#ffe2a8', length: 0.3 },
+  { at: 22.8, colour: '#ffe2a8', length: 0.3 },
+  { at: 25.6, colour: '#ffffff', length: 0.7 },
+]

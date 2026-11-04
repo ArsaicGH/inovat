@@ -29,7 +29,9 @@ export const SET_X = [-66, -22, 22, 66]
 // behind the black, so the graphics card prepares all of them before the first shot).
 // running: the film is playing (it is also built ahead of time, hidden, while the visitor is
 // in the Game Room: EndingScene.tsx; nothing in it moves until it runs).
-export const film = { t: 0, ready: false, running: false }
+// override: a time chosen from outside (the trailer's glimpse of the film), followed instead
+// of the music.
+export const film = { t: 0, ready: false, running: false, override: null as number | null }
 
 export const smooth = (a: number, b: number, x: number) => {
   const t = Math.min(1, Math.max(0, (x - a) / (b - a)))
