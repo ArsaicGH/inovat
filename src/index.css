@@ -1056,50 +1056,11 @@ body {
   overflow: hidden;
 }
 /* Once everything is downloaded: a short spaced gold word with three dots breathing. */
-.loading-preparing {
-  display: flex;
-  align-items: baseline;
-  gap: 2px;
-  margin: 0;
-  color: #e0c27e;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.32em;
-  text-transform: uppercase;
-  animation: pop-in 0.4s ease-out;
-}
-.loading-preparing span {
-  display: inline-flex;
-  gap: 4px;
-  margin-left: 4px;
-}
-.loading-preparing i {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: #c9a25a;
-  animation: preparing-dot 1.2s ease-in-out infinite;
-}
-.loading-preparing i:nth-child(2) {
-  animation-delay: 0.2s;
-}
-.loading-preparing i:nth-child(3) {
-  animation-delay: 0.4s;
-}
-@keyframes preparing-dot {
-  0%,
-  100% {
-    opacity: 0.25;
-  }
-  50% {
-    opacity: 1;
-  }
-}
 .loading-bytes {
-  margin: 0;
+  margin: 10px 0 0;
   font-size: 13px;
   font-variant-numeric: tabular-nums;
-  color: #9a8a68;
+  color: #c9a25a;
 }
 /* The tips at the bottom, in the museum's gold: the
    two tips side by side with a diamond between them. */
@@ -3699,11 +3660,19 @@ body {
   border: 1px solid #c9a25a;
   transform: rotate(45deg);
 }
+/* The link, the thing to remember: in a dark glass box with a gold double edge. */
 .trailer-url {
-  margin: 0;
-  color: #c9a25a;
-  font-size: clamp(12px, 1.3vw, 20px);
-  letter-spacing: 0.24em;
+  margin: 0.6vw 0 0;
+  padding: 0.75em 1.6em;
+  border: 1px solid rgba(217, 181, 110, 0.85);
+  border-radius: 6px;
+  background: rgba(10, 8, 5, 0.55);
+  box-shadow: inset 0 0 0 3px rgba(10, 8, 5, 0.55), inset 0 0 0 4px rgba(201, 162, 90, 0.45), 0 0 28px rgba(201, 162, 90, 0.25);
+  backdrop-filter: blur(4px);
+  color: #f0d595;
+  font-size: clamp(14px, 1.7vw, 28px);
+  font-weight: 600;
+  letter-spacing: 0.16em;
   animation: trailer-fade-in 1.2s 1.4s ease-out both;
 }
 @keyframes trailer-fade-in {
@@ -3792,9 +3761,9 @@ body {
 html.trailer-on .info-panel {
   zoom: 0.74;
 }
-/* ...and both push in slowly, so these shots keep moving like the rest. */
-html.trailer-on .info-panel,
-html.trailer-on .game-panel {
+/* ...and its content pushes in slowly, so the shot keeps moving like the rest. (Its inner row,
+   not the board itself: the board's own opening animation starts the 3D model when it ends.) */
+html.trailer-on .info-panel .board-row {
   animation: trailer-push 2.4s cubic-bezier(0.25, 0.6, 0.3, 1) both;
 }
 @keyframes trailer-push {

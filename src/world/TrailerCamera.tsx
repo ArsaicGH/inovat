@@ -3,7 +3,8 @@ import type { PerspectiveCamera } from 'three'
 import { endingMusicTime } from '../audio/sound'
 import { useMuseumStore, type Mode } from '../state/useMuseumStore'
 import { film, mixPose, smooth } from './ending-shots'
-import { MUSIC_START, segmentAt, trailerClock } from './trailer-script'
+import { startRun } from '../ui/game-run'
+import { GAME_FRAMES, MUSIC_START, segmentAt, trailerClock } from './trailer-script'
 
 // THE TRAILER'S CAMERA (trailer-script.ts): while the trailer plays, it places the camera
 // segment by segment, and switches the game into the ending film (for its glimpse) or the
@@ -12,6 +13,7 @@ import { MUSIC_START, segmentAt, trailerClock } from './trailer-script'
 // (Only mounted with ?trailer.)
 const NORMAL_FOV = 70
 const TRAILER_MODES: Mode[] = ['trailer', 'game', 'ending', 'reading']
+let gameFrame = -1 // the Time Machine moment on screen (GAME_FRAMES)
 
 export default function TrailerCamera() {
   useFrame(({ camera }, delta) => {
@@ -32,6 +34,22 @@ export default function TrailerCamera() {
         if (store.openExhibitId) useMuseumStore.setState({ openExhibitId: null })
         store.setMode(wanted)
       }
+    }
+    // The Time Machine: quick moments from the middle of its cores, one per beat.
+    if (segment.kind === 'game') {
+      const frame = Math.min(GAME_FRAMES.length - 1, Math.floor(into / 0.4))
+      if (frame !== gameFrame) {
+        gameFrame = frame
+        const [round, solved] = GAME_FRAMES[frame]
+        startRun(round)
+        if (solved) store.patchGameRun({ solved: true, points: 2, clues: 3 })
+        else if (round === 2) store.patchGameRun({ clues: 2 })
+      }
+    } else gameFrame = -1
+    // The enlarged board: its text scrolls down to the sources at the end.
+    if (segment.kind === 'reading') {
+      const scroller = document.querySelector('.info-panel .board-scroll')
+      if (scroller) scroller.scrollTop = smooth(0.5, segment.duration - 0.2, into) * (scroller.scrollHeight - scroller.clientHeight)
     }
     film.override = segment.kind === 'film' ? segment.at + into * (segment.speed ?? 1) : null
     if (segment.kind === 'film' || segment.kind === 'black') return

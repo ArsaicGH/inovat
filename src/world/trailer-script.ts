@@ -127,7 +127,7 @@ const standV = (quiz.r.vFront + quiz.r.vBack) / 2 - QUIZ_STAND.z // (the room's 
 const wall = -quiz.r.width / 2
 const gearsShot: Segment = {
   kind: 'museum',
-  duration: 1.6,
+  duration: 0.8,
   fov: 48,
   linear: true,
   from: [quiz.at(wall + 2.3, quiz.mid - 2.6, 2.2), quiz.at(wall, quiz.mid - 1.2, 2.5)],
@@ -157,10 +157,10 @@ export const SEGMENTS: Segment[] = [
   { kind: 'reading', duration: 2.4, exhibit: 'ir1-4', pose: rocketPose },
   // IV. THE DROP (19.2-24.0): twelve inventions, one per beat.
   ...MONTAGE.map((id, k) => glimpse(id, k)),
-  // V. THE TIME MACHINE (24.0-27.2): the clockwork, then its window with all four cores lit,
-  // opening on the music's accent at 25.6.
+  // V. THE TIME MACHINE (24.0-27.2): the clockwork, then its window: six quick moments from
+  // the middle of its cores, one per beat (GAME_FRAMES).
   gearsShot,
-  { kind: 'game', duration: 1.6, pose: consolePose },
+  { kind: 'game', duration: 2.4, pose: consolePose },
   // VI. THROUGH THE PORTAL (27.2-31.6): three moments of the ending film.
   { kind: 'film', duration: 1.2, at: START.rocket + 1.5, speed: 1.2 },
   { kind: 'film', duration: 1.6, at: START.grid + 1.0, speed: 1.3 },
@@ -170,6 +170,16 @@ export const SEGMENTS: Segment[] = [
   { kind: 'black', duration: 0.4 },
   { kind: 'film', duration: 4, at: START.timeline + 8.0, speed: 0.75 },
   { kind: 'film', duration: 600, at: START.hold, speed: 0 },
+]
+
+// The Time Machine's moments: [core (0-3), shown answered right?].
+export const GAME_FRAMES: [number, boolean][] = [
+  [0, false],
+  [1, false],
+  [1, true],
+  [2, false],
+  [3, false],
+  [3, true],
 ]
 
 export const SEGMENT_START: number[] = []
@@ -215,6 +225,6 @@ export const FLASHES: { at: number; colour: string; length: number }[] = [
   { at: 13.6, colour: '#d8f8ff', length: 0.35 },
   { at: 16.8, colour: '#ffe2a8', length: 0.3 },
   { at: 19.2, colour: '#ffe2a8', length: 0.4 },
-  { at: 24.0, colour: '#ffe2a8', length: 0.3 },
+  { at: 24.8, colour: '#ffe2a8', length: 0.3 },
   { at: 27.2, colour: '#ffffff', length: 0.7 },
 ]

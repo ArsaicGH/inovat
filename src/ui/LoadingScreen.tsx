@@ -129,18 +129,11 @@ export default function LoadingScreen() {
         <span style={{ width: `${worldReady ? 100 : shown}%` }} />
       </div>
       {/* The download count; once everything is in (the museum is then still being prepared
-          for the graphics card), a short gold "preparing". */}
+          for the graphics card), a quiet "preparing" in the same place. */}
       {loadedBytes < __STARTUP_BYTES__ ? (
         <p className="loading-bytes">{text.downloaded.replace('{loaded}', megabytes(loadedBytes)).replace('{total}', megabytes(__STARTUP_BYTES__))}</p>
       ) : (
-        <p className="loading-preparing">
-          {text.preparing}
-          <span aria-hidden="true">
-            <i />
-            <i />
-            <i />
-          </span>
-        </p>
+        <p className="loading-bytes">{text.preparing}</p>
       )}
       <div className="loading-tips">
         <p className="loading-tips-list">
