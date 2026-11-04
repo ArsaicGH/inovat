@@ -7,7 +7,6 @@ import type { Era } from './game'
 // (`from`), so a visitor who goes back to the rooms knows where to look.
 // Core I (Lost in time) needs no cards here: it uses the inventions (game.ts) and the
 // era rooms' gallery photos (pictures.ts).
-// Written by Claude from those texts: [CẦN KIỂM TRA] / [NEEDS CHECKING] by the content team.
 
 type Both = Record<Language, string>
 

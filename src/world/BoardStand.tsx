@@ -5,7 +5,7 @@ import PanelBoard from './PanelBoard'
 import { DARK_WOOD, type BoardTheme } from './style'
 
 // A free-standing text board on a stand that matches the room (style.ts board themes):
-// wooden posts, cast-iron posts, steel posts, a beige computer kiosk, or (CMCN 4) no stand
+// wooden posts, cast-iron posts, steel posts, a graphite computer kiosk, or (CMCN 4) no stand
 // at all: the glass board floats above a glowing emitter on the floor.
 
 interface BoardStandProps {
@@ -59,16 +59,16 @@ function Posts({ width, top, look }: { width: number; top: number; look: BoardTh
     )
   }
   if (look === 'screen') {
-    // One beige kiosk column on a wider foot, like a 1980s terminal stand.
+    // One graphite kiosk column on a wider foot, like a terminal stand.
     return (
       <group position={[0, 0, -0.04]}>
         <mesh position={[0, top / 2, 0]} castShadow>
           <boxGeometry args={[0.34, top, 0.22]} />
-          <meshStandardMaterial color="#d9cdb0" roughness={0.6} />
+          <meshStandardMaterial color="#1f2723" roughness={0.5} metalness={0.3} />
         </mesh>
         <mesh position={[0, 0.04, 0]}>
           <boxGeometry args={[0.7, 0.08, 0.45]} />
-          <meshStandardMaterial color="#b9ad90" roughness={0.6} />
+          <meshStandardMaterial color="#161c19" roughness={0.5} metalness={0.3} />
         </mesh>
       </group>
     )

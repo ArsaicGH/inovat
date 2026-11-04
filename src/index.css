@@ -2951,8 +2951,39 @@ body {
 .lost-door:disabled {
   cursor: default;
 }
+/* The right door opens: it lifts, and light from its era pours out of the arch while the
+   machine drops into it. */
+.lost-door {
+  position: relative;
+  overflow: hidden;
+}
 .lost-door.is-answer {
   box-shadow: 0 0 0 3px #2f9a5c, 0 0 22px var(--era);
+  animation: door-open 0.9s ease-out both;
+}
+.lost-door.is-answer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 25%, color-mix(in srgb, var(--era) 80%, #fff) 0%, transparent 70%);
+  animation: door-light 1.2s ease-out both;
+  pointer-events: none;
+}
+@keyframes door-open {
+  35% {
+    transform: translateY(-6px) scale(1.06);
+  }
+}
+@keyframes door-light {
+  from {
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.45;
+  }
 }
 .lost-door.is-wrong-door {
   opacity: 0.35;
@@ -3019,8 +3050,17 @@ body {
   width: 100%;
 }
 .mystery-worth {
+  display: inline-block;
   color: #c2453f;
   font-weight: 600;
+  /* Pops each time the points on offer drop (a new clue, a wrong guess). */
+  animation: worth-drop 0.45s ease-out;
+}
+@keyframes worth-drop {
+  from {
+    transform: scale(1.35);
+    color: #e0503a;
+  }
 }
 .mystery-body {
   display: grid;
@@ -3297,4 +3337,83 @@ body {
   background: rgba(201, 162, 90, 0.22);
   box-shadow: 0 0 20px rgba(201, 162, 90, 0.45);
   transform: rotate(45deg);
+}
+
+/* One hover and focus look for every gold-edged button (title screen, pause menu, settings,
+   boards, map, game, HUD): the same warm glow and a 1 px lift, and a gold ring when reached
+   with the keyboard. */
+.start-button,
+.board-close,
+.game-close,
+.game-primary,
+.hud-return,
+.workshop-help-button {
+  transition: background 0.2s, box-shadow 0.2s, transform 0.2s, opacity 0.2s;
+}
+.start-button:hover,
+.board-close:hover,
+.game-close:hover,
+.game-primary:hover:not(:disabled),
+.workshop-help-button:hover {
+  box-shadow: 0 0 20px rgba(201, 162, 90, 0.45);
+  transform: translateY(-1px);
+}
+/* (The HUD button is centred with a transform, so it keeps it while lifting.) */
+.hud-return:hover {
+  box-shadow: 0 0 20px rgba(201, 162, 90, 0.45), 0 6px 20px rgba(0, 0, 0, 0.45);
+  transform: translateX(-50%) translateY(-1px);
+}
+.start-button:focus-visible,
+.board-close:focus-visible,
+.game-close:focus-visible,
+.game-primary:focus-visible,
+.hud-return:focus-visible,
+.workshop-help-button:focus-visible,
+.title-settings:focus-visible {
+  outline: 2px solid #e0c27e;
+  outline-offset: 3px;
+}
+/* Narrow screens: no room beside the language switch, so the gear sits above its right end. */
+@media (max-width: 560px) {
+  .title-settings {
+    left: auto;
+    right: 0;
+    bottom: calc(100% + 8px);
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* Map on short landscape screens (phones held sideways): the circle of rooms takes the
+   left side at nearly full height, with the title and close button beside it, and its
+   labels are larger, so every room can be read and tapped. */
+@media (max-height: 520px) and (orientation: landscape) {
+  .map-card {
+    width: calc(100% - 32px);
+    display: grid;
+    grid-template-columns: auto minmax(160px, 240px);
+    justify-content: center;
+    column-gap: 24px;
+    align-items: center;
+    align-content: center;
+  }
+  .map-card > * {
+    grid-column: 2;
+  }
+  .map-card > .map-plan {
+    grid-column: 1;
+    grid-row: 1 / span 6;
+    width: min(88vh, 58vw);
+    margin: 0;
+  }
+  .map-room-short {
+    font-size: 4.2cqw;
+  }
+  .map-room-name {
+    font-size: 3cqw;
+  }
+  .map-here,
+  .map-visited {
+    font-size: 3cqw;
+  }
 }

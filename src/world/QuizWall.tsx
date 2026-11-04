@@ -180,6 +180,7 @@ export default function QuizWall() {
   const group = useRef<Group>(null)
   const aimed = useMuseumStore((state) => state.aimedExhibitId)
   const cores = useMuseumStore((state) => state.gameCores)
+  const stars = useMuseumStore((state) => state.coreStars)
 
   useEffect(() => {
     const wall = group.current
@@ -189,7 +190,7 @@ export default function QuizWall() {
   }, [])
 
   // ---- The big screen: title, what to do, and the four power cores ----
-  const screenKey = `${language}|${cores}`
+  const screenKey = `${language}|${cores}|${stars.join('')}`
   const paintScreen: Paint = (ctx, w, h, font) => {
     paintGlass(ctx, w, h)
     const pad = h * 0.1
@@ -221,6 +222,24 @@ export default function QuizWall() {
       ctx.textBaseline = 'middle'
       ctx.font = `700 ${h * 0.07}px ${font}`
       ctx.fillText(['I', 'II', 'III', 'IV'][i], cx, cy + h * 0.005)
+      // The best stars won on this core (three places, the earned ones in gold).
+      // (Drawn as shapes: the museum font has no star, and the sharp-text step redraws text.)
+      if (lit) {
+        for (let k = 0; k < 3; k++) {
+          const sx = cx + (k - 1) * h * 0.055
+          const sy = cy + h * 0.15
+          const r = h * 0.022
+          ctx.beginPath()
+          for (let p = 0; p < 10; p++) {
+            const angle = -Math.PI / 2 + (p * Math.PI) / 5
+            const radius = p % 2 === 0 ? r : r * 0.45
+            ctx.lineTo(sx + Math.cos(angle) * radius, sy + Math.sin(angle) * radius)
+          }
+          ctx.closePath()
+          ctx.fillStyle = k < stars[i] ? '#c9a25a' : '#d8d0c0'
+          ctx.fill()
+        }
+      }
       ctx.textBaseline = 'top'
     }
   }

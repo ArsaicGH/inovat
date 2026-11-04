@@ -1,7 +1,7 @@
 import { useRef, type ReactNode } from 'react'
 import { useContent } from '../content/use-content'
 import { useFrame } from '@react-three/fiber'
-import type { Group, MeshStandardMaterial } from 'three'
+import { ExtrudeGeometry, Path, Shape, type Group, type MeshStandardMaterial } from 'three'
 import type { RoomId } from '../types'
 import { ERA_NUMBER_SCALE, eraNumberY } from './WallPictures'
 import { ANTE_DEPTH, DOOR_WIDTH, HALL_PLANTS, QUIZ_BOARD as DISPLAY, QUIZ_PLATFORM, QUIZ_STAND, roomById, toWorld } from './layout'
@@ -388,6 +388,41 @@ function IntroHall({ size }: { size: RoomSize }) {
 // moulding, a red carpet from the door up to a raised round platform under a spotlight,
 // where the quiz stand waits, and the portal door in the back wall (PortalDoor.tsx).
 const PANEL_W = 2.3
+
+// A flat brass gear for the Game Room's wall panels (the Time Machine's clockwork): `teeth`
+// teeth around a disc with a round hole and spokes cut out. Built once and shared.
+function gearGeometry(teeth: number, radius: number, depth: number) {
+  const shape = new Shape()
+  const tooth = radius * 0.16
+  for (let i = 0; i < teeth * 4; i++) {
+    // Each tooth: rise, top, fall, root (four points per tooth).
+    const angle = (i / (teeth * 4)) * Math.PI * 2
+    const r = i % 4 === 1 || i % 4 === 2 ? radius : radius - tooth
+    const x = Math.cos(angle) * r
+    const y = Math.sin(angle) * r
+    if (i === 0) shape.moveTo(x, y)
+    else shape.lineTo(x, y)
+  }
+  shape.closePath()
+  // Four windows between the spokes, and the axle hole.
+  const inner = radius * 0.68
+  const hub = radius * 0.24
+  for (let k = 0; k < 4; k++) {
+    const a0 = (k / 4) * Math.PI * 2 + 0.22
+    const a1 = ((k + 1) / 4) * Math.PI * 2 - 0.22
+    const window = new Path()
+    window.absarc(0, 0, inner, a0, a1, false)
+    window.absarc(0, 0, hub + radius * 0.08, a1, a0, true)
+    window.closePath()
+    shape.holes.push(window)
+  }
+  const axle = new Path()
+  axle.absarc(0, 0, radius * 0.08, 0, Math.PI * 2, true)
+  shape.holes.push(axle)
+  return new ExtrudeGeometry(shape, { depth, bevelEnabled: false, curveSegments: 6 })
+}
+const BIG_GEAR = gearGeometry(16, 0.36, 0.03)
+const SMALL_GEAR = gearGeometry(10, 0.22, 0.03)
 const CREAM = '#e9dcc2'
 const IVORY = '#f6f0e4'
 // The quiz lectern: a plinth, a slim column and a sloping top with the quiz screen, like a
@@ -530,14 +565,13 @@ function QuizRoom({ size }: { size: RoomSize }) {
                   {gold}
                 </mesh>
               ))}
-              {/* A gold diamond in the middle of each panel. */}
-              <mesh position={[0, 0, 0.04]} rotation={[0, 0, Math.PI / 4]}>
-                <boxGeometry args={[0.42, 0.42, 0.03]} />
+              {/* Clockwork in the middle of each panel: a large brass gear meshing with a
+                  smaller one (the Time Machine's works), still, so they cost nothing per frame. */}
+              <mesh geometry={BIG_GEAR} position={[-0.16, 0.12, 0.03]} rotation={[0, 0, 0.1]}>
                 {gold}
               </mesh>
-              <mesh position={[0, 0, 0.05]} rotation={[0, 0, Math.PI / 4]}>
-                <boxGeometry args={[0.28, 0.28, 0.03]} />
-                <meshStandardMaterial color={CREAM} roughness={0.6} />
+              <mesh geometry={SMALL_GEAR} position={[0.28, -0.22, 0.03]} rotation={[0, 0, 0.3]}>
+                {gold}
               </mesh>
             </group>
           ))}

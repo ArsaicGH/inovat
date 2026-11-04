@@ -24,6 +24,23 @@ const GIVE_UP_AFTER = 20000
 // worked out when the site is built: vite.config.ts). Counted from the browser's own list of
 // finished downloads; a file the browser already kept from an earlier visit counts too.
 const STARTUP_PATHS = __STARTUP_FOLDERS__.map((folder) => `/${folder}/`)
+// The first visit in this browser downloads everything; later ones reuse the browser's copy.
+// (Remembered once the museum has loaded; storage can be blocked, so wrapped in try.)
+const FIRST_VISIT = (() => {
+  try {
+    return localStorage.getItem('inovat-visited') === null
+  } catch {
+    return false
+  }
+})()
+function rememberVisit() {
+  try {
+    localStorage.setItem('inovat-visited', '1')
+  } catch {
+    // (Nothing to do: the hint simply shows again next time.)
+  }
+}
+
 function useDownloadedBytes() {
   const [bytes, setBytes] = useState(0)
   useEffect(() => {
@@ -119,6 +136,7 @@ export default function LoadingScreen() {
   // After fading out, remove the screen completely.
   useEffect(() => {
     if (!worldReady) return
+    rememberVisit()
     const timer = setTimeout(() => setGone(true), 600)
     return () => clearTimeout(timer)
   }, [worldReady])
@@ -131,6 +149,7 @@ export default function LoadingScreen() {
       </div>
       <p className="loading-step">{stepText}</p>
       <p className="loading-bytes">{text.downloaded.replace('{loaded}', megabytes(loadedBytes)).replace('{total}', megabytes(__STARTUP_BYTES__))}</p>
+      {FIRST_VISIT && <p className="loading-bytes">{text.firstVisit}</p>}
       <div className="loading-tips">
         <p className="loading-tips-list">
           {text.tips.map((tip, i) => (

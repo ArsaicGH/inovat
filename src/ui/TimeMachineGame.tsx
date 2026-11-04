@@ -230,7 +230,7 @@ function MysteryRound() {
             {isEra && ` · ${g.era}`}
           </>
         }
-        extra={!run.solved && <span className="mystery-worth">{g.worth.replace('{n}', String(cardPoints(run)))}</span>}
+        extra={!run.solved && <span key={cardPoints(run)} className="mystery-worth">{g.worth.replace('{n}', String(cardPoints(run)))}</span>}
       />
       <div className="mystery-body">
         <ol className="mystery-clues">

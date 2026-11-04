@@ -363,8 +363,7 @@ function buildSpots(): ExhibitSpot[] {
       }
     } else if (room.id === 'quiz') {
       // No boards here for now: the back wall is the quiz screen (QuizWall.tsx) and the
-      // side walls carry decoration (RoomDecor.tsx). (The 'quiz-info' text stays in
-      // exhibits.ts, ready if a board comes back.)
+      // side walls carry decoration (RoomDecor.tsx).
     } else {
       // Overview board on a stand in the middle of the room, under the hanging era
       // sculpture, facing the entrance (leader's choice).

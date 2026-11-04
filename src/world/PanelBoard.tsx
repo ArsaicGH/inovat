@@ -331,6 +331,14 @@ export default function PanelBoard({ exhibitId, width, height, aimed, theme }: P
             </mesh>
           )),
         )}
+      {/* CMCN 3: a thin neon-green edge around the screen (a glowing plane just behind the
+          face, showing as a 1 cm border), like the enlarged board. */}
+      {look === 'screen' && (
+        <mesh position={[0, 0, depth / 2 + 0.0015]}>
+          <planeGeometry args={[faceWidth + 0.02, faceHeight + 0.02]} />
+          <meshBasicMaterial color={theme.rule} toneMapped={false} />
+        </mesh>
+      )}
       {/* Paper face, 3 mm in front of the frame (no shared surface, so no flicker). The
           screen is lit from inside, so it glows more. */}
       <mesh position={[0, 0, depth / 2 + 0.003]}>

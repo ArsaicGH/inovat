@@ -57,7 +57,8 @@ export const BOARD_THEMES: Record<RoomId, BoardTheme> = {
   ir1: { look: 'brass', paper: '#e8d9b5', title: '#3b2414', ink: '#4a3220', muted: '#7a5c3a', rule: '#8a5a2b', frame: '#a87a3a' },
   // White enamel with a navy border, the room's electric blue (leader: room 2 is blue).
   ir2: { look: 'enamel', paper: '#f1eee6', title: '#1d3557', ink: '#22303f', muted: '#4f6378', rule: '#2f5d8a', frame: '#1d3557' },
-  ir3: { look: 'screen', paper: '#0e1a12', title: '#a8ffbf', ink: '#6be08b', muted: '#3f9a5c', rule: '#6be08b', frame: '#d9cdb0' },
+  // A dark screen with a thin neon-green edge, like the enlarged board (leader: no beige case).
+  ir3: { look: 'screen', paper: '#0e1a12', title: '#a8ffbf', ink: '#6be08b', muted: '#3f9a5c', rule: '#6be08b', frame: '#151d18' },
   ir4: { look: 'hologram', paper: 'rgba(6, 34, 46, 0.93)' /* nearly opaque: see-through glass made the text hard to read (leader) */, title: '#e6fdff', ink: '#aef3ff', muted: '#6fd3e6', rule: '#3fd0e0', frame: '#3fd0e0' },
 }
 export const BOARD_FRAME = 0.06

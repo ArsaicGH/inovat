@@ -24,8 +24,8 @@ export interface ExhibitText {
 
 type Both = Record<Language, string>
 
-// Marks text that still has to be written or checked.
-const NOTE: Both = { vi: '[CẦN KIỂM TRA]', en: '[NEEDS CHECKING]' }
+// Shown only if an exhibit id has no text at all (a mistake in the code, never in the game).
+const NOTE: Both = { vi: '', en: '' }
 
 // The labels of the small lines under each title.
 const LABEL = {
@@ -719,22 +719,6 @@ const ENTRIES: Record<string, Entry> = {
       { name: 'NobelPrize.org', title: 'The Nobel Prize in Chemistry 2020', url: 'https://www.nobelprize.org/prizes/chemistry/2020/summary/' },
       { name: 'NobelPrize.org', title: 'The Nobel Prize in Physiology or Medicine 2023', url: 'https://www.nobelprize.org/prizes/medicine/2023/summary/' },
     ],
-  },
-  // ---------- Game Room ----------
-  // (The minigame is not finished yet: this board stays a placeholder.)
-  'quiz-info': {
-    title: { vi: 'Trò chơi câu hỏi', en: 'The Quiz' },
-    facts: [],
-    short: {
-      vi: `Câu hỏi về bốn cuộc Cách mạng Công nghiệp hiện trên bức tường cuối phòng. Nhắm vào đáp án quý khách chọn rồi nhấn E. ${NOTE.vi}`,
-      en: `Questions about the four Industrial Revolutions appear on the back wall. Aim at the answer you choose and press E. ${NOTE.en}`,
-    },
-    long: {
-      vi: `Câu hỏi về bốn cuộc Cách mạng Công nghiệp hiện trên bức tường cuối phòng. Nhắm vào đáp án quý khách chọn rồi nhấn E. ${NOTE.vi}`,
-      en: `Questions about the four Industrial Revolutions appear on the back wall. Aim at the answer you choose and press E. ${NOTE.en}`,
-    },
-    sources: [],
-    placeholder: true,
   },
 }
 

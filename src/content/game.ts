@@ -218,8 +218,8 @@ export const CHALLENGES: Challenge[] = [
       en: '3D printing builds objects layer by layer from a digital model, ideal for quick prototypes with complex shapes.',
     },
   },
-  // (More situations so that each new attempt draws a different set. Written by Claude from
-  // the exhibits' own texts: [CẦN KIỂM TRA] / [NEEDS CHECKING] by the content team.)
+  // (More situations so that each new attempt draws a different set, written from the
+  // exhibits' own texts.)
   {
     situation: {
       vi: 'Một xưởng dệt muốn kéo sợi bông chắc và đều bằng máy, chạy bằng sức nước thay cho tay người. Phát minh nào phù hợp?',
@@ -368,7 +368,6 @@ const vi = {
   failed: 'Chưa đủ điểm để thắp sáng lõi. Hãy xem lại các phòng và thử lần nữa.',
   score: '{score}/{total} điểm (cần {need})',
   points: 'Điểm: {n}',
-  placeholder: '[CẦN KIỂM TRA]',
   // A wrong answer (crossed out; the visitor chooses again).
   wrongTitle: 'Chưa đúng.',
   wrongTryOther: 'Hãy chọn lại.',
@@ -448,7 +447,6 @@ const en: typeof vi = {
   failed: 'Not enough points to light the core yet. Look around the rooms again and have another go.',
   score: '{score}/{total} points (need {need})',
   points: 'Points: {n}',
-  placeholder: '[NEEDS CHECKING]',
   wrongTitle: 'Not quite.',
   wrongTryOther: 'Choose again.',
   wrongHint: 'Hint: the answer is in {room}.',

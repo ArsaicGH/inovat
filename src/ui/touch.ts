@@ -1,3 +1,5 @@
+import { DEV_MODE } from '../dev-mode'
+
 // TOUCH DEVICES (phones and tablets): no mouse or keyboard, so the game uses on-screen
 // controls instead (TouchControls.tsx) and touch wording in the texts (content/ui.ts).
 // Checked once at start. A touch screen alone is not enough (some laptops have one, and
@@ -6,6 +8,9 @@
 // a phone or tablet: the browser says it is mobile, the device name says so, the MAIN
 // pointer is a finger, or an iPad pretending to be a Mac.
 function isTouchDevice(): boolean {
+  // (Developer test switch: ?touch forces the phone version, for browsers that only pretend
+  // to be a phone, like the editor's preview.)
+  if (DEV_MODE && new URLSearchParams(window.location.search).has('touch')) return true
   if (typeof window === 'undefined' || navigator.maxTouchPoints === 0) return false
   const nav = navigator as Navigator & { userAgentData?: { mobile: boolean } }
   if (nav.userAgentData?.mobile) return true
