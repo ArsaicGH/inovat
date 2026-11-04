@@ -3830,7 +3830,6 @@ html.trailer-on .info-overlay {
 html.trailer-on .game-overlay {
   overflow: hidden;
   background: radial-gradient(ellipse at 50% 45%, rgba(12, 10, 7, 0.25), rgba(0, 0, 0, 0.88) 78%);
-  backdrop-filter: blur(5px) brightness(0.75);
   perspective: 1500px;
 }
 html.trailer-on .game-panel {
@@ -3838,15 +3837,27 @@ html.trailer-on .game-panel {
   box-shadow: 0 40px 120px rgba(0, 0, 0, 0.75), 0 0 60px rgba(201, 162, 90, 0.25);
 }
 /* (Each shot's camera-like framing of the window is set frame by frame: TrailerCamera.tsx.) */
-/* (Opened unseen during the shot before, so its 3D view is ready: TrailerCamera.tsx.) */
-html.trailer-preparing .game-overlay {
+/* The board and the game window stay open all through the trailer, unseen except in their
+   own shots (TrailerCamera.tsx), so no 3D view is ever started or torn down mid-trailer. */
+html.trailer-on .info-overlay,
+html.trailer-on .game-overlay {
   opacity: 0;
+  pointer-events: none;
+  animation: none;
+  transition: opacity 0.2s ease-out;
+}
+html.trailer-reading .info-overlay,
+html.trailer-game .game-overlay {
+  opacity: 1;
 }
 /* The core's number and name, a gold chapter tag at the top of each shot. */
 .trailer-core-tag {
   position: absolute;
-  top: calc(var(--bar) + 4vh);
-  left: 5vw;
+  /* (In the margin left of the window, which the shot moves slightly right.) */
+  top: 50%;
+  left: 3vw;
+  max-width: 19vw;
+  translate: 0 -50%;
   display: flex;
   align-items: center;
   gap: 0.9vw;
@@ -3927,7 +3938,7 @@ html.trailer-preparing .game-overlay {
 }
 /* ...and its content pushes in slowly, so the shot keeps moving like the rest. (Its inner row,
    not the board itself: the board's own opening animation starts the 3D model when it ends.) */
-html.trailer-on .info-panel .board-row {
+html.trailer-reading .info-panel .board-row {
   animation: trailer-push 2.4s cubic-bezier(0.25, 0.6, 0.3, 1) both;
 }
 @keyframes trailer-push {

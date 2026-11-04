@@ -50,8 +50,6 @@ export default function TrailerScreen() {
         setEndingMusicPaused(true)
         trailerClock.t = -1 // (black, and the camera waits)
         trailerClock.paused = true
-        useMuseumStore.setState({ openExhibitId: null, gameRun: null })
-        useMuseumStore.getState().setMode('trailer')
         setCountdown(3)
         return
       }

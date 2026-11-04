@@ -4,7 +4,10 @@ import { endingMusicTime } from '../audio/sound'
 import { useMuseumStore, type Mode } from '../state/useMuseumStore'
 import { film, mixPose, smooth } from './ending-shots'
 import { startRun } from '../ui/game-run'
-import { GAME_SHOTS, GAME_SHOT_LENGTH, MUSIC_START, segmentAt, trailerClock } from './trailer-script'
+import { GAME_SHOTS, GAME_SHOT_LENGTH, GAME_START, MUSIC_START, SEGMENTS, segmentAt, trailerClock } from './trailer-script'
+
+// The exhibit whose enlarged board the trailer shows.
+const BOARD = SEGMENTS.find((segment) => segment.kind === 'reading')?.exhibit ?? null
 
 // THE TRAILER'S CAMERA (trailer-script.ts): while the trailer plays, it places the camera
 // segment by segment, and switches the game into the ending film (for its glimpse) or the
@@ -26,28 +29,27 @@ export default function TrailerCamera() {
 
     // The ending film draws itself; the trailer only chooses its moment.
     // (A black beat keeps whatever is behind it, so the film is not stopped and restarted.)
-    const preparing = segment.kind === 'museum' && segment.prepareGame === true
-    document.documentElement.classList.toggle('trailer-preparing', preparing)
-    const wanted: Mode =
-      segment.kind === 'film' ? 'ending' : segment.kind === 'game' || preparing ? 'game' : segment.kind === 'reading' ? 'reading' : segment.kind === 'black' ? store.mode : 'trailer'
-    if (store.mode !== wanted) {
-      if (segment.kind === 'reading') store.openExhibit(segment.exhibit)
-      else {
-        // (Leaving the enlarged board closes it: it shrinks away as the next shot starts.)
-        if (store.openExhibitId) useMuseumStore.setState({ openExhibitId: null })
-        store.setMode(wanted)
-      }
-    }
-    // The Time Machine: four shots, each a core played live (GAME_SHOTS). The window's
-    // camera-like move for each shot is chosen by html[data-game-shot] (index.css).
-    if (segment.kind === 'game' || preparing) {
-      const index = preparing ? 0 : Math.min(GAME_SHOTS.length - 1, Math.floor(into / GAME_SHOT_LENGTH))
+    // SMOOTHNESS: the enlarged board and the Time Machine's window (each with its own small
+    // 3D view) are opened once, unseen, at the very start, and stay open all through the
+    // trailer; their shots only reveal them (html.trailer-reading / .trailer-game, index.css).
+    // Opening one mid-trailer (a new 3D view, its drawing code built) or closing it (the 3D
+    // view torn down) stalled the picture for a moment.
+    const root = document.documentElement.classList
+    root.toggle('trailer-reading', segment.kind === 'reading')
+    root.toggle('trailer-game', segment.kind === 'game')
+    if (store.openExhibitId !== BOARD) useMuseumStore.setState({ openExhibitId: BOARD })
+    const wanted: Mode = segment.kind === 'film' ? 'ending' : segment.kind === 'game' ? 'game' : segment.kind === 'reading' ? 'reading' : segment.kind === 'black' ? store.mode : 'trailer'
+    if (store.mode !== wanted) store.setMode(wanted)
+    // The Time Machine: two shots, each a core played live (GAME_SHOTS). Before them, the first
+    // core is already dealt (its 3D model turning, unseen).
+    if (segment.kind === 'game' || trailerClock.t < GAME_START) {
+      const playing = segment.kind === 'game'
+      const index = playing ? Math.min(GAME_SHOTS.length - 1, Math.floor(into / GAME_SHOT_LENGTH)) : 0
       const shot = GAME_SHOTS[index]
-      const at = preparing ? 0 : into - index * GAME_SHOT_LENGTH
-      if (index !== gameShot) {
+      const at = playing ? into - index * GAME_SHOT_LENGTH : 0
+      if (index !== gameShot || !store.gameRun) {
         gameShot = index
         gameStep = 0
-        document.documentElement.dataset.gameShot = String(index)
         startRun(shot.round)
         if (shot.card) {
           const run = useMuseumStore.getState().gameRun!
@@ -71,9 +73,6 @@ export default function TrailerCamera() {
         gameStep = clues
         store.patchGameRun({ clues: 1 + clues })
       }
-    } else if (gameShot !== -1) {
-      gameShot = -1
-      delete document.documentElement.dataset.gameShot
     }
     // The enlarged board: its text scrolls down to the sources at the end.
     if (segment.kind === 'reading') {

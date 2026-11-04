@@ -10,12 +10,15 @@ import Invention, { ModelCopy } from './inventions'
 // silhouette: lights off, so only the dark shape shows against the glow (the Time Machine
 // game's "mystery machine" round).
 
-export default function ModelViewer({ id, silhouette = false }: { id: string; silhouette?: boolean }) {
+// idle: drawn only when something changes (not every frame), while it is open but unseen
+// (the trailer keeps it open between its shots: TrailerCamera.tsx).
+export default function ModelViewer({ id, silhouette = false, idle = false }: { id: string; silhouette?: boolean; idle?: boolean }) {
   const light = silhouette ? 0 : 1
   return (
     <Canvas
       className="model-viewer-canvas"
       dpr={[1, 1.5]}
+      frameloop={idle ? 'demand' : 'always'}
       // (Sized by its box's layout size, so a zoomed or moving window does not shrink it.)
       resize={{ offsetSize: true }}
       camera={{ fov: 35, position: [0, 0.7, 4.8] }}

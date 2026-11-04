@@ -54,7 +54,8 @@ function App() {
       <InfoPanel />
       {mode === 'map' && <MapMenu />}
       {mode === 'ending' && !TRAILER && <EndingScreen />}
-      {mode === 'game' && <TimeMachineGame />}
+      {/* (In the trailer it stays open, unseen between its shots: TrailerCamera.tsx.) */}
+      {(mode === 'game' || (TRAILER && mode !== 'start')) && <TimeMachineGame />}
       <LoadingScreen />
       <SoundDirector />
       {/* Touch devices held upright: ask to turn them sideways (shown by index.css). */}

@@ -28,6 +28,7 @@ import { TOWN_YEARS } from '../content/game-cards'
 import Town, { townStages } from './game-town'
 import VisitorFigure, { SceneBackdrop } from './game-visitor'
 import { assetUrl } from '../asset-url'
+import { TRAILER } from '../world/trailer-script'
 
 // THE TIME MACHINE REPAIR SHOP (opened from the Game Room's lectern). The first screen is the
 // workshop with the four power cores; each core is a different challenge:
@@ -136,6 +137,8 @@ function LostRound() {
     return () => window.clearTimeout(timer)
   }, [run.solved, run.index])
   const picture = isPhoto(id) ? PICTURES[id] : null
+  // (In the trailer the window stays open, unseen, between its shots.)
+  const trailerIdle = useMuseumStore((state) => TRAILER && state.mode !== 'game')
   return (
     <div className="lost">
       <CardBar
@@ -148,7 +151,7 @@ function LostRound() {
             <img src={assetUrl(picture.file ?? '')} alt="" draggable={false} />
           ) : (
             <Suspense fallback={null}>
-              <ModelViewer id={id} />
+              <ModelViewer id={id} idle={trailerIdle} />
             </Suspense>
           )}
         </div>

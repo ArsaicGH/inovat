@@ -88,6 +88,7 @@ function PictureFigure({ picture, language, theme, credit, className }: { pictur
 // It stays mounted for a moment after closing so the shrink animation can play.
 export default function InfoPanel() {
   const { ui, exhibit, language } = useContent()
+  const mode = useMuseumStore((state) => state.mode)
   const openId = useMuseumStore((state) => state.openExhibitId)
   // The exhibit currently on screen: follows openId, but lingers while shrinking away.
   const [shownId, setShownId] = useState<string | null>(openId)
@@ -126,6 +127,8 @@ export default function InfoPanel() {
   }, [openId])
 
   if (!shownId) return null
+  // (In the trailer the board stays open, unseen, between its shots.)
+  const trailerIdle = TRAILER && mode !== 'reading'
   const text = exhibit(shownId)
   const spot = EXHIBIT_SPOTS.find((s) => s.id === shownId)
   // A picture from a wall gallery ('wall-ir1-2'): shown large on its own, in its room's colours.
@@ -171,7 +174,7 @@ export default function InfoPanel() {
             <div className="model-viewer">
               <Suspense fallback={null}>
                 {/* (In the trailer at once: the shot is short.) */}
-                {(modelReady || TRAILER) && <ModelViewer id={shownId} />}
+                {(modelReady || TRAILER) && <ModelViewer id={shownId} idle={trailerIdle} />}
               </Suspense>
             </div>
           )}

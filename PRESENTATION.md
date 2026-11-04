@@ -59,7 +59,7 @@ moment; take a full-size screenshot with **Win+Shift+S**, then Space again to go
 `?trailer&from=16` starts at second 16 (any second works), to reach a shot quickly or to
 re-record one part. Good moments: the rotunda dome (5 s), each era's headline exhibit (8, 10.5,
 13, 16 s), the Rocket's board (18 s), the montage (19.2-21.6 s), the gears (22 s), the Time
-Machine (core I 22.4-24.8 s, core IV 24.8-27.2 s), the ending film's city and neurons (28-31.5 s), the closing title (33 s).
+Machine (core I 22.4-24.3 s, core IV 24.3-26.2 s), the ending film's city and neurons (28-31.5 s), the closing title (33 s).
 
 For the phone version, play normally (`?devmode` opens everything) and use the phone's own
 screenshot buttons.
