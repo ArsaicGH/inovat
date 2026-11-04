@@ -75,7 +75,10 @@ export default function TrailerScreen() {
       {gameShot !== null && (
         <div key={`tag-${gameShot}`} className="trailer-core-tag">
           <span>{['I', 'II', 'III', 'IV'][GAME_SHOTS[gameShot].round]}</span>
-          {gameText[language].rounds[GAME_SHOTS[gameShot].round].name}
+          <span className="trailer-core-text">
+            <small>{gameText[language].rounds[GAME_SHOTS[gameShot].round].name}</small>
+            {ui.trailer.gameShots[gameShot]}
+          </span>
         </div>
       )}
       <div className="trailer-grain" />

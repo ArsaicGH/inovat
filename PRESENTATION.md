@@ -55,8 +55,8 @@ Open `?trailer`, press F11, click to play, and press **Space** to hold the pictu
 moment; take a full-size screenshot with **Win+Shift+S**, then Space again to go on.
 `?trailer&from=16` starts at second 16 (any second works), to reach a shot quickly or to
 re-record one part. Good moments: the rotunda dome (5 s), each era's headline exhibit (8, 10.5,
-13, 16 s), the Rocket's board (18 s), the montage (19.2-23.2 s), the gears (23.5 s), the four
-Time Machine cores (24-27.2 s), the ending film's city and neurons (28-31.5 s), the closing title (33 s).
+13, 16 s), the Rocket's board (18 s), the montage (19.2-22.4 s), the gears (22.8 s), the Time
+Machine (core I 23.2-25.2 s, core II 25.2-27.2 s), the ending film's city and neurons (28-31.5 s), the closing title (33 s).
 
 For the phone version, play normally (`?devmode` opens everything) and use the phone's own
 screenshot buttons.

@@ -77,6 +77,8 @@ const vi = {
   trailer: {
     start: 'Nhấp để phát trailer',
     // Each: a small gold line (kicker) over the title. The last is the closing title's line.
+    // The Time Machine's two shots: what the player does in each.
+    gameShots: ['Đưa mỗi cỗ máy về đúng thời đại', 'Dựng cả một thị trấn qua bốn thời đại'],
     titles: [
       { kicker: 'INOVAT trình bày', title: 'Một hành trình qua lịch sử công nghiệp' },
       { kicker: 'Từ 1760 đến hôm nay', title: 'Bốn cuộc Cách mạng Công nghiệp' },
@@ -86,7 +88,7 @@ const vi = {
       { kicker: 'Cách mạng IV', title: 'Trí tuệ nhân tạo' },
       { kicker: '21 phát minh', title: 'Sống động trong không gian 3D' },
       { kicker: 'Mở từng hiện vật', title: 'Mô hình 3D xoay được, kèm nguồn tham khảo' },
-      { kicker: 'Cỗ máy thời gian', title: 'Sửa chữa nó để mở cánh cổng' },
+      { kicker: 'Cỗ máy thời gian · bốn thử thách', title: 'Không chỉ là trắc nghiệm' },
       { kicker: 'Phía sau cánh cổng', title: 'Một bộ phim qua bốn thời đại' },
       { kicker: 'Mở cửa ngay trên trình duyệt', title: '' },
     ],
@@ -301,6 +303,7 @@ const en: UiText = {
   },
   trailer: {
     start: 'Click to play the trailer',
+    gameShots: ['Send each machine back to its era', 'Grow a town through four eras'],
     titles: [
       { kicker: 'INOVAT presents', title: 'A journey through industrial history' },
       { kicker: 'From 1760 to today', title: 'Four Industrial Revolutions' },
@@ -310,7 +313,7 @@ const en: UiText = {
       { kicker: 'Revolution IV', title: 'Artificial intelligence' },
       { kicker: '21 inventions', title: 'Brought to life in 3D' },
       { kicker: 'Open any exhibit', title: 'Turn its 3D model, read its sources' },
-      { kicker: 'The Time Machine', title: 'Repair it to open the portal' },
+      { kicker: 'The Time Machine · four challenges', title: 'More than a quiz' },
       { kicker: 'Beyond the portal', title: 'A film across four eras' },
       { kicker: 'Now open in your browser', title: '' },
     ],

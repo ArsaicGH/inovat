@@ -3828,7 +3828,7 @@ html.trailer-preparing .game-overlay {
   gap: 0.9vw;
   padding: 0.5em 1.3em 0.5em 0.6em;
   border: 1px solid rgba(217, 181, 110, 0.7);
-  border-radius: 999px;
+  border-radius: 14px;
   background: rgba(10, 8, 5, 0.6);
   backdrop-filter: blur(4px);
   color: #f0d595;
@@ -3836,9 +3836,29 @@ html.trailer-preparing .game-overlay {
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  animation: trailer-tag 0.8s ease-out both;
+  animation: trailer-tag 2s ease-out both;
 }
-.trailer-core-tag span {
+.trailer-core-tag .trailer-core-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25em;
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  background: none;
+  color: #f6e3b0;
+  font-family: inherit;
+  font-size: 1.15em;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+.trailer-core-text small {
+  color: #c9a25a;
+  font-size: 0.62em;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+.trailer-core-tag > span:first-child {
   display: grid;
   place-items: center;
   width: 2em;
@@ -3854,11 +3874,11 @@ html.trailer-preparing .game-overlay {
     opacity: 0;
     transform: translateX(-20px);
   }
-  30% {
+  12% {
     opacity: 1;
     transform: none;
   }
-  85% {
+  90% {
     opacity: 1;
   }
   to {
@@ -3871,7 +3891,7 @@ html.trailer-preparing .game-overlay {
   inset: 0;
   background: linear-gradient(105deg, transparent 35%, rgba(255, 226, 168, 0.22) 47%, rgba(255, 246, 220, 0.38) 50%, rgba(255, 226, 168, 0.22) 53%, transparent 65%);
   mix-blend-mode: screen;
-  animation: trailer-sheen 0.8s ease-in-out both;
+  animation: trailer-sheen 1.4s ease-in-out both;
 }
 @keyframes trailer-sheen {
   from {

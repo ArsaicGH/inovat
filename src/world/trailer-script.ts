@@ -142,8 +142,8 @@ const consolePose: Pose = [quiz.at(-0.3, standV - 1.9, 1.75), quiz.at(0, standV,
 const rocket = spot('ir1-4')
 const rocketPose: Pose = [near(rocket, 3.0, 0.8, 1.6), [rocket.x, 1.2, rocket.z]]
 
-// A quick montage at the drop: ten more inventions, one per beat.
-const MONTAGE = ['ir1-2', 'ir1-3', 'ir2-4', 'ir2-3', 'ir2-5', 'ir3-2', 'ir3-3', 'ir4-1', 'ir4-5', 'ir4-6']
+// A quick montage at the drop: eight more inventions, one per beat.
+const MONTAGE = ['ir1-2', 'ir1-3', 'ir2-4', 'ir2-5', 'ir3-2', 'ir3-3', 'ir4-1', 'ir4-5']
 
 export const SEGMENTS: Segment[] = [
   // I. OPENING (0-6.4): a gold card on black, the intro hall (on the swell), the rotunda.
@@ -158,12 +158,12 @@ export const SEGMENTS: Segment[] = [
   { ...era4, duration: 3.2 },
   // III. THE BREAK (16.8-19.2): in the music's quiet moment, an exhibit's board opens.
   { kind: 'reading', duration: 2.4, exhibit: 'ir1-4', pose: rocketPose },
-  // IV. THE DROP (19.2-23.2): ten inventions, one per beat.
+  // IV. THE DROP (19.2-22.4): eight inventions, one per beat.
   ...MONTAGE.map((id, k) => glimpse(id, k)),
-  // V. THE TIME MACHINE (23.2-27.2): the clockwork, then the game itself in four shots, its
-  // window floating in the dark like a filmed screen, each core played live (GAME_SHOTS).
+  // V. THE TIME MACHINE (22.4-27.2): the clockwork, then the game itself in two unhurried
+  // shots, its window floating in the dark like a filmed screen, played live (GAME_SHOTS).
   gearsShot,
-  { kind: 'game', duration: 3.2, pose: consolePose },
+  { kind: 'game', duration: 4.0, pose: consolePose },
   // VI. THROUGH THE PORTAL (27.2-31.6): three moments of the ending film.
   { kind: 'film', duration: 1.2, at: START.rocket + 1.5, speed: 1.2 },
   { kind: 'film', duration: 1.6, at: START.grid + 1.0, speed: 1.3 },
@@ -175,12 +175,12 @@ export const SEGMENTS: Segment[] = [
   { kind: 'film', duration: 600, at: START.hold, speed: 0 },
 ]
 
-// The Time Machine's four shots (0.8 s each, one per core). Each core is dealt fresh, then
+// The Time Machine's two shots (2 s each, long enough to follow). Each core is dealt fresh, then
 // played on screen: answered right at `solveAt` seconds into the shot, or (core III) its
 // clues opening one by one. The window's camera-like move for each is in index.css
 // (html[data-game-shot]). card: the card to show first (core I: the Benz car, a model that
 // reads well small).
-export const GAME_SHOT_LENGTH = 0.8
+export const GAME_SHOT_LENGTH = 2.0
 // The window is filmed like a screen: `from` and `to` are its framing at the start and end
 // of the shot: scale, shift (% of its size), tilt (degrees), around `origin` (% of the
 // window): a close-up on the machine pulling back as its door lights, a pan across the
@@ -194,10 +194,8 @@ export interface Framing {
   turnY: number
 }
 export const GAME_SHOTS: { round: number; card?: string; solveAt?: number; cluesAt?: number[]; origin: string; from: Framing; to: Framing }[] = [
-  { round: 0, card: 'ir2-2', solveAt: 0.5, origin: '30% 52%', from: { scale: 2.4, x: 0, y: 0, turnX: 0, turnY: -10 }, to: { scale: 1.5, x: 0, y: 0, turnX: 0, turnY: -3 } },
-  { round: 1, solveAt: 0.45, origin: '50% 42%', from: { scale: 1.85, x: -7, y: 0, turnX: 0, turnY: 6 }, to: { scale: 1.65, x: 6, y: 0, turnX: 0, turnY: -4 } },
-  { round: 2, cluesAt: [0.15, 0.4], origin: '28% 50%', from: { scale: 1.9, x: 2, y: 9, turnX: 9, turnY: 0 }, to: { scale: 1.6, x: 0, y: -6, turnX: 2, turnY: 0 } },
-  { round: 3, solveAt: 0.35, origin: '50% 36%', from: { scale: 2.0, x: 0, y: 0, turnX: -4, turnY: 0 }, to: { scale: 0.95, x: 0, y: 0, turnX: 5, turnY: -3 } },
+  { round: 0, card: 'ir2-2', solveAt: 1.2, origin: '30% 52%', from: { scale: 2.0, x: 0, y: 0, turnX: 0, turnY: -8 }, to: { scale: 1.25, x: 0, y: 0, turnX: 0, turnY: -2 } },
+  { round: 1, solveAt: 1.1, origin: '50% 42%', from: { scale: 1.75, x: -5, y: 0, turnX: 0, turnY: 5 }, to: { scale: 1.45, x: 4, y: 0, turnX: 0, turnY: -3 } },
 ]
 
 export const SEGMENT_START: number[] = []
@@ -228,8 +226,8 @@ export const TITLES: TrailerTitle[] = [
   { text: 4, from: 11.6, to: 13.5, place: 'lower' },
   { text: 5, from: 14.0, to: 16.6, place: 'lower' },
   { text: 7, from: 17.0, to: 19.1, place: 'lower' },
-  { text: 6, from: 19.3, to: 23.0, place: 'centre' },
-  { text: 8, from: 24.1, to: 27.1, place: 'lower' },
+  { text: 6, from: 19.3, to: 22.3, place: 'centre' },
+  { text: 8, from: 23.3, to: 27.1, place: 'lower' },
   { text: 9, from: 27.4, to: 31.5, place: 'lower' },
   { text: 10, from: TRAILER_LENGTH, to: Infinity, place: 'final' }, // (stays)
 ]
@@ -242,10 +240,8 @@ export const FLASHES: { at: number; colour: string; length: number }[] = [
   { at: 13.6, colour: '#d8f8ff', length: 0.35 },
   { at: 16.8, colour: '#ffe2a8', length: 0.3 },
   { at: 19.2, colour: '#ffe2a8', length: 0.4 },
-  { at: 23.2, colour: '#ffe2a8', length: 0.3 },
-  { at: 24.0, colour: '#fff1cf', length: 0.35 },
-  { at: 24.8, colour: '#ffe2a8', length: 0.25 },
-  { at: 25.6, colour: '#fff1cf', length: 0.4 },
-  { at: 26.4, colour: '#ffe2a8', length: 0.25 },
+  { at: 22.4, colour: '#ffe2a8', length: 0.3 },
+  { at: 23.2, colour: '#fff1cf', length: 0.35 },
+  { at: 25.2, colour: '#fff1cf', length: 0.35 },
   { at: 27.2, colour: '#ffffff', length: 0.7 },
 ]
