@@ -16,13 +16,8 @@ const vi = {
   // The loading screen at the start: what is happening, in general terms, and how much has
   // downloaded. {loaded}/{total} = megabytes. Then two tips under a gold ornament.
   loading: {
-    steps: {
-      download: 'Đang tải hiện vật và hình ảnh',
-      rooms: 'Đang dựng các phòng trưng bày',
-      lights: 'Đang thắp đèn khắp bảo tàng',
-      ready: 'Bảo tàng đã sẵn sàng',
-    },
     downloaded: 'Đã tải {loaded} / {total} MB',
+    preparing: 'Đang chuẩn bị',
     tips: ['Nhấn F11 để chơi toàn màn hình', 'Đeo tai nghe để có trải nghiệm tốt nhất'],
   },
   // Guided tutorial (chosen on the start screen). {n} = step number, {total} = number of steps.
@@ -90,7 +85,7 @@ const vi = {
       { kicker: 'Cách mạng III', title: 'Máy tính' },
       { kicker: 'Cách mạng IV', title: 'Trí tuệ nhân tạo' },
       { kicker: '21 phát minh', title: 'Sống động trong không gian 3D' },
-      { kicker: 'Song ngữ Việt – Anh', title: 'Mỗi câu chuyện đều có nguồn' },
+      { kicker: 'Mở từng hiện vật', title: 'Mô hình 3D xoay được, kèm nguồn tham khảo' },
       { kicker: 'Cỗ máy thời gian', title: 'Sửa chữa nó để mở cánh cổng' },
       { kicker: 'Phía sau cánh cổng', title: 'Một bộ phim qua bốn thời đại' },
       { kicker: 'Mở cửa ngay trên trình duyệt', title: '' },
@@ -251,13 +246,8 @@ const en: UiText = {
     tutorialNo: 'No, start exploring',
   },
   loading: {
-    steps: {
-      download: 'Loading the exhibits and pictures',
-      rooms: 'Setting up the exhibition rooms',
-      lights: 'Turning on the lights',
-      ready: 'The museum is ready',
-    },
     downloaded: '{loaded} / {total} MB downloaded',
+    preparing: 'Preparing',
     tips: ['Press F11 to play in full screen', 'Wear headphones for the best experience'],
   },
   tutorial: {
@@ -319,7 +309,7 @@ const en: UiText = {
       { kicker: 'Revolution III', title: 'Computers' },
       { kicker: 'Revolution IV', title: 'Artificial intelligence' },
       { kicker: '21 inventions', title: 'Brought to life in 3D' },
-      { kicker: 'Vietnamese and English', title: 'Every story, sourced' },
+      { kicker: 'Open any exhibit', title: 'Turn its 3D model, read its sources' },
       { kicker: 'The Time Machine', title: 'Repair it to open the portal' },
       { kicker: 'Beyond the portal', title: 'A film across four eras' },
       { kicker: 'Now open in your browser', title: '' },

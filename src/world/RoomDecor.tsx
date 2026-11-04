@@ -421,8 +421,22 @@ function gearGeometry(teeth: number, radius: number, depth: number) {
   shape.holes.push(axle)
   return new ExtrudeGeometry(shape, { depth, bevelEnabled: false, curveSegments: 6 })
 }
-const BIG_GEAR = gearGeometry(16, 0.36, 0.03)
-const SMALL_GEAR = gearGeometry(10, 0.22, 0.03)
+const G8 = gearGeometry(8, 0.15, 0.03)
+const G10 = gearGeometry(10, 0.22, 0.03)
+const G12 = gearGeometry(12, 0.28, 0.03)
+const G16 = gearGeometry(16, 0.36, 0.03)
+const G20 = gearGeometry(20, 0.42, 0.03)
+const G24 = gearGeometry(24, 0.5, 0.03)
+type GearPlace = [ExtrudeGeometry, number, number, number] // shape, x, y, turn
+// A different clockwork in each of the six panels (meshing gears, spaced by their radii).
+const GEAR_PANELS: GearPlace[][] = [
+  [[G16, -0.16, 0.12, 0.1], [G10, 0.28, -0.22, 0.3]],
+  [[G24, -0.12, -0.08, 0.05], [G8, 0.3, 0.34, 0.2]],
+  [[G12, -0.45, 0, 0], [G8, -0.055, 0, 0.2], [G12, 0.34, 0, 0.13]],
+  [[G20, 0, 0.1, 0.07], [G8, 0.455, -0.16, 0.3], [G8, -0.455, -0.16, 0.1]],
+  [[G16, 0.15, -0.1, 0.2], [G10, -0.17, 0.33, 0]],
+  [[G12, 0, 0.32, 0.1], [G16, 0, -0.27, 0]],
+]
 const CREAM = '#e9dcc2'
 const IVORY = '#f6f0e4'
 // The quiz lectern: a plinth, a slim column and a sloping top with the quiz screen, like a
@@ -548,7 +562,7 @@ function QuizRoom({ size }: { size: RoomSize }) {
       {[-1, 1].map((s) => (
         // On each side wall, local x runs along the wall and +z points into the room.
         <group key={s} position={[s * (size.w / 2), 0, 0]} rotation={[0, -s * Math.PI / 2, 0]}>
-          {panelZs.map((z) => (
+          {panelZs.map((z, k) => (
             <group key={z} position={[-s * z, 2.4, 0]}>
               <mesh position={[0, 0, 0.02]}>
                 <planeGeometry args={[PANEL_W, 2.2]} />
@@ -567,12 +581,11 @@ function QuizRoom({ size }: { size: RoomSize }) {
               ))}
               {/* Clockwork in the middle of each panel: a large brass gear meshing with a
                   smaller one (the Time Machine's works), still, so they cost nothing per frame. */}
-              <mesh geometry={BIG_GEAR} position={[-0.16, 0.12, 0.03]} rotation={[0, 0, 0.1]}>
-                {gold}
-              </mesh>
-              <mesh geometry={SMALL_GEAR} position={[0.28, -0.22, 0.03]} rotation={[0, 0, 0.3]}>
-                {gold}
-              </mesh>
+              {GEAR_PANELS[(s > 0 ? 3 : 0) + k].map(([geometry, x, y, turn], i) => (
+                <mesh key={i} geometry={geometry} position={[x, y, 0.03]} rotation={[0, 0, turn]}>
+                  {gold}
+                </mesh>
+              ))}
             </group>
           ))}
           {/* Pilasters: white with a gold base and capital; the two inner ones carry a warm

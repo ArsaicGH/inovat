@@ -11,7 +11,7 @@ import { MUSIC_START, segmentAt, trailerClock } from './trailer-script'
 // the closing title land on the beat; without sound it keeps its own time.
 // (Only mounted with ?trailer.)
 const NORMAL_FOV = 70
-const TRAILER_MODES: Mode[] = ['trailer', 'game', 'ending']
+const TRAILER_MODES: Mode[] = ['trailer', 'game', 'ending', 'reading']
 
 export default function TrailerCamera() {
   useFrame(({ camera }, delta) => {
@@ -23,8 +23,16 @@ export default function TrailerCamera() {
 
     // The ending film draws itself; the trailer only chooses its moment.
     // (A black beat keeps whatever is behind it, so the film is not stopped and restarted.)
-    const wanted: Mode = segment.kind === 'film' ? 'ending' : segment.kind === 'game' ? 'game' : segment.kind === 'black' ? store.mode : 'trailer'
-    if (store.mode !== wanted) store.setMode(wanted)
+    const wanted: Mode =
+      segment.kind === 'film' ? 'ending' : segment.kind === 'game' ? 'game' : segment.kind === 'reading' ? 'reading' : segment.kind === 'black' ? store.mode : 'trailer'
+    if (store.mode !== wanted) {
+      if (segment.kind === 'reading') store.openExhibit(segment.exhibit)
+      else {
+        // (Leaving the enlarged board closes it: it shrinks away as the next shot starts.)
+        if (store.openExhibitId) useMuseumStore.setState({ openExhibitId: null })
+        store.setMode(wanted)
+      }
+    }
     film.override = segment.kind === 'film' ? segment.at + into * (segment.speed ?? 1) : null
     if (segment.kind === 'film' || segment.kind === 'black') return
 
@@ -35,7 +43,7 @@ export default function TrailerCamera() {
       lens.updateProjectionMatrix()
     }
     const [position, target] =
-      segment.kind === 'game'
+      segment.kind === 'game' || segment.kind === 'reading'
         ? segment.pose
         : mixPose(segment.from, segment.to, segment.linear ? into / segment.duration : smooth(0, segment.duration, into))
     camera.position.set(position[0], position[1], position[2])

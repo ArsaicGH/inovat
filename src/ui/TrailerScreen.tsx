@@ -45,6 +45,7 @@ export default function TrailerScreen() {
         className="trailer-start"
         onClick={() => {
           unlockAudio()
+          document.documentElement.classList.add('trailer-on')
           // Everything open and lit for the camera: all four cores, the portal.
           useMuseumStore.setState({ quizPassed: true, gameCores: 4, coreStars: [3, 3, 3, 3] })
           trailerClock.t = TRAILER_FROM

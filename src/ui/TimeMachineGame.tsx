@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { Suspense, lazy, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react'
 import { useContent } from '../content/use-content'
 import { gameText, gameTouchText, type Era } from '../content/game'
 import { PICTURES } from '../content/pictures'
@@ -431,6 +431,9 @@ export default function TimeMachineGame() {
     return () => window.removeEventListener('keydown', onKey)
   }, [])
 
+  const panel = useRef<HTMLDivElement>(null)
+  useFitToScreen(panel)
+
   const Round = playing && !playing.finished ? ROUNDS[playing.round] : null
   function toWorkshop() {
     // A finished core is done with; one in progress waits.
@@ -439,7 +442,7 @@ export default function TimeMachineGame() {
   }
   return (
     <div className="overlay game-overlay">
-      <div className="game-panel">
+      <div ref={panel} className="game-panel">
         <header className="game-header">
           <div>
             <h2>{g.title}</h2>
@@ -487,4 +490,58 @@ export default function TimeMachineGame() {
       </div>
     </div>
   )
+}
+
+// FITTING THE WINDOW TO THE SCREEN: the game measures how tall its content is at its natural
+// size, then scales the whole window (CSS zoom) so it fits the browser window without
+// scrolling, a little larger on big screens. It follows the screen's real size, not the
+// system's display scaling (a laptop at 150 % otherwise got a cramped, scrolling game).
+const PANEL_WIDTH = 1040 // the window's natural width (CSS pixels)
+const MARGIN = 32
+const ZOOM_MIN = 0.6
+const ZOOM_MAX = 1.15
+function useFitToScreen(panel: RefObject<HTMLDivElement | null>) {
+  useLayoutEffect(() => {
+    const element = panel.current
+    if (!element) return
+    let zoom = 1
+    const apply = (z: number) => {
+      element.style.zoom = String(z)
+      element.style.width = `${Math.min(PANEL_WIDTH, (window.innerWidth - MARGIN) / z)}px`
+      element.style.maxHeight = `${(window.innerHeight - MARGIN) / z}px`
+    }
+    const fit = () => {
+      // (In the trailer, the window also leaves room for its cinema bars.)
+      const spare = document.documentElement.classList.contains('trailer-on') ? window.innerHeight * 0.3 : MARGIN
+      // Twice: the height depends on the width, which depends on the zoom.
+      for (let pass = 0; pass < 2; pass++) {
+        apply(zoom)
+        element.classList.add('is-measuring')
+        const natural = element.getBoundingClientRect().height / zoom
+        element.classList.remove('is-measuring')
+        const byHeight = (window.innerHeight - spare) / natural
+        const byWidth = (window.innerWidth - MARGIN) / PANEL_WIDTH
+        // (Larger only where the screen is wider than the window; a narrow screen keeps the
+        // natural size, the window itself getting narrower.)
+        const widest = byWidth > 1 ? Math.min(ZOOM_MAX, byWidth) : 1
+        zoom = Math.max(ZOOM_MIN, Math.min(byHeight, widest))
+      }
+      apply(zoom)
+    }
+    let pending = 0
+    const later = () => {
+      cancelAnimationFrame(pending)
+      pending = requestAnimationFrame(fit)
+    }
+    fit()
+    window.addEventListener('resize', later)
+    // (The content changes with every card: measured again, a frame later.)
+    const watcher = new MutationObserver(later)
+    watcher.observe(element, { childList: true, subtree: true })
+    return () => {
+      cancelAnimationFrame(pending)
+      window.removeEventListener('resize', later)
+      watcher.disconnect()
+    }
+  }, [panel])
 }

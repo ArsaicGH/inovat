@@ -1055,11 +1055,45 @@ body {
   background: rgba(201, 162, 90, 0.15);
   overflow: hidden;
 }
-.loading-step {
-  margin: 6px 0 0;
-  font-size: 15px;
-  letter-spacing: 0.04em;
-  color: #e8d6a8;
+/* Once everything is downloaded: a short spaced gold word with three dots breathing. */
+.loading-preparing {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  margin: 0;
+  color: #e0c27e;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  animation: pop-in 0.4s ease-out;
+}
+.loading-preparing span {
+  display: inline-flex;
+  gap: 4px;
+  margin-left: 4px;
+}
+.loading-preparing i {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #c9a25a;
+  animation: preparing-dot 1.2s ease-in-out infinite;
+}
+.loading-preparing i:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.loading-preparing i:nth-child(3) {
+  animation-delay: 0.4s;
+}
+@keyframes preparing-dot {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 .loading-bytes {
   margin: 0;
@@ -3676,4 +3710,85 @@ body {
   from {
     opacity: 0;
   }
+}
+
+/* Core I, side by side: the machine large on the left, the four doors stacked on the right,
+   so nothing needs scrolling and little space is left empty. The glow behind the machine is
+   an ellipse that fades out inside its own box (no cut-off edges). */
+.lost {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(170px, 30%);
+  grid-template-areas:
+    'bar bar'
+    'stage doors'
+    'note doors';
+  grid-template-rows: auto 1fr auto;
+  align-items: stretch;
+  column-gap: 18px;
+  row-gap: 10px;
+}
+.lost > .game-bar {
+  grid-area: bar;
+}
+.lost > .lost-stage {
+  grid-area: stage;
+  width: 100%;
+}
+.lost > .game-wrong-note,
+.lost > .game-feedback {
+  grid-area: note;
+}
+.lost > .lost-doors {
+  grid-area: doors;
+  grid-template-columns: 1fr;
+  grid-auto-rows: 1fr;
+  gap: 10px;
+}
+.lost-object {
+  height: min(340px, 44vh);
+  background: radial-gradient(closest-side, #f7e7c0 0%, #ecd6a2 45%, rgba(217, 191, 134, 0.55) 75%, rgba(217, 191, 134, 0) 100%);
+}
+.lost-object.is-photo {
+  background: none;
+}
+.lost-object img {
+  max-height: min(330px, 42vh);
+}
+/* Stacked doors: a rounded arch on the left, the numeral and the room side by side. */
+.lost > .lost-doors .lost-door {
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 14px;
+  padding: 8px 16px;
+  border-radius: 40px 12px 12px 40px;
+}
+.lost > .lost-doors .lost-door b {
+  min-width: 2.2em;
+  font-size: 24px;
+}
+
+/* While the game window measures its natural height (TimeMachineGame.tsx useFitToScreen):
+   no height limit and no inner scrolling. */
+.game-panel.is-measuring {
+  max-height: none !important;
+}
+.game-panel.is-measuring .game-scroll {
+  flex: none;
+  overflow: visible;
+}
+
+/* A caption set in the lower cinema bar (over the enlarged board or the game window). */
+.trailer-title.is-bar {
+  bottom: 0;
+  height: var(--bar);
+  justify-content: center;
+  gap: 2px;
+}
+.trailer-title.is-bar .trailer-heading {
+  font-size: clamp(16px, 1.9vw, 30px);
+}
+/* While the trailer plays, the enlarged board shrinks to sit inside the cinema frame (the
+   game window fits itself: TimeMachineGame.tsx). */
+html.trailer-on .info-panel {
+  zoom: 0.74;
 }

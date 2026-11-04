@@ -82,7 +82,6 @@ export default function LoadingScreen() {
     done || worldReady ? 5 : qualityChosen ? 4 : warmedUp ? 3 : parts >= PART_COUNT ? 2 : parts > 0 ? 1 : 0
   const [stage, setStage] = useState(0)
   if (rawStage > stage) setStage(rawStage)
-  const stepText = stage === 0 ? text.steps.download : stage < 3 ? text.steps.rooms : stage < 5 ? text.steps.lights : text.steps.ready
   const megabytes = (n: number) => {
     const value = (n / 1048576).toFixed(1)
     return language === 'vi' ? value.replace('.', ',') : value
@@ -129,8 +128,20 @@ export default function LoadingScreen() {
       <div className="loading-bar" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(shown)}>
         <span style={{ width: `${worldReady ? 100 : shown}%` }} />
       </div>
-      <p className="loading-step">{stepText}</p>
-      <p className="loading-bytes">{text.downloaded.replace('{loaded}', megabytes(loadedBytes)).replace('{total}', megabytes(__STARTUP_BYTES__))}</p>
+      {/* The download count; once everything is in (the museum is then still being prepared
+          for the graphics card), a short gold "preparing". */}
+      {loadedBytes < __STARTUP_BYTES__ ? (
+        <p className="loading-bytes">{text.downloaded.replace('{loaded}', megabytes(loadedBytes)).replace('{total}', megabytes(__STARTUP_BYTES__))}</p>
+      ) : (
+        <p className="loading-preparing">
+          {text.preparing}
+          <span aria-hidden="true">
+            <i />
+            <i />
+            <i />
+          </span>
+        </p>
+      )}
       <div className="loading-tips">
         <p className="loading-tips-list">
           {text.tips.map((tip, i) => (
