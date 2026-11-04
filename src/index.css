@@ -3836,7 +3836,7 @@ html.trailer-preparing .game-overlay {
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  animation: trailer-tag 2s ease-out both;
+  animation: trailer-tag 2.4s ease-out both;
 }
 .trailer-core-tag .trailer-core-text {
   display: flex;
