@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { assetUrl } from '../asset-url'
 
 // PICTURES (photos, paintings and engravings in public/pictures/, listed with their captions
 // and credits in content/pictures.ts): each file is loaded once and shared by the 3D boards,
@@ -14,7 +15,7 @@ export function loadPicture(file: string): Promise<HTMLImageElement> {
       image.decoding = 'async'
       image.onload = () => resolve(image)
       image.onerror = reject
-      image.src = `/${file}`
+      image.src = assetUrl(file)
     })
     cache.set(file, promise)
   }

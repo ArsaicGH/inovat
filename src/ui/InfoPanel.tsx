@@ -10,6 +10,7 @@ import type { Language } from '../content/language'
 import { paintDiagram } from '../world/diagrams'
 import { paintFont, useFontsReady } from '../world/fonts'
 import type { RoomId } from '../types'
+import { assetUrl } from '../asset-url'
 
 // The turning 3D model beside invention boards (part of the 3D download, so loaded on first use).
 const ModelViewer = lazy(() => import('../world/ModelViewer'))
@@ -55,7 +56,7 @@ function PictureFigure({ picture, language, theme, credit, className }: { pictur
   return (
     <figure className={className}>
       {picture.file ? (
-        <img src={`/${picture.file}`} alt={picture.caption[language]} style={{ aspectRatio: picture.aspect }} />
+        <img src={assetUrl(picture.file)} alt={picture.caption[language]} style={{ aspectRatio: picture.aspect }} />
       ) : (
         <DiagramCanvas picture={picture} language={language} theme={theme} />
       )}

@@ -18,6 +18,7 @@ import {
 } from 'three'
 import { CopyMaterial, Pass } from 'postprocessing'
 import { BatchedText, Text } from 'troika-three-text'
+import { assetUrl } from '../asset-url'
 
 // SHARP TEXT. The lower graphics levels draw the 3D picture with fewer pixels and stretch
 // it to the screen, so text painted into the boards' pictures came out blurry. Now the
@@ -43,7 +44,7 @@ const FONT_FILES: Record<number, string> = {
   600: 'be-vietnam-pro-semibold.ttf',
   700: 'be-vietnam-pro-bold.ttf',
 }
-const fontUrl = (weight: number) => `${import.meta.env.BASE_URL}fonts/${FONT_FILES[weight] ?? FONT_FILES[500]}`
+const fontUrl = (weight: number) => assetUrl(`fonts/${FONT_FILES[weight] ?? FONT_FILES[500]}`)
 
 // One line of text, as it would have been painted: x and the baseline y in the picture's
 // pixels, the font's size in pixels and weight, its colour, how it is aligned, and a

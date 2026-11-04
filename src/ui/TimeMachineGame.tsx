@@ -27,6 +27,7 @@ import {
 import { TOWN_YEARS } from '../content/game-cards'
 import Town, { townStages } from './game-town'
 import VisitorFigure, { SceneBackdrop } from './game-visitor'
+import { assetUrl } from '../asset-url'
 
 // THE TIME MACHINE REPAIR SHOP (opened from the Game Room's lectern). The first screen is the
 // workshop with the four power cores; each core is a different challenge:
@@ -144,7 +145,7 @@ function LostRound() {
       <div className={`lost-stage${run.solved ? ' is-in' : run.wrong.length ? ' is-out' : ''}`}>
         <div key={id} className={`lost-object${picture ? ' is-photo' : ''}`}>
           {picture ? (
-            <img src={`${import.meta.env.BASE_URL}${picture.file}`} alt="" draggable={false} />
+            <img src={assetUrl(picture.file ?? '')} alt="" draggable={false} />
           ) : (
             <Suspense fallback={null}>
               <ModelViewer id={id} />

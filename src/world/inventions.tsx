@@ -8,6 +8,7 @@ import { withKtx2 } from './ktx2'
 import { splitWheels, WheelSpin, type Axle } from './spinning-wheels'
 // The historic machines no museum has shared as a 3D model, built in detail by the team.
 import { BessemerConverter, InductionMotor, PuddlingFurnace, Unimate, WaterFrame } from './historic-machines'
+import { assetUrl } from '../asset-url'
 
 // THE 19 INVENTION PROTOTYPES on the plinths of the era rooms (one per text id in
 // src/content/exhibits.ts). Ten are free models from Sketchfab (CC BY, credited in
@@ -160,7 +161,7 @@ function hasShadowStandIn(url: string): boolean {
   return [MODEL.rocket, MODEL.benz, MODEL.pc, MODEL.plc, MODEL.motor, MODEL.gpu, MODEL.printer, MODEL.telephone, MODEL.modelT].includes(url)
 }
 function ShadowStandIn({ url, yaw }: { url: string; yaw: number }) {
-  const loaded = useGLTF(url.replace(/\.glb$/, '-shadow.glb'), true, true, withKtx2)
+  const loaded = useGLTF(assetUrl(url.replace(/\.glb$/, '-shadow.glb')), true, true, withKtx2)
   const scene = useMemo(() => {
     const copy = loaded.scene.clone(true) as Group
     copy.rotation.y = yaw
@@ -178,7 +179,7 @@ function ShadowStandIn({ url, yaw }: { url: string; yaw: number }) {
 }
 
 function GltfModel({ url, size, yaw = 0, lift = 0, animate = false, onOrigin = false, copy: ownCopy = false, wire, axles }: { url: string; size: number; yaw?: number; lift?: number; animate?: boolean; onOrigin?: boolean; copy?: boolean; wire?: MeshBasicMaterial; axles?: Axle[] }) {
-  const loaded = useGLTF(url, true, true, withKtx2)
+  const loaded = useGLTF(assetUrl(url), true, true, withKtx2)
   const copy = useContext(ModelCopy) || ownCopy || Boolean(wire)
   // (The copy shares the original's shapes and materials: cheap.)
   const { scene, wheels } = useMemo(() => {
@@ -899,8 +900,8 @@ const PROTOTYPES: Record<string, () => JSX.Element> = {
 
 // Start downloading the models straight away (they are small), so they are ready by the
 // time the visitor reaches their room.
-Object.values(MODEL).forEach((url) => useGLTF.preload(url, true, true, withKtx2))
-Object.values(MODEL).filter(hasShadowStandIn).forEach((url) => useGLTF.preload(url.replace(/\.glb$/, '-shadow.glb'), true, true, withKtx2))
+Object.values(MODEL).forEach((url) => useGLTF.preload(assetUrl(url), true, true, withKtx2))
+Object.values(MODEL).filter(hasShadowStandIn).forEach((url) => useGLTF.preload(assetUrl(url.replace(/\.glb$/, '-shadow.glb')), true, true, withKtx2))
 
 export default function Invention({ id }: { id: string }) {
   const Prototype = PROTOTYPES[id]

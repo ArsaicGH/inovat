@@ -1,5 +1,6 @@
 import type { RoomId } from '../types'
 import { AUDIO_ENABLED } from '../features'
+import { assetUrl } from '../asset-url'
 
 // SOUND ENGINE (M8b), using the browser's built-in Web Audio (no extra package).
 // - Effects: short sounds played once (clicks, footsteps, doors, quiz).
@@ -30,7 +31,7 @@ import { AUDIO_ENABLED } from '../features'
 // which may not play .ogg). Each browser downloads only the one it can play. The paths
 // below say .ogg; fileFor() swaps the ending where needed.
 const PLAYS_OGG = typeof Audio !== 'undefined' && new Audio().canPlayType('audio/ogg; codecs="vorbis"') !== ''
-const fileFor = (url: string) => (PLAYS_OGG ? url : url.replace(/\.ogg$/, '.m4a'))
+const fileFor = (url: string) => assetUrl(PLAYS_OGG ? url : url.replace(/\.ogg$/, '.m4a'))
 
 const EFFECTS = {
   click: '/sounds/ui/click.ogg',

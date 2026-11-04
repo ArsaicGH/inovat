@@ -23,8 +23,6 @@ const vi = {
       ready: 'Bảo tàng đã sẵn sàng',
     },
     downloaded: 'Đã tải {loaded} / {total} MB',
-    // Only on the first visit in this browser.
-    firstVisit: 'Lần đầu tải lâu hơn một chút; những lần sau sẽ nhanh hơn.',
     tips: ['Nhấn F11 để chơi toàn màn hình', 'Đeo tai nghe để có trải nghiệm tốt nhất'],
   },
   // Guided tutorial (chosen on the start screen). {n} = step number, {total} = number of steps.
@@ -241,7 +239,6 @@ const en: UiText = {
       ready: 'The museum is ready',
     },
     downloaded: '{loaded} / {total} MB downloaded',
-    firstVisit: 'The first visit takes a little longer; later visits load faster.',
     tips: ['Press F11 to play in full screen', 'Wear headphones for the best experience'],
   },
   tutorial: {

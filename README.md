@@ -46,8 +46,9 @@ Switches combine with `&`, for example `?devmode&touch`.
   `src/content/` every visible text in both languages, `public/` models, textures, pictures,
   sounds and fonts.
 - **Assets:** models are glTF with meshopt geometry and KTX2 textures (each under 2 MB); about
-  24 MB loads before the title screen, and each room's music streams when you enter it. Large
-  files are cached by the browser for an hour (`vercel.json`).
+  24 MB loads before the title screen, and each room's music streams when you enter it. Every
+  asset is loaded with a fingerprint of its contents (`src/asset-url.ts`), so browsers keep it
+  for good and fetch it again only when it changes (`vercel.json`).
 - **Text on boards** is drawn as real text in a last step at the screen's full sharpness, so it
   stays crisp at every graphics level (`src/world/sharp-text.tsx`).
 
