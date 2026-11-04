@@ -175,8 +175,8 @@ export const SEGMENTS: Segment[] = [
   { kind: 'film', duration: 600, at: START.hold, speed: 0 },
 ]
 
-// The Time Machine's two shots (2.4 s each, framed wide enough to follow: the whole card
-// in view, a gentle push, the answer given halfway). Each core is dealt fresh, then
+// The Time Machine's two shots (2.4 s each): the whole window at a comfortable distance,
+// the museum around it, a slow drift, the answer given halfway. Cores I and IV. Each core is dealt fresh, then
 // played on screen: answered right at `solveAt` seconds into the shot, or (core III) its
 // clues opening one by one. The window's camera-like move for each is in index.css
 // (html[data-game-shot]). card: the card to show first (core I: the Benz car, a model that
@@ -195,8 +195,8 @@ export interface Framing {
   turnY: number
 }
 export const GAME_SHOTS: { round: number; card?: string; solveAt?: number; cluesAt?: number[]; origin: string; from: Framing; to: Framing }[] = [
-  { round: 0, card: 'ir2-2', solveAt: 1.4, origin: '50% 55%', from: { scale: 1.08, x: 0, y: 0, turnX: 0, turnY: -5 }, to: { scale: 1.2, x: 0, y: 0, turnX: 0, turnY: -1 } },
-  { round: 1, solveAt: 1.4, origin: '50% 45%', from: { scale: 1.12, x: -2, y: 0, turnX: 0, turnY: 4 }, to: { scale: 1.24, x: 2, y: 0, turnX: 0, turnY: -1 } },
+  { round: 0, card: 'ir2-2', solveAt: 1.4, origin: '50% 50%', from: { scale: 0.9, x: -1.5, y: 0, turnX: 0, turnY: -4 }, to: { scale: 0.96, x: 0, y: 0, turnX: 0, turnY: -1 } },
+  { round: 3, solveAt: 1.4, origin: '50% 50%', from: { scale: 0.9, x: 1.5, y: 0, turnX: 0, turnY: 4 }, to: { scale: 0.96, x: 0, y: 0, turnX: 0, turnY: 1 } },
 ]
 
 export const SEGMENT_START: number[] = []
@@ -229,8 +229,7 @@ export const TITLES: TrailerTitle[] = [
   { text: 7, from: 17.0, to: 19.1, place: 'lower' },
   { text: 6, from: 19.3, to: 21.5, place: 'centre' },
   { text: 8, from: 21.7, to: 23.6, place: 'lower' },
-  { text: 9, from: 27.4, to: 29.4, place: 'lower' },
-  { text: 11, from: 29.5, to: 31.5, place: 'lower' },
+  { text: 9, from: 27.4, to: 31.5, place: 'lower' },
   { text: 10, from: TRAILER_LENGTH, to: Infinity, place: 'final' }, // (stays)
 ]
 

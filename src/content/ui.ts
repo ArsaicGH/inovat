@@ -78,7 +78,7 @@ const vi = {
     start: 'Nhấp để phát trailer',
     // Each: a small gold line (kicker) over the title. The last is the closing title's line.
     // The Time Machine's two shots: what the player does in each.
-    gameShots: ['Đưa mỗi cỗ máy về đúng thời đại', 'Dựng cả một thị trấn qua bốn thời đại'],
+    gameShots: ['Đưa mỗi cỗ máy về đúng thời đại', 'Trò chuyện với những vị khách từ quá khứ'],
     titles: [
       { kicker: 'INOVAT trình bày', title: 'Một hành trình qua lịch sử công nghiệp' },
       { kicker: 'Từ 1760 đến hôm nay', title: 'Bốn cuộc Cách mạng Công nghiệp' },
@@ -89,9 +89,8 @@ const vi = {
       { kicker: '21 phát minh', title: 'Sống động trong không gian 3D' },
       { kicker: 'Mở từng hiện vật', title: 'Mô hình 3D xoay được, kèm nguồn tham khảo' },
       { kicker: 'Bốn lõi năng lượng, bốn thử thách', title: 'Trò chơi Cỗ máy thời gian' },
-      { kicker: 'Phía sau cánh cổng', title: 'Một bộ phim qua bốn thời đại' },
+      { kicker: 'Sau khi hoàn thành trò chơi', title: 'Một bộ phim qua bốn thời đại' },
       { kicker: 'Mở cửa ngay trên trình duyệt', title: '' },
-      { kicker: 'Phần thưởng cuối cùng', title: 'Mở khóa khi hoàn thành trò chơi' },
     ],
     url: 'inovat-museum.vercel.app',
   },
@@ -304,7 +303,7 @@ const en: UiText = {
   },
   trailer: {
     start: 'Click to play the trailer',
-    gameShots: ['Send each machine back to its era', 'Grow a town through four eras'],
+    gameShots: ['Send each machine back to its era', 'Talk with visitors from the past'],
     titles: [
       { kicker: 'INOVAT presents', title: 'A journey through industrial history' },
       { kicker: 'From 1760 to today', title: 'Four Industrial Revolutions' },
@@ -315,9 +314,8 @@ const en: UiText = {
       { kicker: '21 inventions', title: 'Brought to life in 3D' },
       { kicker: 'Open any exhibit', title: 'Turn its 3D model, read its sources' },
       { kicker: 'Four power cores, four challenges', title: 'The Time Machine game' },
-      { kicker: 'Beyond the portal', title: 'A film across four eras' },
+      { kicker: 'After you finish the game', title: 'A film across four eras' },
       { kicker: 'Now open in your browser', title: '' },
-      { kicker: 'The final reward', title: 'Unlocked when you finish the game' },
     ],
     url: 'inovat-museum.vercel.app',
   },

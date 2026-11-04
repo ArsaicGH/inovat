@@ -512,7 +512,7 @@ function useFitToScreen(panel: RefObject<HTMLDivElement | null>) {
     }
     const fit = () => {
       // (In the trailer, the window also leaves room for its cinema bars.)
-      const spare = document.documentElement.classList.contains('trailer-on') ? window.innerHeight * 0.12 : MARGIN
+      const spare = document.documentElement.classList.contains('trailer-on') ? window.innerHeight * 0.3 : MARGIN
       // Twice: the height depends on the width, which depends on the zoom.
       for (let pass = 0; pass < 2; pass++) {
         apply(zoom)
