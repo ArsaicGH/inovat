@@ -15,6 +15,8 @@ import Exhibit from './Exhibit'
 import Player from './Player'
 import Interaction from './Interaction'
 import FrameTimingProbe from './FrameTimingProbe'
+import TrailerCamera from './TrailerCamera'
+import { TRAILER } from './trailer-script'
 import { IS_TOUCH } from '../ui/touch'
 import { reportFileProgress, reportFilesDone } from '../ui/load-progress'
 
@@ -24,7 +26,7 @@ DefaultLoadingManager.onProgress = (_item, loaded, total) => reportFileProgress(
 DefaultLoadingManager.onLoad = () => reportFilesDone()
 
 // FPS counter while developing only (loaded on demand, so the live site never downloads it).
-const DevStats = DEV_MODE ? lazy(() => import('@react-three/drei').then((drei) => ({ default: drei.Stats }))) : null
+const DevStats = DEV_MODE && !TRAILER ? lazy(() => import('@react-three/drei').then((drei) => ({ default: drei.Stats }))) : null
 import { CHANDELIER_Y, COLLISION_BOXES, DOORS, EXHIBIT_SPOTS, PART_COUNT, ROOMS, roomById, toWorld } from './layout'
 import { isPartVisible } from './door-state'
 import { ROOM_THEMES } from './room-themes'
@@ -1025,7 +1027,8 @@ export default function Museum() {
           <DevStats />
         </Suspense>
       )}
-      {(DEV_MODE || new URLSearchParams(window.location.search).has('stats')) && <FrameTimingProbe />}
+      {((DEV_MODE && !TRAILER) || new URLSearchParams(window.location.search).has('stats')) && <FrameTimingProbe />}
+      {TRAILER && <TrailerCamera />}
     </Canvas>
   )
 }

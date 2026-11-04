@@ -43,7 +43,7 @@ export default function SoundDirector() {
         if (state.mode === 'map') playEffect('mapOpen')
         if (before.mode === 'map') playEffect('mapClose')
         if (state.mode === 'ending') playEffect('teleport')
-        if (before.mode === 'ending') stopEndingMusic()
+        if (before.mode === 'ending' || before.mode === 'trailer') stopEndingMusic()
         // The room sound fades away in menus and comes back when walking.
         // (Softer, not silent, while playing the Time Machine game.)
         duckAmbience(state.mode === 'exploring' || state.mode === 'ending' ? 1 : state.mode === 'reading' ? 0.7 : state.mode === 'game' ? 0.45 : 0)
@@ -61,7 +61,7 @@ export default function SoundDirector() {
 
       // A new era room visited: a soft chime.
       const newEra = state.visitedRooms.find((room) => !before.visitedRooms.includes(room) && ERA_ROOMS.includes(room))
-      if (newEra) playEffect('newRoom', 0.5)
+      if (newEra && state.mode !== 'trailer') playEffect('newRoom', 0.5)
 
       // The locked Game Room door, when you walk up to it.
       if (state.nearLockedDoor && !before.nearLockedDoor) playEffect('locked', 0.6)

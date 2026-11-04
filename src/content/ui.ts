@@ -78,6 +78,22 @@ const vi = {
     clickHint: 'Nhấp vào khoảng trống hoặc nhấn Tiếp tục',
   },
   // The title screen's settings (the gear beside the volume and language).
+  // The trailer (?trailer in the address), for the team's presentation.
+  trailer: {
+    start: 'Nhấp để phát trailer',
+    captions: [
+      'Bốn cuộc Cách mạng Công nghiệp',
+      'Hơi nước và máy móc',
+      'Điện và sản xuất hàng loạt',
+      'Máy tính và tự động hóa',
+      'Trí tuệ nhân tạo và dữ liệu',
+      '21 phát minh, mô hình 3D',
+      'Song ngữ Việt – Anh, kèm nguồn tham khảo',
+      'Trò chơi Cỗ máy thời gian',
+      'Một bộ phim khép lại hành trình · Chơi trên máy tính và điện thoại',
+    ],
+    url: 'inovat-museum.vercel.app',
+  },
   settings: {
     title: 'Cài đặt',
     open: 'Mở cài đặt',
@@ -289,6 +305,21 @@ const en: UiText = {
     resume: 'Continue',
     toTitle: 'Back to the title screen',
     clickHint: 'Click on blank space or press Continue',
+  },
+  trailer: {
+    start: 'Click to play the trailer',
+    captions: [
+      'Four Industrial Revolutions',
+      'Steam and machines',
+      'Electricity and mass production',
+      'Computers and automation',
+      'Artificial intelligence and data',
+      '21 inventions in 3D',
+      'Bilingual, Vietnamese and English, with sources',
+      'The Time Machine game',
+      'A closing film across the eras · Play on computer and phone',
+    ],
+    url: 'inovat-museum.vercel.app',
   },
   settings: {
     title: 'Settings',

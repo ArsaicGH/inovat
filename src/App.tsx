@@ -9,6 +9,8 @@ import TouchControls from './ui/TouchControls'
 import { IS_TOUCH } from './ui/touch'
 import LoadingScreen from './ui/LoadingScreen'
 import SoundDirector from './audio/SoundDirector'
+import TrailerScreen from './ui/TrailerScreen'
+import { TRAILER } from './world/trailer-script'
 import { Suspense, lazy, useEffect } from 'react'
 import { useMuseumStore } from './state/useMuseumStore'
 import { useContent } from './content/use-content'
@@ -44,7 +46,9 @@ function App() {
       {mode === 'exploring' && IS_TOUCH && <TouchControls />}
       {mode === 'exploring' && <Hud />}
       {/* The title screen waits until everything has loaded (LoadingScreen). */}
-      {mode === 'start' && worldReady && <StartScreen />}
+      {/* (With ?trailer: the trailer instead of the title screen.) */}
+      {mode === 'start' && worldReady && !TRAILER && <StartScreen />}
+      {TRAILER && worldReady && (mode === 'start' || mode === 'trailer') && <TrailerScreen />}
       {mode === 'paused' && <PauseScreen />}
       {/* Always mounted: it animates in when an exhibit opens and out when it closes. */}
       <InfoPanel />

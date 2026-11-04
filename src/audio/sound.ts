@@ -399,6 +399,13 @@ export function stopEndingMusic() {
   music.gain.gain.setTargetAtTime(0, context.currentTime, 0.4)
   music.stopTimer = window.setTimeout(() => pause(music), 2000)
 }
+// Holds the ending's music where it is (the trailer's pause, for screenshots), or goes on.
+export function setEndingMusicPaused(paused: boolean) {
+  const music = streams.get(ENDING_MUSIC)
+  if (!music) return
+  if (paused) music.element.pause()
+  else void music.element.play()
+}
 // Seconds into the ending's music, or null while it is not playing.
 export function endingMusicTime(): number | null {
   const music = streams.get(ENDING_MUSIC)

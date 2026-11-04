@@ -33,6 +33,7 @@ Wi-Fi address and port 5180 on the phone.
 |---|---|---|
 | `?devmode` | Everything unlocked from the start (all rooms, the Game Room, the portal), the FPS counter and the timing readout | Live site (always on locally) |
 | `?stats` | Only the timing readout: frame times, resolution, draw calls, triangles, graphics chip | Live site |
+| `?trailer` | The 30-second trailer instead of the title screen (click to play, Space to pause); see [PRESENTATION.md](PRESENTATION.md) | Live site |
 | `?touch` | The phone version on a computer (on-screen controls, touch wording) | Locally, or with `?devmode` |
 | `?dpr=1`, `?aa=0`, `?shadows=0`, `?fx=0`, `?ao=0` | Turn off sharpness, edge smoothing, shadows, glow or ambient occlusion, to find what slows frames down | Locally, or with `?devmode` |
 

@@ -3417,3 +3417,85 @@ body {
     font-size: 3cqw;
   }
 }
+
+/* ---------- The trailer (?trailer, TrailerScreen.tsx) ---------- */
+.trailer-start {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  border: 0;
+  background: #000;
+  color: rgba(232, 214, 168, 0.55);
+  font: inherit;
+  font-size: 15px;
+  letter-spacing: 0.2em;
+  cursor: pointer;
+}
+.trailer {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  cursor: none;
+}
+/* Caption: low on the screen in the museum's gold, each one fading in. */
+.trailer-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 12vh;
+  margin: 0;
+  text-align: center;
+  color: #f3e7cf;
+  font-size: clamp(20px, 3.2vw, 44px);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.85), 0 0 2px rgba(0, 0, 0, 0.9);
+  animation: trailer-caption 3s ease-out both;
+}
+@keyframes trailer-caption {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+    letter-spacing: 0.16em;
+  }
+  25% {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* Darker corners all the time, black for the closing card. */
+.trailer-veil {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.55));
+  transition: background-color 1s ease-in;
+}
+.trailer.is-fade .trailer-veil,
+.trailer.is-card .trailer-veil {
+  background-color: #000;
+}
+/* The dip at a cut: quick in and out. */
+.trailer.is-cut .trailer-veil {
+  background-color: #000;
+  transition: background-color 0.15s;
+}
+.trailer-card {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: title-in 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.trailer-card .title-ornament {
+  width: min(560px, 70vw);
+}
+.trailer-url {
+  margin: 18px 0 0;
+  color: #c9a25a;
+  font-size: clamp(14px, 1.6vw, 22px);
+  letter-spacing: 0.18em;
+}

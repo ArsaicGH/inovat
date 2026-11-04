@@ -23,7 +23,7 @@ export interface GameRun {
   finished: boolean // every card done (the result is showing)
 }
 
-export type Mode = 'start' | 'exploring' | 'paused' | 'reading' | 'map' | 'ending' | 'game'
+export type Mode = 'start' | 'exploring' | 'paused' | 'reading' | 'map' | 'ending' | 'game' | 'trailer'
 
 // Mouse/touchpad sensitivity is a multiplier: 1 = default speed.
 export const SENSITIVITY_MIN = 0.2
