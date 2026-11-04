@@ -9,6 +9,7 @@ import { ERA_ROOMS, type RoomId } from '../types'
 import { debugStats } from './debug-stats'
 import { playStep } from '../audio/sound'
 import { touchInput } from '../ui/touch'
+import { TRAILER } from './trailer-script'
 
 const WALK_SPEED = 3 // metres per second
 const SPRINT_SPEED = 5.5 // while Shift is held (crossing the rotunda faster)
@@ -276,7 +277,8 @@ export default function Player({ walls }: PlayerProps) {
     // Save progress about once a second once the visit has started.
     const now = performance.now()
     // (Not during the ending: the camera is then far outside the museum.)
-    if (store.mode !== 'start' && store.mode !== 'ending' && now - lastSave.current > 1000) {
+    // (Nor during the trailer, which is not the visitor's own journey.)
+    if (store.mode !== 'start' && store.mode !== 'ending' && !TRAILER && now - lastSave.current > 1000) {
       lastSave.current = now
       saveProgress({ x: camera.position.x, z: camera.position.z, yaw: yaw.current })
     }
@@ -289,7 +291,7 @@ export default function Player({ walls }: PlayerProps) {
       // The era rooms count as visited once inside; the Central Hall once walked into (the map
       // then lets the visitor travel there).
       const counts = ERA_ROOMS.includes(region.room) || region.room === 'rotunda'
-      if (region.inside && counts && !store.visitedRooms.includes(region.room)) {
+      if (region.inside && counts && !TRAILER && !store.visitedRooms.includes(region.room)) {
         store.markVisited(region.room)
       }
     }

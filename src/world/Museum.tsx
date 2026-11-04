@@ -218,7 +218,7 @@ function litRoom(here: RoomId, x: number, z: number): RoomId {
 // How long a change of lit room takes: the old room's lights fade out, then the new
 // room's fade in (seconds each), instead of popping.
 // (The trailer cuts between rooms faster than that: there, at once.)
-const LIGHT_FADE = TRAILER ? 0.01 : 0.3
+const lightFade = () => (TRAILER ? 0.01 : 0.3)
 
 // The rotunda's soft fill light: generous, the hall is meant to feel grand and welcoming.
 const ROTUNDA_FILL = 0.3
@@ -338,7 +338,7 @@ function Lighting() {
     // Fade out, move the lights to the new room, fade back in.
     const dt = Math.min(delta, 0.1)
     if (lit.current !== want) {
-      level.current = Math.max(0, level.current - dt / LIGHT_FADE)
+      level.current = Math.max(0, level.current - dt / lightFade())
       if (level.current === 0 || lit.current === null) {
         lit.current = want
         const plan = SPOT_PLANS.get(want) ?? []
@@ -368,7 +368,7 @@ function Lighting() {
         })
       }
     } else {
-      level.current = Math.min(1, level.current + dt / LIGHT_FADE)
+      level.current = Math.min(1, level.current + dt / lightFade())
     }
     const room = lit.current ?? want
     const plan = SPOT_PLANS.get(room) ?? []
@@ -389,7 +389,7 @@ function Lighting() {
     const key = keyLight.current
     if (key) {
       if (keyArea.current !== here) {
-        keyLevel.current = Math.max(0, keyLevel.current - dt / LIGHT_FADE)
+        keyLevel.current = Math.max(0, keyLevel.current - dt / lightFade())
         const plan = KEY_PLANS.get(here)
         if ((keyLevel.current === 0 || keyArea.current === null) && plan) {
           keyArea.current = here
@@ -405,7 +405,7 @@ function Lighting() {
           keyTarget.updateMatrixWorld()
         }
       } else {
-        keyLevel.current = Math.min(1, keyLevel.current + dt / LIGHT_FADE)
+        keyLevel.current = Math.min(1, keyLevel.current + dt / lightFade())
       }
       key.intensity = (KEY_PLANS.get(keyArea.current ?? here)?.intensity ?? 0) * keyLevel.current
     }
@@ -1029,7 +1029,8 @@ export default function Museum() {
         </Suspense>
       )}
       {((DEV_MODE && !TRAILER) || new URLSearchParams(window.location.search).has('stats')) && <FrameTimingProbe />}
-      {TRAILER && <TrailerCamera />}
+      {/* (Waits unless the trailer plays.) */}
+      <TrailerCamera />
     </Canvas>
   )
 }

@@ -302,6 +302,8 @@ interface MuseumState {
   // The core being played, saved here (not in the game window) so the visitor can leave to
   // look around the rooms and come back to exactly where they were. null = none in progress.
   gameRun: GameRun | null
+  // The trailer is playing (world/trailer-script.ts TRAILER; this copy re-renders the interface).
+  trailerActive: boolean
   setGameRun: (run: GameRun | null) => void
   patchGameRun: (change: Partial<GameRun>) => void
   // The visitor left the game to look around the rooms (a button brings them back).
@@ -413,6 +415,7 @@ export const useMuseumStore = create<MuseumState>((set, get) => ({
   setCoreStars: (round, stars) =>
     set((state) => ({ coreStars: state.coreStars.map((s, i) => (i === round ? Math.max(s, stars) : s)) })),
   gameRun: null,
+  trailerActive: typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('trailer'),
   setGameRun: (run) => set({ gameRun: run }),
   awayFromGame: false,
   setAwayFromGame: (away) => set({ awayFromGame: away }),

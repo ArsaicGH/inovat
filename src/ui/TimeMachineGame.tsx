@@ -111,8 +111,13 @@ function WrongNote({ hintEra }: { hintEra?: Era }) {
   )
 }
 
-// After a right answer: what it means, and on to the next card.
-function RightNote({ children }: { children: ReactNode }) {
+// After a right answer: what it means, and on to the next card, by itself after a moment
+// (or at once with →). delay: milliseconds; the cores with an explanation to read wait longer.
+function RightNote({ children, delay = 3200 }: { children: ReactNode; delay?: number }) {
+  useEffect(() => {
+    const timer = window.setTimeout(nextCard, delay)
+    return () => window.clearTimeout(timer)
+  }, [delay])
   return (
     <div className="game-feedback is-right">
       <p>{children}</p>
@@ -130,12 +135,6 @@ function LostRound() {
   const id = run.deck[run.index]
   const era = cardEra(0, id)
   useKeys(4, (i) => choose(String(i + 1)))
-  // A right answer moves on by itself after a moment (or at once with →).
-  useEffect(() => {
-    if (!run.solved) return
-    const timer = window.setTimeout(nextCard, 1600)
-    return () => window.clearTimeout(timer)
-  }, [run.solved, run.index])
   const picture = isPhoto(id) ? PICTURES[id] : null
   // (In the trailer the window stays open, unseen, between its shots.)
   const trailerIdle = useMuseumStore((state) => TRAILER && state.mode !== 'game')
@@ -161,7 +160,7 @@ function LostRound() {
         {picture && run.solved && <p className="lost-title">{picture.caption[language]}</p>}
       </div>
       {run.wrong.length > 0 && !run.solved && <WrongNote />}
-      {run.solved && <RightNote>{g.rightDoor}</RightNote>}
+      {run.solved && <RightNote delay={1600}>{g.rightDoor}</RightNote>}
       <div className="lost-doors">
         {([1, 2, 3, 4] as Era[]).map((door) => {
           const tried = run.wrong.includes(String(door))
@@ -428,7 +427,7 @@ export default function TimeMachineGame() {
     // Back from the rooms (by the button, or by walking up to the lectern): carry on.
     useMuseumStore.getState().setAwayFromGame(false)
     function onKey(event: KeyboardEvent) {
-      if (event.code === 'Escape') useMuseumStore.getState().setMode('paused')
+      if (event.code === 'Escape' && !TRAILER) useMuseumStore.getState().setMode('paused')
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)

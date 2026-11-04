@@ -1,6 +1,7 @@
 import type { RoomId } from '../types'
 import { AUDIO_ENABLED } from '../features'
 import { assetUrl } from '../asset-url'
+import { TRAILER, TRAILER_PAGE } from '../world/trailer-script'
 
 // SOUND ENGINE (M8b), using the browser's built-in Web Audio (no extra package).
 // - Effects: short sounds played once (clicks, footsteps, doors, quiz).
@@ -295,7 +296,7 @@ function fadeOutAmbience(now: number) {
 // Play the loop of `room` (cross-fading from the previous one), or fade to silence in an
 // area without a loop.
 export function setAmbience(room: RoomId) {
-  if (silenced || IN_TRAILER) return // (the trailer has only its own music)
+  if (silenced || TRAILER) return // (the trailer has only its own music)
   if (!context || !ambienceBus || room === ambienceRoom) return
   const url = AMBIENCE[room]
   const buffer = url && !isMusic(url) ? buffers.get(url) : undefined
@@ -335,7 +336,7 @@ let welcomed = false
 // was then skipped for good. Now it starts anyway and is heard as soon as sound is on
 // (or, if the browser refuses, on the next tap, like the music).
 export function playWelcome() {
-  if (welcomed || !context || IN_TRAILER) return
+  if (welcomed || !context || TRAILER) return
   if (context.state === 'suspended') void context.resume()
   const welcome = stream(WELCOME, false)
   if (!welcome) return
@@ -382,16 +383,19 @@ const ENDING_MUSIC = '/sounds/music/ending.ogg'
 // THE TRAILER (?trailer) plays its own track on a plain audio player of its own, outside the
 // game's sound system, so that nothing there (room music changing as the camera flies
 // through the rooms, ducking, a tab or overlay pausing the sound system) can quieten it.
-const IN_TRAILER = new URLSearchParams(window.location.search).has('trailer')
 let trailerMusic: HTMLAudioElement | null = null
 function trailerTrack() {
   trailerMusic ??= Object.assign(new Audio(fileFor('/sounds/music/trailer.ogg')), { preload: 'auto', volume: 0.8 })
   return trailerMusic
 }
-if (IN_TRAILER && typeof Audio !== 'undefined') trailerTrack() // start downloading it at once
+// Fetched early: at once on the ?trailer page, on the title screen otherwise (StartScreen.tsx).
+export function preloadTrailerMusic() {
+  if (typeof Audio !== 'undefined') trailerTrack()
+}
+if (TRAILER_PAGE) preloadTrailerMusic()
 const ENDING_LEVEL = 0.5 // the same level as the other music (all files are normalized)
 export function playEndingMusic(at = 0) {
-  if (IN_TRAILER) {
+  if (TRAILER) {
     const track = trailerTrack()
     track.currentTime = at
     void track.play()
@@ -417,13 +421,13 @@ export function stopEndingMusic() {
 }
 // Holds the ending's music where it is (the trailer's pause, for screenshots), or goes on.
 export function setEndingMusicPaused(paused: boolean) {
-  const music = IN_TRAILER ? { element: trailerTrack() } : streams.get(ENDING_MUSIC)
+  const music = TRAILER ? { element: trailerTrack() } : streams.get(ENDING_MUSIC)
   if (!music) return
   if (paused) music.element.pause()
   else void music.element.play()
 }
 // Seconds into the ending's music, or null while it is not playing.
 export function endingMusicTime(): number | null {
-  const music = IN_TRAILER ? { element: trailerTrack() } : streams.get(ENDING_MUSIC)
+  const music = TRAILER ? { element: trailerTrack() } : streams.get(ENDING_MUSIC)
   return music && !music.element.paused ? music.element.currentTime : null
 }

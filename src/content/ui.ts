@@ -5,6 +5,8 @@ import type { Language } from './language'
 const vi = {
   start: {
     button: 'Bắt đầu',
+    // At the top of the title screen.
+    trailer: 'Xem trailer',
     // Under "Bắt đầu" when this tab still holds an earlier visit (e.g. after a reload).
     continue: 'Tiếp tục hành trình trước',
     // (Instead of the plain start button, when an earlier visit can be continued.)
@@ -241,6 +243,7 @@ export type UiText = typeof vi
 const en: UiText = {
   start: {
     button: 'Start',
+    trailer: 'Play trailer',
     continue: 'Continue previous visit',
     newJourney: 'Start a new journey',
     tutorialQuestion: 'Would you like a quick guide to the controls?',

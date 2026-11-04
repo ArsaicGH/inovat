@@ -14,12 +14,12 @@ import { playEffect } from '../audio/sound'
 // Each game deals a short set of cards from a much larger pool (core I: 6 of the 21
 // inventions; II: 2 of each era's 5-8 town problems; III: 4 of 25 mysteries; IV: one of two
 // visitors per era, 2 of their 4-5 questions), so a replay meets mostly new cards.
-// (The first number is what a core needs to light: leader's requirement, raised.)
+// (Leader: one star at the pass mark, two for anything above it, three only for a perfect score.)
 export const STARS: [number, number, number][] = [
   [9, 10, 12],
-  [12, 13, 15],
-  [11, 13, 15],
-  [10, 12, 14],
+  [12, 13, 16],
+  [11, 12, 16],
+  [10, 11, 16],
 ]
 export const MAX_POINTS = [12, 16, 16, 16]
 export const PER_ERA = 2 // cores II and IV: cards per era (problems, or questions per visitor)

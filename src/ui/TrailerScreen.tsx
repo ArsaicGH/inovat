@@ -2,8 +2,16 @@ import { useEffect, useState, type CSSProperties } from 'react'
 import { useContent } from '../content/use-content'
 import { gameText } from '../content/game'
 import { useMuseumStore } from '../state/useMuseumStore'
-import { playEndingMusic, setEndingMusicPaused, unlockAudio } from '../audio/sound'
-import { FLASHES, GAME_SHOTS, GAME_SHOT_LENGTH, MUSIC_START, TITLES, TRAILER_FROM, segmentAt, trailerClock } from '../world/trailer-script'
+import { playEndingMusic, setEndingMusicPaused } from '../audio/sound'
+import { FLASHES, GAME_SHOTS, GAME_SHOT_LENGTH, MUSIC_START, TITLES, TRAILER_FROM, TRAILER_LENGTH, TRAILER_PAGE, segmentAt, trailerClock } from '../world/trailer-script'
+import { closeTrailer, leaveTrailer, startTrailer, trailerFromMenu } from './trailer-run'
+
+// From the title screen: how long the closing title holds before the way back, and the two
+// steps of it (the picture behind the title fades to black; then the trailer's screen fades
+// away, its gold INOVAT dissolving into the title screen's own).
+const HOLD = 3.6
+const DARKEN_MS = 1000
+const REVEAL_MS = 1600
 
 // THE TRAILER'S SCREEN (?trailer, trailer-script.ts): first a quiet "click to play" (so the
 // team can start their screen recorder), then everything drawn over the camera's flight:
@@ -13,10 +21,12 @@ export default function TrailerScreen() {
   const { ui, site, language } = useContent()
   const mode = useMuseumStore((state) => state.mode)
   const [t, setT] = useState(-1)
+  // The way back to the title screen (from the title screen only): darken, then reveal.
+  const [leaving, setLeaving] = useState<'darken' | 'reveal' | null>(null)
 
-  // Follow the trailer's clock (kept by TrailerCamera).
+  // Follow the trailer's clock (kept by TrailerCamera); held still on the way back.
   useEffect(() => {
-    if (mode === 'start') return
+    if (mode === 'start' || leaving) return
     let frame = 0
     const tick = () => {
       setT(trailerClock.t)
@@ -24,7 +34,34 @@ export default function TrailerScreen() {
     }
     frame = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(frame)
-  }, [mode])
+  }, [mode, leaving])
+
+  // From the title screen: after the closing title has held, back to the title screen (Esc
+  // goes back at once).
+  useEffect(() => {
+    if (trailerFromMenu && !leaving && t >= TRAILER_LENGTH + HOLD) setLeaving('darken')
+  }, [t, leaving])
+  useEffect(() => {
+    if (!trailerFromMenu || leaving) return
+    const onKey = (event: KeyboardEvent) => {
+      if (event.code === 'Escape') setLeaving('darken')
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [leaving])
+  useEffect(() => {
+    if (leaving === 'darken') {
+      const timer = window.setTimeout(() => {
+        leaveTrailer()
+        setLeaving('reveal')
+      }, DARKEN_MS)
+      return () => window.clearTimeout(timer)
+    }
+    if (leaving === 'reveal') {
+      const timer = window.setTimeout(closeTrailer, REVEAL_MS)
+      return () => window.clearTimeout(timer)
+    }
+  }, [leaving])
 
   // R (hidden): play the trailer again from the start, after a 3-2-1 countdown on black, for
   // another take of the screen recording. (A second take is also the smoothest: by then every
@@ -46,7 +83,7 @@ export default function TrailerScreen() {
   useEffect(() => {
     if (mode === 'start') return
     const onKey = (event: KeyboardEvent) => {
-      if (event.code === 'KeyR' && !event.repeat) {
+      if (event.code === 'KeyR' && !event.repeat && !trailerFromMenu) {
         setEndingMusicPaused(true)
         trailerClock.t = -1 // (black, and the camera waits)
         trailerClock.paused = true
@@ -62,35 +99,22 @@ export default function TrailerScreen() {
     return () => window.removeEventListener('keydown', onKey)
   }, [mode])
 
-  if (mode === 'start') {
+  if (mode === 'start' && !leaving) {
+    if (!TRAILER_PAGE) return null
     return (
-      <button
-        type="button"
-        className="trailer-start"
-        onClick={() => {
-          unlockAudio()
-          document.documentElement.classList.add('trailer-on')
-          // Everything open and lit for the camera: all four cores, the portal.
-          useMuseumStore.setState({ quizPassed: true, gameCores: 4, coreStars: [3, 3, 3, 3] })
-          trailerClock.t = TRAILER_FROM
-          useMuseumStore.getState().setMode('trailer')
-          playEndingMusic(MUSIC_START + TRAILER_FROM)
-          // The 3D model views of the board and the game, fetched now so they appear at once.
-          void import('../world/ModelViewer')
-        }}
-      >
+      <button type="button" className="trailer-start" onClick={() => startTrailer(TRAILER_FROM, false)}>
         {ui.trailer.start}
       </button>
     )
   }
 
   const now = t < 0 ? null : segmentAt(t)
-  const black = !now || now.segment.kind === 'black'
+  const black = !now || now.segment.kind === 'black' || leaving !== null
   const gameShot = now?.segment.kind === 'game' ? Math.min(GAME_SHOTS.length - 1, Math.floor(now.into / GAME_SHOT_LENGTH)) : null
   const titles = TITLES.filter((title) => t >= title.from && t < title.to)
   const flash = FLASHES.find((f) => t >= f.at - f.length * 0.4 && t < f.at + f.length)
   return (
-    <div className="trailer" aria-live="polite">
+    <div className={leaving ? `trailer is-${leaving}` : 'trailer'} aria-live="polite">
       <div className={black ? 'trailer-black is-on' : 'trailer-black'} />
       {countdown !== null && (
         <div key={countdown} className="trailer-countdown">

@@ -4,7 +4,7 @@ import { endingMusicTime } from '../audio/sound'
 import { useMuseumStore, type Mode } from '../state/useMuseumStore'
 import { film, mixPose, smooth } from './ending-shots'
 import { startRun } from '../ui/game-run'
-import { GAME_SHOTS, GAME_SHOT_LENGTH, GAME_START, MUSIC_START, SEGMENTS, segmentAt, trailerClock } from './trailer-script'
+import { GAME_SHOTS, GAME_SHOT_LENGTH, GAME_START, MUSIC_START, SEGMENTS, TRAILER, segmentAt, trailerCamera, trailerClock } from './trailer-script'
 
 // The exhibit whose enlarged board the trailer shows.
 const BOARD = SEGMENTS.find((segment) => segment.kind === 'reading')?.exhibit ?? null
@@ -21,8 +21,26 @@ let gameStep = 0 // how far it has been played
 
 export default function TrailerCamera() {
   useFrame(({ camera }, delta) => {
+    const lens = camera as PerspectiveCamera
+    // Back from the trailer: the camera where it was before.
+    if (trailerCamera.restore) {
+      trailerCamera.restore = false
+      const saved = trailerCamera.saved
+      trailerCamera.saved = null
+      if (saved) {
+        camera.position.set(...saved.position)
+        camera.quaternion.set(...saved.quaternion)
+        lens.fov = saved.fov
+        lens.updateProjectionMatrix()
+      }
+      return
+    }
     const store = useMuseumStore.getState()
-    if (!TRAILER_MODES.includes(store.mode) || trailerClock.t < 0) return
+    if (!TRAILER || !TRAILER_MODES.includes(store.mode) || trailerClock.t < 0) return
+    if (!trailerCamera.saved) {
+      const q = camera.quaternion
+      trailerCamera.saved = { position: [camera.position.x, camera.position.y, camera.position.z], quaternion: [q.x, q.y, q.z, q.w], fov: lens.fov }
+    }
     const music = endingMusicTime()
     if (!trailerClock.paused) trailerClock.t = music !== null ? Math.max(music - MUSIC_START, trailerClock.t) : trailerClock.t + Math.min(delta, 0.1)
     const { segment, into } = segmentAt(trailerClock.t)
@@ -82,7 +100,6 @@ export default function TrailerCamera() {
     film.override = segment.kind === 'film' ? segment.at + into * (segment.speed ?? 1) : null
     if (segment.kind === 'film' || segment.kind === 'black') return
 
-    const lens = camera as PerspectiveCamera
     const fov = segment.kind === 'museum' ? (segment.fov ?? NORMAL_FOV) : lens.fov
     if (lens.fov !== fov) {
       lens.fov = fov

@@ -10,7 +10,7 @@ import { IS_TOUCH } from './ui/touch'
 import LoadingScreen from './ui/LoadingScreen'
 import SoundDirector from './audio/SoundDirector'
 import TrailerScreen from './ui/TrailerScreen'
-import { TRAILER } from './world/trailer-script'
+import { TRAILER_PAGE } from './world/trailer-script'
 import { Suspense, lazy, useEffect } from 'react'
 import { useMuseumStore } from './state/useMuseumStore'
 import { useContent } from './content/use-content'
@@ -27,6 +27,7 @@ const Museum = lazy(() => import('./world/Museum'))
 // Which screen is shown depends only on the current mode.
 function App() {
   const mode = useMuseumStore((state) => state.mode)
+  const trailer = useMuseumStore((state) => state.trailerActive)
   const worldReady = useMuseumStore((state) => state.worldReady)
   const { language, site, ui } = useContent()
 
@@ -47,15 +48,15 @@ function App() {
       {mode === 'exploring' && <Hud />}
       {/* The title screen waits until everything has loaded (LoadingScreen). */}
       {/* (With ?trailer: the trailer instead of the title screen.) */}
-      {mode === 'start' && worldReady && !TRAILER && <StartScreen />}
-      {TRAILER && worldReady && <TrailerScreen />}
+      {mode === 'start' && worldReady && !TRAILER_PAGE && <StartScreen />}
+      {trailer && worldReady && <TrailerScreen />}
       {mode === 'paused' && <PauseScreen />}
       {/* Always mounted: it animates in when an exhibit opens and out when it closes. */}
       <InfoPanel />
       {mode === 'map' && <MapMenu />}
-      {mode === 'ending' && !TRAILER && <EndingScreen />}
+      {mode === 'ending' && !trailer && <EndingScreen />}
       {/* (In the trailer it stays open, unseen between its shots: TrailerCamera.tsx.) */}
-      {(mode === 'game' || (TRAILER && mode !== 'start')) && <TimeMachineGame />}
+      {(mode === 'game' || (trailer && mode !== 'start')) && <TimeMachineGame />}
       <LoadingScreen />
       <SoundDirector />
       {/* Touch devices held upright: ask to turn them sideways (shown by index.css). */}

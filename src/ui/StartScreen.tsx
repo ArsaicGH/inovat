@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useContent } from '../content/use-content'
 import { useMuseumStore, hasSavedProgress } from '../state/useMuseumStore'
 import LockButton from './LockButton'
@@ -6,6 +6,8 @@ import LanguageSwitch from './LanguageSwitch'
 import VolumeSlider from './VolumeSlider'
 import SensitivitySlider from './SensitivitySlider'
 import GraphicsSlider from './GraphicsSlider'
+import { startTrailer } from './trailer-run'
+import { preloadTrailerMusic } from '../audio/sound'
 
 // First screen: the decorated INOVAT title and a start button. On a first visit "Bắt đầu"
 // starts the guided tutorial at once; after an earlier visit, "new journey" asks whether to
@@ -18,8 +20,18 @@ export default function StartScreen() {
   const setTutorial = useMuseumStore((state) => state.setTutorial)
   const continueSavedVisit = useMuseumStore((state) => state.continueSavedVisit)
 
+  // (The trailer's music, fetched while the title screen shows.)
+  useEffect(() => preloadTrailerMusic(), [])
+
   return (
     <div className="overlay title-overlay">
+      {/* At the top: play the trailer, which then returns to this screen. */}
+      <button type="button" className="title-trailer" onClick={() => startTrailer(0, true)}>
+        <svg viewBox="0 0 12 14" aria-hidden="true">
+          <path d="M1 1 L11 7 L1 13 Z" />
+        </svg>
+        {ui.start.trailer}
+      </button>
       <div className="title-block">
         <div className="title-ornament" aria-hidden="true">
           <span />

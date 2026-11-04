@@ -20,7 +20,16 @@ import type { RoomId } from '../types'
 export const TRAILER_LENGTH = 31.6 // the closing title appears here, on the final hit, and stays
 export const MUSIC_START = 0
 
-export const TRAILER = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('trailer')
+// The ?trailer page (for recording it), which opens straight on the trailer.
+export const TRAILER_PAGE = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('trailer')
+// The trailer is playing: on that page, or from "Xem trailer" on the title screen (ui/trailer-run.ts).
+// (A live binding: every module that imports it sees it change.)
+export let TRAILER = TRAILER_PAGE
+export function setTrailer(on: boolean) {
+  TRAILER = on
+}
+// Where the camera was before the trailer, put back afterwards (TrailerCamera.tsx).
+export const trailerCamera: { saved: { position: Vec3; quaternion: [number, number, number, number]; fov: number } | null; restore: boolean } = { saved: null, restore: false }
 
 // The trailer's clock (seconds since it began), kept by TrailerCamera from the music.
 // paused: held with Space, for full-size screenshots of any moment.
