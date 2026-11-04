@@ -355,7 +355,15 @@ const vi = {
   cores: 'Lõi năng lượng',
   roundOf: 'Lõi {n}/4',
   // The workshop (the game's first screen).
-  hubIntro: 'Mỗi lõi năng lượng là một thử thách khác nhau về bốn cuộc cách mạng. Thắp sáng cả bốn lõi để mở cánh cổng. Một sao là đủ để qua; ba sao dành cho người muốn chinh phục.',
+  // The rules, the first page of the game window (then the four cores).
+  rulesTitle: 'Cách chơi',
+  rules: [
+    'Mỗi lõi năng lượng là một thử thách khác nhau về bốn cuộc cách mạng. Thắp sáng cả bốn lõi để mở cánh cổng.',
+    'Trả lời đúng ở lần thử đầu được 2 điểm, lần thứ hai được 1 điểm, các lần sau không được điểm. Riêng lõi III: đoán đúng càng sớm, càng ít gợi ý, càng nhiều điểm.',
+    'Ở mỗi lõi, một sao là đủ để qua; ba sao dành cho người muốn chinh phục.',
+  ],
+  rulesNext: 'Đến bốn lõi năng lượng',
+  rulesBack: 'Xem lại cách chơi',
   repair: 'Sửa lõi {n}',
   resume: 'Tiếp tục lõi {n}',
   replay: 'Chơi lại',
@@ -434,7 +442,14 @@ const en: typeof vi = {
   close: 'Close',
   cores: 'Power cores',
   roundOf: 'Core {n}/4',
-  hubIntro: 'Each power core is a different challenge about the four revolutions. Light all four to open the portal. One star is enough to pass; three are for those who want to master it.',
+  rulesTitle: 'How to play',
+  rules: [
+    'Each power core is a different challenge about the four revolutions. Light all four to open the portal.',
+    'A right answer on the first try scores 2 points, on the second try 1 point, and after that none. Core III is different: the sooner you guess, with fewer clues, the more points you score.',
+    'In each core, one star is enough to pass; three are for those who want to master it.',
+  ],
+  rulesNext: 'To the four power cores',
+  rulesBack: 'How to play',
   repair: 'Repair core {n}',
   resume: 'Continue core {n}',
   replay: 'Replay',

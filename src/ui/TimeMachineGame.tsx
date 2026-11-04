@@ -350,7 +350,62 @@ function Result({ onDone }: { onDone: () => void }) {
 }
 
 // ---- The workshop: the four cores, their stars, and what to repair next ----
-function Workshop({ onPlay }: { onPlay: () => void }) {
+// THE RULES: the game window's first page, numbered points, each with a small picture.
+function Rules({ onNext }: { onNext: () => void }) {
+  const { g } = useGame()
+  const pictures = [
+    // 1. The four cores, in their era colours.
+    <span key="cores" className="rules-cores">
+      {ERA_COLOURS.map((colour) => (
+        <i key={colour} style={{ '--era': colour } as CSSProperties} />
+      ))}
+    </span>,
+    // 2. The points, try by try.
+    <span key="points" className="rules-points">
+      <b>+2</b>
+      <b>+1</b>
+      <b>0</b>
+    </span>,
+    // 3. One star to pass, three to master.
+    <span key="stars" className="rules-stars">
+      <Stars n={1} />
+      <Stars n={3} />
+    </span>,
+  ]
+  return (
+    <div className="rules">
+      <h3 className="rules-title">{g.rulesTitle}</h3>
+      <ol className="rules-list">
+        {g.rules.map((rule, i) => (
+          <li key={i}>
+            <span className="rules-number">{i + 1}</span>
+            <p>{rule}</p>
+            {pictures[i]}
+          </li>
+        ))}
+        <li>
+          <span className="rules-number">{g.rules.length + 1}</span>
+          <p>
+            <button className="game-close workshop-help-button" onClick={goBackToRooms}>
+              {g.goBack}
+            </button>{' '}
+            {g.goBackHelp}
+          </p>
+        </li>
+      </ol>
+      <div className="rules-actions">
+        <button className="game-primary" onClick={onNext}>
+          {g.rulesNext} →
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// Shown first only on the first opening of the game window in a visit.
+let rulesSeen = false
+
+function Workshop({ onPlay, onRules }: { onPlay: () => void; onRules: () => void }) {
   const { g } = useGame()
   const cores = useMuseumStore((state) => state.gameCores)
   const stars = useMuseumStore((state) => state.coreStars)
@@ -363,13 +418,6 @@ function Workshop({ onPlay }: { onPlay: () => void }) {
   const inProgress = (round: number) => run?.round === round && !run.finished
   return (
     <div className="workshop">
-      <p className="game-task">{g.hubIntro}</p>
-      <p className="workshop-help">
-        <button className="game-close workshop-help-button" onClick={goBackToRooms}>
-          {g.goBack}
-        </button>{' '}
-        {g.goBackHelp}
-      </p>
       <div className="workshop-cores">
         {g.rounds.map((round, i) => {
           const lit = i < cores
@@ -398,6 +446,11 @@ function Workshop({ onPlay }: { onPlay: () => void }) {
           )
         })}
       </div>
+      <div className="rules-actions">
+        <button className="game-close" onClick={onRules}>
+          ← {g.rulesBack}
+        </button>
+      </div>
       {cores >= 4 && (
         <div className="game-done">
           <h3>{g.doneTitle}</h3>
@@ -420,6 +473,8 @@ export default function TimeMachineGame() {
   // The workshop shows when no core is being played, or when the visitor steps back to it
   // (the core in progress stays saved).
   const [atWorkshop, setAtWorkshop] = useState(false)
+  // The workshop's two pages: the rules (first), then the four cores.
+  const [rules, setRules] = useState(!rulesSeen)
   const playing = run && !atWorkshop ? run : null
   const scroll = useScrollFades<HTMLDivElement>(`${playing?.round}-${playing?.index}-${playing?.finished}`)
 
@@ -471,7 +526,15 @@ export default function TimeMachineGame() {
 
         {/* The round scrolls between the header and the result bar, which stay in view. */}
         <div ref={scroll} className="game-scroll scroll-fade">
-          {!playing && <Workshop onPlay={() => setAtWorkshop(false)} />}
+          {!playing && rules && (
+            <Rules
+              onNext={() => {
+                rulesSeen = true
+                setRules(false)
+              }}
+            />
+          )}
+          {!playing && !rules && <Workshop onPlay={() => setAtWorkshop(false)} onRules={() => setRules(true)} />}
           {playing && (
             <>
               <p className="game-task">{g.rounds[playing.round].task}</p>

@@ -4000,3 +4000,87 @@ html.trailer-reading .info-panel .board-row {
   opacity: 0;
   transition: opacity 1.6s ease-in-out;
 }
+
+/* THE GAME'S RULES (TimeMachineGame.tsx Rules): numbered points in gold medallions, each with
+   a small picture, then the way on to the four cores. */
+.rules-title {
+  margin: 4px 0 14px;
+  color: #6b4a1c;
+  font-size: 1.15em;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.rules-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.rules-list li {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 18px;
+  border: 1px solid rgba(201, 162, 90, 0.4);
+  border-radius: 12px;
+  background: linear-gradient(90deg, rgba(255, 250, 238, 0.9), rgba(250, 240, 218, 0.7));
+}
+.rules-list p {
+  margin: 0;
+  line-height: 1.5;
+}
+.rules-number {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff3cf, #c9a25a 60%, #8a6428);
+  box-shadow: 0 0 0 2px rgba(201, 162, 90, 0.35), 0 2px 6px rgba(80, 55, 20, 0.3);
+  color: #2a1d0b;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 700;
+}
+.rules-cores {
+  display: flex;
+  gap: 6px;
+}
+.rules-cores i {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--era);
+  box-shadow: 0 0 10px var(--era);
+}
+.rules-points {
+  display: flex;
+  gap: 6px;
+}
+.rules-points b {
+  min-width: 34px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #3fa36a;
+  color: #fff;
+  font-size: 0.85em;
+  text-align: center;
+}
+.rules-points b:nth-child(2) {
+  background: #c9a25a;
+}
+.rules-points b:nth-child(3) {
+  background: #b9ad99;
+}
+.rules-stars {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+.rules-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}

@@ -18,8 +18,8 @@ import { playEffect } from '../audio/sound'
 export const STARS: [number, number, number][] = [
   [9, 10, 12],
   [12, 13, 16],
-  [11, 12, 16],
-  [10, 11, 16],
+  [12, 13, 16],
+  [12, 13, 16],
 ]
 export const MAX_POINTS = [12, 16, 16, 16]
 export const PER_ERA = 2 // cores II and IV: cards per era (problems, or questions per visitor)
