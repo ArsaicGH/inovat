@@ -4,6 +4,7 @@ theme: inovat
 size: 16:9
 paginate: true
 lang: vi
+transition: fade
 title: INOVAT – Bảo tàng Cách mạng Công nghiệp
 description: Bài thuyết trình của nhóm INOVAT về bốn cuộc cách mạng công nghiệp và bảo tàng ảo 3D.
 footer: INOVAT · Bảo tàng Cách mạng Công nghiệp
@@ -12,10 +13,8 @@ footer: INOVAT · Bảo tàng Cách mạng Công nghiệp
 <!-- _class: title -->
 <!-- _paginate: false -->
 <!--
-[Slide 1 · Nguyên · ~8 giây]
-"Kính chào thầy cô và các bạn. Nhóm chúng em xin trình bày INOVAT, bảo tàng ảo về bốn cuộc cách mạng công nghiệp."
-Đứng thẳng, nhìn khán giả, nói chậm. Không đọc chữ trên slide.
-→ Chuyển: "Mời bạn Linh mở đầu phần lịch sử."
+[Slide 1 · ~9 giây]
+"Kính chào thầy cô và các bạn. Chúng em là nhóm INOVAT. Hôm nay, chúng em xin giới thiệu bảo tàng ảo về bốn cuộc cách mạng công nghiệp."
 -->
 
 <img class="bg" src="assets/game/hall-clean.jpg" alt="Sảnh trung tâm của bảo tàng INOVAT">
@@ -27,11 +26,27 @@ footer: INOVAT · Bảo tàng Cách mạng Công nghiệp
 
 ---
 
+<!-- _class: intro -->
 <!--
-[Slide 2 · Linh · ~32 giây]
-"Lịch sử công nghiệp không phải bốn bước rời rạc, mà là một dòng chảy. Cách mạng công nghiệp thứ nhất, từ giữa thế kỷ mười tám, là cơ giới hóa với máy hơi nước. Thứ hai, cuối thế kỷ mười chín, đưa điện và dây chuyền lắp ráp vào sản xuất hàng loạt. Thứ ba, từ nửa sau thế kỷ hai mươi, là máy tính, robot và tự động hóa. Thứ tư, từ đầu thế kỷ hai mươi mốt, là dữ liệu, kết nối và hệ thống thông minh."
-Chỉ lần lượt vào từng ảnh khi nói. Lưu ý: các mốc là cách phân kỳ quy ước, các nhà sử học còn tranh luận về ranh giới.
-→ Chuyển: "Vậy các cuộc cách mạng ấy nối với nhau như thế nào? Mời bạn Quang Anh."
+[Slide 2 · ~26 giây]
+"Các cuộc cách mạng công nghiệp hình thành từ nhiều nguyên nhân khác nhau. Những điểm yếu, những giới hạn của thời trước chính là động lực để con người cải tiến, và mở ra cuộc cách mạng tiếp theo. Qua nhiều cải cách, đổi mới, những sáng chế ấy trở thành những đồ dùng quanh ta ngày nay: điện thoại, ô tô, máy tính."
+-->
+
+<div class="eyebrow" style="color:var(--gold);">Mở đầu</div>
+
+# Mỗi cuộc cách mạng bắt đầu từ giới hạn của thời trước
+
+<div class="why">
+<div class="w"><div class="wn">1</div><h3>Nhiều nguyên nhân</h3><p>Khoa học, kinh tế và nhu cầu xã hội cùng thúc đẩy. Không có một nguyên nhân duy nhất.</p></div>
+<div class="w"><div class="wn">2</div><h3>Giới hạn là động lực</h3><p>Điểm yếu, điểm khuyết của cuộc cách mạng trước thúc đẩy con người cải tiến, mở ra cuộc cách mạng sau.</p></div>
+<div class="w"><div class="wn">3</div><h3>Hiện diện quanh ta</h3><p>Qua nhiều cải cách và đổi mới, sáng chế trở thành đồ dùng ngày nay: điện thoại, ô tô, máy tính.</p></div>
+</div>
+
+---
+
+<!--
+[Slide 3 · ~33 giây]
+"Vậy bốn cuộc cách mạng ấy là gì? Cách mạng thứ nhất, từ giữa thế kỷ mười tám, là cơ giới hóa: máy móc và máy hơi nước thay sức người, sức nước. Cách mạng thứ hai, cuối thế kỷ mười chín, đưa điện, thép và dây chuyền lắp ráp vào sản xuất hàng loạt. Cách mạng thứ ba, nửa sau thế kỷ hai mươi, là máy tính, robot và tự động hóa. Cách mạng thứ tư, từ đầu thế kỷ hai mươi mốt, là dữ liệu, kết nối và hệ thống thông minh."
 -->
 
 # Bốn cuộc cách mạng, một dòng chảy phát triển
@@ -46,10 +61,8 @@ Chỉ lần lượt vào từng ảnh khi nói. Lưu ý: các mốc là cách ph
 ---
 
 <!--
-[Slide 3 · Quang Anh · ~40 giây]
-"Mỗi cuộc cách mạng đứng trên vai cuộc trước. Hãy nhìn ba mạch phát triển. Về sản xuất: từ máy móc dùng hơi nước, đến dây chuyền lắp ráp của Ford khoảng năm 1913, đến robot và bộ điều khiển PLC, rồi nhà máy kết nối ngày nay. Về truyền thông: điện báo năm 1837, điện thoại năm 1876, mạng ARPANET năm 1969, rồi Internet và điện toán đám mây. Về nền tảng công nghệ: hơi nước, điện năng, vi xử lý, rồi dữ liệu và trí tuệ nhân tạo. Cái đi sau dùng được cái đi trước, nhưng đó là sự kế thừa chứ không phải hệ quả tất yếu."
-Lưu ý lịch sử: AI có gốc từ hội thảo Dartmouth 1956; chỉ bùng nổ ở thế kỷ XXI nhờ dữ liệu và sức tính. Không nói "A gây ra B".
-→ Chuyển: "Nhưng kế thừa không có nghĩa là lặp lại."
+[Slide 4 · ~40 giây]
+"Bốn cuộc cách mạng không đứng riêng lẻ mà nối với nhau thành ba mạch. Về sản xuất: từ máy hơi nước, đến dây chuyền lắp ráp, đến robot, rồi nhà máy kết nối. Về truyền thông: điện báo, điện thoại, mạng máy tính, rồi Internet và điện toán đám mây. Về nền tảng công nghệ: hơi nước, điện năng, vi xử lý, rồi dữ liệu và trí tuệ nhân tạo. Cái đi sau dựa trên cái đi trước, nhưng đó là sự kế thừa, không phải hệ quả tất yếu."
 -->
 
 # Sự kế thừa và phát triển
@@ -84,10 +97,8 @@ Lưu ý lịch sử: AI có gốc từ hội thảo Dartmouth 1956; chỉ bùng 
 ---
 
 <!--
-[Slide 4 · Quang Anh · ~35 giây]
-"Nhưng kế thừa không có nghĩa là lặp lại. Mỗi thời đại tạo ra một biến đổi riêng, dựa trên một nền tảng đã có, và để lại một thách thức mới. Cuộc cách mạng thứ nhất đưa sản xuất vào nhà máy, nhưng kéo theo điều kiện lao động nặng nhọc. Thứ hai cho sản xuất hàng loạt, cùng công việc dây chuyền đơn điệu. Thứ ba cho tự động hóa, và nỗi lo về việc làm. Thứ tư có trí tuệ nhân tạo, cùng các câu hỏi về dữ liệu và đạo đức."
-Đây là phần diễn giải của nhóm dựa trên các nguồn trong bảo tàng; nếu bị hỏi, thừa nhận đây là cách nhìn tổng quát, không phải mọi nơi, mọi lúc đều như vậy.
-→ Chuyển: "Để thấy dòng chảy ấy, mời cả lớp xem trailer."
+[Slide 5 · ~36 giây]
+"Nhưng kế thừa không có nghĩa là lặp lại. Mỗi thời đại có một biến đổi riêng, một nền tảng đã có, và để lại một thách thức mới. Cách mạng thứ nhất đưa sản xuất vào nhà máy, nhưng lao động nặng nhọc. Cách mạng thứ hai cho sản xuất hàng loạt, nhưng công việc dây chuyền đơn điệu. Cách mạng thứ ba cho tự động hóa, và nỗi lo mất việc. Cách mạng thứ tư có trí tuệ nhân tạo, cùng những câu hỏi về việc làm, dữ liệu và đạo đức. Để thấy dòng chảy ấy, mời thầy cô và các bạn xem trailer."
 -->
 
 # Kế thừa, khác biệt và những thách thức mới
@@ -105,10 +116,9 @@ Lưu ý lịch sử: AI có gốc từ hội thảo Dartmouth 1956; chỉ bùng 
 <!-- _footer: "" -->
 <!-- _paginate: false -->
 <!--
-[Slide 5 · Trailer · ~30 giây · không ai nói]
-Video tự phát khi chuyển đến slide này (có âm thanh). Nếu không tự phát: bấm nút phát. Nếu trình duyệt chặn, bấm một lần vào video.
-Dự phòng: mở https://inovat-museum.vercel.app/?trailer hoặc file video trong gói dự phòng.
-Khi trailer kết thúc, Hoàng bước lên: "Đó là INOVAT."
+[Slide 6 · Trailer · 37 giây · KHÔNG AI NÓI]
+Video tự phát khi chuyển đến slide này (có âm thanh). Nếu không tự phát, bấm nút phát. Đứng yên, im lặng đến hết.
+Khi trailer kết thúc, bấm sang slide tiếp theo.
 -->
 
 <div class="eyebrow">Trailer · 0:37</div>
@@ -120,31 +130,30 @@ Khi trailer kết thúc, Hoàng bước lên: "Đó là INOVAT."
 <!-- _paginate: false -->
 <!-- _footer: "" -->
 <!--
-[Slide 6 · Hoàng · ~35 giây]
-"Đó là INOVAT, hành trình khám phá lịch sử. Một bảo tàng ba chiều chạy ngay trên trình duyệt: không cần cài đặt, có hai ngôn ngữ Việt và Anh. Bên trong có hai mươi mốt phát minh, bốn phòng thời đại và một trò chơi. Thầy cô và các bạn có thể quét mã QR này để tự khám phá ngay."
-KHÔNG demo trực tiếp. Chỉ vào mã QR.
-→ Chuyển: "Vậy bảo tàng được tổ chức thế nào?"
+[Slide 7 · ~27 giây]
+"Đó là INOVAT, hành trình khám phá lịch sử: một bảo tàng ba chiều chạy ngay trên trình duyệt, không cần cài đặt, có tiếng Việt và tiếng Anh. Bảo tàng gồm bốn phòng thời đại, hai mươi mốt phát minh, bảy mươi bốn hình ảnh trên tường và trên các bảng thông tin, và bốn vòng trò chơi. Mọi người có thể vào thử ngay tại địa chỉ này."
+(74 hình ảnh = 60 ảnh, tranh, tranh khắc + 14 sơ đồ do nhóm vẽ; 48 trên tường các phòng + 26 trên bảng thông tin.)
 -->
 
 <div class="shot"><img src="assets/game/hall-clean.jpg" alt="Sảnh trung tâm của bảo tàng, ảnh chụp từ trò chơi"></div>
 <div class="txt">
 <div class="eyebrow">Sản phẩm của nhóm</div>
-<h1 style="font-size:40px;">INOVAT: Hành trình khám phá lịch sử</h1>
-<ul>
-<li>Bảo tàng ảo 3D, chạy ngay trên trình duyệt</li>
-<li>Không cần cài đặt, không cần đăng nhập</li>
-<li>Tiếng Việt và English</li>
-<li><strong>21 phát minh</strong> · 4 phòng thời đại · 1 trò chơi</li>
-</ul>
-<div class="qr"><div class="code"><img src="assets/branding/qr-game.svg" alt="Mã QR đến bảo tàng INOVAT"></div><div><div class="url">inovat-museum.vercel.app</div><div class="hint">Quét mã để tự khám phá</div></div></div>
+<h1 style="font-size:38px;">INOVAT: Hành trình khám phá lịch sử</h1>
+<p class="sub" style="font-size:20px;">Bảo tàng ảo 3D chạy ngay trên trình duyệt · Tiếng Việt và English</p>
+<div class="stats">
+<div class="stat"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M10 42V14a14 14 0 0 1 28 0v28M5 42h38M18 42V24a6 6 0 0 1 12 0v18"/></svg><div><b>4</b><span>phòng thời đại</span></div></div>
+<div class="stat"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 5a12.5 12.5 0 0 0-7 22.9V33h14v-5.1A12.5 12.5 0 0 0 24 5zM18 38h12M20.5 43h7"/></svg><div><b>21</b><span>phát minh</span></div></div>
+<div class="stat"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="6" y="9" width="36" height="30" rx="2"/><circle cx="17" cy="20" r="3.5"/><path d="M6 34l11-10 8 7 7-6 10 9"/></svg><div><b>74</b><span>hình ảnh</span></div></div>
+<div class="stat"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="4" y="15" width="40" height="22" rx="11"/><path d="M15 21v10M10 26h10"/><circle cx="32" cy="23.5" r="1.8"/><circle cx="37" cy="28.5" r="1.8"/></svg><div><b>4</b><span>vòng trò chơi</span></div></div>
+</div>
+<div class="url">inovat-museum.vercel.app</div>
 </div>
 
 ---
 
 <!--
-[Slide 7 · Hoàng · ~25 giây]
-"Hành trình đi từ sảnh trung tâm, qua bốn phòng theo đúng thứ tự thời gian, rồi đến phòng trò chơi. Thứ tự này khiến người xem tự thấy dòng chảy: bước qua mỗi cánh cửa là bước sang một thời đại. Cuối cùng, cánh cổng chỉ mở khi hoàn thành trò chơi."
-→ Chuyển: "Mỗi phòng có một diện mạo riêng."
+[Slide 8 · ~23 giây]
+"Hành trình đi từ sảnh trung tâm, qua bốn phòng theo đúng thứ tự thời gian, rồi đến phòng trò chơi. Bước qua mỗi cánh cửa là bước sang một thời đại. Cuối cùng, cánh cổng chỉ mở khi hoàn thành trò chơi."
 -->
 
 # Cấu trúc bảo tàng: một hành trình theo thời gian
@@ -161,9 +170,8 @@ KHÔNG demo trực tiếp. Chỉ vào mã QR.
 ---
 
 <!--
-[Slide 8 · Hoàng · ~25 giây]
-"Mỗi thời đại có một bản sắc thị giác riêng: màu ấm của gạch và đồng cho hơi nước, xanh thép cho điện, xanh lục cho máy tính, ánh lam trong suốt cho kỷ nguyên số. Chỉ cần nhìn màu sắc, người xem đã biết mình đang ở đâu trong dòng thời gian."
-→ Chuyển: "Sau khi xem, người chơi phải vận dụng. Mời bạn Hải."
+[Slide 9 · ~21 giây]
+"Mỗi thời đại có một bản sắc thị giác riêng: màu ấm của gạch và đồng cho hơi nước, xanh thép cho điện, xanh lục cho máy tính, ánh lam trong suốt cho kỷ nguyên số. Nhìn màu sắc là biết mình đang ở đâu trong dòng thời gian."
 -->
 
 # Bốn thời đại, bốn bản sắc thị giác
@@ -178,13 +186,11 @@ KHÔNG demo trực tiếp. Chỉ vào mã QR.
 ---
 
 <!--
-[Slide 9 · Hải · ~35 giây]
-"Sau khi tham quan, người xem phải vận dụng. Trò chơi Cỗ máy thời gian có bốn lõi năng lượng. Lõi một: đưa các cỗ máy về đúng cuộc cách mạng. Lõi hai: giúp một thị trấn lớn lên qua bốn thời kỳ. Lõi ba: đoán phát minh từ các gợi ý. Lõi bốn: trò chuyện với những vị khách từ quá khứ về cái giá của đổi thay. Trả lời sai sẽ được gợi ý phòng cần xem lại."
-Nếu bị hỏi điểm: xem slide dự phòng B2.
-→ Chuyển: "Toàn bộ trải nghiệm đi theo một trình tự học tập. Mời bạn Hoàng."
+[Slide 10 · ~32 giây]
+"Sau khi xem, người chơi phải vận dụng. Trò chơi Cỗ máy thời gian có bốn vòng. Vòng một: đưa các cỗ máy về đúng cuộc cách mạng. Vòng hai: giúp một thị trấn lớn lên qua bốn thời kỳ. Vòng ba: đoán phát minh từ các gợi ý. Vòng bốn: trò chuyện với những vị khách từ quá khứ về cái giá của đổi thay. Trả lời sai thì được gợi ý phòng cần xem lại."
 -->
 
-# Trò chơi "Cỗ máy thời gian"
+# Trò chơi "Cỗ máy thời gian": bốn vòng
 
 <div class="split">
 <div class="cores">
@@ -193,15 +199,14 @@ Nếu bị hỏi điểm: xem slide dự phòng B2.
 <div class="core"><div class="n">III</div><div><h3>Tôi là ai?</h3><p>Đoán điều bí ẩn từ gợi ý; đoán sớm được nhiều điểm hơn.</p></div></div>
 <div class="core"><div class="n">IV</div><div><h3>Những vị khách từ quá khứ</h3><p>Nói về đổi thay của mỗi thời và cái giá phải trả.</p></div></div>
 </div>
-<div class="shots"><div class="im"><img src="assets/game/game-q2.jpg" alt="Lõi I trong trò chơi Cỗ máy thời gian"></div><div class="im"><img src="assets/game/game-q3.jpg" alt="Lõi IV trong trò chơi Cỗ máy thời gian"></div></div>
+<div class="shots"><div class="im"><img src="assets/game/game-q2.jpg" alt="Vòng I trong trò chơi Cỗ máy thời gian"></div><div class="im"><img src="assets/game/game-q3.jpg" alt="Vòng IV trong trò chơi Cỗ máy thời gian"></div></div>
 </div>
 
 ---
 
 <!--
-[Slide 10 · Hoàng · ~25 giây]
-"Như vậy, sản phẩm dẫn người xem đi từ khám phá đến hiểu: quan sát hiện vật ba chiều, đọc bảng thông tin và đối chiếu nguồn, rồi dùng trò chơi để kiểm tra mình đã nhìn ra mối liên hệ giữa các thời đại hay chưa."
-→ Chuyển: "Và mọi thứ đều có nguồn."
+[Slide 11 · ~23 giây]
+"Như vậy, người xem đi từ khám phá đến hiểu: quan sát hiện vật ba chiều, đọc bảng thông tin, đối chiếu ảnh và nguồn, rồi vận dụng qua trò chơi để thấy mối liên hệ giữa các thời đại."
 -->
 
 # Từ khám phá đến hiểu
@@ -210,7 +215,7 @@ Nếu bị hỏi điểm: xem slide dự phòng B2.
 <div class="st"><span class="k">Bước 1</span><b>Quan sát</b><p>Xem hiện vật 3D, xoay và phóng to.</p></div>
 <div class="st"><span class="k">Bước 2</span><b>Đọc</b><p>Năm, nhân vật và bảng thông tin của từng phát minh.</p></div>
 <div class="st"><span class="k">Bước 3</span><b>Đối chiếu</b><p>Ảnh tư liệu, dòng thời gian và nguồn tham khảo.</p></div>
-<div class="st"><span class="k">Bước 4</span><b>Vận dụng</b><p>Bốn lõi trò chơi hỏi về mối liên hệ giữa các thời đại.</p></div>
+<div class="st"><span class="k">Bước 4</span><b>Vận dụng</b><p>Bốn vòng trò chơi hỏi về mối liên hệ giữa các thời đại.</p></div>
 <div class="st"><span class="k">Bước 5</span><b>Hiểu</b><p>Thắp sáng bốn lõi, mở cánh cổng và xem đoạn phim kết.</p></div>
 </div>
 <div class="band"><span>Người xem không chỉ ghi nhớ năm tháng,</span><b>mà nhìn ra dòng chảy giữa các thời đại.</b></div>
@@ -218,9 +223,8 @@ Nếu bị hỏi điểm: xem slide dự phòng B2.
 ---
 
 <!--
-[Slide 11 · Hoàng · ~15 giây]
-"Mọi nội dung đều có nguồn: Britannica, Science Museum Group, Thư viện Quốc hội Hoa Kỳ, NASA và nhiều nơi khác. Ảnh lấy từ Wikimedia Commons, tất cả được ghi công ngay trong bảo tàng, ở bảng Ghi công tại sảnh."
-→ Chuyển: "Mời bạn Nguyên kết thúc."
+[Slide 12 · ~15 giây]
+"Mọi nội dung đều có nguồn: Britannica, Science Museum Group, Thư viện Quốc hội Hoa Kỳ và nhiều nơi khác. Ảnh lấy từ Wikimedia Commons, tác giả và giấy phép được ghi công ngay trong bảo tàng."
 -->
 
 # Nguồn tư liệu và ghi công
@@ -237,9 +241,9 @@ Nếu bị hỏi điểm: xem slide dự phòng B2.
 <!-- _class: dark -->
 <!-- _footer: "" -->
 <!--
-[Slide 12 · Nguyên · ~12 giây]
-"Tóm lại: mỗi cuộc cách mạng kế thừa nền tảng của cuộc trước, mở rộng khả năng sản xuất và kết nối, đồng thời tạo ra những thay đổi và thách thức mới. Xin cảm ơn thầy cô và các bạn đã lắng nghe."
-Đọc luận điểm chậm, rõ. Sau đó cả nhóm cúi chào và chuyển sang slide hỏi đáp.
+[Slide 13 · ~16 giây]
+"Tóm lại: mỗi cuộc cách mạng công nghiệp kế thừa nền tảng của cuộc trước, mở rộng khả năng sản xuất và kết nối, đồng thời tạo ra những thay đổi và thách thức mới. Xin cảm ơn thầy cô và các bạn."
+Đọc luận điểm thật chậm.
 -->
 
 <div class="eyebrow" style="color:var(--gold);">Kết luận</div>
@@ -261,86 +265,13 @@ Nếu bị hỏi điểm: xem slide dự phòng B2.
 <!-- _class: qa -->
 <!-- _paginate: false -->
 <!--
-[Slide 13 · Hỏi đáp · ~2 phút 40 giây]
-Cả nhóm đứng cạnh nhau. Người được hỏi trả lời theo thứ tự: Kết luận → Lý do → Dẫn chứng → Thừa nhận giới hạn. Ngân hàng câu hỏi và người phụ trách: xem notes/qa-bank.md.
-Nếu không chắc: "Chúng em xin phép kiểm tra lại nguồn và bổ sung" thay vì đoán.
+[Slide 14 · Hỏi đáp]
+"Xin mời thầy cô và các bạn đặt câu hỏi."
+Trả lời theo thứ tự: Kết luận, Lý do, Dẫn chứng, Thừa nhận giới hạn. Nếu không chắc: "Chúng em xin phép kiểm tra lại nguồn và bổ sung." Ngân hàng câu hỏi: ghi chú Q&A.
 -->
 
 <div class="shot"><img src="assets/game/hall-clean.jpg" alt="Sảnh trung tâm của bảo tàng INOVAT"></div>
 <div class="txt">
 <div class="big">Xin cảm ơn.<br>Mời thầy cô và các bạn đặt câu hỏi.</div>
-<div class="qr"><div class="code"><img src="assets/branding/qr-game.svg" alt="Mã QR đến bảo tàng INOVAT"></div><div><div class="url">inovat-museum.vercel.app</div><div class="hint">Khám phá bảo tàng INOVAT</div></div></div>
-</div>
-
----
-
-<!-- _footer: "Phụ lục · dành cho phần hỏi đáp" -->
-<!--
-[Phụ lục B1 · Quang Anh / Linh] Dùng khi bị hỏi về mốc thời gian, "tại sao 1769 mà một số tài liệu ghi 1784", hoặc ranh giới giữa các cuộc cách mạng.
-Trả lời: Kết luận: các mốc là quy ước, không phải ranh giới cứng. Lý do: mỗi phát minh có nhiều ngày khác nhau (bằng sáng chế, thử nghiệm, sản xuất). Dẫn chứng: bảng này. Giới hạn: bảo tàng chọn ngày bằng sáng chế hoặc ngày ghi trong nguồn và ghi rõ.
--->
-
-<div class="bk">PHỤ LỤC B1</div>
-
-# Các mốc thời gian: vì sao có chỗ khác nhau?
-
-| Mốc | Trong bảo tàng | Ghi chú |
-|---|---|---|
-| 1769 | Bằng sáng chế động cơ hơi nước của Watt; bằng sáng chế Water Frame của Arkwright | Ngày bằng sáng chế |
-| 1783–1784 | Luyện sắt bằng lò khuấy (Cort) | Bảo tàng ghi 1784, năm của bằng sáng chế lò khuấy |
-| 1784 | Một số tài liệu dùng làm mốc mở đầu CMCN 1 | Mốc tượng trưng cho giai đoạn máy móc, không phải một sự kiện duy nhất |
-| 1956 | Hội thảo Dartmouth | Nền móng của AI, nhưng AI chỉ bùng nổ ở thế kỷ XXI |
-
-<p class="note">Các mốc chỉ là <strong>quy ước</strong> để dễ theo dõi; các nhà sử học vẫn tranh luận về ranh giới giữa các cuộc cách mạng.</p>
-
----
-
-<!-- _footer: "Phụ lục · dành cho phần hỏi đáp" -->
-<!--
-[Phụ lục B2 · Hải] Dùng khi bị hỏi cách tính điểm, tại sao đặt ngưỡng như vậy, hoặc trò chơi có công bằng không.
--->
-
-<div class="bk">PHỤ LỤC B2</div>
-
-# Luật chơi và cách tính điểm
-
-| Lõi | Tên | Điểm tối đa | Điểm để qua (1 sao) |
-|---|---|---|---|
-| I | Lạc giữa thời gian | 12 | 9 |
-| II | Thị trấn lớn lên | 16 | 12 |
-| III | Tôi là ai? | 16 | 12 |
-| IV | Những vị khách từ quá khứ | 16 | 12 |
-
-<ul class="plain">
-<li>Đúng ngay lần đầu được 2 điểm, lần thứ hai được 1 điểm, sau đó không có điểm.</li>
-<li>Sao: 1 sao khi đạt điểm qua, 2 sao khi trên mức đó, 3 sao khi đạt điểm tối đa.</li>
-<li>Thắp sáng cả bốn lõi để mở cánh cổng phía sau.</li>
-</ul>
-
----
-
-<!-- _footer: "Phụ lục · dành cho phần hỏi đáp" -->
-<!--
-[Phụ lục B3 · Hoàng] Dùng khi bị hỏi về hạn chế của sản phẩm hoặc hướng phát triển.
-Thừa nhận trung thực: bảo tàng tập trung vào các phát minh tiêu biểu, nhiều ví dụ từ châu Âu và Hoa Kỳ.
--->
-
-<div class="bk">PHỤ LỤC B3</div>
-
-# Giới hạn và hướng phát triển
-
-<div class="row c2" style="gap:30px;">
-<div><h3 style="font-family:'Playfair Display',serif; font-size:28px; margin:0 0 6px; color:var(--burgundy);">Giới hạn của sản phẩm</h3>
-<ul class="plain" style="font-size:21px;">
-<li>Chỉ chọn <strong>21 phát minh tiêu biểu</strong>, không thể bao quát cả lịch sử.</li>
-<li>Nhiều ví dụ đến từ châu Âu và Hoa Kỳ, nơi các mốc được ghi chép rõ.</li>
-<li>Phần "thách thức" là diễn giải chung, không phải mọi nơi đều như nhau.</li>
-<li>Mô hình 3D là hình minh họa, không phải bản sao chính xác.</li>
-</ul></div>
-<div><h3 style="font-family:'Playfair Display',serif; font-size:28px; margin:0 0 6px; color:var(--burgundy);">Có thể phát triển tiếp</h3>
-<ul class="plain" style="font-size:21px;">
-<li>Thêm hiện vật và câu chuyện công nghiệp Việt Nam.</li>
-<li>Thêm câu hỏi và cấp độ cho trò chơi.</li>
-<li>Thêm tư liệu từ nhiều khu vực khác nhau.</li>
-</ul></div>
+<div class="url" style="margin-top:auto; font-size:26px; font-weight:700; color:#F6E3A8;">inovat-museum.vercel.app</div>
 </div>

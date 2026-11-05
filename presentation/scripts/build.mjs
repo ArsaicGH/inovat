@@ -6,17 +6,10 @@ import { cpSync, existsSync, readdirSync, mkdirSync, readFileSync, rmSync, write
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import QRCode from 'qrcode'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const site = join(root, 'site')
 const dist = join(root, 'dist')
-const GAME_URL = 'https://inovat-museum.vercel.app/'
-
-// 1. QR code of the live museum (an SVG, so it stays sharp on every screen and in the PDF).
-mkdirSync(join(root, 'assets/branding'), { recursive: true })
-const qr = await QRCode.toString(GAME_URL, { type: 'svg', margin: 0, errorCorrectionLevel: 'M', color: { dark: '#332D27', light: '#FFFFFF' } })
-writeFileSync(join(root, 'assets/branding/qr-game.svg'), qr)
 
 // 2. The theme with its fonts inlined (data URIs), so HTML and PDF never depend on font files.
 try { rmSync(dist, { recursive: true, force: true }) } catch {}
@@ -80,14 +73,16 @@ if (process.env.SKIP_PDF) {
 //    itself (with sound) when its slide opens and pausing when it closes.
 const extra = `
 <style>
-.inovat-tools{position:fixed;top:10px;right:12px;z-index:20;display:flex;gap:8px;font:600 13px/1 'Be Vietnam Pro',system-ui,sans-serif;opacity:.0;transition:opacity .25s}
+.inovat-tools{position:fixed;top:10px;right:12px;z-index:20;display:flex;gap:8px;font:600 13px/1 'Be Vietnam Pro',system-ui,sans-serif;opacity:0;transition:opacity .25s}
 body:hover .inovat-tools,.inovat-tools:focus-within{opacity:.92}
 .inovat-tools a{background:rgba(21,17,13,.82);color:#F6E3A8;border:1px solid rgba(198,161,91,.7);border-radius:999px;padding:8px 14px;text-decoration:none;letter-spacing:.04em}
 .inovat-tools a:hover{background:#15110d;color:#fff}
 .inovat-tools .hint{background:rgba(21,17,13,.6);color:rgba(243,235,221,.85);border-radius:999px;padding:8px 12px;border:1px solid rgba(198,161,91,.35)}
-@media print{.inovat-tools{display:none}}
+.inovat-zone{position:fixed;top:0;bottom:0;width:50%;z-index:5;pointer-events:none}
+.inovat-zone.l{left:0;cursor:w-resize}.inovat-zone.r{right:0;cursor:e-resize}
+@media print{.inovat-tools,.inovat-zone{display:none}}
 </style>
-<div class="inovat-tools"><span class="hint">← → chuyển slide · F toàn màn hình · P ghi chú người nói</span><a href="inovat-presentation.pdf" download>Tải bản PDF</a></div>
+<div class="inovat-tools"><span class="hint">Bấm bên phải: tiếp · bên trái: lùi · F: toàn màn hình · P: ghi chú</span><a href="script.html" target="_blank">Kịch bản</a><a href="inovat-presentation.pdf" download>Tải bản PDF</a></div>
 <script>
 (function(){
   function sync(){
@@ -100,8 +95,33 @@ body:hover .inovat-tools,.inovat-tools:focus-within{opacity:.92}
   }
   new MutationObserver(sync).observe(document.body,{attributes:true,subtree:true,attributeFilter:['class']});
   sync();
+  // Click the right half of the screen for the next slide, the left half for the previous one.
+  document.addEventListener('click',function(e){
+    if(e.target.closest('video,a,button,input,.inovat-tools,.bespoke-marp-osc'))return;
+    var b=document.querySelector('[data-bespoke-marp-osc="'+(e.clientX>window.innerWidth/2?'next':'prev')+'"]');
+    if(b)b.click();
+  });
+  document.addEventListener('mousemove',function(e){
+    document.body.style.cursor=e.clientX>window.innerWidth/2?'e-resize':'w-resize';
+  });
 })();
 </script>`
+// Plain pages for the script and the Q&A bank, readable on a phone.
+function mdToHtml(md) {
+  const esc = (t) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  const inline = (t) => esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/`([^`]+)`/g, '<code>$1</code>')
+  return md.split(/\r?\n/).map((l) => {
+    if (/^---+$/.test(l)) return '<hr>'
+    const h = l.match(/^(#{1,3}) (.*)/)
+    if (h) return `<h${h[1].length}>${inline(h[2])}</h${h[1].length}>`
+    if (/^- /.test(l)) return `<li>${inline(l.slice(2))}</li>`
+    return l.trim() ? `<p>${inline(l)}</p>` : ''
+  }).join('\n')
+}
+for (const [file, name, title] of [['speaking-script.md', 'script.html', 'Kịch bản nói INOVAT'], ['qa-bank.md', 'qa.html', 'Ngân hàng câu hỏi INOVAT']]) {
+  const body = mdToHtml(readFileSync(join(root, 'notes', file), 'utf8'))
+  writeFileSync(join(site, name), `<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title><style>body{font:20px/1.6 'Segoe UI',system-ui,sans-serif;max-width:760px;margin:0 auto;padding:20px 18px 80px;background:#F3EBDD;color:#332D27}h1{font-family:Georgia,serif;font-size:30px}h2{font-family:Georgia,serif;font-size:24px;margin-top:34px;color:#702F35;border-top:2px solid #C6A15B;padding-top:14px}p{margin:10px 0}code{background:#E9DFC9;padding:1px 5px;border-radius:3px}a{color:#702F35}</style></head><body><p><a href="./">← Về bài thuyết trình</a></p>${body}</body></html>`)
+}
 const indexPath = join(site, 'index.html')
 let html = readFileSync(indexPath, 'utf8')
 html = html.replace('</body>', extra + '</body>')

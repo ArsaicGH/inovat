@@ -2,10 +2,10 @@
 
 The team's slide deck, separate from the museum game.
 
-- `slides.md`: the 16 slides (13 main + 3 backups), Vietnamese text, speaker notes in HTML comments.
+- `slides.md`: the 14 slides, Vietnamese text, speaking script in HTML comments (press P in the browser).
 - `theme/inovat.css`: the Marp theme (ivory, gold, burgundy; Playfair Display and Be Vietnam Pro, bundled in `theme/fonts`).
-- `assets/`: screenshots and the trailer (`video/trailer.mp4`), historical pictures, QR code.
-- `notes/`: `speaker-notes.md`, `qa-bank.md`, `sources.md`.
+- `assets/`: screenshots and the trailer (`video/trailer.mp4`), historical pictures.
+- `notes/`: `speaking-script.md` (also published as script.html), `qa-bank.md` (qa.html), `sources.md`.
 - `scripts/build.mjs`: builds `site/index.html` and `site/inovat-presentation.pdf`.
 
 Live: https://arsaicgh.github.io/inovat/ (PDF: https://arsaicgh.github.io/inovat/inovat-presentation.pdf)

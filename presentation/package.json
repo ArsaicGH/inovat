@@ -9,7 +9,6 @@
   },
   "devDependencies": {
     "@fontsource/playfair-display": "5.2.8",
-    "@marp-team/marp-cli": "4.5.1",
-    "qrcode": "1.5.4"
+    "@marp-team/marp-cli": "4.5.1"
   }
 }
