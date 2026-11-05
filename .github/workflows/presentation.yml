@@ -1,0 +1,53 @@
+# Builds the INOVAT presentation (presentation/slides.md -> HTML + PDF) and publishes it to
+# GitHub Pages. Separate from the museum game (which Vercel deploys from the repository root).
+name: Presentation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'presentation/**'
+      - '.github/workflows/presentation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: presentation/package-lock.json
+      - name: Install
+        working-directory: presentation
+        run: npm ci
+      - name: Build slides and PDF
+        working-directory: presentation
+        env:
+          CHROME_PATH: /usr/bin/google-chrome
+        run: npm run build
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: presentation/site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

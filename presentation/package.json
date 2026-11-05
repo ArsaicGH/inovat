@@ -1,0 +1,15 @@
+{
+  "name": "inovat-presentation",
+  "private": true,
+  "version": "1.0.0",
+  "description": "INOVAT presentation deck (Marp). Separate from the museum game; built to static HTML + PDF.",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "dev": "marp slides.md --theme theme/inovat.css --html --allow-local-files --server"
+  },
+  "devDependencies": {
+    "@fontsource/playfair-display": "5.2.8",
+    "@marp-team/marp-cli": "4.5.1",
+    "qrcode": "1.5.4"
+  }
+}
