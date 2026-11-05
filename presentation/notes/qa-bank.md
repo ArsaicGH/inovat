@@ -41,7 +41,7 @@ Kết luận: để người xem tự khám phá và tự thấy mối liên h�
 Kết luận: mỗi nội dung đều có nguồn. Lý do: nhóm quy định không tự bịa mốc, tên hay số liệu; chỗ chưa chắc được đánh dấu để kiểm tra. Dẫn chứng: nguồn trên từng bảng mở rộng (Britannica, Science Museum Group, Thư viện Quốc hội Hoa Kỳ...). Giới hạn: nguồn thứ cấp có thể khác nhau về chi tiết.
 
 **11. Trò chơi đo điều gì?**
-Kết luận: đo mối liên hệ giữa các thời đại chứ không chỉ ghi nhớ năm tháng. Lý do: bốn lõi hỏi về phân loại, giải quyết vấn đề, suy luận từ gợi ý, và cái giá của đổi thay. Dẫn chứng: slide 10. Giới hạn: là trò chơi ngắn, không thay cho bài kiểm tra.
+Kết luận: đo mối liên hệ giữa các thời đại chứ không chỉ ghi nhớ năm tháng. Lý do: bốn lõi hỏi về phân loại, giải quyết vấn đề, suy luận từ gợi ý, và cái giá của đổi thay. Dẫn chứng: slide 11. Giới hạn: là trò chơi ngắn, không thay cho bài kiểm tra.
 
 **12. Vì sao đặt ngưỡng điểm như vậy?**
 Kết luận: để cần xem lại phòng mới qua được. Lý do: ngưỡng 9/12 ở lõi I, 12/16 ở các lõi còn lại; đúng ngay lần đầu 2 điểm, lần hai 1 điểm. Dẫn chứng: dòng thời gian trong bảo tàng. Giới hạn: các ngưỡng là lựa chọn của nhóm, có thể điều chỉnh.
@@ -53,7 +53,7 @@ Kết luận: được gợi ý để quay lại học. Lý do: mỗi câu sai b
 Kết luận: trình duyệt trên máy tính, có điều khiển cảm ứng cho điện thoại và máy tính bảng. Lý do: không cần cài đặt. Dẫn chứng: địa chỉ inovat-museum.vercel.app trên slide 7. Giới hạn: máy yếu nên giảm mức đồ họa trong menu tạm dừng.
 
 **15. Ai làm gì trong nhóm?**
-Kết luận: cả năm bạn cùng tham gia. Lý do/Dẫn chứng: Hoàng trưởng nhóm, định hướng và thiết kế trải nghiệm; Linh nghiên cứu và biên soạn nội dung; Hải thiết kế trò chơi, bố cục phòng và hiện vật; Nguyên và Quang Anh góp ý, hoàn thiện (slide 13). Giới hạn: vai trò có chồng lấn.
+Kết luận: cả năm bạn cùng tham gia. Lý do/Dẫn chứng: Hoàng trưởng nhóm, định hướng và thiết kế trải nghiệm; Linh nghiên cứu và biên soạn nội dung; Hải thiết kế trò chơi, bố cục phòng và hiện vật; Nguyên và Quang Anh góp ý, hoàn thiện (slide 14). Giới hạn: vai trò có chồng lấn.
 
 ## C. Câu hỏi khó
 

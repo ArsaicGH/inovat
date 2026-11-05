@@ -179,3 +179,32 @@ section.prod .txt { flex: 1.5; padding: 44px 48px 44px 44px; }
 .stat b { display: block; font-family: 'Playfair Display', serif; font-size: 118px; line-height: 0.95; background: linear-gradient(180deg, #F9E9B8 0%, #E0B964 50%, #A87C34 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .stat span { display: block; font-size: 25px; font-weight: 600; letter-spacing: 0.04em; color: #F3EBDD; margin-top: 4px; }
 section.prod .url { margin-top: auto; font-size: 28px; font-weight: 700; color: var(--burgundy); letter-spacing: 0.02em; }
+
+/* 2: intro (one paragraph + a chain of three pictures) */
+.introgrid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 54px; flex: 1; min-height: 0; align-items: center; margin-top: -8px; }
+.itext p { font-family: 'Playfair Display', serif; font-size: 35px; line-height: 1.5; color: rgba(243,235,221,0.95); border-left: 4px solid var(--gold); padding-left: 30px; margin-top: 16px; }
+.itext strong { color: #F6E3A8; }
+.ichain { display: flex; flex-direction: column; gap: 4px; }
+.ichain figure { position: relative; margin: 0; height: 148px; border-radius: 6px; overflow: hidden; border: 1.5px solid rgba(198,161,91,0.7); box-shadow: 0 8px 22px rgba(0,0,0,0.45); }
+.ichain figure img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.ichain figcaption { position: absolute; left: 0; bottom: 0; right: 0; padding: 26px 16px 8px; background: linear-gradient(0deg, rgba(10,8,5,0.92), rgba(10,8,5,0)); font-size: 20px; font-weight: 600; color: #F3EBDD; }
+.ichain figcaption b { color: var(--gold); font-size: 14px; letter-spacing: 0.16em; margin-right: 10px; }
+.ichain .iar { text-align: center; color: var(--gold); font-size: 22px; line-height: 1; }
+
+/* 10: room features */
+.feat { display: grid; grid-template-columns: 1.1fr 1fr; gap: 28px; margin-top: 18px; flex: 1; min-height: 0; }
+.fcol { display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+.fimg { position: relative; flex: 1; min-height: 0; border-radius: 8px; overflow: hidden; border: 1px solid rgba(152,119,70,0.55); box-shadow: 0 8px 24px rgba(51,45,39,0.25); background: #15110d; }
+.fimg > img:not(.inset) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.fimg .inset { position: absolute; right: 12px; bottom: 12px; width: 46%; border: 2px solid var(--gold); border-radius: 5px; box-shadow: 0 6px 18px rgba(0,0,0,0.6); }
+.fcap { display: flex; gap: 14px; align-items: flex-start; }
+.fn { flex: none; width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(180deg, #F6E3A8, #B58A3E); color: #2a1d0b; font-family: 'Playfair Display', serif; font-weight: 700; font-size: 24px; display: grid; place-items: center; }
+.fcap h3 { font-family: 'Playfair Display', serif; font-size: 27px; margin: 0; line-height: 1.2; }
+.fcap p { font-size: 19.5px; line-height: 1.4; margin-top: 3px; }
+
+/* 15: thanks + Q&A */
+section.qa .thanks { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 54px; color: #F3EBDD; letter-spacing: 0.02em; }
+section.qa .qabig { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 230px; line-height: 1; letter-spacing: 0.04em; margin: 6px 0 0 -6px; background: linear-gradient(180deg, #FBEBBB 0%, #E2BB66 46%, #9B7536 100%); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 6px 18px rgba(0,0,0,0.55)); }
+section.qa .url { margin-top: auto; font-size: 26px; font-weight: 700; color: #F6E3A8; }
+section.qa .txt { padding: 56px 50px 50px; }
+.f2 .fcap { padding-right: 56px; }

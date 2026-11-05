@@ -4,7 +4,7 @@ theme: inovat
 size: 16:9
 paginate: true
 lang: vi
-transition: fade
+transition: slide
 title: INOVAT – Bảo tàng Cách mạng Công nghiệp
 description: Bài thuyết trình của nhóm INOVAT về bốn cuộc cách mạng công nghiệp và bảo tàng ảo 3D.
 footer: INOVAT · Bảo tàng Cách mạng Công nghiệp
@@ -28,18 +28,22 @@ footer: INOVAT · Bảo tàng Cách mạng Công nghiệp
 
 <!-- _class: intro -->
 <!--
-[Slide 2 · ~26 giây]
-"Các cuộc cách mạng công nghiệp hình thành từ nhiều nguyên nhân khác nhau. Những điểm yếu, những giới hạn của thời trước chính là động lực để con người cải tiến, và mở ra cuộc cách mạng tiếp theo. Qua nhiều cải cách, đổi mới, những sáng chế ấy trở thành những đồ dùng quanh ta ngày nay: điện thoại, ô tô, máy tính."
+[Slide 2 · ~24 giây]
+"Các cuộc cách mạng công nghiệp hình thành từ nhiều nguyên nhân khác nhau. Những điểm yếu, những giới hạn của thời trước chính là động lực để con người cải tiến, và mở ra cuộc cách mạng tiếp theo. Qua nhiều cải cách, đổi mới, những sáng chế ấy trở thành những đồ dùng quanh ta ngày nay."
 -->
 
+<div class="introgrid">
+<div class="itext">
 <div class="eyebrow" style="color:var(--gold);">Mở đầu</div>
-
-# Mỗi cuộc cách mạng bắt đầu từ giới hạn của thời trước
-
-<div class="why">
-<div class="w"><div class="wn">1</div><h3>Nhiều nguyên nhân</h3><p>Khoa học, kinh tế và nhu cầu xã hội cùng thúc đẩy. Không có một nguyên nhân duy nhất.</p></div>
-<div class="w"><div class="wn">2</div><h3>Giới hạn là động lực</h3><p>Điểm yếu, điểm khuyết của cuộc cách mạng trước thúc đẩy con người cải tiến, mở ra cuộc cách mạng sau.</p></div>
-<div class="w"><div class="wn">3</div><h3>Hiện diện quanh ta</h3><p>Qua nhiều cải cách và đổi mới, sáng chế trở thành đồ dùng ngày nay: điện thoại, ô tô, máy tính.</p></div>
+<p>Các cuộc cách mạng công nghiệp hình thành từ <strong>nhiều nguyên nhân khác nhau</strong>. Những <strong>điểm yếu, điểm khuyết</strong> của cuộc cách mạng trước chính là động lực để con người cải tiến, mở ra cuộc cách mạng sau. Qua nhiều công cuộc cải cách, đổi mới, những sáng chế ấy trở thành <strong>những đồ dùng quanh ta</strong> ngày nay.</p>
+</div>
+<div class="ichain">
+<figure><img src="assets/historical/ir1-1.webp" alt="Mặt cắt động cơ hơi nước của Watt"><figcaption><b>CMCN 1</b>Máy hơi nước</figcaption></figure>
+<div class="iar">↓</div>
+<figure><img src="assets/historical/ir2-4.webp" alt="Dây chuyền lắp ráp của Ford năm 1913"><figcaption><b>CMCN 2</b>Dây chuyền lắp ráp</figcaption></figure>
+<div class="iar">↓</div>
+<figure><img src="assets/historical/ir3-5.webp" alt="Điện thoại di động đời đầu bên cạnh điện thoại thông minh"><figcaption><b>CMCN 3</b>Điện thoại di động</figcaption></figure>
+</div>
 </div>
 
 ---
@@ -186,7 +190,27 @@ Khi trailer kết thúc, bấm sang slide tiếp theo.
 ---
 
 <!--
-[Slide 10 · ~32 giây]
+[Slide 10 · ~24 giây]
+"Trong mỗi phòng, mỗi hiện vật có một bảng thông tin. Đến gần, người xem có thể mở bảng phóng to, kèm mô hình ba chiều xoay được và nguồn tham khảo. Hình ảnh có ở khắp nơi: trên các bảng thông tin và trên tường các phòng, tổng cộng bảy mươi bốn hình ảnh, để người xem vừa đọc vừa nhìn tư liệu thật."
+-->
+
+# Trong mỗi phòng: hiện vật, bảng thông tin, hình ảnh
+
+<div class="feat">
+<div class="fcol f1">
+<div class="fimg"><img src="assets/game/panel-3d.jpg" alt="Bảng thông tin phóng to của đầu máy Rocket, kèm mô hình 3D xoay được"></div>
+<div class="fcap"><span class="fn">1</span><div><h3>Mở từng hiện vật</h3><p>Bảng thông tin phóng to, kèm <strong>mô hình 3D xoay được</strong> và nguồn tham khảo.</p></div></div>
+</div>
+<div class="fcol f2">
+<div class="fimg"><img src="assets/game/wall-pics.jpg" alt="Bốn bức tranh và ảnh tư liệu trên tường phòng CMCN 1"><img class="inset" src="assets/game/room-pics.jpg" alt="Ảnh trên tường và bảng thông tin trong phòng CMCN 1"></div>
+<div class="fcap"><span class="fn">2</span><div><h3>Hình ảnh ở khắp nơi</h3><p>Trên tường các phòng và trên bảng thông tin: <strong>74 hình ảnh</strong> tư liệu và sơ đồ.</p></div></div>
+</div>
+</div>
+
+---
+
+<!--
+[Slide 11 · ~32 giây]
 "Sau khi xem, người chơi phải vận dụng. Trò chơi Cỗ máy thời gian có bốn vòng. Vòng một: đưa các cỗ máy về đúng cuộc cách mạng. Vòng hai: giúp một thị trấn lớn lên qua bốn thời kỳ. Vòng ba: đoán phát minh từ các gợi ý. Vòng bốn: trò chuyện với những vị khách từ quá khứ về cái giá của đổi thay. Trả lời sai thì được gợi ý phòng cần xem lại."
 -->
 
@@ -205,7 +229,7 @@ Khi trailer kết thúc, bấm sang slide tiếp theo.
 ---
 
 <!--
-[Slide 11 · ~23 giây]
+[Slide 12 · ~23 giây]
 "Như vậy, người xem đi từ khám phá đến hiểu: quan sát hiện vật ba chiều, đọc bảng thông tin, đối chiếu ảnh và nguồn, rồi vận dụng qua trò chơi để thấy mối liên hệ giữa các thời đại."
 -->
 
@@ -223,7 +247,7 @@ Khi trailer kết thúc, bấm sang slide tiếp theo.
 ---
 
 <!--
-[Slide 12 · ~15 giây]
+[Slide 13 · ~15 giây]
 "Mọi nội dung đều có nguồn: Britannica, Science Museum Group, Thư viện Quốc hội Hoa Kỳ và nhiều nơi khác. Ảnh lấy từ Wikimedia Commons, tác giả và giấy phép được ghi công ngay trong bảo tàng."
 -->
 
@@ -241,7 +265,7 @@ Khi trailer kết thúc, bấm sang slide tiếp theo.
 <!-- _class: dark -->
 <!-- _footer: "" -->
 <!--
-[Slide 13 · ~16 giây]
+[Slide 14 · ~16 giây]
 "Tóm lại: mỗi cuộc cách mạng công nghiệp kế thừa nền tảng của cuộc trước, mở rộng khả năng sản xuất và kết nối, đồng thời tạo ra những thay đổi và thách thức mới. Xin cảm ơn thầy cô và các bạn."
 Đọc luận điểm thật chậm.
 -->
@@ -265,13 +289,14 @@ Khi trailer kết thúc, bấm sang slide tiếp theo.
 <!-- _class: qa -->
 <!-- _paginate: false -->
 <!--
-[Slide 14 · Hỏi đáp]
-"Xin mời thầy cô và các bạn đặt câu hỏi."
+[Slide 15 · Hỏi đáp]
+"Xin cảm ơn. Xin mời thầy cô và các bạn đặt câu hỏi."
 Trả lời theo thứ tự: Kết luận, Lý do, Dẫn chứng, Thừa nhận giới hạn. Nếu không chắc: "Chúng em xin phép kiểm tra lại nguồn và bổ sung." Ngân hàng câu hỏi: ghi chú Q&A.
 -->
 
 <div class="shot"><img src="assets/game/hall-clean.jpg" alt="Sảnh trung tâm của bảo tàng INOVAT"></div>
 <div class="txt">
-<div class="big">Xin cảm ơn.<br>Mời thầy cô và các bạn đặt câu hỏi.</div>
-<div class="url" style="margin-top:auto; font-size:26px; font-weight:700; color:#F6E3A8;">inovat-museum.vercel.app</div>
+<div class="thanks">Xin cảm ơn.</div>
+<div class="qabig">Q&amp;A</div>
+<div class="url">inovat-museum.vercel.app</div>
 </div>
