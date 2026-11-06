@@ -1,6 +1,6 @@
 # Kịch bản nói INOVAT (đọc từ đầu đến cuối)
 
-**Tổng thời lượng: khoảng 5 phút 50 giây** (nói khoảng 5 phút 10 giây + trailer 37 giây).
+**Tổng thời lượng: khoảng 5 phút 40 giây** (nói khoảng 5 phút + trailer 37 giây).
 Cách dùng: mỗi đoạn dưới đây tương ứng một slide. Nói chậm, rõ, nhìn khán giả, không đọc chữ trên slide. Chuyển slide bằng cách bấm bên phải màn hình (hoặc phím mũi tên phải).
 Nếu bị chậm: bỏ bớt slide 8 hoặc đọc rất ngắn slide 9, 10 và 13, nhưng luôn giữ slide 2, 5 và 13.
 
@@ -18,13 +18,13 @@ Các cuộc cách mạng công nghiệp hình thành từ nhiều nguyên nhân 
 
 Vậy bốn cuộc cách mạng ấy là gì? Cách mạng thứ nhất, từ giữa thế kỷ mười tám, là cơ giới hóa: máy móc và máy hơi nước thay sức người, sức nước. Cách mạng thứ hai, cuối thế kỷ mười chín, đưa điện, thép và dây chuyền lắp ráp vào sản xuất hàng loạt. Cách mạng thứ ba, nửa sau thế kỷ hai mươi, là máy tính, robot và tự động hóa. Cách mạng thứ tư, từ đầu thế kỷ hai mươi mốt, là dữ liệu, kết nối và hệ thống thông minh.
 
-## Slide 4 · Sự kế thừa và phát triển (≈ 40 giây)
+## Slide 4 · Sự kế thừa và phát triển (≈ 35 giây)
 
-Bốn cuộc cách mạng không đứng riêng lẻ mà nối với nhau thành ba mạch. Về sản xuất: từ máy hơi nước, đến dây chuyền lắp ráp, đến robot, rồi nhà máy kết nối. Về truyền thông: điện báo, điện thoại, mạng máy tính, rồi Internet và điện toán đám mây. Về nền tảng công nghệ: hơi nước, điện năng, vi xử lý, rồi dữ liệu và trí tuệ nhân tạo. Cái đi sau dựa trên cái đi trước, nhưng đó là sự kế thừa, không phải hệ quả tất yếu.
+Bốn cuộc cách mạng không đứng riêng lẻ mà nối với nhau thành ba mạch. Về sản xuất: từ máy dệt cơ khí, đến dây chuyền lắp ráp, rồi robot và nhà máy thông minh. Về truyền thông: từ điện thoại, đến mạng máy tính, rồi điện thoại thông minh. Về nền tảng công nghệ: từ hơi nước, đến vi xử lý, rồi dữ liệu và trí tuệ nhân tạo. Cái đi sau dựa trên cái đi trước, nhưng đó là sự kế thừa, không phải hệ quả tất yếu.
 
-## Slide 5 · Kế thừa, khác biệt và thách thức mới (≈ 36 giây)
+## Slide 5 · Kế thừa, khác biệt và thách thức mới (≈ 30 giây)
 
-Nhưng kế thừa không có nghĩa là lặp lại. Mỗi thời đại có một biến đổi riêng, một nền tảng đã có, và để lại một thách thức mới. Cách mạng thứ nhất đưa sản xuất vào nhà máy, nhưng lao động nặng nhọc. Cách mạng thứ hai cho sản xuất hàng loạt, nhưng công việc dây chuyền đơn điệu. Cách mạng thứ ba cho tự động hóa, và nỗi lo mất việc. Cách mạng thứ tư có trí tuệ nhân tạo, cùng những câu hỏi về việc làm, dữ liệu và đạo đức. Để thấy dòng chảy ấy, mời thầy cô và các bạn xem trailer.
+Nhưng kế thừa không có nghĩa là lặp lại. Mỗi thời đại có một biến đổi riêng và để lại một thách thức mới. Cách mạng thứ nhất đưa sản xuất vào nhà máy, nhưng lao động nặng nhọc. Cách mạng thứ hai cho sản xuất hàng loạt, nhưng công việc đơn điệu. Cách mạng thứ ba cho tự động hóa, và nỗi lo mất việc. Cách mạng thứ tư có trí tuệ nhân tạo, cùng những câu hỏi về việc làm và đạo đức. Để thấy dòng chảy ấy, mời thầy cô và các bạn xem trailer.
 
 ## Slide 6 · Trailer (37 giây, không ai nói)
 

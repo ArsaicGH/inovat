@@ -28,3 +28,16 @@ Britannica, Science Museum Group, Thư viện Quốc hội Hoa Kỳ, Intel, IBM,
 
 - Playfair Display (SIL OFL) qua gói `@fontsource/playfair-display`.
 - Be Vietnam Pro (SIL OFL), kèm `theme/fonts`.
+
+## Ảnh dùng thêm ở slide 2, 4 và 14
+
+| Tệp | Nội dung | Tác giả | Giấy phép |
+|---|---|---|---|
+| `ir1-1.webp` | Mặt cắt động cơ hơi nước tác dụng kép của Watt, khoảng 1782 | Không rõ tác giả | Phạm vi công cộng |
+| `ir3-5.webp` | Motorola DynaTAC bên cạnh Samsung Galaxy Note Edge | Umut Çolak | Phạm vi công cộng |
+| `wall-ir2-1.webp` | Nữ điện thoại viên Nhật Bản tại tổng đài, 1902 | Không rõ tác giả | Phạm vi công cộng |
+| `ir3-4.webp` | Sơ đồ logic mạng ARPANET, 3/1977 | ARPANET | Phạm vi công cộng |
+| `ir3-1.webp` | Bộ vi xử lý Intel C4004 | Thomas Nguyen | CC BY-SA 4.0 |
+| `wall-ir4-11.webp` | Điện thoại thông minh hiển thị bản đồ | Highways England | CC BY 2.0 |
+| `wall-ir4-1.webp` | Siêu máy tính Frontier, Oak Ridge National Laboratory, 2022 | Oak Ridge National Laboratory | CC BY 2.0 |
+| `wall-ir4-4.webp` | Xe tự lái Waymo, Mountain View, 2017 | Grendelkhan | CC BY-SA 4.0 |

@@ -43,6 +43,8 @@ footer: INOVAT · Bảo tàng Cách mạng Công nghiệp
 <figure><img src="assets/historical/ir2-4.webp" alt="Dây chuyền lắp ráp của Ford năm 1913"><figcaption><b>CMCN 2</b>Dây chuyền lắp ráp</figcaption></figure>
 <div class="iar">↓</div>
 <figure><img src="assets/historical/ir3-5.webp" alt="Điện thoại di động đời đầu bên cạnh điện thoại thông minh"><figcaption><b>CMCN 3</b>Điện thoại di động</figcaption></figure>
+<div class="iar">↓</div>
+<figure><img src="assets/historical/wall-ir4-4.webp" alt="Xe tự lái Waymo"><figcaption><b>CMCN 4</b>Xe tự lái</figcaption></figure>
 </div>
 </div>
 
@@ -65,54 +67,45 @@ footer: INOVAT · Bảo tàng Cách mạng Công nghiệp
 ---
 
 <!--
-[Slide 4 · ~40 giây]
-"Bốn cuộc cách mạng không đứng riêng lẻ mà nối với nhau thành ba mạch. Về sản xuất: từ máy hơi nước, đến dây chuyền lắp ráp, đến robot, rồi nhà máy kết nối. Về truyền thông: điện báo, điện thoại, mạng máy tính, rồi Internet và điện toán đám mây. Về nền tảng công nghệ: hơi nước, điện năng, vi xử lý, rồi dữ liệu và trí tuệ nhân tạo. Cái đi sau dựa trên cái đi trước, nhưng đó là sự kế thừa, không phải hệ quả tất yếu."
+[Slide 4 · ~35 giây]
+"Bốn cuộc cách mạng không đứng riêng lẻ mà nối với nhau thành ba mạch. Về sản xuất: từ máy dệt cơ khí, đến dây chuyền lắp ráp, rồi robot và nhà máy thông minh. Về truyền thông: từ điện thoại, đến mạng máy tính, rồi điện thoại thông minh. Về nền tảng công nghệ: từ hơi nước, đến vi xử lý, rồi dữ liệu và trí tuệ nhân tạo. Cái đi sau dựa trên cái đi trước, nhưng đó là sự kế thừa, không phải hệ quả tất yếu."
 -->
 
 # Sự kế thừa và phát triển
 
-<div class="row" style="grid-template-rows: repeat(3, 1fr); gap: 14px;">
-<div style="display:grid; grid-template-columns: 190px 1fr; gap: 18px; align-items:stretch;">
-<div style="display:flex; flex-direction:column; justify-content:center; border-left:6px solid var(--e1); padding-left:14px;"><b style="font-family:'Playfair Display',serif; font-size:26px;">Sản xuất</b><span style="font-size:15px; color:var(--taupe);">cách con người làm ra của cải</span></div>
-<div class="flow">
-<div class="n"><b>Máy móc hơi nước</b><span>CMCN 1</span></div><div class="n"><b>Dây chuyền lắp ráp</b><span>khoảng 1913</span></div><div class="n"><b>Robot và PLC</b><span>từ 1961</span></div><div class="n"><b>Nhà máy kết nối</b><span>IoT, bản sao số</span></div>
-</div></div>
-<div style="display:grid; grid-template-columns: 190px 1fr; gap: 18px; align-items:stretch;">
-<div style="display:flex; flex-direction:column; justify-content:center; border-left:6px solid var(--e2); padding-left:14px;"><b style="font-family:'Playfair Display',serif; font-size:26px;">Truyền thông</b><span style="font-size:15px; color:var(--taupe);">cách thông tin đi từ nơi này đến nơi khác</span></div>
-<div class="flow">
-<div class="n"><b>Điện báo</b><span>1837</span></div><div class="n"><b>Điện thoại</b><span>1876</span></div><div class="n"><b>ARPANET, Web</b><span>1969 · 1989</span></div><div class="n"><b>Đám mây, dữ liệu lớn</b><span>từ 2006</span></div>
-</div></div>
-<div style="display:grid; grid-template-columns: 190px 1fr; gap: 18px; align-items:stretch;">
-<div style="display:flex; flex-direction:column; justify-content:center; border-left:6px solid var(--e3); padding-left:14px;"><b style="font-family:'Playfair Display',serif; font-size:26px;">Nền tảng công nghệ</b><span style="font-size:15px; color:var(--taupe);">cái mà các phát minh sau dựa vào</span></div>
-<div class="flow">
-<div class="n"><b>Động cơ hơi nước</b><span>1769</span></div><div class="n"><b>Điện năng</b><span>đèn sợi đốt 1879</span></div><div class="n"><b>Bộ vi xử lý</b><span>Intel 4004, 1971</span></div><div class="n"><b>Dữ liệu và AI</b><span>gốc 1956 · bùng nổ XXI</span></div>
-</div></div>
+<div class="paths">
+<div class="path"><div class="pl" style="border-color:var(--e1)"><b>Sản xuất</b></div>
+<figure><img src="assets/historical/ir1-overview.webp" alt="Máy dệt cơ khí"><figcaption>Máy dệt cơ khí<i>1835</i></figcaption></figure><span class="pa">→</span>
+<figure><img src="assets/historical/ir2-4.webp" alt="Dây chuyền lắp ráp"><figcaption>Dây chuyền lắp ráp<i>1913</i></figcaption></figure><span class="pa">→</span>
+<figure><img src="assets/historical/ir4-overview.webp" alt="Robot trong nhà máy"><figcaption>Robot, nhà máy thông minh<i>2005</i></figcaption></figure></div>
+<div class="path"><div class="pl" style="border-color:var(--e2)"><b>Truyền thông</b></div>
+<figure><img src="assets/historical/wall-ir2-1.webp" alt="Tổng đài điện thoại"><figcaption>Điện thoại<i>1902</i></figcaption></figure><span class="pa">→</span>
+<figure><img src="assets/historical/ir3-4.webp" alt="Bản đồ mạng ARPANET"><figcaption>Mạng máy tính ARPANET<i>1977</i></figcaption></figure><span class="pa">→</span>
+<figure><img src="assets/historical/wall-ir4-11.webp" alt="Điện thoại thông minh"><figcaption>Điện thoại thông minh<i>nay</i></figcaption></figure></div>
+<div class="path"><div class="pl" style="border-color:var(--e3)"><b>Nền tảng công nghệ</b></div>
+<figure><img src="assets/historical/ir1-1.webp" alt="Động cơ hơi nước của Watt"><figcaption>Hơi nước<i>1782</i></figcaption></figure><span class="pa">→</span>
+<figure><img src="assets/historical/ir3-1.webp" alt="Bộ vi xử lý Intel 4004"><figcaption>Vi xử lý<i>1971</i></figcaption></figure><span class="pa">→</span>
+<figure><img src="assets/historical/wall-ir4-1.webp" alt="Siêu máy tính Frontier"><figcaption>Dữ liệu và AI<i>2022</i></figcaption></figure></div>
 </div>
-<p class="note" style="margin-top:12px;">Mỗi mắt xích dùng được thành quả của mắt xích trước, nhưng đó là <strong>kế thừa</strong>, không phải hệ quả tất yếu.</p>
-
-<style scoped>
-.flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
-.flow .n { position: relative; background: #FBF6EC; border: 1px solid rgba(152,119,70,0.4); border-radius: 6px; padding: 8px 12px; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 3px 10px rgba(51,45,39,0.1); }
-.flow .n b { font-size: 21px; line-height: 1.2; font-family: 'Playfair Display', serif; }
-.flow .n span { font-size: 15.5px; color: var(--brass); font-weight: 600; margin-top: 2px; }
-.flow .n:not(:last-child)::after { content: '\2192'; position: absolute; right: -19px; top: 50%; transform: translateY(-50%); color: var(--brass); font-size: 22px; }
-</style>
+<p class="note" style="margin-top:6px;">Kế thừa, <strong>không phải hệ quả tất yếu</strong>.</p>
+<div class="credit">Ảnh: Wikimedia Commons (phạm vi công cộng hoặc Creative Commons); tác giả và giấy phép ghi trong notes/sources.md.</div>
 
 ---
 
 <!--
-[Slide 5 · ~36 giây]
-"Nhưng kế thừa không có nghĩa là lặp lại. Mỗi thời đại có một biến đổi riêng, một nền tảng đã có, và để lại một thách thức mới. Cách mạng thứ nhất đưa sản xuất vào nhà máy, nhưng lao động nặng nhọc. Cách mạng thứ hai cho sản xuất hàng loạt, nhưng công việc dây chuyền đơn điệu. Cách mạng thứ ba cho tự động hóa, và nỗi lo mất việc. Cách mạng thứ tư có trí tuệ nhân tạo, cùng những câu hỏi về việc làm, dữ liệu và đạo đức. Để thấy dòng chảy ấy, mời thầy cô và các bạn xem trailer."
+[Slide 5 · ~30 giây]
+"Nhưng kế thừa không có nghĩa là lặp lại. Mỗi thời đại có một biến đổi riêng và để lại một thách thức mới. Cách mạng thứ nhất đưa sản xuất vào nhà máy, nhưng lao động nặng nhọc. Cách mạng thứ hai cho sản xuất hàng loạt, nhưng công việc đơn điệu. Cách mạng thứ ba cho tự động hóa, và nỗi lo mất việc. Cách mạng thứ tư có trí tuệ nhân tạo, cùng những câu hỏi về việc làm và đạo đức. Để thấy dòng chảy ấy, mời thầy cô và các bạn xem trailer."
 -->
 
-# Kế thừa, khác biệt và những thách thức mới
+# Kế thừa, khác biệt và thách thức mới
 
 <div class="row c4" style="gap:16px;">
-<div class="card bd1"><img style="height:130px" src="assets/historical/ir1-3.webp" alt="Thợ luyện khuấy gang trong lò khuấy"><div class="body"><span class="pill p1">CMCN 1</span><p><b>Biến đổi:</b> sản xuất chuyển từ xưởng thủ công sang nhà máy cơ khí.</p><p><b>Nền tảng:</b> than, sắt và động cơ hơi nước.</p><p><b>Thách thức:</b> lao động nặng nhọc, đô thị đông đúc.</p><div class="credit">W. Macfarlane · 1917 · PD</div></div></div>
-<div class="card bd2"><img style="height:130px" src="assets/historical/ir2-1.webp" alt="Lò thổi Bessemer ở Pittsburgh, 1886"><div class="body"><span class="pill p2">CMCN 2</span><p><b>Biến đổi:</b> điện và thép đưa sản xuất hàng loạt thành hiện thực.</p><p><b>Nền tảng:</b> máy móc, sắt thép của thời trước.</p><p><b>Thách thức:</b> công việc dây chuyền đơn điệu.</p><div class="credit">C. Graham · 1886 · PD</div></div></div>
-<div class="card bd3"><img style="height:130px" src="assets/historical/wall-ir3-9.webp" alt="Phòng máy tính IBM 7090 của NASA, 1962"><div class="body"><span class="pill p3">CMCN 3</span><p><b>Biến đổi:</b> máy tính và robot điều khiển sản xuất.</p><p><b>Nền tảng:</b> điện năng và mạng viễn thông.</p><p><b>Thách thức:</b> lo ngại mất việc lặp đi lặp lại.</p><div class="credit">NASA · khoảng 1962 · PD</div></div></div>
-<div class="card bd4"><img style="height:130px" src="assets/historical/wall-ir4-4.webp" alt="Xe tự lái Waymo ở Mountain View, 2017"><div class="body"><span class="pill p4">CMCN 4</span><p><b>Biến đổi:</b> dữ liệu và AI kết nối con người, máy móc.</p><p><b>Nền tảng:</b> máy tính và Internet.</p><p><b>Thách thức:</b> việc làm, quyền riêng tư, đạo đức AI.</p><div class="credit">Grendelkhan · 2017 · CC BY-SA 4.0</div></div></div>
+<div class="card bd1"><img class="tall" src="assets/historical/ir1-3.webp" alt="Thợ luyện khuấy gang trong lò khuấy"><div class="body"><span class="pill p1">CMCN 1</span><p class="l1">Nhà máy cơ khí</p><p class="l2">Lao động nặng nhọc</p><div class="credit">W. Macfarlane · 1917 · PD</div></div></div>
+<div class="card bd2"><img class="tall" src="assets/historical/ir2-1.webp" alt="Lò thổi Bessemer ở Pittsburgh, 1886"><div class="body"><span class="pill p2">CMCN 2</span><p class="l1">Sản xuất hàng loạt</p><p class="l2">Công việc đơn điệu</p><div class="credit">C. Graham · 1886 · PD</div></div></div>
+<div class="card bd3"><img class="tall" src="assets/historical/wall-ir3-9.webp" alt="Phòng máy tính IBM 7090 của NASA, 1962"><div class="body"><span class="pill p3">CMCN 3</span><p class="l1">Tự động hóa</p><p class="l2">Lo mất việc</p><div class="credit">NASA · khoảng 1962 · PD</div></div></div>
+<div class="card bd4"><img class="tall" src="assets/historical/wall-ir4-4.webp" alt="Xe tự lái Waymo ở Mountain View, 2017"><div class="body"><span class="pill p4">CMCN 4</span><p class="l1">Dữ liệu và AI</p><p class="l2">Việc làm, đạo đức AI</p><div class="credit">Grendelkhan · 2017 · CC BY-SA 4.0</div></div></div>
 </div>
+<div class="legend"><span><i class="lg1"></i>Biến đổi</span><span><i class="lg2"></i>Thách thức</span></div>
 
 ---
 
@@ -236,13 +229,13 @@ Khi trailer kết thúc, bấm sang slide tiếp theo.
 # Từ khám phá đến hiểu
 
 <div class="seq">
-<div class="st"><span class="k">Bước 1</span><b>Quan sát</b><p>Xem hiện vật 3D, xoay và phóng to.</p></div>
-<div class="st"><span class="k">Bước 2</span><b>Đọc</b><p>Năm, nhân vật và bảng thông tin của từng phát minh.</p></div>
-<div class="st"><span class="k">Bước 3</span><b>Đối chiếu</b><p>Ảnh tư liệu, dòng thời gian và nguồn tham khảo.</p></div>
-<div class="st"><span class="k">Bước 4</span><b>Vận dụng</b><p>Bốn vòng trò chơi hỏi về mối liên hệ giữa các thời đại.</p></div>
-<div class="st"><span class="k">Bước 5</span><b>Hiểu</b><p>Thắp sáng bốn lõi, mở cánh cổng và xem đoạn phim kết.</p></div>
+<div class="st"><img src="assets/game/room-morse.jpg" alt="Hiện vật trong phòng CMCN 1"><span class="k">1</span><b>Quan sát</b><p>Hiện vật 3D</p></div>
+<div class="st"><img src="assets/game/panel-3d.jpg" alt="Bảng thông tin phóng to"><span class="k">2</span><b>Đọc</b><p>Bảng thông tin</p></div>
+<div class="st"><img src="assets/game/wall-painting.jpg" alt="Tranh trên tường"><span class="k">3</span><b>Đối chiếu</b><p>Ảnh và nguồn</p></div>
+<div class="st"><img src="assets/game/game-q2.jpg" alt="Trò chơi Cỗ máy thời gian"><span class="k">4</span><b>Vận dụng</b><p>Bốn vòng trò chơi</p></div>
+<div class="st"><img src="assets/game/film.jpg" alt="Đoạn phim kết"><span class="k">5</span><b>Hiểu</b><p>Mở cánh cổng</p></div>
 </div>
-<div class="band"><span>Người xem không chỉ ghi nhớ năm tháng,</span><b>mà nhìn ra dòng chảy giữa các thời đại.</b></div>
+<div class="band"><b>Từ ghi nhớ năm tháng đến hiểu dòng chảy lịch sử.</b></div>
 
 ---
 
@@ -254,11 +247,10 @@ Khi trailer kết thúc, bấm sang slide tiếp theo.
 # Nguồn tư liệu và ghi công
 
 <div class="src">
-<div><h3>Nguồn nội dung</h3>Britannica · Science Museum Group · Thư viện Quốc hội Hoa Kỳ · Intel · IBM · CERN · Nobel Prize. Mỗi phát minh có nguồn riêng, kèm đường dẫn trong bảng mở rộng.</div>
-<div><h3>Hình ảnh</h3>Ảnh, tranh và tranh khắc lấy từ Wikimedia Commons (phạm vi công cộng hoặc Creative Commons). Tác giả và giấy phép nằm dưới từng ảnh.</div>
-<div><h3>Ghi công trong bảo tàng</h3>Mô hình 3D, âm thanh và phông chữ được ghi công đầy đủ tại bảng "Ghi công" ở sảnh trung tâm.</div>
+<div><img src="assets/game/panel-3d.jpg" alt="Bảng thông tin với nguồn tham khảo"><h3>Nguồn nội dung</h3><p>Britannica · Science Museum Group · Thư viện Quốc hội Hoa Kỳ</p></div>
+<div><img src="assets/game/wall-pics.jpg" alt="Ảnh tư liệu trên tường"><h3>Hình ảnh</h3><p>Wikimedia Commons · tác giả và giấy phép dưới mỗi ảnh</p></div>
+<div><img src="assets/game/hall-clean.jpg" alt="Sảnh trung tâm của bảo tàng"><h3>Ghi công</h3><p>Bảng "Ghi công" ở sảnh trung tâm</p></div>
 </div>
-<p class="note">Mọi nội dung hiển thị đều có hai ngôn ngữ; chỗ chưa chắc chắn được đánh dấu để kiểm tra lại, không tự bịa số liệu hay nguồn.</p>
 
 ---
 
@@ -270,19 +262,18 @@ Khi trailer kết thúc, bấm sang slide tiếp theo.
 Đọc luận điểm thật chậm.
 -->
 
-<div class="eyebrow" style="color:var(--gold);">Kết luận</div>
-
-# Nhóm INOVAT
+<div class="eyebrow" style="color:var(--gold);">Kết luận · Nhóm INOVAT</div>
 
 <p class="thesis">Mỗi cuộc cách mạng công nghiệp kế thừa nền tảng của cuộc trước, mở rộng khả năng sản xuất và kết nối, đồng thời tạo ra những thay đổi và thách thức mới.</p>
 
-<div class="team">
-<div><b>Nguyễn Hoàng</b>Trưởng nhóm · định hướng và thiết kế trải nghiệm</div>
-<div><b>Nguyễn Phúc Khánh Linh</b>Nghiên cứu và biên soạn nội dung</div>
-<div><b>Đỗ Minh Hải</b>Thiết kế trò chơi, bố cục phòng và hiện vật</div>
-<div><b>Lê Khôi Nguyên</b>Góp ý và hoàn thiện</div>
-<div><b>Ngô Quang Anh</b>Góp ý và hoàn thiện</div>
+<div class="eras">
+<figure><img src="assets/historical/ir1-overview.webp" alt="CMCN 1"><span class="pill p1">CMCN 1</span></figure><span class="ea">→</span>
+<figure><img src="assets/historical/ir2-4.webp" alt="CMCN 2"><span class="pill p2">CMCN 2</span></figure><span class="ea">→</span>
+<figure><img src="assets/historical/ir3-overview.webp" alt="CMCN 3"><span class="pill p3">CMCN 3</span></figure><span class="ea">→</span>
+<figure><img src="assets/historical/ir4-overview.webp" alt="CMCN 4"><span class="pill p4">CMCN 4</span></figure>
 </div>
+
+<div class="teamline">Nguyễn Hoàng · Nguyễn Phúc Khánh Linh · Đỗ Minh Hải · Lê Khôi Nguyên · Ngô Quang Anh</div>
 
 ---
 

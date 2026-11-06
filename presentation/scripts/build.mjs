@@ -81,7 +81,7 @@ body:hover .inovat-tools,.inovat-tools:focus-within{opacity:.92}
 .inovat-zone{position:fixed;top:0;bottom:0;width:50%;z-index:5;pointer-events:none}
 .inovat-zone.l{left:0;cursor:w-resize}.inovat-zone.r{right:0;cursor:e-resize}
 @media print{.inovat-tools,.inovat-zone{display:none}}
-:root{--marp-bespoke-transition-animation-duration:.9s}
+:root{--marp-bespoke-transition-animation-duration:.45s}
 ::view-transition-group(*){animation-timing-function:cubic-bezier(.65,0,.25,1)}
 </style>
 <div class="inovat-tools"><span class="hint">Bấm bên phải: tiếp · bên trái: lùi · F: toàn màn hình · P: ghi chú</span><a href="script.html" target="_blank">Kịch bản</a><a href="inovat-presentation.pdf" download>Tải bản PDF</a></div>

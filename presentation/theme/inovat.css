@@ -208,3 +208,60 @@ section.qa .qabig { font-family: 'Playfair Display', serif; font-weight: 700; fo
 section.qa .url { margin-top: auto; font-size: 26px; font-weight: 700; color: #F6E3A8; }
 section.qa .txt { padding: 56px 50px 50px; }
 .f2 .fcap { padding-right: 56px; }
+
+/* 2: four-card chain (smaller cards) */
+.ichain figure { height: 118px; }
+.ichain figcaption { padding: 20px 14px 6px; font-size: 19px; }
+
+/* 4: three pathways of pictures */
+.paths { display: grid; grid-template-rows: repeat(3, 1fr); gap: 12px; margin-top: 16px; flex: 1; min-height: 0; }
+.path { display: grid; grid-template-columns: 170px 1fr 28px 1fr 28px 1fr; align-items: stretch; gap: 8px; min-height: 0; }
+.pl { display: flex; align-items: center; border-left: 6px solid var(--gold); padding-left: 14px; }
+.pl b { font-family: 'Playfair Display', serif; font-size: 25px; line-height: 1.2; }
+.path figure { position: relative; margin: 0; border-radius: 6px; overflow: hidden; border: 1px solid rgba(152,119,70,0.5); box-shadow: 0 4px 12px rgba(51,45,39,0.2); min-height: 0; }
+.path figure img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.path figcaption { position: absolute; left: 0; right: 0; bottom: 0; padding: 22px 12px 6px; background: linear-gradient(0deg, rgba(10,8,5,0.92), rgba(10,8,5,0)); color: #F3EBDD; font-size: 18px; font-weight: 600; line-height: 1.2; }
+.path figcaption i { display: block; font-style: normal; font-size: 14px; color: var(--gold); letter-spacing: 0.08em; font-weight: 700; }
+.pa { align-self: center; text-align: center; color: var(--brass); font-size: 26px; }
+
+/* 5: big picture cards with two short lines */
+.card img.tall { height: 250px; }
+.card .l1, .card .l2 { font-size: 24px; line-height: 1.25; font-weight: 600; padding-left: 14px; position: relative; }
+.card .l1::before, .card .l2::before { content: ''; position: absolute; left: 0; top: 6px; bottom: 6px; width: 5px; border-radius: 3px; background: var(--brass); }
+.card .l2::before { background: var(--burgundy); }
+.card .l2 { color: var(--burgundy); }
+.legend { display: flex; gap: 26px; justify-content: center; margin-top: 10px; font-size: 16px; color: var(--taupe); }
+.legend i { display: inline-block; width: 18px; height: 5px; border-radius: 3px; margin-right: 8px; vertical-align: middle; }
+.legend .lg1 { background: var(--brass); } .legend .lg2 { background: var(--burgundy); }
+
+/* 12: picture steps (override the text version) */
+.seq { margin-top: 20px; height: 380px; flex: none; }
+.seq .st { padding: 0; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-start; }
+.seq .st img { width: 100%; height: 215px; object-fit: cover; display: block; }
+.seq .st .k { position: absolute; top: 10px; left: 10px; width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(180deg, #F6E3A8, #B58A3E); color: #2a1d0b; font-family: 'Playfair Display', serif; font-size: 20px; letter-spacing: 0; display: grid; place-items: center; }
+.seq .st b { font-size: 30px; margin: 14px 14px 2px; }
+.seq .st p { font-size: 21px; margin: 0 14px; color: var(--taupe); }
+
+/* 13: picture cards */
+.src { margin-bottom: 0; }
+.src > div { padding: 0; overflow: hidden; min-height: 0; }
+.src img { width: 100%; height: 250px; object-fit: cover; display: block; }
+.src h3 { margin: 14px 18px 4px; }
+.src p { margin: 0 18px; font-size: 20px; line-height: 1.4; color: var(--taupe); }
+
+/* 14: closing with pictures */
+.eras { display: flex; align-items: center; gap: 14px; margin-top: 30px; }
+.eras figure { position: relative; margin: 0; flex: 1; height: 170px; border-radius: 6px; overflow: hidden; border: 1.5px solid rgba(198,161,91,0.7); }
+.eras figure img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.eras .pill { position: absolute; left: 10px; bottom: 10px; }
+.eras .ea { color: var(--gold); font-size: 28px; }
+.teamline { margin-top: auto; padding-top: 14px; border-top: 2px solid var(--gold); font-size: 21px; color: rgba(243,235,221,0.9); letter-spacing: 0.02em; }
+section.dark .thesis { font-size: 36px; margin-top: 14px; }
+
+/* polish */
+.legend { padding-right: 60px; }
+.seq { height: 430px; }
+.seq .st img { height: 250px; }
+.src img { height: 310px; }
+.src p { padding-bottom: 18px; }
+.eras figure { height: 235px; }
