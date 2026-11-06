@@ -10,25 +10,45 @@ description: Bài thuyết trình của nhóm INOVAT về bốn cuộc cách m�
 footer: INOVAT · Bảo tàng Cách mạng Công nghiệp
 ---
 
-<!-- _class: title -->
+<!-- _class: cover -->
 <!-- _paginate: false -->
 <!--
-[Slide 1 · ~9 giây]
-"Kính chào thầy cô và các bạn. Chúng em là nhóm INOVAT. Hôm nay, chúng em xin giới thiệu bảo tàng ảo về bốn cuộc cách mạng công nghiệp."
+[Slide 1 · ~10 giây]
+"Kính chào thầy cô và các bạn. Hôm nay, nhóm chúng em xin trình bày về bốn cuộc cách mạng công nghiệp, và bảo tàng ảo mà chúng em đã xây dựng."
 -->
 
-<img class="bg" src="assets/game/hall-clean.jpg" alt="Sảnh trung tâm của bảo tàng INOVAT">
-<div class="shade"></div>
-<div class="logo">INOVAT</div>
-<div class="tag">Bảo tàng Cách mạng Công nghiệp</div>
+<div class="panels">
+<figure><img src="assets/historical/ir1-overview.webp" alt="Máy dệt cơ khí, 1835"><figcaption><span class="pill p1">CMCN 1</span><b>Cơ giới hóa</b></figcaption></figure>
+<figure><img src="assets/historical/ir2-4.webp" alt="Dây chuyền lắp ráp của Ford, 1913"><figcaption><span class="pill p2">CMCN 2</span><b>Sản xuất hàng loạt</b></figcaption></figure>
+<figure><img src="assets/historical/ir3-overview.webp" alt="Phòng điều khiển sứ mệnh Apollo 11, 1969"><figcaption><span class="pill p3">CMCN 3</span><b>Tự động hóa và số hóa</b></figcaption></figure>
+<figure><img src="assets/historical/ir4-overview.webp" alt="Robot KUKA tại nhà máy BMW Leipzig, 2005"><figcaption><span class="pill p4">CMCN 4</span><b>Kết nối và hệ thống thông minh</b></figcaption></figure>
+</div>
+<div class="ctitle">Bốn cuộc cách mạng công nghiệp</div>
 <div class="line"></div>
-<div class="who">Bốn cuộc cách mạng · một dòng chảy phát triển</div>
+<div class="csub">Một dòng chảy phát triển</div>
+
+---
+
+<!--
+[Slide 2 · ~10 giây]
+"Trước hết, xin giới thiệu các thành viên trong nhóm: Nguyễn Hoàng, Đỗ Minh Hải, Nguyễn Phúc Khánh Linh, Lê Khôi Nguyên và Ngô Quang Anh."
+-->
+
+# Thành viên nhóm
+
+<div class="members">
+<div class="mem"><div class="mono">NH</div><h3>Nguyễn Hoàng</h3><div class="mid">2210002</div><span class="cls">E04</span></div>
+<div class="mem"><div class="mono">ĐH</div><h3>Đỗ Minh Hải</h3><div class="mid">2210020</div><span class="cls">E03</span></div>
+<div class="mem"><div class="mono">NL</div><h3>Nguyễn Phúc Khánh Linh</h3><div class="mid">2210028</div><span class="cls">E04</span></div>
+<div class="mem"><div class="mono">LN</div><h3>Lê Khôi Nguyên</h3><div class="mid">2210015</div><span class="cls">E03</span></div>
+<div class="mem"><div class="mono">NA</div><h3>Ngô Quang Anh</h3><div class="mid">2210018</div><span class="cls">E04</span></div>
+</div>
 
 ---
 
 <!-- _class: intro -->
 <!--
-[Slide 2 · ~24 giây]
+[Slide 3 · ~24 giây]
 "Các cuộc cách mạng công nghiệp hình thành từ nhiều nguyên nhân khác nhau. Những điểm yếu, những giới hạn của thời trước chính là động lực để con người cải tiến, và mở ra cuộc cách mạng tiếp theo. Qua nhiều cải cách, đổi mới, những sáng chế ấy trở thành những đồ dùng quanh ta ngày nay."
 -->
 
@@ -51,7 +71,7 @@ footer: INOVAT · Bảo tàng Cách mạng Công nghiệp
 ---
 
 <!--
-[Slide 3 · ~33 giây]
+[Slide 4 · ~33 giây]
 "Vậy bốn cuộc cách mạng ấy là gì? Cách mạng thứ nhất, từ giữa thế kỷ mười tám, là cơ giới hóa: máy móc và máy hơi nước thay sức người, sức nước. Cách mạng thứ hai, cuối thế kỷ mười chín, đưa điện, thép và dây chuyền lắp ráp vào sản xuất hàng loạt. Cách mạng thứ ba, nửa sau thế kỷ hai mươi, là máy tính, robot và tự động hóa. Cách mạng thứ tư, từ đầu thế kỷ hai mươi mốt, là dữ liệu, kết nối và hệ thống thông minh."
 -->
 
@@ -67,7 +87,7 @@ footer: INOVAT · Bảo tàng Cách mạng Công nghiệp
 ---
 
 <!--
-[Slide 4 · ~35 giây]
+[Slide 5 · ~35 giây]
 "Bốn cuộc cách mạng không đứng riêng lẻ mà nối với nhau thành ba mạch. Về sản xuất: từ máy dệt cơ khí, đến dây chuyền lắp ráp, rồi robot và nhà máy thông minh. Về truyền thông: từ điện thoại, đến mạng máy tính, rồi điện thoại thông minh. Về nền tảng công nghệ: từ hơi nước, đến vi xử lý, rồi dữ liệu và trí tuệ nhân tạo. Cái đi sau dựa trên cái đi trước, nhưng đó là sự kế thừa, không phải hệ quả tất yếu."
 -->
 
@@ -93,7 +113,7 @@ footer: INOVAT · Bảo tàng Cách mạng Công nghiệp
 ---
 
 <!--
-[Slide 5 · ~30 giây]
+[Slide 6 · ~30 giây]
 "Nhưng kế thừa không có nghĩa là lặp lại. Mỗi thời đại có một biến đổi riêng và để lại một thách thức mới. Cách mạng thứ nhất đưa sản xuất vào nhà máy, nhưng lao động nặng nhọc. Cách mạng thứ hai cho sản xuất hàng loạt, nhưng công việc đơn điệu. Cách mạng thứ ba cho tự động hóa, và nỗi lo mất việc. Cách mạng thứ tư có trí tuệ nhân tạo, cùng những câu hỏi về việc làm và đạo đức. Để thấy dòng chảy ấy, mời thầy cô và các bạn xem trailer."
 -->
 
@@ -113,7 +133,7 @@ footer: INOVAT · Bảo tàng Cách mạng Công nghiệp
 <!-- _footer: "" -->
 <!-- _paginate: false -->
 <!--
-[Slide 6 · Trailer · 37 giây · KHÔNG AI NÓI]
+[Slide 7 · Trailer · 37 giây · KHÔNG AI NÓI]
 Video tự phát khi chuyển đến slide này (có âm thanh). Nếu không tự phát, bấm nút phát. Đứng yên, im lặng đến hết.
 Khi trailer kết thúc, bấm sang slide tiếp theo.
 -->
@@ -127,7 +147,7 @@ Khi trailer kết thúc, bấm sang slide tiếp theo.
 <!-- _paginate: false -->
 <!-- _footer: "" -->
 <!--
-[Slide 7 · ~27 giây]
+[Slide 8 · ~27 giây]
 "Đó là INOVAT, hành trình khám phá lịch sử: một bảo tàng ba chiều chạy ngay trên trình duyệt, không cần cài đặt, có tiếng Việt và tiếng Anh. Bảo tàng gồm bốn phòng thời đại, hai mươi mốt phát minh, bảy mươi bốn hình ảnh trên tường và trên các bảng thông tin, và bốn vòng trò chơi. Mọi người có thể vào thử ngay tại địa chỉ này."
 (74 hình ảnh = 60 ảnh, tranh, tranh khắc + 14 sơ đồ do nhóm vẽ; 48 trên tường các phòng + 26 trên bảng thông tin.)
 -->
@@ -149,7 +169,7 @@ Khi trailer kết thúc, bấm sang slide tiếp theo.
 ---
 
 <!--
-[Slide 8 · ~23 giây]
+[Slide 9 · ~23 giây]
 "Hành trình đi từ sảnh trung tâm, qua bốn phòng theo đúng thứ tự thời gian, rồi đến phòng trò chơi. Bước qua mỗi cánh cửa là bước sang một thời đại. Cuối cùng, cánh cổng chỉ mở khi hoàn thành trò chơi."
 -->
 
@@ -167,7 +187,7 @@ Khi trailer kết thúc, bấm sang slide tiếp theo.
 ---
 
 <!--
-[Slide 9 · ~21 giây]
+[Slide 10 · ~21 giây]
 "Mỗi thời đại có một bản sắc thị giác riêng: màu ấm của gạch và đồng cho hơi nước, xanh thép cho điện, xanh lục cho máy tính, ánh lam trong suốt cho kỷ nguyên số. Nhìn màu sắc là biết mình đang ở đâu trong dòng thời gian."
 -->
 
@@ -183,7 +203,7 @@ Khi trailer kết thúc, bấm sang slide tiếp theo.
 ---
 
 <!--
-[Slide 10 · ~24 giây]
+[Slide 11 · ~24 giây]
 "Trong mỗi phòng, mỗi hiện vật có một bảng thông tin. Đến gần, người xem có thể mở bảng phóng to, kèm mô hình ba chiều xoay được và nguồn tham khảo. Hình ảnh có ở khắp nơi: trên các bảng thông tin và trên tường các phòng, tổng cộng bảy mươi bốn hình ảnh, để người xem vừa đọc vừa nhìn tư liệu thật."
 -->
 
@@ -203,7 +223,7 @@ Khi trailer kết thúc, bấm sang slide tiếp theo.
 ---
 
 <!--
-[Slide 11 · ~32 giây]
+[Slide 12 · ~32 giây]
 "Sau khi xem, người chơi phải vận dụng. Trò chơi Cỗ máy thời gian có bốn vòng. Vòng một: đưa các cỗ máy về đúng cuộc cách mạng. Vòng hai: giúp một thị trấn lớn lên qua bốn thời kỳ. Vòng ba: đoán phát minh từ các gợi ý. Vòng bốn: trò chuyện với những vị khách từ quá khứ về cái giá của đổi thay. Trả lời sai thì được gợi ý phòng cần xem lại."
 -->
 
@@ -219,7 +239,7 @@ Khi trailer kết thúc, bấm sang slide tiếp theo.
 ---
 
 <!--
-[Slide 12 · ~23 giây]
+[Slide 13 · ~23 giây]
 "Như vậy, người xem đi từ khám phá đến hiểu: quan sát hiện vật ba chiều, đọc bảng thông tin, đối chiếu ảnh và nguồn, rồi vận dụng qua trò chơi để thấy mối liên hệ giữa các thời đại."
 -->
 
@@ -237,7 +257,7 @@ Khi trailer kết thúc, bấm sang slide tiếp theo.
 ---
 
 <!--
-[Slide 13 · ~15 giây]
+[Slide 14 · ~15 giây]
 "Mọi nội dung đều có nguồn: Britannica, Science Museum Group, Thư viện Quốc hội Hoa Kỳ và nhiều nơi khác. Ảnh lấy từ Wikimedia Commons, tác giả và giấy phép được ghi công ngay trong bảo tàng."
 -->
 
@@ -255,7 +275,7 @@ Khi trailer kết thúc, bấm sang slide tiếp theo.
 <!-- _class: dark -->
 <!-- _footer: "" -->
 <!--
-[Slide 14 · ~16 giây]
+[Slide 15 · ~16 giây]
 "Tóm lại: mỗi cuộc cách mạng công nghiệp kế thừa nền tảng của cuộc trước, mở rộng khả năng sản xuất và kết nối, đồng thời tạo ra những thay đổi và thách thức mới. Xin cảm ơn thầy cô và các bạn."
 Đọc luận điểm thật chậm.
 -->
@@ -278,7 +298,7 @@ Khi trailer kết thúc, bấm sang slide tiếp theo.
 <!-- _class: qa -->
 <!-- _paginate: false -->
 <!--
-[Slide 15 · Hỏi đáp]
+[Slide 16 · Hỏi đáp]
 "Xin cảm ơn. Xin mời thầy cô và các bạn đặt câu hỏi."
 Trả lời theo thứ tự: Kết luận, Lý do, Dẫn chứng, Thừa nhận giới hạn. Nếu không chắc: "Chúng em xin phép kiểm tra lại nguồn và bổ sung." Ngân hàng câu hỏi: ghi chú Q&A.
 -->

@@ -27,7 +27,7 @@ Kết luận: từ tự động hóa từng máy sang hệ thống kết nối v
 Kết luận: AI có gốc sớm hơn. Lý do: lĩnh vực này được đặt tên tại hội thảo Dartmouth năm 1956. Dẫn chứng: dòng thời gian phòng CMCN 4 (1956 rồi 2022 với ChatGPT). Giới hạn: AI chỉ bùng nổ ở thế kỷ XXI nhờ dữ liệu và sức tính, vì vậy bảo tàng xếp vào CMCN 4.
 
 **7. Cách mạng công nghiệp mang lại điều gì xấu?**
-Kết luận: có cả mặt tốt và mặt xấu. Lý do: năng suất tăng nhưng kèm theo điều kiện lao động nặng nhọc, việc làm thay đổi, các câu hỏi mới về dữ liệu và đạo đức. Dẫn chứng: slide 5. Giới hạn: đó là diễn giải chung, mỗi nơi mỗi thời khác nhau.
+Kết luận: có cả mặt tốt và mặt xấu. Lý do: năng suất tăng nhưng kèm theo điều kiện lao động nặng nhọc, việc làm thay đổi, các câu hỏi mới về dữ liệu và đạo đức. Dẫn chứng: slide 6. Giới hạn: đó là diễn giải chung, mỗi nơi mỗi thời khác nhau.
 
 **8. Vai trò của Việt Nam thì sao?**
 Kết luận: bảo tàng hiện tập trung vào các phát minh tiêu biểu thế giới. Lý do: để dựng dòng chảy chung trước. Dẫn chứng: có nhắc Luật AI của Việt Nam (2026) trong dòng thời gian CMCN 4. Giới hạn: đây là hướng phát triển tiếp (dòng thời gian trong bảo tàng).
@@ -35,13 +35,13 @@ Kết luận: bảo tàng hiện tập trung vào các phát minh tiêu biểu t
 ## B. Sản phẩm
 
 **9. Vì sao làm bảo tàng 3D mà không làm bài thuyết trình hay video?**
-Kết luận: để người xem tự khám phá và tự thấy mối liên hệ. Lý do: đi qua bốn phòng theo thứ tự thời gian tạo cảm giác dòng chảy. Dẫn chứng: bố cục phòng (slide 8), bản sắc từng thời đại (slide 9). Giới hạn: cần thiết bị chạy được 3D; có thể chỉnh chất lượng đồ họa.
+Kết luận: để người xem tự khám phá và tự thấy mối liên hệ. Lý do: đi qua bốn phòng theo thứ tự thời gian tạo cảm giác dòng chảy. Dẫn chứng: bố cục phòng (slide 9), bản sắc từng thời đại (slide 10). Giới hạn: cần thiết bị chạy được 3D; có thể chỉnh chất lượng đồ họa.
 
 **10. Làm sao đảm bảo thông tin chính xác?**
 Kết luận: mỗi nội dung đều có nguồn. Lý do: nhóm quy định không tự bịa mốc, tên hay số liệu; chỗ chưa chắc được đánh dấu để kiểm tra. Dẫn chứng: nguồn trên từng bảng mở rộng (Britannica, Science Museum Group, Thư viện Quốc hội Hoa Kỳ...). Giới hạn: nguồn thứ cấp có thể khác nhau về chi tiết.
 
 **11. Trò chơi đo điều gì?**
-Kết luận: đo mối liên hệ giữa các thời đại chứ không chỉ ghi nhớ năm tháng. Lý do: bốn lõi hỏi về phân loại, giải quyết vấn đề, suy luận từ gợi ý, và cái giá của đổi thay. Dẫn chứng: slide 11. Giới hạn: là trò chơi ngắn, không thay cho bài kiểm tra.
+Kết luận: đo mối liên hệ giữa các thời đại chứ không chỉ ghi nhớ năm tháng. Lý do: bốn lõi hỏi về phân loại, giải quyết vấn đề, suy luận từ gợi ý, và cái giá của đổi thay. Dẫn chứng: slide 12. Giới hạn: là trò chơi ngắn, không thay cho bài kiểm tra.
 
 **12. Vì sao đặt ngưỡng điểm như vậy?**
 Kết luận: để cần xem lại phòng mới qua được. Lý do: ngưỡng 9/12 ở lõi I, 12/16 ở các lõi còn lại; đúng ngay lần đầu 2 điểm, lần hai 1 điểm. Dẫn chứng: dòng thời gian trong bảo tàng. Giới hạn: các ngưỡng là lựa chọn của nhóm, có thể điều chỉnh.
@@ -50,10 +50,10 @@ Kết luận: để cần xem lại phòng mới qua được. Lý do: ngưỡng
 Kết luận: được gợi ý để quay lại học. Lý do: mỗi câu sai báo "Gợi ý: câu trả lời nằm ở phòng nào". Dẫn chứng: nút "Quay lại các phòng" và phím R để về câu đang làm. Giới hạn: người chơi vẫn có thể đoán ngẫu nhiên, nên điểm giảm dần theo lần thử.
 
 **14. Sản phẩm chạy trên thiết bị nào?**
-Kết luận: trình duyệt trên máy tính, có điều khiển cảm ứng cho điện thoại và máy tính bảng. Lý do: không cần cài đặt. Dẫn chứng: địa chỉ inovat-museum.vercel.app trên slide 7. Giới hạn: máy yếu nên giảm mức đồ họa trong menu tạm dừng.
+Kết luận: trình duyệt trên máy tính, có điều khiển cảm ứng cho điện thoại và máy tính bảng. Lý do: không cần cài đặt. Dẫn chứng: địa chỉ inovat-museum.vercel.app trên slide 8. Giới hạn: máy yếu nên giảm mức đồ họa trong menu tạm dừng.
 
 **15. Ai làm gì trong nhóm?**
-Kết luận: cả năm bạn cùng tham gia. Lý do/Dẫn chứng: Hoàng trưởng nhóm, định hướng và thiết kế trải nghiệm; Linh nghiên cứu và biên soạn nội dung; Hải thiết kế trò chơi, bố cục phòng và hiện vật; Nguyên và Quang Anh góp ý, hoàn thiện (slide 14). Giới hạn: vai trò có chồng lấn.
+Kết luận: cả năm bạn cùng tham gia. Lý do/Dẫn chứng: Hoàng trưởng nhóm, định hướng và thiết kế trải nghiệm; Linh nghiên cứu và biên soạn nội dung; Hải thiết kế trò chơi, bố cục phòng và hiện vật; Nguyên và Quang Anh góp ý, hoàn thiện (slide 15). Giới hạn: vai trò có chồng lấn.
 
 ## C. Câu hỏi khó
 

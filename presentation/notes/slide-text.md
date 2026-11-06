@@ -4,11 +4,42 @@ Tự động tạo từ bản trình chiếu (chỉ chữ nhìn thấy trên sli
 
 ## Slide 1
 
-INOVAT
-Bảo tàng Cách mạng Công nghiệp
-Bốn cuộc cách mạng · một dòng chảy phát triển
+CMCN 1
+Cơ giới hóa
+CMCN 2
+Sản xuất hàng loạt
+CMCN 3
+Tự động hóa và số hóa
+CMCN 4
+Kết nối và hệ thống thông minh
+Bốn cuộc cách mạng công nghiệp
+Một dòng chảy phát triển
 
 ## Slide 2
+
+Thành viên nhóm
+NH
+Nguyễn Hoàng
+2210002
+E04
+ĐH
+Đỗ Minh Hải
+2210020
+E03
+NL
+Nguyễn Phúc Khánh Linh
+2210028
+E04
+LN
+Lê Khôi Nguyên
+2210015
+E03
+NA
+Ngô Quang Anh
+2210018
+E04
+
+## Slide 3
 
 Mở đầu
 Các cuộc cách mạng công nghiệp hình thành từ nhiều nguyên nhân khác nhau. Những điểm yếu, điểm khuyết của cuộc cách mạng trước chính là động lực để con người cải tiến, mở ra cuộc cách mạng sau. Qua nhiều công cuộc cải cách, đổi mới, những sáng chế ấy trở thành những đồ dùng quanh ta ngày nay.
@@ -24,7 +55,7 @@ CMCN 3
 CMCN 4
 Xe tự lái
 
-## Slide 3
+## Slide 4
 
 Bốn cuộc cách mạng, một dòng chảy phát triển
 CMCN 1
@@ -48,7 +79,7 @@ Kết nối và hệ thống thông minh
 Dữ liệu, kết nối, trí tuệ nhân tạo, công nghệ sinh học.
 BMW Werk Leipzig, 2005 · CC BY-SA 2.0 DE
 
-## Slide 4
+## Slide 5
 
 Sự kế thừa và phát triển
 Sản xuất
@@ -81,7 +112,7 @@ Dữ liệu và AI
 Kế thừa, không phải hệ quả tất yếu.
 Ảnh: Wikimedia Commons (phạm vi công cộng hoặc Creative Commons); tác giả và giấy phép ghi trong notes/sources.md.
 
-## Slide 5
+## Slide 6
 
 Kế thừa, khác biệt và thách thức mới
 CMCN 1
@@ -103,11 +134,11 @@ Grendelkhan · 2017 · CC BY-SA 4.0
 Biến đổi
 Thách thức
 
-## Slide 6
+## Slide 7
 
 Trailer · 0:37
 
-## Slide 7
+## Slide 8
 
 Sản phẩm của nhóm
 INOVAT: Hành trình khám phá lịch sử
@@ -122,7 +153,7 @@ hình ảnh
 vòng trò chơi
 inovat-museum.vercel.app
 
-## Slide 8
+## Slide 9
 
 Cấu trúc bảo tàng: một hành trình theo thời gian
 1
@@ -144,7 +175,7 @@ Phòng CMCN 4
 Phòng trò chơi
 Cỗ máy thời gian. Hoàn thành để mở cánh cổng.
 
-## Slide 9
+## Slide 10
 
 Bốn thời đại, bốn bản sắc thị giác
 CMCN 1
@@ -156,7 +187,7 @@ Màn hình xanh lục của thời máy tính
 CMCN 4
 Kính trong và ánh lam của kỷ nguyên số
 
-## Slide 10
+## Slide 11
 
 Trong mỗi phòng: hiện vật, bảng thông tin, hình ảnh
 1
@@ -166,7 +197,7 @@ Bảng thông tin phóng to, kèm mô hình 3D xoay được và nguồn tham kh
 Hình ảnh ở khắp nơi
 Trên tường các phòng và trên bảng thông tin: 74 hình ảnh tư liệu và sơ đồ.
 
-## Slide 11
+## Slide 12
 
 Trò chơi "Cỗ máy thời gian": bốn vòng
 I
@@ -182,7 +213,7 @@ IV
 Những vị khách từ quá khứ
 Nói về đổi thay của mỗi thời và cái giá phải trả.
 
-## Slide 12
+## Slide 13
 
 Từ khám phá đến hiểu
 1
@@ -203,7 +234,7 @@ Thắp sáng bốn lõi, mở cánh cổng và xem đoạn phim kết.
 Người xem không chỉ ghi nhớ năm tháng,
 mà nhìn ra dòng chảy giữa các thời đại.
 
-## Slide 13
+## Slide 14
 
 Nguồn tư liệu và ghi công
 Nguồn nội dung
@@ -214,7 +245,7 @@ Ghi công trong bảo tàng
 Mô hình 3D, âm thanh và phông chữ được ghi công đầy đủ tại bảng "Ghi công" ở sảnh trung tâm.
 Mọi nội dung hiển thị đều có hai ngôn ngữ; chỗ chưa chắc chắn được đánh dấu để kiểm tra lại, không tự bịa số liệu hay nguồn.
 
-## Slide 14
+## Slide 15
 
 Kết luận · Nhóm INOVAT
 Mỗi cuộc cách mạng công nghiệp kế thừa nền tảng của cuộc trước, mở rộng khả năng sản xuất và kết nối, đồng thời tạo ra những thay đổi và thách thức mới.
@@ -227,7 +258,7 @@ CMCN 3
 CMCN 4
 Nguyễn Hoàng · Nguyễn Phúc Khánh Linh · Đỗ Minh Hải · Lê Khôi Nguyên · Ngô Quang Anh
 
-## Slide 15
+## Slide 16
 
 Xin cảm ơn.
 Q&A
