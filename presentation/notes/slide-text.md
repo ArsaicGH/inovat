@@ -19,7 +19,7 @@ E04
 2
 Đỗ Minh Hải
 2210020
-E03
+E02
 3
 Nguyễn Phúc Khánh Linh
 2210028
