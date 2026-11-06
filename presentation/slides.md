@@ -18,14 +18,15 @@ footer: INOVAT · Bảo tàng Cách mạng Công nghiệp
 -->
 
 <div class="panels">
-<figure><img src="assets/historical/ir1-overview.webp" alt="Máy dệt cơ khí, 1835"><figcaption><span class="pill p1">CMCN 1</span><b>Cơ giới hóa</b></figcaption></figure>
-<figure><img src="assets/historical/ir2-4.webp" alt="Dây chuyền lắp ráp của Ford, 1913"><figcaption><span class="pill p2">CMCN 2</span><b>Sản xuất hàng loạt</b></figcaption></figure>
-<figure><img src="assets/historical/ir3-overview.webp" alt="Phòng điều khiển sứ mệnh Apollo 11, 1969"><figcaption><span class="pill p3">CMCN 3</span><b>Tự động hóa và số hóa</b></figcaption></figure>
-<figure><img src="assets/historical/ir4-overview.webp" alt="Robot KUKA tại nhà máy BMW Leipzig, 2005"><figcaption><span class="pill p4">CMCN 4</span><b>Kết nối và hệ thống thông minh</b></figcaption></figure>
+<figure><img src="assets/historical/ir1-overview.webp" alt="Máy dệt cơ khí, 1835"></figure>
+<figure><img src="assets/historical/ir2-4.webp" alt="Dây chuyền lắp ráp của Ford, 1913"></figure>
+<figure><img src="assets/historical/ir3-overview.webp" alt="Phòng điều khiển sứ mệnh Apollo 11, 1969"></figure>
+<figure><img src="assets/historical/ir4-overview.webp" alt="Robot KUKA tại nhà máy BMW Leipzig, 2005"></figure>
 </div>
 <div class="ctitle">Bốn cuộc cách mạng công nghiệp</div>
 <div class="line"></div>
 <div class="csub">Một dòng chảy phát triển</div>
+<div class="cbrand"><div class="blogo">INOVAT</div><div class="bsub">Sản phẩm bảo tàng số</div></div>
 
 ---
 

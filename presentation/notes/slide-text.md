@@ -4,16 +4,10 @@ Tự động tạo từ bản trình chiếu (chỉ chữ nhìn thấy trên sli
 
 ## Slide 1
 
-CMCN 1
-Cơ giới hóa
-CMCN 2
-Sản xuất hàng loạt
-CMCN 3
-Tự động hóa và số hóa
-CMCN 4
-Kết nối và hệ thống thông minh
 Bốn cuộc cách mạng công nghiệp
 Một dòng chảy phát triển
+INOVAT
+Sản phẩm bảo tàng số
 
 ## Slide 2
 
