@@ -12,23 +12,23 @@ Sản phẩm bảo tàng số
 ## Slide 2
 
 Thành viên nhóm
-NH
+1
 Nguyễn Hoàng
 2210002
 E04
-ĐH
+2
 Đỗ Minh Hải
 2210020
 E03
-NL
+3
 Nguyễn Phúc Khánh Linh
 2210028
 E04
-LN
+4
 Lê Khôi Nguyên
 2210015
 E03
-NA
+5
 Ngô Quang Anh
 2210018
 E04

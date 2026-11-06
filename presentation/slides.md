@@ -38,11 +38,11 @@ footer: INOVAT · Bảo tàng Cách mạng Công nghiệp
 # Thành viên nhóm
 
 <div class="members">
-<div class="mem"><div class="mono">NH</div><h3>Nguyễn Hoàng</h3><div class="mid">2210002</div><span class="cls">E04</span></div>
-<div class="mem"><div class="mono">ĐH</div><h3>Đỗ Minh Hải</h3><div class="mid">2210020</div><span class="cls">E03</span></div>
-<div class="mem"><div class="mono">NL</div><h3>Nguyễn Phúc Khánh Linh</h3><div class="mid">2210028</div><span class="cls">E04</span></div>
-<div class="mem"><div class="mono">LN</div><h3>Lê Khôi Nguyên</h3><div class="mid">2210015</div><span class="cls">E03</span></div>
-<div class="mem"><div class="mono">NA</div><h3>Ngô Quang Anh</h3><div class="mid">2210018</div><span class="cls">E04</span></div>
+<div class="mem"><div class="mono">1</div><h3>Nguyễn Hoàng</h3><div class="mid">2210002</div><span class="cls">E04</span></div>
+<div class="mem"><div class="mono">2</div><h3>Đỗ Minh Hải</h3><div class="mid">2210020</div><span class="cls">E03</span></div>
+<div class="mem"><div class="mono">3</div><h3>Nguyễn Phúc Khánh Linh</h3><div class="mid">2210028</div><span class="cls">E04</span></div>
+<div class="mem"><div class="mono">4</div><h3>Lê Khôi Nguyên</h3><div class="mid">2210015</div><span class="cls">E03</span></div>
+<div class="mem"><div class="mono">5</div><h3>Ngô Quang Anh</h3><div class="mid">2210018</div><span class="cls">E04</span></div>
 </div>
 
 ---

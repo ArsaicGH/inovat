@@ -339,3 +339,5 @@ section.cover .line { position: relative; width: 120px; height: 2px; background:
 .blogo { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 104px; line-height: 1; letter-spacing: 0.14em; margin-right: -0.14em; background: linear-gradient(180deg, #FBEBBB 0%, #E2BB66 50%, #A87C34 100%); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 4px 14px rgba(0,0,0,0.55)); }
 .bsub { margin-top: 10px; font-size: 22px; letter-spacing: 0.24em; text-transform: uppercase; color: rgba(243,235,221,0.95); }
 .panels figure::after { background: linear-gradient(180deg, rgba(14,10,6,0.92) 0%, rgba(14,10,6,0.6) 42%, rgba(14,10,6,0.35) 66%, rgba(14,10,6,0.9) 100%); }
+
+.mono { font-size: 58px; letter-spacing: 0; }
