@@ -209,14 +209,11 @@ Khi trailer kết thúc, bấm sang slide tiếp theo.
 
 # Trò chơi "Cỗ máy thời gian": bốn vòng
 
-<div class="split">
-<div class="cores">
-<div class="core"><div class="n">I</div><div><h3>Lạc giữa thời gian</h3><p>Đưa mỗi cỗ máy về đúng cánh cửa cách mạng của nó.</p></div></div>
-<div class="core"><div class="n">II</div><div><h3>Thị trấn lớn lên</h3><p>Chọn phát minh giải quyết vấn đề của từng thời kỳ.</p></div></div>
-<div class="core"><div class="n">III</div><div><h3>Tôi là ai?</h3><p>Đoán điều bí ẩn từ gợi ý; đoán sớm được nhiều điểm hơn.</p></div></div>
-<div class="core"><div class="n">IV</div><div><h3>Những vị khách từ quá khứ</h3><p>Nói về đổi thay của mỗi thời và cái giá phải trả.</p></div></div>
-</div>
-<div class="shots"><div class="im"><img src="assets/game/game-q2.jpg" alt="Vòng I trong trò chơi Cỗ máy thời gian"></div><div class="im"><img src="assets/game/game-q3.jpg" alt="Vòng IV trong trò chơi Cỗ máy thời gian"></div></div>
+<div class="cgrid">
+<div class="cc"><img src="assets/game/core1.jpg" alt="Vòng I: Lạc giữa thời gian"><div><span class="cn">I</span><h3>Lạc giữa thời gian</h3><p>Đưa mỗi cỗ máy về đúng cánh cửa cách mạng của nó.</p></div></div>
+<div class="cc"><img src="assets/game/core2.jpg" alt="Vòng II: Thị trấn lớn lên"><div><span class="cn">II</span><h3>Thị trấn lớn lên</h3><p>Chọn phát minh giải quyết vấn đề của từng thời kỳ.</p></div></div>
+<div class="cc"><img src="assets/game/core3.jpg" alt="Vòng III: Tôi là ai?"><div><span class="cn">III</span><h3>Tôi là ai?</h3><p>Đoán điều bí ẩn từ gợi ý; đoán sớm được nhiều điểm hơn.</p></div></div>
+<div class="cc"><img src="assets/game/core4.jpg" alt="Vòng IV: Những vị khách từ quá khứ"><div><span class="cn">IV</span><h3>Những vị khách từ quá khứ</h3><p>Nói về đổi thay của mỗi thời và cái giá phải trả.</p></div></div>
 </div>
 
 ---
@@ -229,13 +226,13 @@ Khi trailer kết thúc, bấm sang slide tiếp theo.
 # Từ khám phá đến hiểu
 
 <div class="seq">
-<div class="st"><img src="assets/game/room-morse.jpg" alt="Hiện vật trong phòng CMCN 1"><span class="k">1</span><b>Quan sát</b><p>Hiện vật 3D</p></div>
-<div class="st"><img src="assets/game/panel-3d.jpg" alt="Bảng thông tin phóng to"><span class="k">2</span><b>Đọc</b><p>Bảng thông tin</p></div>
-<div class="st"><img src="assets/game/wall-painting.jpg" alt="Tranh trên tường"><span class="k">3</span><b>Đối chiếu</b><p>Ảnh và nguồn</p></div>
-<div class="st"><img src="assets/game/game-q2.jpg" alt="Trò chơi Cỗ máy thời gian"><span class="k">4</span><b>Vận dụng</b><p>Bốn vòng trò chơi</p></div>
-<div class="st"><img src="assets/game/film.jpg" alt="Đoạn phim kết"><span class="k">5</span><b>Hiểu</b><p>Mở cánh cổng</p></div>
+<div class="st"><img src="assets/game/room-morse.jpg" alt="Hiện vật trong phòng CMCN 1"><span class="k">1</span><b>Quan sát</b><p>Xem hiện vật 3D, xoay và phóng to.</p></div>
+<div class="st"><img src="assets/game/panel-3d.jpg" alt="Bảng thông tin phóng to"><span class="k">2</span><b>Đọc</b><p>Năm, nhân vật và bảng thông tin của từng phát minh.</p></div>
+<div class="st"><img src="assets/game/wall-painting.jpg" alt="Tranh trên tường"><span class="k">3</span><b>Đối chiếu</b><p>Ảnh tư liệu, dòng thời gian và nguồn tham khảo.</p></div>
+<div class="st"><img src="assets/game/core1.jpg" alt="Trò chơi Cỗ máy thời gian"><span class="k">4</span><b>Vận dụng</b><p>Bốn vòng trò chơi hỏi về mối liên hệ giữa các thời đại.</p></div>
+<div class="st"><img src="assets/game/film.jpg" alt="Đoạn phim kết"><span class="k">5</span><b>Hiểu</b><p>Thắp sáng bốn lõi, mở cánh cổng và xem đoạn phim kết.</p></div>
 </div>
-<div class="band"><b>Từ ghi nhớ năm tháng đến hiểu dòng chảy lịch sử.</b></div>
+<div class="band"><span>Người xem không chỉ ghi nhớ năm tháng,</span><b>mà nhìn ra dòng chảy giữa các thời đại.</b></div>
 
 ---
 
@@ -247,10 +244,11 @@ Khi trailer kết thúc, bấm sang slide tiếp theo.
 # Nguồn tư liệu và ghi công
 
 <div class="src">
-<div><img src="assets/game/panel-3d.jpg" alt="Bảng thông tin với nguồn tham khảo"><h3>Nguồn nội dung</h3><p>Britannica · Science Museum Group · Thư viện Quốc hội Hoa Kỳ</p></div>
-<div><img src="assets/game/wall-pics.jpg" alt="Ảnh tư liệu trên tường"><h3>Hình ảnh</h3><p>Wikimedia Commons · tác giả và giấy phép dưới mỗi ảnh</p></div>
-<div><img src="assets/game/hall-clean.jpg" alt="Sảnh trung tâm của bảo tàng"><h3>Ghi công</h3><p>Bảng "Ghi công" ở sảnh trung tâm</p></div>
+<div><img src="assets/game/panel-3d.jpg" alt="Bảng thông tin với nguồn tham khảo"><h3>Nguồn nội dung</h3><p>Britannica · Science Museum Group · Thư viện Quốc hội Hoa Kỳ · Intel · IBM · CERN · Nobel Prize. Mỗi phát minh có nguồn riêng, kèm đường dẫn trong bảng mở rộng.</p></div>
+<div><img src="assets/game/wall-pics.jpg" alt="Ảnh tư liệu trên tường"><h3>Hình ảnh</h3><p>Ảnh, tranh và tranh khắc lấy từ Wikimedia Commons (phạm vi công cộng hoặc Creative Commons). Tác giả và giấy phép nằm dưới từng ảnh.</p></div>
+<div><img src="assets/game/hall-clean.jpg" alt="Sảnh trung tâm của bảo tàng"><h3>Ghi công trong bảo tàng</h3><p>Mô hình 3D, âm thanh và phông chữ được ghi công đầy đủ tại bảng "Ghi công" ở sảnh trung tâm.</p></div>
 </div>
+<p class="note">Mọi nội dung hiển thị đều có hai ngôn ngữ; chỗ chưa chắc chắn được đánh dấu để kiểm tra lại, không tự bịa số liệu hay nguồn.</p>
 
 ---
 

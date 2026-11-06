@@ -187,30 +187,32 @@ Nói về đổi thay của mỗi thời và cái giá phải trả.
 Từ khám phá đến hiểu
 1
 Quan sát
-Hiện vật 3D
+Xem hiện vật 3D, xoay và phóng to.
 2
 Đọc
-Bảng thông tin
+Năm, nhân vật và bảng thông tin của từng phát minh.
 3
 Đối chiếu
-Ảnh và nguồn
+Ảnh tư liệu, dòng thời gian và nguồn tham khảo.
 4
 Vận dụng
-Bốn vòng trò chơi
+Bốn vòng trò chơi hỏi về mối liên hệ giữa các thời đại.
 5
 Hiểu
-Mở cánh cổng
-Từ ghi nhớ năm tháng đến hiểu dòng chảy lịch sử.
+Thắp sáng bốn lõi, mở cánh cổng và xem đoạn phim kết.
+Người xem không chỉ ghi nhớ năm tháng,
+mà nhìn ra dòng chảy giữa các thời đại.
 
 ## Slide 13
 
 Nguồn tư liệu và ghi công
 Nguồn nội dung
-Britannica · Science Museum Group · Thư viện Quốc hội Hoa Kỳ
+Britannica · Science Museum Group · Thư viện Quốc hội Hoa Kỳ · Intel · IBM · CERN · Nobel Prize. Mỗi phát minh có nguồn riêng, kèm đường dẫn trong bảng mở rộng.
 Hình ảnh
-Wikimedia Commons · tác giả và giấy phép dưới mỗi ảnh
-Ghi công
-Bảng "Ghi công" ở sảnh trung tâm
+Ảnh, tranh và tranh khắc lấy từ Wikimedia Commons (phạm vi công cộng hoặc Creative Commons). Tác giả và giấy phép nằm dưới từng ảnh.
+Ghi công trong bảo tàng
+Mô hình 3D, âm thanh và phông chữ được ghi công đầy đủ tại bảng "Ghi công" ở sảnh trung tâm.
+Mọi nội dung hiển thị đều có hai ngôn ngữ; chỗ chưa chắc chắn được đánh dấu để kiểm tra lại, không tự bịa số liệu hay nguồn.
 
 ## Slide 14
 
